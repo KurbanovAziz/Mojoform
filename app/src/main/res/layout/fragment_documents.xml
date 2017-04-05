@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/main_activity_background">
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="45dp"
+            android:background="#95699e"
+            android:gravity="center_vertical"
+            android:paddingLeft="25dp"
+            android:text="@string/folders"
+            android:textColor="@android:color/white"
+            android:textSize="17sp" />
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/folders_recycler_view"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_marginLeft="13dp"
+            android:layout_marginRight="13dp"
+            android:layout_weight="1"
+            android:clipToPadding="false"
+            android:paddingBottom="12dp" />
+
+        <TextView
+            android:id="@+id/files_block"
+            android:layout_width="match_parent"
+            android:layout_height="45dp"
+            android:background="#95699e"
+            android:gravity="center_vertical"
+            android:paddingLeft="25dp"
+            android:text="@string/files"
+            android:textColor="@android:color/white"
+            android:textSize="17sp" />
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/files_recycler_view"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_marginLeft="13dp"
+            android:layout_marginRight="13dp"
+            android:layout_weight="1"
+            android:clipToPadding="false"
+            android:paddingBottom="12dp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/empty_block"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <RelativeLayout
+            android:layout_width="95dp"
+            android:layout_height="95dp"
+            android:background="@drawable/white_circle">
+
+            <ImageView
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_centerInParent="true"
+                android:adjustViewBounds="true"
+                android:src="@drawable/folder_hd_icon" />
+        </RelativeLayout>
+
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="6dp"
+            android:text="@string/empty_here"
+            android:textColor="@android:color/black"
+            android:textSize="17sp" />
+    </LinearLayout>
+
+
+</RelativeLayout>

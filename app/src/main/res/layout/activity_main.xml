@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/main_content"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true">
+
+    <RelativeLayout
+        android:id="@+id/topPanel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="-2dp"
+        android:layout_marginRight="-2dp"
+        android:layout_marginTop="-30dp">
+
+        <ImageView
+            android:id="@+id/header_background"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:adjustViewBounds="true"
+            android:src="@drawable/main_activity_header_background" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_alignBottom="@+id/header_background"
+            android:orientation="horizontal">
+
+            <android.support.v4.widget.Space
+                android:layout_width="10dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical" />
+
+            <FrameLayout
+                android:id="@+id/back_btn"
+                android:layout_width="40dp"
+                android:layout_height="match_parent"
+                android:paddingBottom="12dp"
+                android:visibility="gone">
+
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_gravity="bottom|center_horizontal"
+                    android:adjustViewBounds="true"
+                    android:src="@drawable/back_arrow_icon" />
+            </FrameLayout>
+
+            <FrameLayout
+                android:id="@+id/sandwich_btn"
+                android:layout_width="40dp"
+                android:layout_height="match_parent"
+                android:paddingBottom="12dp">
+
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_gravity="bottom|center_horizontal"
+                    android:adjustViewBounds="true"
+                    android:src="@drawable/sandwich_icon" />
+            </FrameLayout>
+
+            <TextView
+                android:id="@+id/title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom"
+                android:layout_marginBottom="-0.8dp"
+                android:layout_marginLeft="10dp"
+                android:paddingBottom="12dp"
+                android:text="Документы"
+                android:textAllCaps="true"
+                android:textColor="@android:color/white"
+                android:textSize="18sp" />
+
+            <android.support.v4.widget.Space
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1" />
+
+            <FrameLayout
+                android:id="@+id/grid_btn"
+                android:layout_width="40dp"
+                android:layout_height="match_parent"
+                android:paddingBottom="12dp">
+
+                <ImageView
+                    android:id="@+id/list_grid_icon"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_gravity="bottom|right"
+                    android:adjustViewBounds="true"
+                    android:src="@drawable/grid_icon" />
+            </FrameLayout>
+
+            <FrameLayout
+                android:id="@+id/search_btn"
+                android:layout_width="40dp"
+                android:layout_height="match_parent"
+                android:paddingBottom="12dp">
+
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_gravity="bottom|right"
+                    android:adjustViewBounds="true"
+                    android:src="@drawable/search_icon" />
+            </FrameLayout>
+
+            <FrameLayout
+                android:id="@+id/download_btn"
+                android:layout_width="40dp"
+                android:layout_height="match_parent"
+                android:paddingBottom="12dp">
+
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_gravity="bottom|right"
+                    android:adjustViewBounds="true"
+                    android:src="@drawable/download_icon" />
+            </FrameLayout>
+
+            <android.support.v4.widget.Space
+                android:layout_width="20dp"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
+
+        <FrameLayout
+            android:id="@+id/container"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@+id/header_background" />
+    </RelativeLayout>
+
+
+</android.support.design.widget.CoordinatorLayout>

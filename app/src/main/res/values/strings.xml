@@ -1,0 +1,19 @@
+<resources>
+    <string name="host">https://mojo-qa.dev-alex.org</string>
+    <string name="app_name">Mojo</string>
+    <string name="username">имя пользователя</string>
+    <string name="password">пароль</string>
+    <string name="not_all_fields_filled">Заполнены не все поля</string>
+    <string name="loading_please_wait">Загрузка, пожалуйста подождите…</string>
+    <string name="network_error">Отсутвует интернет соединение, либо сервер недоступен</string>
+    <string name="invalid_username_or_password">Неверное имя пользователя или пароль</string>
+    <string name="tasks">Задачи</string>
+    <string name="documents">Документы</string>
+    <string name="exit">Выход</string>
+    <string name="ended">Завершенные</string>
+    <string name="busy">В работе</string>
+    <string name="all">Все</string>
+    <string name="folders">Папки</string>
+    <string name="files">Файлы</string>
+    <string name="empty_here">Тут пусто</string>
+</resources>
