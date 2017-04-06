@@ -54,7 +54,7 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
     @Override
     public void onBindViewHolder(TaskViewHolder viewHolder, int i) {
         final Task task = tasks.get(i);
-        viewHolder.taskActiveCircle.setVisibility(task.suspended ? View.INVISIBLE : View.VISIBLE);
+        viewHolder.taskActiveCircle.setVisibility((task.suspended == null || task.suspended) ? View.INVISIBLE : View.VISIBLE);
 
         SimpleDateFormat sdf = new SimpleDateFormat("dd MMMM yyyy | HH.mm", Locale.getDefault());
         viewHolder.taskDate.setText(sdf.format(task.dueDate));

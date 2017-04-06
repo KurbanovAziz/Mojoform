@@ -30,6 +30,8 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 
 import okhttp3.Credentials;
 import okhttp3.OkHttpClient;
@@ -37,13 +39,12 @@ import okhttp3.Request;
 import okhttp3.Response;
 
 public class TasksFragment extends Fragment {
-    private final int ALL_TASKS = 1;
-    private final int FINISHED_TASKS = 2;
-    private final int BUSY_TASKS = 3;
-
     private View rootView;
     private ProgressDialog loopDialog;
     private RecyclerView recyclerView;
+
+    private ArrayList<Task> finishedTasks;
+    private ArrayList<Task> busyTasks;
 
 
     public static TasksFragment newInstance() {
@@ -61,12 +62,12 @@ public class TasksFragment extends Fragment {
         recyclerView = (RecyclerView) rootView.findViewById(R.id.recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
-        setListeners();
         initDialog();
         setupHeader();
-
+        new GetTasksTask().execute();
         ((RadioButton) rootView.findViewById(R.id.busy)).setChecked(true);
 
+        setListeners();
         return rootView;
     }
 
@@ -87,15 +88,33 @@ public class TasksFragment extends Fragment {
             public void onCheckedChanged(RadioGroup group, @IdRes int checkedId) {
                 switch (checkedId) {
                     case R.id.ended:
-                        new GetTasksTask(FINISHED_TASKS).execute();
+                        recyclerView.setAdapter(new TaskAdapter(getContext(), finishedTasks));
                         break;
 
                     case R.id.busy:
-                        new GetTasksTask(BUSY_TASKS).execute();
+                        recyclerView.setAdapter(new TaskAdapter(getContext(), busyTasks));
                         break;
 
                     case R.id.all:
-                        new GetTasksTask(ALL_TASKS).execute();
+                        ArrayList<Task> allTasks = new ArrayList<>(busyTasks);
+                        allTasks.addAll(finishedTasks);
+
+                        Collections.sort(allTasks, new Comparator<Task>() {
+                            @Override
+                            public int compare(Task task1, Task task2) {
+                                if (task1.dueDate == null)
+                                    return -1;
+                                if (task2.dueDate == null)
+                                    return 1;
+
+                                if (task1.dueDate.getTime() == task2.dueDate.getTime())
+                                    return 0;
+
+                                return (task1.dueDate.after(task2.dueDate)) ? 1 : -1;
+                            }
+                        });
+
+                        recyclerView.setAdapter(new TaskAdapter(getContext(), allTasks));
                         break;
                 }
             }
@@ -112,12 +131,6 @@ public class TasksFragment extends Fragment {
     }
 
     private class GetTasksTask extends AsyncTask<Void, Void, Integer> {
-        private ArrayList<Task> tasks;
-        private int type;
-
-        GetTasksTask(int type) {
-            this.type = type;
-        }
 
         @Override
         protected void onPreExecute() {
@@ -128,19 +141,34 @@ public class TasksFragment extends Fragment {
         @Override
         protected Integer doInBackground(Void... params) {
             try {
-                tasks = new ArrayList<>();
+                Response response = null;
+                finishedTasks = new ArrayList<>();
+                busyTasks = new ArrayList<>();
+                String url;
 
-                OkHttpClient client = new OkHttpClient();
-                Request request = new Request.Builder().header("Authorization", Credentials.basic("kermit", "kermit"))
-                        .url("http://jira.dev-alex.org:19080/activiti-rest/service/runtime/tasks?taskAssignee="
-                                + Data.currentUser.userName + "&includeProcessVariables=TRUE").build();
+                for (int i = 0; i < 2; i++) {
+                    if (i == 0)
+                        url = "http://jira.dev-alex.org:19080/activiti-rest/service/history/" +
+                                "historic-task-instances?taskAssignee=" + Data.currentUser.userName;
+                    else
+                        url = "http://jira.dev-alex.org:19080/activiti-rest/service/runtime/tasks?taskAssignee="
+                                + Data.currentUser.userName + "&includeProcessVariables=TRUE";
 
-                Response response = client.newCall(request).execute();
+                    OkHttpClient client = new OkHttpClient();
+                    Request request = new Request.Builder().header("Authorization", Credentials.basic("kermit", "kermit"))
+                            .url(url).build();
 
-                if (response.code() == 200) {
-                    JSONArray tasksJson = new JSONObject(response.body().string()).getJSONArray("data");
-                    tasks = new ObjectMapper().readValue(tasksJson.toString(), new TypeReference<ArrayList<Task>>() {
-                    });
+                    response = client.newCall(request).execute();
+
+                    if (response.code() == 200) {
+                        JSONArray tasksJson = new JSONObject(response.body().string()).getJSONArray("data");
+                        if (i == 0)
+                            finishedTasks = new ObjectMapper().readValue(tasksJson.toString(), new TypeReference<ArrayList<Task>>() {
+                            });
+                        else
+                            busyTasks = new ObjectMapper().readValue(tasksJson.toString(), new TypeReference<ArrayList<Task>>() {
+                            });
+                    }
                 }
 
                 return response.code();
@@ -162,9 +190,8 @@ public class TasksFragment extends Fragment {
                 TokenService.deleteToken();
                 startActivity(new Intent(getContext(), AuthActivity.class));
                 getActivity().finish();
-            } else {
-                recyclerView.setAdapter(new TaskAdapter(getContext(), tasks));
             }
+            recyclerView.setAdapter(new TaskAdapter(getContext(), busyTasks));
         }
     }
 }

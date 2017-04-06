@@ -16,4 +16,8 @@
     <string name="folders">Папки</string>
     <string name="files">Файлы</string>
     <string name="empty_here">Тут пусто</string>
+    <string name="move">Переместить</string>
+    <string name="rename">Переименовать</string>
+    <string name="delete">Удалить</string>
+    <string name="deselect">Отменить выделение</string>
 </resources>

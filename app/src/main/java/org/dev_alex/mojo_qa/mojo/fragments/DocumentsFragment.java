@@ -16,6 +16,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -25,6 +27,7 @@ import org.dev_alex.mojo_qa.mojo.R;
 import org.dev_alex.mojo_qa.mojo.activities.AuthActivity;
 import org.dev_alex.mojo_qa.mojo.adapters.FileAdapter;
 import org.dev_alex.mojo_qa.mojo.adapters.FolderAdapter;
+import org.dev_alex.mojo_qa.mojo.custom_views.RelativeLayoutWithPopUp;
 import org.dev_alex.mojo_qa.mojo.models.File;
 import org.dev_alex.mojo_qa.mojo.models.FileSystemStackEntry;
 import org.dev_alex.mojo_qa.mojo.services.BitmapCacheService;
@@ -38,7 +41,9 @@ import java.util.ArrayList;
 import okhttp3.Response;
 
 public class DocumentsFragment extends Fragment {
-    private View rootView;
+    private RelativeLayoutWithPopUp rootView;
+    private RelativeLayout popupWindow;
+
     private ProgressDialog loopDialog;
     private RecyclerView folderRecyclerView;
     private RecyclerView filesRecyclerView;
@@ -71,7 +76,11 @@ public class DocumentsFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        rootView = inflater.inflate(R.layout.fragment_documents, container, false);
+        rootView = (RelativeLayoutWithPopUp) inflater.inflate(R.layout.fragment_documents, container, false);
+
+        popupWindow = (RelativeLayout) rootView.findViewById(R.id.popup_layout);
+        rootView.addPopUpWindow(popupWindow);
+
         bitmapCacheService = new BitmapCacheService();
 
         isGridView = false;
@@ -155,27 +164,53 @@ public class DocumentsFragment extends Fragment {
             folderRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
             filesRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         }
-        if (folderAdapter != null && fileAdapter != null) {
-            folderAdapter = new FolderAdapter
-                    (DocumentsFragment.this, foldersStack.get(foldersStack.size() - 1).folders, isGridView);
-            fileAdapter = new FileAdapter(DocumentsFragment.this, foldersStack.get(foldersStack.size() - 1).files, isGridView);
+        if (folderAdapter != null && fileAdapter != null)
+            setAdapters(foldersStack.get(foldersStack.size() - 1).files, foldersStack.get(foldersStack.size() - 1).folders);
+    }
 
-            folderRecyclerView.setAdapter(folderAdapter);
-            filesRecyclerView.setAdapter(fileAdapter);
+    private void setAdapters(ArrayList<File> files, ArrayList<File> folders) {
+        if ((files == null || files.isEmpty()) && (folders == null || folders.isEmpty()))
+            rootView.findViewById(R.id.empty_block).setVisibility(View.VISIBLE);
+        else
+            rootView.findViewById(R.id.empty_block).setVisibility(View.GONE);
+
+
+        if (files == null || files.isEmpty()) {
+            rootView.findViewById(R.id.files_block).setVisibility(View.GONE);
+            rootView.findViewById(R.id.files_recycler_view).setVisibility(View.GONE);
+
+            LinearLayout.LayoutParams layoutParams = (LinearLayout.LayoutParams) folderRecyclerView.getLayoutParams();
+            layoutParams.height = LinearLayout.LayoutParams.MATCH_PARENT;
+            folderRecyclerView.setLayoutParams(layoutParams);
+        } else {
+            rootView.findViewById(R.id.files_block).setVisibility(View.VISIBLE);
+            rootView.findViewById(R.id.files_recycler_view).setVisibility(View.VISIBLE);
+
+            LinearLayout.LayoutParams layoutParams = (LinearLayout.LayoutParams) folderRecyclerView.getLayoutParams();
+            layoutParams.height = LinearLayout.LayoutParams.WRAP_CONTENT;
+            folderRecyclerView.setLayoutParams(layoutParams);
         }
+
+        if (folders == null || folders.isEmpty()) {
+            rootView.findViewById(R.id.folders_block).setVisibility(View.GONE);
+            rootView.findViewById(R.id.folders_recycler_view).setVisibility(View.GONE);
+        } else {
+            rootView.findViewById(R.id.folders_block).setVisibility(View.VISIBLE);
+            rootView.findViewById(R.id.folders_recycler_view).setVisibility(View.VISIBLE);
+        }
+
+        folderAdapter = new FolderAdapter(this, folders, isGridView);
+        fileAdapter = new FileAdapter(DocumentsFragment.this, files, isGridView);
+
+        folderRecyclerView.setAdapter(folderAdapter);
+        filesRecyclerView.setAdapter(fileAdapter);
     }
 
     private boolean popFileStack() {
         if (foldersStack != null && foldersStack.size() > 1) {
-            rootView.findViewById(R.id.empty_block).setVisibility(View.GONE);
-            rootView.findViewById(R.id.files_block).setVisibility(View.VISIBLE);
-
             foldersStack.remove(foldersStack.size() - 1);
             updateHeader();
-            filesRecyclerView.setAdapter
-                    (new FileAdapter(this, foldersStack.get(foldersStack.size() - 1).files, isGridView));
-            folderRecyclerView.setAdapter
-                    (new FolderAdapter(this, foldersStack.get(foldersStack.size() - 1).folders, isGridView));
+            setAdapters(foldersStack.get(foldersStack.size() - 1).files, foldersStack.get(foldersStack.size() - 1).folders);
 
             if (downloadTask != null && downloadTask.getStatus() != AsyncTask.Status.FINISHED)
                 downloadTask.cancel(false);
@@ -263,24 +298,12 @@ public class DocumentsFragment extends Fragment {
                 startActivity(new Intent(getContext(), AuthActivity.class));
                 getActivity().finish();
             } else {
-                if (files.isEmpty() && folders.isEmpty()) {
-                    rootView.findViewById(R.id.empty_block).setVisibility(View.VISIBLE);
-                    rootView.findViewById(R.id.files_block).setVisibility(View.INVISIBLE);
-                } else {
-                    rootView.findViewById(R.id.empty_block).setVisibility(View.GONE);
-                    rootView.findViewById(R.id.files_block).setVisibility(View.VISIBLE);
-                }
-
                 downloadTask = new DownloadImagesTask(fileIdsWithPreviews);
                 downloadTask.execute();
 
                 foldersStack.add(new FileSystemStackEntry(folders, files, fileId == null ? "" : fileName));
 
-                folderAdapter = new FolderAdapter(DocumentsFragment.this, folders, isGridView);
-                fileAdapter = new FileAdapter(DocumentsFragment.this, files, isGridView);
-
-                folderRecyclerView.setAdapter(folderAdapter);
-                filesRecyclerView.setAdapter(fileAdapter);
+                setAdapters(files, folders);
                 updateHeader();
             }
         }
