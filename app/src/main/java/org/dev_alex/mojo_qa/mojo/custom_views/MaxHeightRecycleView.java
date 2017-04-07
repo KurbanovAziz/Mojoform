@@ -6,7 +6,7 @@ import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
 
 public class MaxHeightRecycleView extends RecyclerView {
-    private int maxHeight = (int) Math.round(getResources().getDisplayMetrics().heightPixels * 0.36);
+    private int maxHeight = (int) Math.round(getResources().getDisplayMetrics().heightPixels * 0.825);
     private boolean maxHeightEnabled = true;
 
     public void setMaxHeightPercentage(float percentage) {
