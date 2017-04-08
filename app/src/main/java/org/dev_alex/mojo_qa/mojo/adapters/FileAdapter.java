@@ -88,6 +88,13 @@ public class FileAdapter extends RecyclerView.Adapter<FileAdapter.FileViewHolder
             viewHolder.fileIcon.setImageBitmap(bitmap);
         } else
             viewHolder.fileIcon.setImageResource(R.drawable.file_icon);
+
+        viewHolder.moreBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                parentFragment.showPopUpWindow(file.id);
+            }
+        });
     }
 
     @Override

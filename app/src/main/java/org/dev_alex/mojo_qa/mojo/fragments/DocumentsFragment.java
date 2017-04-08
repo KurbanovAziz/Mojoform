@@ -58,6 +58,8 @@ public class DocumentsFragment extends Fragment {
     private ArrayList<FileSystemStackEntry> foldersStack;
     public BitmapCacheService bitmapCacheService;
 
+    private String selectedItemId;
+
     public static DocumentsFragment newInstance() {
         Bundle args = new Bundle();
         DocumentsFragment fragment = new DocumentsFragment();
@@ -82,6 +84,7 @@ public class DocumentsFragment extends Fragment {
 
         popupWindow = (RelativeLayout) rootView.findViewById(R.id.popup_layout);
         rootView.addPopUpWindow(popupWindow);
+        popupWindow.setVisibility(View.GONE);
 
         bitmapCacheService = new BitmapCacheService();
 
@@ -230,6 +233,11 @@ public class DocumentsFragment extends Fragment {
             return true;
         } else
             return false;
+    }
+
+    public void showPopUpWindow(String itemId) {
+        selectedItemId = itemId;
+        popupWindow.setVisibility(View.VISIBLE);
     }
 
     public class GetFilesTask extends AsyncTask<Void, Void, Integer> {

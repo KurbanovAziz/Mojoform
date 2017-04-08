@@ -49,7 +49,6 @@
                 android:id="@+id/file_icon"
                 android:layout_width="25dp"
                 android:layout_height="25dp"
-
                 android:layout_gravity="center_vertical"
                 android:layout_marginLeft="4dp"
                 android:adjustViewBounds="true"
@@ -67,17 +66,17 @@
                 android:maxLines="1"
                 android:text="Отчет о состоянии дел везде и"
                 android:textColor="#4c3d5f"
-                android:textSize="15sp"
-                app:layout_constraintDimensionRatio="w,1.04:1" />
+                android:textSize="15sp" />
 
             <ImageView
                 android:id="@+id/more_btn"
-                android:layout_width="18dp"
-                android:layout_height="25dp"
+                android:layout_width="26dp"
+                android:layout_height="35dp"
                 android:layout_gravity="center_vertical"
+                android:paddingBottom="5dp"
+                android:paddingTop="5dp"
                 android:scaleType="centerCrop"
-                android:src="@drawable/more_icon"
-                app:layout_constraintDimensionRatio="h,1:1.06" />
+                android:src="@drawable/more_icon" />
         </LinearLayout>
     </LinearLayout>
 </android.support.constraint.ConstraintLayout>

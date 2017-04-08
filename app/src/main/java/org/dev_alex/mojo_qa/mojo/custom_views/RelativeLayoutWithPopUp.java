@@ -54,6 +54,7 @@ public class RelativeLayoutWithPopUp extends RelativeLayout {
                         public void onAnimationEnd(Animation animation) {
                             popUpWindow.setVisibility(GONE);
                             popUpWindow.setTag(0);
+
                         }
 
                         @Override
@@ -62,6 +63,7 @@ public class RelativeLayoutWithPopUp extends RelativeLayout {
                         }
                     });
                     popUpWindow.startAnimation(mFadeOutAnimation);
+                    return false;
                 }
             }
         }
