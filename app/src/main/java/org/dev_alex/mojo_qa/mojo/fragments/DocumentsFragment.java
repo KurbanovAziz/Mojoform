@@ -4,11 +4,13 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.ColorDrawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.NestedScrollView;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -17,6 +19,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
+import android.view.Window;
+import android.view.WindowManager;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -163,6 +168,13 @@ public class DocumentsFragment extends Fragment {
                 filesRecyclerView.setNestedScrollingEnabled(!scrollView.canScrollVertically(1));
             }
         });
+
+        rootView.findViewById(R.id.create_dit_btn).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showCreateDirDialog();
+            }
+        });
     }
 
     private void swapAdapterType() {
@@ -217,6 +229,63 @@ public class DocumentsFragment extends Fragment {
 
         folderRecyclerView.setAdapter(folderAdapter);
         filesRecyclerView.setAdapter(fileAdapter);
+    }
+
+    private void showRenameDialog() {
+        LayoutInflater layoutInflater = LayoutInflater.from(getContext());
+        final View dialogView = layoutInflater.inflate(R.layout.dialog_folder_management, null, false);
+        final AlertDialog renameDialog = new AlertDialog.Builder(getContext()).create();
+        renameDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        renameDialog.setView(dialogView);
+        renameDialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
+
+        dialogView.findViewById(R.id.left_btn).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                renameDialog.dismiss();
+            }
+        });
+        dialogView.findViewById(R.id.right_btn).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                renameDialog.dismiss();
+            }
+        });
+
+        renameDialog.show();
+    }
+
+    private void showCreateDirDialog() {
+        LayoutInflater layoutInflater = LayoutInflater.from(getContext());
+        final View dialogView = layoutInflater.inflate(R.layout.dialog_folder_management, null, false);
+        final AlertDialog createDirDialog = new AlertDialog.Builder(getContext()).create();
+        createDirDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        createDirDialog.setView(dialogView);
+        createDirDialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
+
+        ((TextView) dialogView.findViewById(R.id.dialog_title)).setText(R.string.new_folder);
+        ((EditText) dialogView.findViewById(R.id.text_input)).setHint(R.string.folder_name);
+        ((TextView) dialogView.findViewById(R.id.right_btn_text)).setText(R.string.create);
+
+        dialogView.findViewById(R.id.left_btn).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                createDirDialog.dismiss();
+            }
+        });
+        dialogView.findViewById(R.id.right_btn).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                createDirDialog.dismiss();
+            }
+        });
+
+
+        WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
+        lp.copyFrom(createDirDialog.getWindow().getAttributes());
+        lp.width = WindowManager.LayoutParams.MATCH_PARENT;
+        createDirDialog.getWindow().setAttributes(lp);
+        createDirDialog.show();
     }
 
     private boolean popFileStack() {

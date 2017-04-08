@@ -9,15 +9,15 @@
     <ImageView
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_alignBottom="@+id/popup_layout_data"
-        android:layout_alignLeft="@+id/popup_layout_data"
-        android:layout_alignRight="@+id/popup_layout_data"
-        android:layout_alignTop="@+id/popup_layout_data"
+        android:layout_alignBottom="@+id/dialog_data"
+        android:layout_alignLeft="@+id/dialog_data"
+        android:layout_alignRight="@+id/dialog_data"
+        android:layout_alignTop="@+id/dialog_data"
         android:scaleType="fitXY"
         android:src="@drawable/float_background" />
 
     <LinearLayout
-        android:id="@+id/popup_layout_data"
+        android:id="@+id/dialog_data"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:clipToPadding="true"

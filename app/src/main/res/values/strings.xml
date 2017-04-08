@@ -20,4 +20,10 @@
     <string name="rename">Переименовать</string>
     <string name="delete">Удалить</string>
     <string name="deselect">Отменить выделение</string>
+    <string name="rename_folder">Переименовать Папку</string>
+    <string name="cancel">Отмена</string>
+    <string name="old_name">Старое название</string>
+    <string name="new_folder">Новая папка</string>
+    <string name="folder_name">Название папки</string>
+    <string name="create">Создать</string>
 </resources>
