@@ -7,9 +7,11 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.DrawerLayout;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -18,10 +20,13 @@ import net.cachapa.expandablelayout.ExpandableLayout;
 import org.dev_alex.mojo_qa.mojo.R;
 import org.dev_alex.mojo_qa.mojo.activities.AuthActivity;
 import org.dev_alex.mojo_qa.mojo.activities.MainActivity;
-import org.dev_alex.mojo_qa.mojo.models.Template;
 import org.dev_alex.mojo_qa.mojo.services.RequestService;
 import org.dev_alex.mojo_qa.mojo.services.TokenService;
+import org.json.JSONArray;
 import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.Iterator;
 
 import okhttp3.Response;
 
@@ -52,19 +57,6 @@ public class TemplateFragment extends Fragment {
         setListeners();
 
         new GetTemplateTask(templateId).execute();
-
-        final ExpandableLayout expandableLayout = (ExpandableLayout) rootView.findViewById(R.id.expandable_layout);
-        ((TextView) rootView.findViewById(R.id.tmp)).setText("wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww");
-        //expandableLayout.setOrientation(LinearLayout.VERTICAL);
-        rootView.findViewById(R.id.expand_button).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // expandableLayout.initLayout();
-                expandableLayout.toggle();
-                //   expandableLayout.initLayout();
-            }
-        });
-
         return rootView;
     }
 
@@ -98,9 +90,85 @@ public class TemplateFragment extends Fragment {
         loopDialog.setCancelable(false);
     }
 
+    private void renderTemplate(JSONObject template) {
+        try {
+            LinearLayout rootContainer = (LinearLayout) rootView.findViewById(R.id.root_container);
+            JSONArray pages = template.getJSONArray("items");
+            for (int i = 0; i < pages.length(); i++) {
+                JSONObject page = pages.getJSONObject(i).getJSONObject("page");
+                if (page.has("items"))
+                    fillContainer(rootContainer, page.getJSONArray("items"));
+
+            }
+        } catch (Exception exc) {
+            exc.printStackTrace();
+        }
+    }
+
+    private void fillContainer(LinearLayout container, JSONArray dataJson) throws Exception {
+        ArrayList<String> fields = new ArrayList<>();
+        for (int i = 0; i < dataJson.length(); i++) {
+            JSONObject value = dataJson.getJSONObject(i);
+            Iterator<String> iterator = value.keys();
+            while (iterator.hasNext()) {
+                String currentKey = iterator.next();
+                fields.add(currentKey);
+            }
+        }
+
+        for (int i = 0; i < fields.size(); i++) {
+            JSONObject value = dataJson.getJSONObject(i).getJSONObject(fields.get(i));
+            switch (fields.get(i)) {
+                case "category":
+                    LinearLayout categoryHeader = (LinearLayout) getActivity().getLayoutInflater().inflate(R.layout.category_header, null, false);
+                    if (value.has("caption"))
+                        ((TextView) categoryHeader.getChildAt(1)).setText(value.getString("caption"));
+                    else
+                        ((TextView) categoryHeader.getChildAt(1)).setText("Нет заголовка");
+
+                    LinearLayout expandableContent = (LinearLayout) getActivity().getLayoutInflater().inflate(R.layout.expandable_content, null, false);
+                    fillContainer(expandableContent, value.getJSONArray("items"));
+
+                    final ExpandableLayout expandableLayout = new ExpandableLayout(getContext());
+                    expandableLayout.setOrientation(ExpandableLayout.VERTICAL);
+                    expandableLayout.addView(expandableContent);
+
+                    categoryHeader.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            expandableLayout.toggle();
+                        }
+                    });
+
+                    container.addView(categoryHeader);
+                    container.addView(expandableLayout);
+                    break;
+
+                case "select":
+                    break;
+
+                case "text":
+                    break;
+
+                case "lineedit":
+                    break;
+
+                case "textarea":
+                    break;
+
+                case "checkbox":
+                    break;
+
+                case "slider":
+                    break;
+            }
+        }
+        Log.d("jeka", String.valueOf(fields.size()));
+    }
+
     private class GetTemplateTask extends AsyncTask<Void, Void, Integer> {
-        private Template template;
         private String templateId;
+        private JSONObject template;
 
         public GetTemplateTask(String templateId) {
             this.templateId = templateId;
@@ -117,12 +185,11 @@ public class TemplateFragment extends Fragment {
             try {
                 String url = "/api/fs-mojo/get/template/" + templateId;
 
-
                 Response response = RequestService.createGetRequest(url);
 
                 if (response.code() == 200) {
                     String responseStr = response.body().string();
-                    JSONObject templateJson = new JSONObject(responseStr).getJSONObject("data");
+                    template = new JSONObject(responseStr);
                 }
                 return response.code();
             } catch (Exception exc) {
@@ -144,7 +211,7 @@ public class TemplateFragment extends Fragment {
                 startActivity(new Intent(getContext(), AuthActivity.class));
                 getActivity().finish();
             } else {
-
+                renderTemplate(template);
             }
         }
     }
