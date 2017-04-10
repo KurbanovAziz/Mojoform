@@ -20,7 +20,7 @@ import org.dev_alex.mojo_qa.mojo.fragments.TasksFragment;
 import org.dev_alex.mojo_qa.mojo.services.TokenService;
 
 public class MainActivity extends AppCompatActivity {
-    private Drawer drawer;
+    public Drawer drawer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

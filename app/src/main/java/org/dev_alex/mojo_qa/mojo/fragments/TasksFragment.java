@@ -63,7 +63,6 @@ public class TasksFragment extends Fragment {
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
         initDialog();
-        setupHeader();
         new GetTasksTask().execute();
         ((RadioButton) rootView.findViewById(R.id.busy)).setChecked(true);
 
@@ -71,6 +70,11 @@ public class TasksFragment extends Fragment {
         return rootView;
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        setupHeader();
+    }
 
     private void setupHeader() {
         ((TextView) getActivity().findViewById(R.id.title)).setText(getString(R.string.tasks));
@@ -78,7 +82,7 @@ public class TasksFragment extends Fragment {
         getActivity().findViewById(R.id.back_btn).setVisibility(View.GONE);
 
         getActivity().findViewById(R.id.sandwich_btn).setVisibility(View.VISIBLE);
-        getActivity().findViewById(R.id.download_btn).setVisibility(View.VISIBLE);
+        getActivity().findViewById(R.id.group_by_btn).setVisibility(View.VISIBLE);
         getActivity().findViewById(R.id.search_btn).setVisibility(View.VISIBLE);
     }
 
@@ -88,11 +92,11 @@ public class TasksFragment extends Fragment {
             public void onCheckedChanged(RadioGroup group, @IdRes int checkedId) {
                 switch (checkedId) {
                     case R.id.ended:
-                        recyclerView.setAdapter(new TaskAdapter(getContext(), finishedTasks));
+                        recyclerView.setAdapter(new TaskAdapter(TasksFragment.this, finishedTasks));
                         break;
 
                     case R.id.busy:
-                        recyclerView.setAdapter(new TaskAdapter(getContext(), busyTasks));
+                        recyclerView.setAdapter(new TaskAdapter(TasksFragment.this, busyTasks));
                         break;
 
                     case R.id.all:
@@ -114,7 +118,7 @@ public class TasksFragment extends Fragment {
                             }
                         });
 
-                        recyclerView.setAdapter(new TaskAdapter(getContext(), allTasks));
+                        recyclerView.setAdapter(new TaskAdapter(TasksFragment.this, allTasks));
                         break;
                 }
             }
@@ -128,6 +132,11 @@ public class TasksFragment extends Fragment {
         loopDialog.setIndeterminate(true);
         loopDialog.setCanceledOnTouchOutside(false);
         loopDialog.setCancelable(false);
+    }
+
+    public void showFillTemplateWindow(String templateId) {
+        getActivity().getSupportFragmentManager().beginTransaction()
+                .replace(R.id.container, TemplateFragment.newInstance(templateId)).addToBackStack(null).commit();
     }
 
     private class GetTasksTask extends AsyncTask<Void, Void, Integer> {
@@ -191,7 +200,7 @@ public class TasksFragment extends Fragment {
                 startActivity(new Intent(getContext(), AuthActivity.class));
                 getActivity().finish();
             }
-            recyclerView.setAdapter(new TaskAdapter(getContext(), busyTasks));
+            recyclerView.setAdapter(new TaskAdapter(TasksFragment.this, busyTasks));
         }
     }
 }

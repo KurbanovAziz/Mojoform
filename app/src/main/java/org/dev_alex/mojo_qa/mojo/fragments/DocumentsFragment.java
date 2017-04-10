@@ -114,7 +114,7 @@ public class DocumentsFragment extends Fragment {
 
         getActivity().findViewById(R.id.grid_btn).setVisibility(View.VISIBLE);
         getActivity().findViewById(R.id.sandwich_btn).setVisibility(View.VISIBLE);
-        getActivity().findViewById(R.id.download_btn).setVisibility(View.VISIBLE);
+        getActivity().findViewById(R.id.group_by_btn).setVisibility(View.VISIBLE);
         getActivity().findViewById(R.id.search_btn).setVisibility(View.VISIBLE);
 
         getActivity().findViewById(R.id.grid_btn).setOnClickListener(new View.OnClickListener() {

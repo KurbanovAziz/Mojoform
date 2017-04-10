@@ -10,6 +10,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import org.dev_alex.mojo_qa.mojo.R;
+import org.dev_alex.mojo_qa.mojo.fragments.TasksFragment;
 import org.dev_alex.mojo_qa.mojo.models.Task;
 import org.dev_alex.mojo_qa.mojo.models.Variable;
 
@@ -21,6 +22,7 @@ import java.util.Locale;
 public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder> {
     private Context context;
     private ArrayList<Task> tasks;
+    private TasksFragment parentFragment;
 
     static class TaskViewHolder extends RecyclerView.ViewHolder {
         TextView taskTitle;
@@ -40,8 +42,8 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
     }
 
 
-    public TaskAdapter(Context context, ArrayList<Task> tasks) {
-        this.context = context;
+    public TaskAdapter(TasksFragment parentFragment, ArrayList<Task> tasks) {
+        this.parentFragment = parentFragment;
         this.tasks = tasks;
     }
 
@@ -54,6 +56,7 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
     @Override
     public void onBindViewHolder(TaskViewHolder viewHolder, int i) {
         final Task task = tasks.get(i);
+        String templateId = null;
         viewHolder.taskActiveCircle.setVisibility((task.suspended == null || task.suspended) ? View.INVISIBLE : View.VISIBLE);
 
         SimpleDateFormat sdf = new SimpleDateFormat("dd MMMM yyyy | HH.mm", Locale.getDefault());
@@ -69,9 +72,22 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
 
             viewHolder.taskTitle.setText("");
             if (task.variables != null)
-                for (Variable variable : task.variables)
+                for (Variable variable : task.variables) {
                     if (variable.name.equals("TemplateName"))
                         viewHolder.taskTitle.setText(variable.value);
+                    if (variable.name.equals("TemplateId"))
+                        templateId = variable.value;
+                }
+        }
+
+        if (templateId != null) {
+            final String finalTemplateId = templateId;
+            viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    parentFragment.showFillTemplateWindow(finalTemplateId);
+                }
+            });
         }
     }
 
