@@ -32,7 +32,6 @@ public class AuthActivity extends AppCompatActivity {
         getSupportFragmentManager().beginTransaction().replace(R.id.container, LoginFragment.newInstance()).commit();
     }
 
-
     private void initDialog() {
         loopDialog = new ProgressDialog(this, R.style.ProgressDialogStyle);
         loopDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);

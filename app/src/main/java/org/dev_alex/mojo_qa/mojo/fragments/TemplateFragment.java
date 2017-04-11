@@ -2,16 +2,28 @@ package org.dev_alex.mojo_qa.mojo.fragments;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.LayerDrawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v4.widget.Space;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.text.method.DigitsKeyListener;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.WebView;
+import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
+import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -27,6 +39,8 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.Locale;
+import java.util.Random;
 
 import okhttp3.Response;
 
@@ -120,34 +134,26 @@ public class TemplateFragment extends Fragment {
             JSONObject value = dataJson.getJSONObject(i).getJSONObject(fields.get(i));
             switch (fields.get(i)) {
                 case "category":
-                    LinearLayout categoryHeader = (LinearLayout) getActivity().getLayoutInflater().inflate(R.layout.category_header, null, false);
-                    if (value.has("caption"))
-                        ((TextView) categoryHeader.getChildAt(1)).setText(value.getString("caption"));
-                    else
-                        ((TextView) categoryHeader.getChildAt(1)).setText("Нет заголовка");
-
-                    LinearLayout expandableContent = (LinearLayout) getActivity().getLayoutInflater().inflate(R.layout.expandable_content, null, false);
-                    fillContainer(expandableContent, value.getJSONArray("items"));
-
-                    final ExpandableLayout expandableLayout = new ExpandableLayout(getContext());
-                    expandableLayout.setOrientation(ExpandableLayout.VERTICAL);
-                    expandableLayout.addView(expandableContent);
-
-                    categoryHeader.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view) {
-                            expandableLayout.toggle();
-                        }
-                    });
-
-                    container.addView(categoryHeader);
-                    container.addView(expandableLayout);
+                    createCategory(value, container);
                     break;
 
                 case "select":
                     break;
 
                 case "text":
+                    WebView myWebView = new WebView(getContext());
+                    String mime = "text/html";
+                    String encoding = "utf-8";
+                    String html;
+
+                    if (value.has("text"))
+                        html = value.getString("text");
+                    else
+                        html = "Нет текста";
+
+                    myWebView.getSettings().setJavaScriptEnabled(true);
+                    myWebView.loadDataWithBaseURL(null, html, mime, encoding, null);
+                    container.addView(myWebView);
                     break;
 
                 case "lineedit":
@@ -157,20 +163,180 @@ public class TemplateFragment extends Fragment {
                     break;
 
                 case "checkbox":
+                    LinearLayout checkBoxContainer = (LinearLayout) getActivity().getLayoutInflater().inflate(R.layout.checkbox, container, false);
+
+                    if (value.has("caption"))
+                        ((TextView) checkBoxContainer.getChildAt(1)).setText(value.getString("caption"));
+                    else
+                        ((TextView) checkBoxContainer.getChildAt(1)).setText("Нет текста");
+
+                    container.addView(checkBoxContainer);
                     break;
 
                 case "slider":
+                    createSeekBar(value, container);
                     break;
+
+                default:
             }
+            Log.d("jeka", fields.get(i));
+
+            Space space = new Space(getContext());
+            space.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, (int) TypedValue.applyDimension(
+                    TypedValue.COMPLEX_UNIT_DIP, 10, getResources().getDisplayMetrics())));
+            container.addView(space);
         }
-        Log.d("jeka", String.valueOf(fields.size()));
+    }
+
+    private void createCategory(JSONObject value, LinearLayout container) throws Exception {
+        Random rnd = new Random();
+        int color = Color.argb(255, rnd.nextInt(256), rnd.nextInt(256), rnd.nextInt(256));
+
+        LinearLayout categoryHeader = (LinearLayout) getActivity().getLayoutInflater().inflate(R.layout.category_header, container, false);
+        ((LayerDrawable) categoryHeader.getBackground()).findDrawableByLayerId(R.id.background).setColorFilter(color, PorterDuff.Mode.SRC_IN);
+
+        if (value.has("caption"))
+            ((TextView) categoryHeader.getChildAt(1)).setText(value.getString("caption"));
+        else
+            ((TextView) categoryHeader.getChildAt(1)).setText("Нет заголовка");
+
+        LinearLayout expandableContent = (LinearLayout) getActivity().getLayoutInflater().inflate(R.layout.expandable_content, container, false);
+        ((LayerDrawable) expandableContent.getBackground()).findDrawableByLayerId(R.id.background).setColorFilter(color, PorterDuff.Mode.SRC_IN);
+
+        fillContainer(expandableContent, value.getJSONArray("items"));
+
+
+        final ExpandableLayout expandableLayout = new ExpandableLayout(getContext());
+        expandableLayout.setOrientation(ExpandableLayout.VERTICAL);
+        expandableLayout.addView(expandableContent);
+        if (value.has("collapsed"))
+            if (value.getBoolean("collapsed"))
+                expandableLayout.collapse();
+            else
+                expandableLayout.expand();
+
+        categoryHeader.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                expandableLayout.toggle();
+            }
+        });
+
+
+        container.addView(categoryHeader);
+        container.addView(expandableLayout);
+    }
+
+    private void createSeekBar(JSONObject value, LinearLayout container) throws Exception {
+        final LinearLayout seekBarContainer = (LinearLayout) getActivity().getLayoutInflater().inflate(R.layout.slider, container, false);
+        if (value.has("caption"))
+            ((TextView) seekBarContainer.getChildAt(0)).setText(value.getString("caption"));
+        else
+            ((TextView) seekBarContainer.getChildAt(0)).setText("Нет текста");
+
+
+        final SeekBar seekBar = ((SeekBar) seekBarContainer.getChildAt(1));
+        final EditText changeValue = (EditText) ((LinearLayout) seekBarContainer.getChildAt(4)).getChildAt(1);
+
+        final float minValue = (float) value.getDouble("min_value");
+        final float maxValue = (float) value.getDouble("max_value");
+        float step = (float) value.getDouble("step");
+        String minValueStr = String.valueOf(minValue), maxValueStr = String.valueOf(maxValue);
+
+        final int digitsAfterPoint = Math.max((minValueStr.contains(".")) ? 0 : minValueStr.substring(minValueStr.indexOf("." + 1)).length(),
+                (maxValueStr.contains(".")) ? 0 : maxValueStr.substring(maxValueStr.indexOf("." + 1)).length());
+        final int digitsOffset = (int) Math.pow(10, digitsAfterPoint);
+
+        ((TextView) ((RelativeLayout) seekBarContainer.getChildAt(2)).getChildAt(0)).setText(formatFloat(minValue));
+
+        ((TextView) ((RelativeLayout) seekBarContainer.getChildAt(2)).getChildAt(1)).setText(formatFloat(maxValue));
+        seekBar.setMax((int) ((maxValue - minValue) * digitsOffset));
+        seekBar.incrementProgressBy((int) (step * digitsOffset));
+        seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                ((TextView) seekBarContainer.getChildAt(3)).setText(formatFloat((progress / digitsOffset) + minValue));
+                changeValue.setText(formatFloat((progress / digitsOffset) + minValue));
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
+
+        if (digitsOffset > 1) {
+            if (minValue < 0)
+                changeValue.setKeyListener(DigitsKeyListener.getInstance("-0123456789."));
+            else
+                changeValue.setKeyListener(DigitsKeyListener.getInstance("0123456789."));
+        } else {
+            if (minValue < 0)
+                changeValue.setKeyListener(DigitsKeyListener.getInstance("-0123456789"));
+            else
+                changeValue.setKeyListener(DigitsKeyListener.getInstance("0123456789"));
+        }
+
+        changeValue.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                String result;
+                if (!s.toString().isEmpty()) {
+                    result = s.toString();
+                    float value = Float.parseFloat(s.toString());
+                    if (value < minValue)
+                        result = formatFloat(minValue);
+                    else if (value > maxValue)
+                        result = formatFloat(maxValue);
+                    else if (!formatFloat(value).equals(s.toString()))
+                        result = (formatFloat(value));
+                    else {
+                        int pointI = s.toString().indexOf(".");
+                        if (pointI != -1) {
+                            if (s.toString().substring(s.toString().indexOf("." + 1)).length() > digitsAfterPoint) {
+                                result = s.toString().substring(0, s.toString().indexOf("." + 1) + digitsAfterPoint);
+                            }
+                        }
+                    }
+
+                    if (!s.toString().equals(result)) {
+                        changeValue.setText(result);
+                    }
+                    if (!s.toString().isEmpty())
+                        seekBar.setProgress((int) ((Float.parseFloat(result) - minValue) * digitsOffset));
+                }
+            }
+        });
+
+        container.addView(seekBarContainer);
+        seekBar.setProgress(0);
+    }
+
+    public static String formatFloat(float d) {
+        if (d == (long) d)
+            return String.format(Locale.getDefault(), "%d", (int) d);
+        else
+            return String.format("%s", d);
     }
 
     private class GetTemplateTask extends AsyncTask<Void, Void, Integer> {
         private String templateId;
         private JSONObject template;
 
-        public GetTemplateTask(String templateId) {
+        GetTemplateTask(String templateId) {
             this.templateId = templateId;
         }
 

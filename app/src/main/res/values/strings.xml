@@ -26,4 +26,5 @@
     <string name="new_folder">Новая папка</string>
     <string name="folder_name">Название папки</string>
     <string name="create">Создать</string>
+    <string name="change_value">Изменить значение</string>
 </resources>

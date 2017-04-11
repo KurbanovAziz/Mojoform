@@ -2,8 +2,8 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="50dp"
-    android:background="#1585f5"
     android:minHeight="50dp"
+    android:background="@drawable/category_header_background"
     android:orientation="horizontal"
     android:paddingLeft="10dp"
     android:paddingRight="10dp">
@@ -13,7 +13,7 @@
         android:layout_height="25dp"
         android:layout_gravity="center_vertical"
         android:adjustViewBounds="true"
-        android:src="@drawable/folder_icon" />
+        android:src="@drawable/folder_hd_icon" />
 
     <TextView
         android:layout_width="match_parent"
