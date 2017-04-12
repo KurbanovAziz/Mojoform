@@ -17,10 +17,11 @@
         android:layout_gravity="center_horizontal" />
 
     <SeekBar
+        android:id="@+id/seekBar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:progressDrawable="@drawable/seekbar_progresss"
         android:layout_marginTop="10dp"
-        android:progressDrawable="@drawable/seekbar_progress_drawable"
         android:splitTrack="false"
         android:thumb="@drawable/seekbar_thumb"
         tools:targetApi="lollipop" />

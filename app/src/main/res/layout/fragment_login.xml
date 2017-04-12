@@ -37,7 +37,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:alpha="0.55"
-            android:background="@drawable/input_text_background" />
+            android:background="@drawable/input_text_background_purple_border" />
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -97,7 +97,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:alpha="0.55"
-            android:background="@drawable/input_text_background" />
+            android:background="@drawable/input_text_background_purple_border" />
 
         <RelativeLayout
             android:layout_width="match_parent"

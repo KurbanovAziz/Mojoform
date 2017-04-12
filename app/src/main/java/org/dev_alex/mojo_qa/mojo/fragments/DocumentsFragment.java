@@ -133,17 +133,19 @@ public class DocumentsFragment extends Fragment {
     }
 
     private void updateHeader() {
-        if (foldersStack != null && foldersStack.size() > 1) {
-            ((TextView) getActivity().findViewById(R.id.title))
-                    .setText(foldersStack.get(foldersStack.size() - 1).parentName);
+        if (getActivity() != null) {
+            if (foldersStack != null && foldersStack.size() > 1) {
+                ((TextView) getActivity().findViewById(R.id.title))
+                        .setText(foldersStack.get(foldersStack.size() - 1).parentName);
 
-            getActivity().findViewById(R.id.sandwich_btn).setVisibility(View.GONE);
-            getActivity().findViewById(R.id.back_btn).setVisibility(View.VISIBLE);
+                getActivity().findViewById(R.id.sandwich_btn).setVisibility(View.GONE);
+                getActivity().findViewById(R.id.back_btn).setVisibility(View.VISIBLE);
 
-        } else {
-            ((TextView) getActivity().findViewById(R.id.title)).setText(getString(R.string.documents));
-            getActivity().findViewById(R.id.sandwich_btn).setVisibility(View.VISIBLE);
-            getActivity().findViewById(R.id.back_btn).setVisibility(View.GONE);
+            } else {
+                ((TextView) getActivity().findViewById(R.id.title)).setText(getString(R.string.documents));
+                getActivity().findViewById(R.id.sandwich_btn).setVisibility(View.VISIBLE);
+                getActivity().findViewById(R.id.back_btn).setVisibility(View.GONE);
+            }
         }
     }
 

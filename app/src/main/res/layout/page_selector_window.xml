@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/page_select_layout"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_marginLeft="8dp"
+    android:orientation="vertical">
+
+    <ImageView
+        android:layout_width="30dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="right"
+        android:layout_marginRight="6dp"
+        android:adjustViewBounds="true"
+        android:alpha="0.9"
+        android:src="@drawable/page_triangle" />
+
+    <LinearLayout
+        android:id="@+id/page_container"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="#e6473868"
+        android:orientation="vertical" />
+</LinearLayout>

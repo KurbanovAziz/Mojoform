@@ -20,8 +20,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebView;
+import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.LinearLayout;
+import android.widget.RadioButton;
 import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
@@ -29,9 +32,11 @@ import android.widget.Toast;
 
 import net.cachapa.expandablelayout.ExpandableLayout;
 
+import org.dev_alex.mojo_qa.mojo.Data;
 import org.dev_alex.mojo_qa.mojo.R;
 import org.dev_alex.mojo_qa.mojo.activities.AuthActivity;
 import org.dev_alex.mojo_qa.mojo.activities.MainActivity;
+import org.dev_alex.mojo_qa.mojo.models.Page;
 import org.dev_alex.mojo_qa.mojo.services.RequestService;
 import org.dev_alex.mojo_qa.mojo.services.TokenService;
 import org.json.JSONArray;
@@ -48,6 +53,7 @@ public class TemplateFragment extends Fragment {
     private View rootView;
     private ProgressDialog loopDialog;
     private String templateId;
+    private ArrayList<Page> pages;
 
     public static TemplateFragment newInstance(String templateId) {
         Bundle args = new Bundle();
@@ -106,17 +112,72 @@ public class TemplateFragment extends Fragment {
 
     private void renderTemplate(JSONObject template) {
         try {
-            LinearLayout rootContainer = (LinearLayout) rootView.findViewById(R.id.root_container);
-            JSONArray pages = template.getJSONArray("items");
-            for (int i = 0; i < pages.length(); i++) {
-                JSONObject page = pages.getJSONObject(i).getJSONObject("page");
-                if (page.has("items"))
-                    fillContainer(rootContainer, page.getJSONArray("items"));
+            if (template != null) {
+                if (template.has("name"))
+                    ((TextView) rootView.findViewById(R.id.template_name)).setText(template.getString("name"));
 
+                pages = new ArrayList<>();
+
+                JSONArray pagesJson = template.getJSONArray("items");
+                for (int i = 0; i < pagesJson.length(); i++) {
+                    LinearLayout rootContainer = new LinearLayout(getContext());
+                    rootContainer.setOrientation(LinearLayout.VERTICAL);
+                    LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                    rootContainer.setLayoutParams(layoutParams);
+
+                    JSONObject pageJson = pagesJson.getJSONObject(i).getJSONObject("page");
+                    if (pageJson.has("items"))
+                        fillContainer(rootContainer, pageJson.getJSONArray("items"));
+
+                    final Page page = new Page(pageJson.getString("caption"), pageJson.getString("id"), rootContainer);
+                    pages.add(page);
+
+                    LinearLayout pageContainer = (LinearLayout) rootView.findViewById(R.id.page_container);
+                    TextView cardPage = (TextView) getActivity().getLayoutInflater().inflate(R.layout.card_page, pageContainer, false);
+                    cardPage.setText(page.name);
+                    pageContainer.addView(cardPage);
+                    cardPage.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            setPage(page);
+                            rootView.findViewById(R.id.page_select_layout).setVisibility(View.GONE);
+                        }
+                    });
+                }
+                if (!pages.isEmpty()) {
+                    setPage(pages.get(0));
+
+                    rootView.findViewById(R.id.page_name).setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            if (rootView.findViewById(R.id.page_select_layout).getVisibility() == View.GONE)
+                                rootView.findViewById(R.id.page_select_layout).setVisibility(View.VISIBLE);
+                            else
+                                rootView.findViewById(R.id.page_select_layout).setVisibility(View.GONE);
+                        }
+                    });
+                }
             }
         } catch (Exception exc) {
             exc.printStackTrace();
         }
+    }
+
+    private void setPage(Page page) {
+        FrameLayout rootContainer = (FrameLayout) rootView.findViewById(R.id.root_container);
+        rootContainer.removeAllViewsInLayout();
+        rootContainer.addView(page.layout);
+
+        ((TextView) rootView.findViewById(R.id.page_name)).setText(page.name);
+        int pagePos = pages.indexOf(page);
+        for (int i = 0; i < ((LinearLayout) rootView.findViewById(R.id.page_container)).getChildCount(); i++)
+            if (pagePos == i) {
+                ((LinearLayout) rootView.findViewById(R.id.page_container)).getChildAt(i).setBackgroundColor(Color.parseColor("#ff322452"));
+                ((LinearLayout) rootView.findViewById(R.id.page_container)).getChildAt(i).setAlpha(1);
+            } else {
+                ((LinearLayout) rootView.findViewById(R.id.page_container)).getChildAt(i).setBackgroundColor(Color.TRANSPARENT);
+                ((LinearLayout) rootView.findViewById(R.id.page_container)).getChildAt(i).setAlpha(0.83f);
+            }
     }
 
     private void fillContainer(LinearLayout container, JSONArray dataJson) throws Exception {
@@ -138,10 +199,11 @@ public class TemplateFragment extends Fragment {
                     break;
 
                 case "select":
+                    createSelectBtnContainer(value, container);
                     break;
 
                 case "text":
-                    WebView myWebView = new WebView(getContext());
+                    WebView text = new WebView(getContext());
                     String mime = "text/html";
                     String encoding = "utf-8";
                     String html;
@@ -151,15 +213,31 @@ public class TemplateFragment extends Fragment {
                     else
                         html = "Нет текста";
 
-                    myWebView.getSettings().setJavaScriptEnabled(true);
-                    myWebView.loadDataWithBaseURL(null, html, mime, encoding, null);
-                    container.addView(myWebView);
+                    text.getSettings().setJavaScriptEnabled(true);
+                    text.loadDataWithBaseURL(null, html, mime, encoding, null);
+                    container.addView(text);
                     break;
 
                 case "lineedit":
+                    LinearLayout editTextSingleLineContainer = (LinearLayout) getActivity().getLayoutInflater().inflate(R.layout.lineedit, container, false);
+
+                    if (value.has("caption"))
+                        ((TextView) editTextSingleLineContainer.getChildAt(0)).setText(value.getString("caption"));
+                    else
+                        ((TextView) editTextSingleLineContainer.getChildAt(0)).setText("Нет текста");
+
+                    container.addView(editTextSingleLineContainer);
                     break;
 
                 case "textarea":
+                    LinearLayout editTextMultiLineContainer = (LinearLayout) getActivity().getLayoutInflater().inflate(R.layout.textarea, container, false);
+
+                    if (value.has("caption"))
+                        ((TextView) editTextMultiLineContainer.getChildAt(0)).setText(value.getString("caption"));
+                    else
+                        ((TextView) editTextMultiLineContainer.getChildAt(0)).setText("Нет текста");
+
+                    container.addView(editTextMultiLineContainer);
                     break;
 
                 case "checkbox":
@@ -177,9 +255,29 @@ public class TemplateFragment extends Fragment {
                     createSeekBar(value, container);
                     break;
 
+                case "photo":
+                    break;
+
+                case "richedit":
+                    WebView richEdit = new WebView(getContext());
+                    mime = "text/html";
+                    encoding = "utf-8";
+
+                    if (value.has("html"))
+                        html = value.getString("html");
+                    else
+                        html = "Нет текста";
+
+                    richEdit.getSettings().setJavaScriptEnabled(true);
+                    richEdit.loadDataWithBaseURL(null, html, mime, encoding, null);
+                    container.addView(richEdit);
+                    Log.d("jeka", fields.get(i));
+                    break;
+
                 default:
+                    Log.d("jeka", fields.get(i));
             }
-            Log.d("jeka", fields.get(i));
+
 
             Space space = new Space(getContext());
             space.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, (int) TypedValue.applyDimension(
@@ -325,6 +423,59 @@ public class TemplateFragment extends Fragment {
         seekBar.setProgress(0);
     }
 
+    private void createSelectBtnContainer(JSONObject value, LinearLayout container) throws Exception {
+        LinearLayout selectBtnLayout = (LinearLayout) getActivity().getLayoutInflater().inflate(R.layout.select_layout, container, false);
+        LinearLayout selectBtnContainer = (LinearLayout) selectBtnLayout.getChildAt(1);
+
+        if (value.has("caption"))
+            ((TextView) selectBtnLayout.getChildAt(0)).setText(value.getString("caption"));
+        else
+            ((TextView) selectBtnLayout.getChildAt(0)).setText("Нет заголовка");
+
+        if (value.has("options")) {
+            final ArrayList<RadioButton> buttons = new ArrayList<>();
+            CompoundButton.OnCheckedChangeListener radioButtonListener = new CompoundButton.OnCheckedChangeListener() {
+                @Override
+                public void onCheckedChanged(CompoundButton selectedButton, boolean isChecked) {
+                    if (isChecked)
+                        for (CompoundButton compoundButton : buttons)
+                            if (!compoundButton.equals(selectedButton))
+                                compoundButton.setChecked(false);
+                }
+            };
+
+            LinearLayout currentRow = new LinearLayout(getContext());
+
+            JSONArray options = value.getJSONArray("options");
+            for (int j = 0; j < options.length(); j++) {
+                JSONObject option = options.getJSONObject(j);
+                if (j % 2 == 0) {
+                    currentRow = new LinearLayout(getContext());
+                    currentRow.setOrientation(LinearLayout.HORIZONTAL);
+                    selectBtnContainer.addView(currentRow);
+                }
+
+                RadioButton selectBtn = (RadioButton) getActivity().getLayoutInflater().inflate(R.layout.select_btn, currentRow, false);
+                selectBtn.setOnCheckedChangeListener(radioButtonListener);
+                buttons.add(selectBtn);
+
+                if (option.has("caption"))
+                    selectBtn.setText(option.getString("caption"));
+                else
+                    selectBtn.setText("Нет текста:(");
+                currentRow.addView(selectBtn);
+            }
+            if (options.length() % 2 == 1) {
+                Space space = new Space(getContext());
+                LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT);
+                layoutParams.weight = 1;
+                space.setLayoutParams(layoutParams);
+                currentRow.addView(space);
+            }
+        }
+        container.addView(selectBtnLayout);
+    }
+
     public static String formatFloat(float d) {
         if (d == (long) d)
             return String.format(Locale.getDefault(), "%d", (int) d);
@@ -355,7 +506,7 @@ public class TemplateFragment extends Fragment {
 
                 if (response.code() == 200) {
                     String responseStr = response.body().string();
-                    template = new JSONObject(responseStr);
+                    template = new JSONObject(Data.tt);
                 }
                 return response.code();
             } catch (Exception exc) {

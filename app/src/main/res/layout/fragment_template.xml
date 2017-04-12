@@ -4,32 +4,70 @@
     android:layout_height="match_parent"
     android:background="@drawable/main_activity_background">
 
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:layout_height="wrap_content">
 
         <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:layout_marginLeft="10dp"
-            android:layout_marginRight="10dp">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:text="Название документа"
-                android:textColor="@android:color/black" />
-        </RelativeLayout>
-
-
-        <LinearLayout
-            android:id="@+id/root_container"
+            android:id="@+id/page_title_block"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginLeft="8dp"
             android:layout_marginRight="8dp"
-            android:orientation="vertical" />
-    </LinearLayout>
+            android:layout_marginTop="7dp">
+
+            <TextView
+                android:maxLines="1"
+                android:id="@+id/template_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_centerVertical="true"
+                android:layout_marginRight="5dp"
+                android:layout_toLeftOf="@+id/page_name"
+                android:ellipsize="end"
+                android:text=""
+                android:textColor="#ff4c3d5f"
+                android:textSize="17sp" />
+
+            <TextView
+                android:id="@+id/page_name"
+                android:maxLines="1"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:background="@drawable/page_title_background"
+                android:ellipsize="end"
+                android:gravity="center"
+                android:maxLength="18"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp"
+                android:text=""
+                android:textColor="#ff4c3d5f"
+                android:textSize="16sp" />
+
+        </RelativeLayout>
+
+        <FrameLayout
+            android:id="@+id/root_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/page_title_block"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp" />
+
+        <FrameLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignRight="@+id/page_title_block"
+            android:layout_below="@+id/page_title_block">
+
+            <include
+                layout="@layout/page_selector_window"
+                android:visibility="gone" />
+        </FrameLayout>
+
+    </RelativeLayout>
+
 </ScrollView>
