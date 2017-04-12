@@ -27,4 +27,6 @@
     <string name="folder_name">Название папки</string>
     <string name="create">Создать</string>
     <string name="change_value">Изменить значение</string>
+    <string name="hold_task">Отложить задачу</string>
+    <string name="finish">Завершить</string>
 </resources>

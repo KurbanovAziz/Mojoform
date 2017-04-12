@@ -54,6 +54,7 @@ public class TemplateFragment extends Fragment {
     private ProgressDialog loopDialog;
     private String templateId;
     private ArrayList<Page> pages;
+    private int currentPagePos;
 
     public static TemplateFragment newInstance(String templateId) {
         Bundle args = new Bundle();
@@ -98,7 +99,23 @@ public class TemplateFragment extends Fragment {
     }
 
     private void setListeners() {
+        rootView.findViewById(R.id.left_arrow).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (pages != null && !pages.isEmpty())
+                    if (currentPagePos > 0)
+                        setPage(pages.get(currentPagePos - 1));
+            }
+        });
 
+        rootView.findViewById(R.id.right_arrow).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (pages != null && !pages.isEmpty())
+                    if (currentPagePos < pages.size() - 1)
+                        setPage(pages.get(currentPagePos + 1));
+            }
+        });
     }
 
     private void initDialog() {
@@ -156,6 +173,8 @@ public class TemplateFragment extends Fragment {
                                 rootView.findViewById(R.id.page_select_layout).setVisibility(View.GONE);
                         }
                     });
+
+                    rootView.findViewById(R.id.buttons_block).setVisibility(View.VISIBLE);
                 }
             }
         } catch (Exception exc) {
@@ -169,9 +188,9 @@ public class TemplateFragment extends Fragment {
         rootContainer.addView(page.layout);
 
         ((TextView) rootView.findViewById(R.id.page_name)).setText(page.name);
-        int pagePos = pages.indexOf(page);
+        currentPagePos = pages.indexOf(page);
         for (int i = 0; i < ((LinearLayout) rootView.findViewById(R.id.page_container)).getChildCount(); i++)
-            if (pagePos == i) {
+            if (currentPagePos == i) {
                 ((LinearLayout) rootView.findViewById(R.id.page_container)).getChildAt(i).setBackgroundColor(Color.parseColor("#ff322452"));
                 ((LinearLayout) rootView.findViewById(R.id.page_container)).getChildAt(i).setAlpha(1);
             } else {

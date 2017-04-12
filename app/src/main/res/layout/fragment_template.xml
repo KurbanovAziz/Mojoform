@@ -17,7 +17,6 @@
             android:layout_marginTop="7dp">
 
             <TextView
-                android:maxLines="1"
                 android:id="@+id/template_name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -26,13 +25,13 @@
                 android:layout_marginRight="5dp"
                 android:layout_toLeftOf="@+id/page_name"
                 android:ellipsize="end"
+                android:maxLines="1"
                 android:text=""
                 android:textColor="#ff4c3d5f"
                 android:textSize="17sp" />
 
             <TextView
                 android:id="@+id/page_name"
-                android:maxLines="1"
                 android:layout_width="wrap_content"
                 android:layout_height="40dp"
                 android:layout_alignParentRight="true"
@@ -41,6 +40,7 @@
                 android:ellipsize="end"
                 android:gravity="center"
                 android:maxLength="18"
+                android:maxLines="1"
                 android:paddingLeft="10dp"
                 android:paddingRight="10dp"
                 android:text=""
@@ -56,6 +56,72 @@
             android:layout_below="@+id/page_title_block"
             android:layout_marginLeft="8dp"
             android:layout_marginRight="8dp" />
+
+        <LinearLayout
+            android:id="@+id/buttons_block"
+            android:layout_width="match_parent"
+            android:layout_height="80dp"
+            android:layout_below="@id/root_container"
+            android:orientation="horizontal"
+            android:visibility="gone">
+
+            <FrameLayout
+                android:id="@+id/left_arrow"
+                android:layout_width="30dp"
+                android:layout_height="match_parent"
+                android:layout_gravity="center_vertical">
+
+                <ImageView
+                    android:layout_width="22dp"
+                    android:layout_height="22dp"
+                    android:layout_gravity="right|center_vertical"
+                    android:adjustViewBounds="true"
+                    android:src="@drawable/left_arrow" />
+            </FrameLayout>
+
+
+            <TextView
+                android:id="@+id/gold_task_btn"
+                android:layout_width="0dp"
+                android:layout_height="72dp"
+                android:layout_marginTop="12dp"
+                android:layout_weight="1"
+                android:background="@drawable/blue_btn_with_shadow"
+                android:gravity="top|center_horizontal"
+                android:paddingTop="17dp"
+                android:text="@string/hold_task"
+                android:textColor="@android:color/white"
+                android:textSize="17sp" />
+
+            <TextView
+                android:id="@+id/finish_btn"
+                android:layout_width="0dp"
+                android:layout_height="72dp"
+                android:layout_marginTop="12dp"
+                android:layout_weight="1"
+                android:background="@drawable/green_btn_with_shadow"
+                android:gravity="top|center_horizontal"
+                android:paddingTop="17dp"
+                android:text="@string/finish"
+                android:textColor="@android:color/white"
+                android:textSize="17sp" />
+
+            <FrameLayout
+                android:id="@+id/right_arrow"
+                android:layout_width="30dp"
+                android:layout_height="match_parent">
+
+                <ImageView
+                    android:layout_width="22dp"
+                    android:layout_height="22dp"
+                    android:layout_gravity="left|center_vertical"
+                    android:adjustViewBounds="true"
+                    android:rotation="180"
+                    android:src="@drawable/left_arrow" />
+            </FrameLayout>
+
+
+        </LinearLayout>
 
         <FrameLayout
             android:layout_width="wrap_content"

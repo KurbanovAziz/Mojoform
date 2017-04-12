@@ -158,7 +158,7 @@ public class TasksFragment extends Fragment {
                 for (int i = 0; i < 2; i++) {
                     if (i == 0)
                         url = "http://jira.dev-alex.org:19080/activiti-rest/service/history/" +
-                                "historic-task-instances?taskAssignee=" + Data.currentUser.userName;
+                                "historic-task-instances?taskAssignee=" + Data.currentUser.userName + "&includeProcessVariables=TRUE";
                     else
                         url = "http://jira.dev-alex.org:19080/activiti-rest/service/runtime/tasks?taskAssignee="
                                 + Data.currentUser.userName + "&includeProcessVariables=TRUE";
