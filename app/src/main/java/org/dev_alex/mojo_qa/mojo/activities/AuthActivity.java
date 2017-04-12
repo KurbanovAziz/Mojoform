@@ -13,9 +13,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.dev_alex.mojo_qa.mojo.Data;
 import org.dev_alex.mojo_qa.mojo.R;
 import org.dev_alex.mojo_qa.mojo.fragments.LoginFragment;
+import org.dev_alex.mojo_qa.mojo.fragments.LoginHistoryFragment;
 import org.dev_alex.mojo_qa.mojo.models.User;
+import org.dev_alex.mojo_qa.mojo.services.LoginHistoryService;
 import org.dev_alex.mojo_qa.mojo.services.RequestService;
-import org.dev_alex.mojo_qa.mojo.services.TokenService;
 import org.json.JSONObject;
 
 import okhttp3.Response;
@@ -29,7 +30,10 @@ public class AuthActivity extends AppCompatActivity {
         setContentView(R.layout.activity_auth);
 
         initDialog();
-        getSupportFragmentManager().beginTransaction().replace(R.id.container, LoginFragment.newInstance()).commit();
+        if (LoginHistoryService.lastLoginUsersExists())
+            getSupportFragmentManager().beginTransaction().replace(R.id.container, LoginHistoryFragment.newInstance()).commit();
+        else
+            getSupportFragmentManager().beginTransaction().replace(R.id.container, LoginFragment.newInstance()).commit();
     }
 
     private void initDialog() {
@@ -86,7 +90,7 @@ public class AuthActivity extends AppCompatActivity {
                 Toast.makeText(AuthActivity.this, R.string.invalid_username_or_password, Toast.LENGTH_LONG).show();
             else {
                 Data.currentUser = user;
-                TokenService.updateToken(user.token);
+                LoginHistoryService.addUser(user);
                 Log.d("mojo-log", user.token);
                 startActivity(new Intent(AuthActivity.this, MainActivity.class));
                 finish();

@@ -39,7 +39,6 @@ import org.dev_alex.mojo_qa.mojo.models.File;
 import org.dev_alex.mojo_qa.mojo.models.FileSystemStackEntry;
 import org.dev_alex.mojo_qa.mojo.services.BitmapCacheService;
 import org.dev_alex.mojo_qa.mojo.services.RequestService;
-import org.dev_alex.mojo_qa.mojo.services.TokenService;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -383,7 +382,6 @@ public class DocumentsFragment extends Fragment {
             if (responseCode == null)
                 Toast.makeText(getContext(), R.string.network_error, Toast.LENGTH_LONG).show();
             else if (responseCode == 401) {
-                TokenService.deleteToken();
                 startActivity(new Intent(getContext(), AuthActivity.class));
                 getActivity().finish();
             } else {

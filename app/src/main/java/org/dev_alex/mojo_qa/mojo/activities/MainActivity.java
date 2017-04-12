@@ -17,7 +17,6 @@ import org.dev_alex.mojo_qa.mojo.R;
 import org.dev_alex.mojo_qa.mojo.custom_views.CustomDrawerItem;
 import org.dev_alex.mojo_qa.mojo.fragments.DocumentsFragment;
 import org.dev_alex.mojo_qa.mojo.fragments.TasksFragment;
-import org.dev_alex.mojo_qa.mojo.services.TokenService;
 
 public class MainActivity extends AppCompatActivity {
     public Drawer drawer;
@@ -61,7 +60,6 @@ public class MainActivity extends AppCompatActivity {
                                 getSupportFragmentManager().beginTransaction().replace(R.id.container, DocumentsFragment.newInstance()).commit();
                                 break;
                             case 3:
-                                TokenService.deleteToken();
                                 startActivity(new Intent(MainActivity.this, AuthActivity.class));
                                 finish();
                                 break;

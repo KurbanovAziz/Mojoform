@@ -32,13 +32,11 @@ import android.widget.Toast;
 
 import net.cachapa.expandablelayout.ExpandableLayout;
 
-import org.dev_alex.mojo_qa.mojo.Data;
 import org.dev_alex.mojo_qa.mojo.R;
 import org.dev_alex.mojo_qa.mojo.activities.AuthActivity;
 import org.dev_alex.mojo_qa.mojo.activities.MainActivity;
 import org.dev_alex.mojo_qa.mojo.models.Page;
 import org.dev_alex.mojo_qa.mojo.services.RequestService;
-import org.dev_alex.mojo_qa.mojo.services.TokenService;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -525,7 +523,7 @@ public class TemplateFragment extends Fragment {
 
                 if (response.code() == 200) {
                     String responseStr = response.body().string();
-                    template = new JSONObject(Data.tt);
+                    template = new JSONObject(responseStr);
                 }
                 return response.code();
             } catch (Exception exc) {
@@ -543,7 +541,6 @@ public class TemplateFragment extends Fragment {
             if (responseCode == null)
                 Toast.makeText(getContext(), R.string.network_error, Toast.LENGTH_LONG).show();
             else if (responseCode == 401) {
-                TokenService.deleteToken();
                 startActivity(new Intent(getContext(), AuthActivity.class));
                 getActivity().finish();
             } else {

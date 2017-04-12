@@ -1,6 +1,7 @@
 package org.dev_alex.mojo_qa.mojo.services;
 
 import org.dev_alex.mojo_qa.mojo.App;
+import org.dev_alex.mojo_qa.mojo.Data;
 import org.dev_alex.mojo_qa.mojo.R;
 
 import java.util.ArrayList;
@@ -23,10 +24,6 @@ public class RequestService {
         String url = App.getContext().getString(R.string.host) + path;
         RequestBody body = RequestBody.create(JSON, jsonStr);
         Request.Builder requestBuilder = new Request.Builder().url(url).post(body);
-
-        if (TokenService.isTokenExists())
-            requestBuilder.addHeader("auth_token", TokenService.getToken());
-
         return client.newCall(requestBuilder.build()).execute();
     }
 
@@ -34,16 +31,12 @@ public class RequestService {
         OkHttpClient client = createOkHttpClient();
         String url = App.getContext().getString(R.string.host) + path;
         Request.Builder requestBuilder = new Request.Builder().url(url);
-
-        if (TokenService.isTokenExists())
-            requestBuilder.addHeader("auth_token", TokenService.getToken());
-
         return client.newCall(requestBuilder.build()).execute();
     }
 
 
     private static OkHttpClient createOkHttpClient() {
-        if (TokenService.isTokenExists())
+        if (Data.currentUser != null)
             return new OkHttpClient().newBuilder()
                     .cookieJar(new CookieJar() {
                         @Override
@@ -70,7 +63,7 @@ public class RequestService {
                 .domain(domain)
                 .path("/")
                 .name("auth_token")
-                .value(TokenService.getToken())
+                .value(Data.currentUser.token)
                 .secure()
                 .build();
     }

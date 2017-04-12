@@ -25,7 +25,6 @@ import org.dev_alex.mojo_qa.mojo.R;
 import org.dev_alex.mojo_qa.mojo.activities.AuthActivity;
 import org.dev_alex.mojo_qa.mojo.adapters.TaskAdapter;
 import org.dev_alex.mojo_qa.mojo.models.Task;
-import org.dev_alex.mojo_qa.mojo.services.TokenService;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -196,7 +195,6 @@ public class TasksFragment extends Fragment {
             if (responseCode == null)
                 Toast.makeText(getContext(), R.string.network_error, Toast.LENGTH_LONG).show();
             else if (responseCode == 401) {
-                TokenService.deleteToken();
                 startActivity(new Intent(getContext(), AuthActivity.class));
                 getActivity().finish();
             }

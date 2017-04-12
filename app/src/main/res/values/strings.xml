@@ -29,4 +29,5 @@
     <string name="change_value">Изменить значение</string>
     <string name="hold_task">Отложить задачу</string>
     <string name="finish">Завершить</string>
+    <string name="new_user">Новый пользователь</string>
 </resources>

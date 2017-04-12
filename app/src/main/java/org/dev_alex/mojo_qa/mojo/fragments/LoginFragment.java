@@ -16,7 +16,6 @@ public class LoginFragment extends Fragment {
     private View rootView;
 
 
-
     public static LoginFragment newInstance() {
         Bundle args = new Bundle();
         LoginFragment fragment = new LoginFragment();
@@ -45,10 +44,7 @@ public class LoginFragment extends Fragment {
                 else
                     ((AuthActivity) getActivity()).new LoginTask(login.getText().toString().trim(),
                             password.getText().toString()).execute();
-
             }
         });
     }
-
-
 }
