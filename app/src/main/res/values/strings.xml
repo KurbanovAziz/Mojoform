@@ -30,4 +30,5 @@
     <string name="hold_task">Отложить задачу</string>
     <string name="finish">Завершить</string>
     <string name="new_user">Новый пользователь</string>
+    <string name="pass_is_empty">Пароль не введен</string>
 </resources>

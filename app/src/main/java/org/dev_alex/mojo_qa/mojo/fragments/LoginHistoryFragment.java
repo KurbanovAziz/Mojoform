@@ -3,15 +3,20 @@ package org.dev_alex.mojo_qa.mojo.fragments;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 
 import org.dev_alex.mojo_qa.mojo.R;
+import org.dev_alex.mojo_qa.mojo.adapters.UserAdapter;
+import org.dev_alex.mojo_qa.mojo.services.LoginHistoryService;
 
 public class LoginHistoryFragment extends Fragment {
     private View rootView;
+    private RecyclerView recyclerView;
 
 
     public static LoginHistoryFragment newInstance() {
@@ -26,6 +31,9 @@ public class LoginHistoryFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         rootView = inflater.inflate(R.layout.fragment_login_history, container, false);
 
+        recyclerView = (RecyclerView) rootView.findViewById(R.id.recycler_view);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        recyclerView.setAdapter(new UserAdapter(this, LoginHistoryService.getLastLoginedUsers()));
         setListeners();
         return rootView;
     }
