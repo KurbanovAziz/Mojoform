@@ -4,6 +4,7 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.widget.Toast;
@@ -14,6 +15,7 @@ import org.dev_alex.mojo_qa.mojo.Data;
 import org.dev_alex.mojo_qa.mojo.R;
 import org.dev_alex.mojo_qa.mojo.fragments.LoginFragment;
 import org.dev_alex.mojo_qa.mojo.fragments.LoginHistoryFragment;
+import org.dev_alex.mojo_qa.mojo.fragments.LogoFragment;
 import org.dev_alex.mojo_qa.mojo.models.User;
 import org.dev_alex.mojo_qa.mojo.services.LoginHistoryService;
 import org.dev_alex.mojo_qa.mojo.services.RequestService;
@@ -30,10 +32,17 @@ public class AuthActivity extends AppCompatActivity {
         setContentView(R.layout.activity_auth);
 
         initDialog();
-        if (LoginHistoryService.lastLoginUsersExists())
-            getSupportFragmentManager().beginTransaction().replace(R.id.container, LoginHistoryFragment.newInstance()).commit();
-        else
-            getSupportFragmentManager().beginTransaction().replace(R.id.container, LoginFragment.newInstance()).commit();
+
+        getSupportFragmentManager().beginTransaction().replace(R.id.container, LogoFragment.newInstance()).commit();
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if (LoginHistoryService.lastLoginUsersExists())
+                    getSupportFragmentManager().beginTransaction().replace(R.id.container, LoginHistoryFragment.newInstance()).commit();
+                else
+                    getSupportFragmentManager().beginTransaction().replace(R.id.container, LoginFragment.newInstance()).commit();
+            }
+        }, 3000);
     }
 
     private void initDialog() {
