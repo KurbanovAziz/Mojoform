@@ -1,7 +1,9 @@
 package org.dev_alex.mojo_qa.mojo.fragments;
 
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.LayerDrawable;
@@ -20,6 +22,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebView;
+import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.FrameLayout;
@@ -32,14 +35,17 @@ import android.widget.Toast;
 
 import net.cachapa.expandablelayout.ExpandableLayout;
 
+import org.dev_alex.mojo_qa.mojo.App;
 import org.dev_alex.mojo_qa.mojo.R;
 import org.dev_alex.mojo_qa.mojo.activities.AuthActivity;
 import org.dev_alex.mojo_qa.mojo.activities.MainActivity;
 import org.dev_alex.mojo_qa.mojo.models.Page;
 import org.dev_alex.mojo_qa.mojo.services.RequestService;
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.net.HttpURLConnection;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Locale;
@@ -53,6 +59,7 @@ public class TemplateFragment extends Fragment {
     private String templateId;
     private ArrayList<Page> pages;
     private int currentPagePos;
+    private JSONObject template;
 
     public static TemplateFragment newInstance(String templateId) {
         Bundle args = new Bundle();
@@ -114,6 +121,21 @@ public class TemplateFragment extends Fragment {
                         setPage(pages.get(currentPagePos + 1));
             }
         });
+
+        rootView.findViewById(R.id.hold_task_btn).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (templateId != null) {
+                    SharedPreferences mSettings;
+                    mSettings = App.getContext().getSharedPreferences("templates", Context.MODE_PRIVATE);
+                    SharedPreferences.Editor editor = mSettings.edit();
+
+                    editor.putString(templateId, template.toString());
+                    editor.apply();
+                    getActivity().getSupportFragmentManager().popBackStack();
+                }
+            }
+        });
     }
 
     private void initDialog() {
@@ -125,7 +147,7 @@ public class TemplateFragment extends Fragment {
         loopDialog.setCancelable(false);
     }
 
-    private void renderTemplate(JSONObject template) {
+    private void renderTemplate() {
         try {
             if (template != null) {
                 if (template.has("name"))
@@ -209,7 +231,7 @@ public class TemplateFragment extends Fragment {
         }
 
         for (int i = 0; i < fields.size(); i++) {
-            JSONObject value = dataJson.getJSONObject(i).getJSONObject(fields.get(i));
+            final JSONObject value = dataJson.getJSONObject(i).getJSONObject(fields.get(i));
             switch (fields.get(i)) {
                 case "category":
                     createCategory(value, container);
@@ -243,6 +265,30 @@ public class TemplateFragment extends Fragment {
                     else
                         ((TextView) editTextSingleLineContainer.getChildAt(0)).setText("Нет текста");
 
+                    if (value.has("value"))
+                        ((EditText) editTextSingleLineContainer.getChildAt(1)).setText(value.getString("value"));
+                    ((EditText) editTextSingleLineContainer.getChildAt(1)).addTextChangedListener(new TextWatcher() {
+                        @Override
+                        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+                        }
+
+                        @Override
+                        public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+                        }
+
+                        @Override
+                        public void afterTextChanged(Editable s) {
+                            try {
+                                if (s.toString().trim().isEmpty())
+                                    value.remove("value");
+                                else
+                                    value.put("value", s.toString().trim());
+                            } catch (Exception ignored) {
+                            }
+                        }
+                    });
                     container.addView(editTextSingleLineContainer);
                     break;
 
@@ -254,6 +300,30 @@ public class TemplateFragment extends Fragment {
                     else
                         ((TextView) editTextMultiLineContainer.getChildAt(0)).setText("Нет текста");
 
+                    if (value.has("value"))
+                        ((EditText) editTextMultiLineContainer.getChildAt(1)).setText(value.getString("value"));
+                    ((EditText) editTextMultiLineContainer.getChildAt(1)).addTextChangedListener(new TextWatcher() {
+                        @Override
+                        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+                        }
+
+                        @Override
+                        public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+                        }
+
+                        @Override
+                        public void afterTextChanged(Editable s) {
+                            try {
+                                if (s.toString().trim().isEmpty())
+                                    value.remove("value");
+                                else
+                                    value.put("value", s.toString().trim());
+                            } catch (Exception ignored) {
+                            }
+                        }
+                    });
                     container.addView(editTextMultiLineContainer);
                     break;
 
@@ -265,6 +335,19 @@ public class TemplateFragment extends Fragment {
                     else
                         ((TextView) checkBoxContainer.getChildAt(1)).setText("Нет текста");
 
+                    ((CheckBox) checkBoxContainer.getChildAt(0)).setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                        @Override
+                        public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                            try {
+                                value.put("value", isChecked);
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    });
+
+                    if (value.has("value"))
+                        ((CheckBox) checkBoxContainer.getChildAt(0)).setChecked(value.getBoolean("value"));
                     container.addView(checkBoxContainer);
                     break;
 
@@ -310,8 +393,8 @@ public class TemplateFragment extends Fragment {
         LinearLayout categoryHeader = (LinearLayout) getActivity().getLayoutInflater().inflate(R.layout.category_header, container, false);
         ((LayerDrawable) categoryHeader.getBackground()).findDrawableByLayerId(R.id.background).setColorFilter(color, PorterDuff.Mode.SRC_IN);
 
-        if (value.has("caption"))
-            ((TextView) categoryHeader.getChildAt(1)).setText(value.getString("caption"));
+        if (value.has("name"))
+            ((TextView) categoryHeader.getChildAt(1)).setText(value.getString("name"));
         else
             ((TextView) categoryHeader.getChildAt(1)).setText("Нет заголовка");
 
@@ -342,7 +425,7 @@ public class TemplateFragment extends Fragment {
         container.addView(expandableLayout);
     }
 
-    private void createSeekBar(JSONObject value, LinearLayout container) throws Exception {
+    private void createSeekBar(final JSONObject value, LinearLayout container) throws Exception {
         final LinearLayout seekBarContainer = (LinearLayout) getActivity().getLayoutInflater().inflate(R.layout.slider, container, false);
         if (value.has("caption"))
             ((TextView) seekBarContainer.getChildAt(0)).setText(value.getString("caption"));
@@ -368,34 +451,30 @@ public class TemplateFragment extends Fragment {
         seekBar.setMax((int) ((maxValue - minValue) * digitsOffset));
         seekBar.incrementProgressBy((int) (step * digitsOffset));
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            boolean trackByUser = false;
+
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 ((TextView) seekBarContainer.getChildAt(3)).setText(formatFloat((progress / digitsOffset) + minValue));
-                changeValue.setText(formatFloat((progress / digitsOffset) + minValue));
+                if (trackByUser)
+                    changeValue.setText(formatFloat((progress / digitsOffset) + minValue));
             }
 
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {
-
+                trackByUser = true;
             }
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
-
+                trackByUser = false;
             }
         });
 
-        if (digitsOffset > 1) {
-            if (minValue < 0)
-                changeValue.setKeyListener(DigitsKeyListener.getInstance("-0123456789."));
-            else
-                changeValue.setKeyListener(DigitsKeyListener.getInstance("0123456789."));
-        } else {
-            if (minValue < 0)
-                changeValue.setKeyListener(DigitsKeyListener.getInstance("-0123456789"));
-            else
-                changeValue.setKeyListener(DigitsKeyListener.getInstance("0123456789"));
-        }
+        if (minValue < 0)
+            changeValue.setKeyListener(DigitsKeyListener.getInstance("-0123456789."));
+        else
+            changeValue.setKeyListener(DigitsKeyListener.getInstance("0123456789."));
 
         changeValue.addTextChangedListener(new TextWatcher() {
             @Override
@@ -411,36 +490,45 @@ public class TemplateFragment extends Fragment {
                 String result;
                 if (!s.toString().isEmpty()) {
                     result = s.toString();
-                    float value = Float.parseFloat(s.toString());
-                    if (value < minValue)
+                    float floatValue = Float.parseFloat(s.toString());
+                    if (floatValue < minValue)
                         result = formatFloat(minValue);
-                    else if (value > maxValue)
+                    else if (floatValue > maxValue)
                         result = formatFloat(maxValue);
-                    else if (!formatFloat(value).equals(s.toString()))
-                        result = (formatFloat(value));
-                    else {
-                        int pointI = s.toString().indexOf(".");
-                        if (pointI != -1) {
-                            if (s.toString().substring(s.toString().indexOf("." + 1)).length() > digitsAfterPoint) {
-                                result = s.toString().substring(0, s.toString().indexOf("." + 1) + digitsAfterPoint);
-                            }
-                        }
-                    }
+                    else if (!result.endsWith(".") && !formatFloat(floatValue).equals(result))
+                        result = formatFloat(floatValue);
 
                     if (!s.toString().equals(result)) {
                         changeValue.setText(result);
                     }
                     if (!s.toString().isEmpty())
-                        seekBar.setProgress((int) ((Float.parseFloat(result) - minValue) * digitsOffset));
+                        seekBar.setProgress(Math.round(Float.parseFloat(result) - minValue) * digitsOffset);
+
+                    float seekBarProgress = seekBar.getProgress() / digitsOffset + minValue;
+                    if (Float.compare(seekBarProgress, Float.parseFloat(result)) != 0)
+                        changeValue.setTextColor(Color.RED);
+                    else
+                        changeValue.setTextColor(Color.BLACK);
+
+                    try {
+                        value.put("value", Float.parseFloat(result));
+                    } catch (Exception ignored) {
+                    }
                 }
             }
         });
 
         container.addView(seekBarContainer);
-        seekBar.setProgress(0);
+        if (value.has("value")) {
+            changeValue.setText(value.getString("value"));
+            seekBar.setProgress(Math.round(Float.parseFloat(value.getString("value")) - minValue) * digitsOffset);
+        } else {
+            seekBar.setProgress(0);
+            changeValue.setText(formatFloat((seekBar.getProgress() / digitsOffset) + minValue));
+        }
     }
 
-    private void createSelectBtnContainer(JSONObject value, LinearLayout container) throws Exception {
+    private void createSelectBtnContainer(final JSONObject value, LinearLayout container) throws Exception {
         LinearLayout selectBtnLayout = (LinearLayout) getActivity().getLayoutInflater().inflate(R.layout.select_layout, container, false);
         LinearLayout selectBtnContainer = (LinearLayout) selectBtnLayout.getChildAt(1);
 
@@ -454,10 +542,18 @@ public class TemplateFragment extends Fragment {
             CompoundButton.OnCheckedChangeListener radioButtonListener = new CompoundButton.OnCheckedChangeListener() {
                 @Override
                 public void onCheckedChanged(CompoundButton selectedButton, boolean isChecked) {
-                    if (isChecked)
+                    if (isChecked) {
                         for (CompoundButton compoundButton : buttons)
                             if (!compoundButton.equals(selectedButton))
                                 compoundButton.setChecked(false);
+
+                        try {
+                            String btnId = (String) selectedButton.getTag();
+                            value.put("value", btnId);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
                 }
             };
 
@@ -474,7 +570,10 @@ public class TemplateFragment extends Fragment {
 
                 RadioButton selectBtn = (RadioButton) getActivity().getLayoutInflater().inflate(R.layout.select_btn, currentRow, false);
                 selectBtn.setOnCheckedChangeListener(radioButtonListener);
+                selectBtn.setTag(option.getString("id"));
                 buttons.add(selectBtn);
+
+                selectBtn.setChecked(value.has("value") && value.getString("value").equals(option.getString("id")));
 
                 if (option.has("caption"))
                     selectBtn.setText(option.getString("caption"));
@@ -502,7 +601,6 @@ public class TemplateFragment extends Fragment {
 
     private class GetTemplateTask extends AsyncTask<Void, Void, Integer> {
         private String templateId;
-        private JSONObject template;
 
         GetTemplateTask(String templateId) {
             this.templateId = templateId;
@@ -517,15 +615,22 @@ public class TemplateFragment extends Fragment {
         @Override
         protected Integer doInBackground(Void... params) {
             try {
-                String url = "/api/fs-mojo/get/template/" + templateId;
+                SharedPreferences mSettings;
+                mSettings = App.getContext().getSharedPreferences("templates", Context.MODE_PRIVATE);
+                String templateJson = mSettings.getString(templateId, "");
+                if (!templateJson.equals("")) {
+                    template = new JSONObject(templateJson);
+                    return HttpURLConnection.HTTP_OK;
+                } else {
+                    String url = "/api/fs-mojo/get/template/" + templateId;
+                    Response response = RequestService.createGetRequest(url);
 
-                Response response = RequestService.createGetRequest(url);
-
-                if (response.code() == 200) {
-                    String responseStr = response.body().string();
-                    template = new JSONObject(responseStr);
+                    if (response.code() == 200) {
+                        String responseStr = response.body().string();
+                        template = new JSONObject(responseStr);
+                    }
+                    return response.code();
                 }
-                return response.code();
             } catch (Exception exc) {
                 exc.printStackTrace();
                 return null;
@@ -544,7 +649,7 @@ public class TemplateFragment extends Fragment {
                 startActivity(new Intent(getContext(), AuthActivity.class));
                 getActivity().finish();
             } else {
-                renderTemplate(template);
+                renderTemplate();
             }
         }
     }
