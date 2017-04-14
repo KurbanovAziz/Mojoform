@@ -277,12 +277,18 @@ public class DocumentsFragment extends Fragment {
         dialogView.findViewById(R.id.right_btn).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                createDirDialog.dismiss();
+                if (((EditText) dialogView.findViewById(R.id.text_input)).getText().toString().trim().isEmpty())
+                    Toast.makeText(getContext(), R.string.input_folder_name, Toast.LENGTH_LONG).show();
+                else
+                    new CreateDirTask(createDirDialog, ((EditText) dialogView.findViewById(R.id.text_input)).getText().toString().trim()).execute();
             }
         });
     }
 
     private AlertDialog createDialogWithBlur(View dialogView) {
+        Bitmap screenShot = BlurHelper.takeScreenShot(getActivity());
+        final Bitmap blurScreenShot = BlurHelper.fastBlur(screenShot, 0.1f, 10);
+
         final AlertDialog dialog = new AlertDialog.Builder(getContext()).create();
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         dialog.setView(dialogView);
@@ -292,18 +298,21 @@ public class DocumentsFragment extends Fragment {
                 getActivity().findViewById(R.id.blur_background).setVisibility(View.GONE);
             }
         });
+        dialog.setOnShowListener(new DialogInterface.OnShowListener() {
+            @Override
+            public void onShow(DialogInterface dialog) {
+                getActivity().findViewById(R.id.blur_background).setVisibility(View.VISIBLE);
+                ((ImageView) getActivity().findViewById(R.id.blur_background)).setImageBitmap(blurScreenShot);
+            }
+        });
         dialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
 
-        Bitmap screenShot = BlurHelper.takeScreenShot(getActivity());
-        Bitmap blurScreenShot = BlurHelper.fastBlur(screenShot, 0.14f, 10);
-        getActivity().findViewById(R.id.blur_background).setVisibility(View.VISIBLE);
-        ((ImageView) getActivity().findViewById(R.id.blur_background)).setImageBitmap(blurScreenShot);
-
-        dialog.show();
         WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
         lp.copyFrom(dialog.getWindow().getAttributes());
         lp.width = WindowManager.LayoutParams.MATCH_PARENT;
         dialog.getWindow().setAttributes(lp);
+        dialog.show();
+
         return dialog;
     }
 
@@ -326,6 +335,69 @@ public class DocumentsFragment extends Fragment {
     public void showPopUpWindow(String itemId) {
         selectedItemId = itemId;
         popupWindow.setVisibility(View.VISIBLE);
+    }
+
+    public class CreateDirTask extends AsyncTask<Void, Void, Integer> {
+        private AlertDialog dialog;
+        private String parentId;
+        private String name;
+        private File folder;
+
+        public CreateDirTask(AlertDialog dialog, String name) {
+            this.name = name;
+            this.dialog = dialog;
+            parentId = foldersStack.get(foldersStack.size() - 1).id;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            if (downloadTask != null && downloadTask.getStatus() != AsyncTask.Status.FINISHED)
+                downloadTask.cancel(false);
+            loopDialog.show();
+        }
+
+        @Override
+        protected Integer doInBackground(Void... params) {
+            try {
+                String url = "/api/fs/create_folder/" + parentId;
+                JSONObject jsonObject = new JSONObject();
+                jsonObject.put("name", name);
+
+                Response response = RequestService.createPostRequest(url, jsonObject.toString());
+
+                if (response.code() == 201) {
+                    JSONObject resultJson = new JSONObject(response.body().string());
+                    folder = new ObjectMapper().readValue(resultJson.getJSONObject("entry").toString(), File.class);
+                }
+
+                return response.code();
+            } catch (Exception exc) {
+                exc.printStackTrace();
+                return null;
+            }
+        }
+
+        @Override
+        protected void onPostExecute(Integer responseCode) {
+            super.onPostExecute(responseCode);
+            if (loopDialog != null && loopDialog.isShowing())
+                loopDialog.dismiss();
+
+            if (responseCode == null)
+                Toast.makeText(getContext(), R.string.network_error, Toast.LENGTH_LONG).show();
+            else if (responseCode == 401) {
+                startActivity(new Intent(getContext(), AuthActivity.class));
+                getActivity().finish();
+            } else if (responseCode == 409)
+                Toast.makeText(getContext(), R.string.folder_already_exists, Toast.LENGTH_SHORT).show();
+            else {
+                foldersStack.get(foldersStack.size() - 1).folders.add(folder);
+                folderAdapter.notifyDataSetChanged();
+                dialog.dismiss();
+                Toast.makeText(getContext(), R.string.folder_successfully_created, Toast.LENGTH_SHORT).show();
+            }
+        }
     }
 
     public class GetFilesTask extends AsyncTask<Void, Void, Integer> {
@@ -383,6 +455,11 @@ public class DocumentsFragment extends Fragment {
                     }
                 }
 
+                if (fileId == null) {
+                    response = RequestService.createGetRequest("/api/fs/infomy");
+                    fileId = new JSONObject(response.body().string()).getJSONObject("entry").getString("id");
+                }
+
                 return response.code();
             } catch (Exception exc) {
                 exc.printStackTrace();
@@ -405,7 +482,7 @@ public class DocumentsFragment extends Fragment {
                 downloadTask = new DownloadImagesTask(fileIdsWithPreviews);
                 downloadTask.execute();
 
-                foldersStack.add(new FileSystemStackEntry(folders, files, fileId == null ? "" : fileName));
+                foldersStack.add(new FileSystemStackEntry(folders, files, fileName == null ? "" : fileName, fileId));
 
                 setAdapters(files, folders);
                 updateHeader();

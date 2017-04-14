@@ -31,4 +31,7 @@
     <string name="finish">Завершить</string>
     <string name="new_user">Новый пользователь</string>
     <string name="pass_is_empty">Пароль не введен</string>
+    <string name="input_folder_name">Введите название папки</string>
+    <string name="folder_successfully_created">Папка успешно создана</string>
+    <string name="folder_already_exists">Папка с таким именем уже сущесвует</string>
 </resources>
