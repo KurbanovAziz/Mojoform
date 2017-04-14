@@ -1,6 +1,7 @@
 package org.dev_alex.mojo_qa.mojo.fragments;
 
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -38,6 +39,7 @@ import org.dev_alex.mojo_qa.mojo.custom_views.RelativeLayoutWithPopUp;
 import org.dev_alex.mojo_qa.mojo.models.File;
 import org.dev_alex.mojo_qa.mojo.models.FileSystemStackEntry;
 import org.dev_alex.mojo_qa.mojo.services.BitmapCacheService;
+import org.dev_alex.mojo_qa.mojo.services.BlurHelper;
 import org.dev_alex.mojo_qa.mojo.services.RequestService;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -259,14 +261,12 @@ public class DocumentsFragment extends Fragment {
     private void showCreateDirDialog() {
         LayoutInflater layoutInflater = LayoutInflater.from(getContext());
         final View dialogView = layoutInflater.inflate(R.layout.dialog_folder_management, null, false);
-        final AlertDialog createDirDialog = new AlertDialog.Builder(getContext()).create();
-        createDirDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-        createDirDialog.setView(dialogView);
-        createDirDialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
 
         ((TextView) dialogView.findViewById(R.id.dialog_title)).setText(R.string.new_folder);
         ((EditText) dialogView.findViewById(R.id.text_input)).setHint(R.string.folder_name);
         ((TextView) dialogView.findViewById(R.id.right_btn_text)).setText(R.string.create);
+
+        final AlertDialog createDirDialog = createDialogWithBlur(dialogView);
 
         dialogView.findViewById(R.id.left_btn).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -280,13 +280,31 @@ public class DocumentsFragment extends Fragment {
                 createDirDialog.dismiss();
             }
         });
+    }
 
+    private AlertDialog createDialogWithBlur(View dialogView) {
+        final AlertDialog dialog = new AlertDialog.Builder(getContext()).create();
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setView(dialogView);
+        dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+            @Override
+            public void onDismiss(DialogInterface dialog) {
+                getActivity().findViewById(R.id.blur_background).setVisibility(View.GONE);
+            }
+        });
+        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
 
+        Bitmap screenShot = BlurHelper.takeScreenShot(getActivity());
+        Bitmap blurScreenShot = BlurHelper.fastBlur(screenShot, 0.14f, 10);
+        getActivity().findViewById(R.id.blur_background).setVisibility(View.VISIBLE);
+        ((ImageView) getActivity().findViewById(R.id.blur_background)).setImageBitmap(blurScreenShot);
+
+        dialog.show();
         WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
-        lp.copyFrom(createDirDialog.getWindow().getAttributes());
+        lp.copyFrom(dialog.getWindow().getAttributes());
         lp.width = WindowManager.LayoutParams.MATCH_PARENT;
-        createDirDialog.getWindow().setAttributes(lp);
-        createDirDialog.show();
+        dialog.getWindow().setAttributes(lp);
+        return dialog;
     }
 
     private boolean popFileStack() {
@@ -336,7 +354,6 @@ public class DocumentsFragment extends Fragment {
 
                 files = new ArrayList<>();
                 folders = new ArrayList<>();
-
 
                 String url;
                 if (fileId == null) {
@@ -413,7 +430,7 @@ public class DocumentsFragment extends Fragment {
         @Override
         protected Void doInBackground(Void... params) {
             for (String fileId : fileIds) {
-                if (!bitmapCacheService.hasThumnailInMemCache(fileId))
+                if (!bitmapCacheService.hasThumbnailInMemCache(fileId))
                     try {
                         Response thumbResponse = RequestService.createGetRequest("/api/fs/thumbnail/" + fileId);
                         byte[] imageBytes = thumbResponse.body().bytes();

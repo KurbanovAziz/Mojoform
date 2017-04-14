@@ -83,8 +83,8 @@ public class FileAdapter extends RecyclerView.Adapter<FileAdapter.FileViewHolder
         } else
             viewHolder.fileDate.setText(sdf.format(file.createdAt));
 
-        if (parentFragment.bitmapCacheService.hasThumnailInMemCache(file.id)) {
-            Bitmap bitmap = parentFragment.bitmapCacheService.getThumnailFromMemCache(file.id);
+        if (parentFragment.bitmapCacheService.hasThumbnailInMemCache(file.id)) {
+            Bitmap bitmap = parentFragment.bitmapCacheService.getThumbnailFromMemCache(file.id);
             viewHolder.fileIcon.setImageBitmap(bitmap);
         } else
             viewHolder.fileIcon.setImageResource(R.drawable.file_icon);

@@ -7,7 +7,7 @@
     android:fitsSystemWindows="true">
 
     <RelativeLayout
-        android:id="@+id/topPanel"
+        android:id="@+id/activity_main_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginLeft="-2dp"
@@ -132,6 +132,12 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_below="@+id/header_background" />
+
+        <ImageView
+            android:id="@+id/blur_background"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="gone" />
     </RelativeLayout>
 
 

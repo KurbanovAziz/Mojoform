@@ -37,7 +37,7 @@ public class BitmapCacheService {
         return mMemoryCache.get("preview_" + fileId);
     }
 
-    public Bitmap getThumnailFromMemCache(String fileId) {
+    public Bitmap getThumbnailFromMemCache(String fileId) {
         return mMemoryCache.get("thumb_" + fileId);
     }
 
@@ -45,7 +45,7 @@ public class BitmapCacheService {
         return mMemoryCache.get("preview_" + fileId) != null;
     }
 
-    public boolean hasThumnailInMemCache(String fileId) {
+    public boolean hasThumbnailInMemCache(String fileId) {
         return mMemoryCache.get("thumb_" + fileId) != null;
     }
 }
