@@ -75,6 +75,7 @@ public class TasksFragment extends Fragment {
 
         recyclerView = (RecyclerView) rootView.findViewById(R.id.recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        ((RadioButton) rootView.findViewById(R.id.busy)).setChecked(true);
 
         initDialog();
         setListeners();
@@ -223,6 +224,7 @@ public class TasksFragment extends Fragment {
             date = String.format("%s %s", monthName, currentDate.get(Calendar.YEAR));
         }
         ((TextView) rootView.findViewById(R.id.calendar_date)).setText(date);
+        new GetTasksTask().execute();
     }
 
     private void initDialog() {
@@ -255,13 +257,27 @@ public class TasksFragment extends Fragment {
                 busyTasks = new ArrayList<>();
                 String url;
 
+                SimpleDateFormat isoDateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+                String dateParams;
+                if (withDay)
+                    dateParams = "&dueOn=" + isoDateFormat.format(currentDate.getTime());
+                else {
+                    Calendar monthCalendar = Calendar.getInstance();
+                    monthCalendar.setTime(currentDate.getTime());
+                    monthCalendar.set(Calendar.DAY_OF_MONTH, 1);
+                    dateParams = "&dueAfter=" + isoDateFormat.format(monthCalendar.getTime());
+
+                    monthCalendar.add(Calendar.MONTH, 1);
+                    dateParams += "&dueBefore=" + isoDateFormat.format(monthCalendar.getTime());
+                }
+
                 for (int i = 0; i < 2; i++) {
                     if (i == 0)
                         url = "http://jira.dev-alex.org:19080/activiti-rest/service/history/" +
-                                "historic-task-instances?taskAssignee=" + Data.currentUser.userName + "&includeProcessVariables=TRUE";
+                                "historic-task-instances?taskAssignee=" + Data.currentUser.userName + "&includeProcessVariables=TRUE" + dateParams;
                     else
                         url = "http://jira.dev-alex.org:19080/activiti-rest/service/runtime/tasks?taskAssignee="
-                                + Data.currentUser.userName + "&includeProcessVariables=TRUE";
+                                + Data.currentUser.userName + "&includeProcessVariables=TRUE" + dateParams;
 
                     OkHttpClient client = new OkHttpClient();
                     Request request = new Request.Builder().header("Authorization", Credentials.basic("kermit", "kermit"))
@@ -298,10 +314,11 @@ public class TasksFragment extends Fragment {
             else if (responseCode == 401) {
                 startActivity(new Intent(getContext(), AuthActivity.class));
                 getActivity().finish();
-            } else {
+            } else if (responseCode == 200) {
                 ((RadioButton) rootView.findViewById(R.id.busy)).setChecked(true);
                 recyclerView.setAdapter(new TaskAdapter(TasksFragment.this, busyTasks));
-            }
+            } else
+                Toast.makeText(getContext(), R.string.unknown_error, Toast.LENGTH_LONG).show();
         }
     }
 }
