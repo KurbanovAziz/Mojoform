@@ -19,6 +19,9 @@ import android.widget.Toast;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.prolificinteractive.materialcalendarview.MaterialCalendarView;
+
+import net.cachapa.expandablelayout.ExpandableLayout;
 
 import org.dev_alex.mojo_qa.mojo.Data;
 import org.dev_alex.mojo_qa.mojo.R;
@@ -29,8 +32,10 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 
 import okhttp3.Credentials;
 import okhttp3.OkHttpClient;
@@ -44,6 +49,7 @@ public class TasksFragment extends Fragment {
 
     private ArrayList<Task> finishedTasks;
     private ArrayList<Task> busyTasks;
+    private Calendar currentDate;
 
 
     public static TasksFragment newInstance() {
@@ -105,20 +111,33 @@ public class TasksFragment extends Fragment {
                             @Override
                             public int compare(Task task1, Task task2) {
                                 if (task1.dueDate == null)
-                                    return -1;
-                                if (task2.dueDate == null)
                                     return 1;
+                                if (task2.dueDate == null)
+                                    return -1;
 
                                 if (task1.dueDate.getTime() == task2.dueDate.getTime())
                                     return 0;
 
-                                return (task1.dueDate.after(task2.dueDate)) ? 1 : -1;
+                                return (task1.dueDate.after(task2.dueDate)) ? -1 : 1;
                             }
                         });
 
                         recyclerView.setAdapter(new TaskAdapter(TasksFragment.this, allTasks));
                         break;
                 }
+            }
+        });
+
+        currentDate = Calendar.getInstance();
+        currentDate.setTime(new Date());
+        MaterialCalendarView calendarView = (MaterialCalendarView) rootView.findViewById(R.id.calendarView);
+        calendarView.setTopbarVisible(false);
+        calendarView.setCurrentDate(currentDate);
+
+        rootView.findViewById(R.id.calendar_control_panel).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ((ExpandableLayout) rootView.findViewById(R.id.expandable_calendar_layout)).toggle();
             }
         });
     }

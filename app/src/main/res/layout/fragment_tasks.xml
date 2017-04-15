@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/main_activity_background"
     android:orientation="vertical">
 
     <RelativeLayout
+        android:id="@+id/calendar_control_panel"
         android:layout_width="match_parent"
         android:layout_height="45dp"
         android:background="#95699e">
@@ -59,6 +61,17 @@
             android:paddingTop="15dp"
             android:src="@drawable/close_icon" />
     </RelativeLayout>
+
+    <net.cachapa.expandablelayout.ExpandableLayout
+        android:id="@+id/expandable_calendar_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:el_duration="1000"
+        app:el_expanded="false"
+        app:layout_expandable="true">
+
+        <include layout="@layout/calendar_expanding_part" />
+    </net.cachapa.expandablelayout.ExpandableLayout>
 
     <RadioGroup
         android:id="@+id/task_toggle"

@@ -88,7 +88,7 @@
                 android:layout_weight="1"
                 android:background="@drawable/blue_btn_with_shadow"
                 android:gravity="top|center_horizontal"
-                android:paddingTop="17dp"
+                android:paddingTop="15.5dp"
                 android:text="@string/hold_task"
                 android:textColor="@android:color/white"
                 android:textSize="17sp" />
@@ -101,7 +101,7 @@
                 android:layout_weight="1"
                 android:background="@drawable/green_btn_with_shadow"
                 android:gravity="top|center_horizontal"
-                android:paddingTop="17dp"
+                android:paddingTop="15.5dp"
                 android:text="@string/finish"
                 android:textColor="@android:color/white"
                 android:textSize="17sp" />
