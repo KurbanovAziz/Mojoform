@@ -11,6 +11,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -94,10 +95,10 @@ public class TasksFragment extends Fragment {
         ((TextView) getActivity().findViewById(R.id.title)).setText(getString(R.string.tasks));
         getActivity().findViewById(R.id.grid_btn).setVisibility(View.GONE);
         getActivity().findViewById(R.id.back_btn).setVisibility(View.GONE);
+        getActivity().findViewById(R.id.search_btn).setVisibility(View.GONE);
+        getActivity().findViewById(R.id.group_by_btn).setVisibility(View.GONE);
 
         getActivity().findViewById(R.id.sandwich_btn).setVisibility(View.VISIBLE);
-        getActivity().findViewById(R.id.group_by_btn).setVisibility(View.VISIBLE);
-        getActivity().findViewById(R.id.search_btn).setVisibility(View.VISIBLE);
     }
 
     private void setListeners() {
@@ -152,36 +153,17 @@ public class TasksFragment extends Fragment {
                 expandableLayout.collapse();
                 currentDate = date.getCalendar();
                 withDay = true;
-                updateDate();
+                updateDate(true);
             }
         });
 
         calendarView.setOnMonthChangedListener(new OnMonthChangedListener() {
             @Override
             public void onMonthChanged(MaterialCalendarView widget, CalendarDay date) {
+                Log.d("mojo-log", String.valueOf(date.getMonth()));
                 withDay = false;
                 currentDate = date.getCalendar();
-                updateDate();
-            }
-        });
-
-        rootView.findViewById(R.id.calendar_arrow_left).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                withDay = false;
-                currentDate.add(Calendar.MONTH, -1);
-                calendarView.setCurrentDate(CalendarDay.from(currentDate), true);
-                updateDate();
-            }
-        });
-
-        rootView.findViewById(R.id.calendar_arrow_right).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                withDay = false;
-                currentDate.add(Calendar.MONTH, 1);
-                calendarView.setCurrentDate(CalendarDay.from(currentDate), true);
-                updateDate();
+                updateDate(true);
             }
         });
 
@@ -189,9 +171,24 @@ public class TasksFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 withDay = false;
-                currentDate.setTime(new Date());
-                calendarView.setCurrentDate(CalendarDay.from(currentDate), true);
-                updateDate();
+                calendarView.setCurrentDate(CalendarDay.from(new Date()), true);
+            }
+        });
+
+
+        rootView.findViewById(R.id.calendar_arrow_left).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                withDay = false;
+                calendarView.goToPrevious();
+            }
+        });
+
+        rootView.findViewById(R.id.calendar_arrow_right).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                withDay = false;
+                calendarView.goToNext();
             }
         });
 
@@ -208,7 +205,7 @@ public class TasksFragment extends Fragment {
         calendarView.addDecorator(decorator);
     }
 
-    private void updateDate() {
+    private void updateDate(boolean needUpdate) {
         String date;
 
         if (withDay)
@@ -224,7 +221,8 @@ public class TasksFragment extends Fragment {
             date = String.format("%s %s", monthName, currentDate.get(Calendar.YEAR));
         }
         ((TextView) rootView.findViewById(R.id.calendar_date)).setText(date);
-        new GetTasksTask().execute();
+        if (needUpdate)
+            new GetTasksTask().execute();
     }
 
     private void initDialog() {
