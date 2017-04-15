@@ -62,10 +62,9 @@ public class TasksFragment extends Fragment {
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
         initDialog();
-        new GetTasksTask().execute();
-        ((RadioButton) rootView.findViewById(R.id.busy)).setChecked(true);
-
         setListeners();
+        new GetTasksTask().execute();
+
         return rootView;
     }
 
@@ -197,8 +196,10 @@ public class TasksFragment extends Fragment {
             else if (responseCode == 401) {
                 startActivity(new Intent(getContext(), AuthActivity.class));
                 getActivity().finish();
+            } else {
+                ((RadioButton) rootView.findViewById(R.id.busy)).setChecked(true);
+                recyclerView.setAdapter(new TaskAdapter(TasksFragment.this, busyTasks));
             }
-            recyclerView.setAdapter(new TaskAdapter(TasksFragment.this, busyTasks));
         }
     }
 }

@@ -1,16 +1,26 @@
 package org.dev_alex.mojo_qa.mojo.fragments;
 
+import android.Manifest;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.LayerDrawable;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
+import android.support.v4.util.Pair;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.Space;
 import android.text.Editable;
@@ -26,6 +36,7 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.FrameLayout;
+import android.widget.HorizontalScrollView;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RelativeLayout;
@@ -38,28 +49,41 @@ import net.cachapa.expandablelayout.ExpandableLayout;
 import org.dev_alex.mojo_qa.mojo.App;
 import org.dev_alex.mojo_qa.mojo.R;
 import org.dev_alex.mojo_qa.mojo.activities.AuthActivity;
+import org.dev_alex.mojo_qa.mojo.activities.ImageViewActivity;
 import org.dev_alex.mojo_qa.mojo.activities.MainActivity;
 import org.dev_alex.mojo_qa.mojo.models.Page;
+import org.dev_alex.mojo_qa.mojo.services.BitmapService;
 import org.dev_alex.mojo_qa.mojo.services.RequestService;
+import org.dev_alex.mojo_qa.mojo.services.Utils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
 import java.net.HttpURLConnection;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Locale;
 import java.util.Random;
 
+import de.hdodenhof.circleimageview.CircleImageView;
 import okhttp3.Response;
 
+import static android.app.Activity.RESULT_OK;
+
 public class TemplateFragment extends Fragment {
+    private final int PHOTO_REQUEST_CODE = 10;
+    private final int IMAGE_SHOW_REQUEST_CODE = 11;
+
     private View rootView;
     private ProgressDialog loopDialog;
     private String templateId;
     private ArrayList<Page> pages;
     private int currentPagePos;
     private JSONObject template;
+
+    private Pair<LinearLayout, JSONObject> currentPhotoBlock;
+    private String cameraImagePath;
 
     public static TemplateFragment newInstance(String templateId) {
         Bundle args = new Bundle();
@@ -84,6 +108,57 @@ public class TemplateFragment extends Fragment {
 
         new GetTemplateTask(templateId).execute();
         return rootView;
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == PHOTO_REQUEST_CODE && resultCode == RESULT_OK) {
+            if (data == null)
+                new ProcessingBitmapTask(cameraImagePath, true).execute();
+            else {
+                Uri selectedImage = data.getData();
+                String picturePath = selectedImage.getPath();
+                if (picturePath.endsWith(".png") || picturePath.endsWith(".jpg") || picturePath.endsWith(".jpeg") || picturePath.endsWith(".bmp"))
+                    new ProcessingBitmapTask(picturePath, true).execute();
+                else {
+                    String[] filePathColumn = {MediaStore.Images.Media.DATA};
+                    Cursor cursor = getActivity().getContentResolver().query(selectedImage, filePathColumn, null, null, null);
+
+                    if (cursor == null) {
+                        Toast.makeText(getContext(), "что-то пошло не так", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                    cursor.moveToFirst();
+                    int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
+                    picturePath = cursor.getString(columnIndex);
+                    cursor.close();
+
+                    String expansion = picturePath.substring(picturePath.lastIndexOf('.') + 1);
+                    if (!expansion.equals("jpg") && !expansion.equals("png") && !expansion.equals("jpeg") && !expansion.equals("bmp")) {
+                        Toast.makeText(getContext(), "Пожалуйста, выберите файл в формет jpg, png или bmp", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                    new ProcessingBitmapTask(picturePath, true).execute();
+                }
+            }
+        }
+
+        if (requestCode == IMAGE_SHOW_REQUEST_CODE && resultCode == RESULT_OK && data != null) {
+            try {
+                JSONArray deletedImages = new JSONArray(data.getStringExtra("deleted_images"));
+                for (int i = 0; i < deletedImages.length(); i++) {
+                    String imagePath = deletedImages.getString(i);
+                    currentPhotoBlock.second.put("image_paths", Utils.removeItemWithValue(currentPhotoBlock.second.getJSONArray("image_paths"), imagePath));
+
+                    for (int j = 0; j < currentPhotoBlock.first.getChildCount(); j++)
+                        if (currentPhotoBlock.first.getChildAt(j).getTag().equals(imagePath))
+                            currentPhotoBlock.first.removeViewAt(j);
+                }
+            } catch (Exception exc) {
+                exc.printStackTrace();
+            }
+        }
     }
 
     private void setupHeader() {
@@ -356,6 +431,33 @@ public class TemplateFragment extends Fragment {
                     break;
 
                 case "photo":
+                    final LinearLayout photoLayout = (LinearLayout) getActivity().getLayoutInflater().inflate(R.layout.photo_layout, container, false);
+
+                    if (value.has("caption"))
+                        ((TextView) ((LinearLayout) photoLayout.getChildAt(0)).getChildAt(1)).setText(value.getString("caption"));
+                    else
+                        ((TextView) ((LinearLayout) photoLayout.getChildAt(0)).getChildAt(1)).setText("Нет текста");
+
+                    ((LinearLayout) photoLayout.getChildAt(0)).getChildAt(0).setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            if (checkExternalPermissions()) {
+                                currentPhotoBlock = new Pair<>((LinearLayout) ((HorizontalScrollView) photoLayout.getChildAt(1)).getChildAt(0), value);
+                                Pair<Intent, File> intentFilePair = BitmapService.getPickImageIntent(getContext());
+                                cameraImagePath = intentFilePair.second.getAbsolutePath();
+                                startActivityForResult(intentFilePair.first, PHOTO_REQUEST_CODE);
+                            } else
+                                requestPermissions();
+                        }
+                    });
+
+                    container.addView(photoLayout);
+
+                    if (value.has("image_paths")) {
+                        currentPhotoBlock = new Pair<>((LinearLayout) ((HorizontalScrollView) photoLayout.getChildAt(1)).getChildAt(0), value);
+                        for (int j = 0; j < value.getJSONArray("image_paths").length(); j++)
+                            new ProcessingBitmapTask(value.getJSONArray("image_paths").getString(j), false).execute();
+                    }
                     break;
 
                 case "richedit":
@@ -599,6 +701,52 @@ public class TemplateFragment extends Fragment {
             return String.format("%s", d);
     }
 
+    private boolean checkExternalPermissions() {
+        int permissionCheckWrite = ContextCompat.checkSelfPermission(getContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        int permissionCheckRead = ContextCompat.checkSelfPermission(getContext(), Manifest.permission.READ_EXTERNAL_STORAGE);
+        return (permissionCheckRead == PackageManager.PERMISSION_GRANTED && permissionCheckWrite == PackageManager.PERMISSION_GRANTED);
+    }
+
+    private void requestPermissions() {
+        if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.READ_CONTACTS) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(getActivity(),
+                    new String[]{Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE}, 0);
+        }
+    }
+
+
+    private CircleImageView createImgFrame(Bitmap photo) {
+        int imgSize = Math.round(TypedValue.applyDimension
+                (TypedValue.COMPLEX_UNIT_DIP, 54, getResources().getDisplayMetrics()));
+        int frameMargins = Math.round(TypedValue.applyDimension
+                (TypedValue.COMPLEX_UNIT_DIP, 8, getResources().getDisplayMetrics()));
+
+        CircleImageView circleImageView = new CircleImageView(getContext());
+        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(imgSize, imgSize);
+        layoutParams.setMargins(0, frameMargins, frameMargins, frameMargins);
+        circleImageView.setLayoutParams(layoutParams);
+        //circleImageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
+        circleImageView.setImageBitmap(photo);
+
+        final JSONObject currentValue = currentPhotoBlock.second;
+        final LinearLayout currentLayout = currentPhotoBlock.first;
+        circleImageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                try {
+                    Intent showPhotoIntent = new Intent(getContext(), ImageViewActivity.class);
+                    showPhotoIntent.putExtra("images", currentValue.getJSONArray("image_paths").toString());
+                    startActivityForResult(showPhotoIntent, IMAGE_SHOW_REQUEST_CODE);
+                    currentPhotoBlock = new Pair<>(currentLayout, currentValue);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+
+        return circleImageView;
+    }
+
     private class GetTemplateTask extends AsyncTask<Void, Void, Integer> {
         private String templateId;
 
@@ -650,6 +798,75 @@ public class TemplateFragment extends Fragment {
                 getActivity().finish();
             } else {
                 renderTemplate();
+            }
+        }
+    }
+
+    private class ProcessingBitmapTask extends AsyncTask<Void, Void, Integer> {
+        private String cachedImgPath;
+        private Bitmap photo;
+        private String picturePath;
+        private boolean copyToChache;
+
+
+        ProcessingBitmapTask(String picturePath, boolean withCopyInChache) {
+            this.picturePath = picturePath;
+            this.copyToChache = withCopyInChache;
+        }
+
+        @Override
+        protected Integer doInBackground(Void... params) {
+            int imgSize = Math.round(TypedValue.applyDimension
+                    (TypedValue.COMPLEX_UNIT_DIP, 93, getResources().getDisplayMetrics()));
+
+            try {
+                final BitmapFactory.Options tmpOptions = new BitmapFactory.Options();
+                final BitmapFactory.Options options = new BitmapFactory.Options();
+
+                tmpOptions.inJustDecodeBounds = true;
+                BitmapFactory.decodeFile(picturePath, tmpOptions);
+                options.inSampleSize = BitmapService.calculateInSampleSize(tmpOptions, imgSize);
+                options.inJustDecodeBounds = false;
+
+                photo = BitmapFactory.decodeFile(picturePath, options);
+                photo = BitmapService.modifyOrientation(photo, picturePath);
+
+                if (copyToChache) {
+                    options.inSampleSize = BitmapService.calculateInSampleSize(tmpOptions, 1200);
+                    cachedImgPath = BitmapService.saveBitmapToCache(BitmapService.modifyOrientation(BitmapFactory.decodeFile(picturePath, options), picturePath));
+                    if (cachedImgPath == null)
+                        return null;
+                } else
+                    cameraImagePath = picturePath;
+
+                return 1;
+
+            } catch (Exception exc) {
+                return null;
+            }
+        }
+
+        @Override
+        protected void onPostExecute(Integer resCode) {
+            super.onPostExecute(resCode);
+            try {
+                if (resCode != null) {
+                    CircleImageView circleImageView = createImgFrame(photo);
+                    circleImageView.setTag(cachedImgPath);
+                    currentPhotoBlock.first.addView(circleImageView);
+
+
+                    if (copyToChache)
+                        if (currentPhotoBlock.second.has("image_paths"))
+                            currentPhotoBlock.second.getJSONArray("image_paths").put(cachedImgPath);
+                        else {
+                            JSONArray imagePaths = new JSONArray();
+                            imagePaths.put(cachedImgPath);
+                            currentPhotoBlock.second.put("image_paths", imagePaths);
+                        }
+                }
+            } catch (Exception exc) {
+                exc.printStackTrace();
             }
         }
     }
