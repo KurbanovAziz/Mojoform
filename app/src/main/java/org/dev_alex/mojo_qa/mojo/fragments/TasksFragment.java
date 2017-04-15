@@ -2,9 +2,11 @@ package org.dev_alex.mojo_qa.mojo.fragments;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.IdRes;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
@@ -19,11 +21,15 @@ import android.widget.Toast;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.prolificinteractive.materialcalendarview.CalendarDay;
 import com.prolificinteractive.materialcalendarview.MaterialCalendarView;
+import com.prolificinteractive.materialcalendarview.OnDateSelectedListener;
+import com.prolificinteractive.materialcalendarview.OnMonthChangedListener;
 
 import net.cachapa.expandablelayout.ExpandableLayout;
 
 import org.dev_alex.mojo_qa.mojo.Data;
+import org.dev_alex.mojo_qa.mojo.EventDecorator;
 import org.dev_alex.mojo_qa.mojo.R;
 import org.dev_alex.mojo_qa.mojo.activities.AuthActivity;
 import org.dev_alex.mojo_qa.mojo.adapters.TaskAdapter;
@@ -31,11 +37,14 @@ import org.dev_alex.mojo_qa.mojo.models.Task;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.text.DateFormatSymbols;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.Locale;
 
 import okhttp3.Credentials;
 import okhttp3.OkHttpClient;
@@ -50,7 +59,7 @@ public class TasksFragment extends Fragment {
     private ArrayList<Task> finishedTasks;
     private ArrayList<Task> busyTasks;
     private Calendar currentDate;
-
+    private boolean withDay = false;
 
     public static TasksFragment newInstance() {
         Bundle args = new Bundle();
@@ -128,18 +137,92 @@ public class TasksFragment extends Fragment {
             }
         });
 
+        final ExpandableLayout expandableLayout = ((ExpandableLayout) rootView.findViewById(R.id.expandable_calendar_layout));
+
         currentDate = Calendar.getInstance();
         currentDate.setTime(new Date());
-        MaterialCalendarView calendarView = (MaterialCalendarView) rootView.findViewById(R.id.calendarView);
+        final MaterialCalendarView calendarView = (MaterialCalendarView) rootView.findViewById(R.id.calendarView);
         calendarView.setTopbarVisible(false);
         calendarView.setCurrentDate(currentDate);
+
+        calendarView.setOnDateChangedListener(new OnDateSelectedListener() {
+            @Override
+            public void onDateSelected(@NonNull MaterialCalendarView widget, @NonNull CalendarDay date, boolean selected) {
+                expandableLayout.collapse();
+                currentDate = date.getCalendar();
+                withDay = true;
+                updateDate();
+            }
+        });
+
+        calendarView.setOnMonthChangedListener(new OnMonthChangedListener() {
+            @Override
+            public void onMonthChanged(MaterialCalendarView widget, CalendarDay date) {
+                withDay = false;
+                currentDate = date.getCalendar();
+                updateDate();
+            }
+        });
+
+        rootView.findViewById(R.id.calendar_arrow_left).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                withDay = false;
+                currentDate.add(Calendar.MONTH, -1);
+                calendarView.setCurrentDate(CalendarDay.from(currentDate), true);
+                updateDate();
+            }
+        });
+
+        rootView.findViewById(R.id.calendar_arrow_right).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                withDay = false;
+                currentDate.add(Calendar.MONTH, 1);
+                calendarView.setCurrentDate(CalendarDay.from(currentDate), true);
+                updateDate();
+            }
+        });
+
+        rootView.findViewById(R.id.calendar_reset_btn).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                withDay = false;
+                currentDate.setTime(new Date());
+                calendarView.setCurrentDate(CalendarDay.from(currentDate), true);
+                updateDate();
+            }
+        });
 
         rootView.findViewById(R.id.calendar_control_panel).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ((ExpandableLayout) rootView.findViewById(R.id.expandable_calendar_layout)).toggle();
+                expandableLayout.toggle();
             }
         });
+
+        ArrayList<CalendarDay> days = new ArrayList<>();
+        days.add(CalendarDay.from(new Date()));
+        EventDecorator decorator = new EventDecorator(Color.parseColor("#ff26c373"), days);
+        calendarView.addDecorator(decorator);
+    }
+
+    private void updateDate() {
+        String date;
+
+        if (withDay)
+            date = new SimpleDateFormat("dd MMMM yyyy", Locale.getDefault()).format(currentDate.getTime());
+        else {
+            String monthName;
+
+            if (Locale.getDefault().getISO3Language().equals("rus")) {
+                String monthList[] = {"Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"};
+                monthName = monthList[currentDate.get(Calendar.MONTH)];
+            } else
+                monthName = new DateFormatSymbols(Locale.getDefault()).getMonths()[currentDate.get(Calendar.MONTH)];
+            date = String.format("%s %s", monthName, currentDate.get(Calendar.YEAR));
+        }
+        ((TextView) rootView.findViewById(R.id.calendar_date)).setText(date);
     }
 
     private void initDialog() {
