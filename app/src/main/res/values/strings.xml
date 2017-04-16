@@ -38,8 +38,14 @@
     <string name="pass_is_empty">Пароль не введен</string>
     <string name="input_folder_name">Введите название папки</string>
     <string name="folder_successfully_created">Папка успешно создана</string>
-    <string name="folder_already_exists">Папка с таким именем уже сущесвует</string>
+    <string name="file_or_folder_already_exists">Файл или папка с таким именем уже сущесвует</string>
     <string name="pick_image">Выбрать изображение</string>
     <string name="of">из</string>
     <string name="unknown_error">Непредвиденная ошибка</string>
+    <string name="folder_locked">Папка заблокирована, операции с ней запрещены</string>
+    <string name="file_locked">Файл заблокирован, операции с ним запрещены</string>
+    <string name="move_here">Переместить сюда</string>
+    <string name="to_cancel">Отменить</string>
+    <string name="log_in">Войти</string>
+    <string name="moved_successfully">Успешно перемещено!</string>
 </resources>

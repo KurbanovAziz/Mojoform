@@ -59,7 +59,6 @@
                 android:layout_height="match_parent"
                 android:layout_centerVertical="true"
                 android:layout_marginLeft="10dp"
-                android:text="mojo12345"
                 android:layout_marginRight="15dp"
                 android:layout_toRightOf="@id/password_icon"
                 android:background="@android:color/transparent"
@@ -68,6 +67,7 @@
                 android:inputType="textPassword"
                 android:paddingBottom="3dp"
                 android:paddingLeft="5dp"
+                android:text="mojo12345"
                 android:textColorHint="@android:color/white"
                 android:textCursorDrawable="@null" />
         </RelativeLayout>
@@ -115,7 +115,6 @@
 
             <EditText
                 android:id="@+id/username"
-                android:text="Ivan.ivanov"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_centerVertical="true"
@@ -128,6 +127,7 @@
                 android:inputType="textVisiblePassword"
                 android:paddingBottom="3dp"
                 android:paddingLeft="5dp"
+                android:text="Ivan.ivanov"
                 android:textColorHint="@android:color/white"
                 android:textCursorDrawable="@null" />
         </RelativeLayout>
@@ -152,17 +152,19 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.85" />
+        app:layout_constraintGuide_percent="0.93" />
 
     <Button
         android:id="@+id/login_btn"
         android:layout_width="0dp"
-        android:layout_height="45dp"
+        android:layout_height="64dp"
         android:layout_marginBottom="0dp"
         android:layout_marginLeft="0dp"
         android:layout_marginRight="0dp"
-        android:background="@drawable/blue_button"
-        android:text="Войти"
+        android:background="@drawable/blue_btn_with_shadow"
+        android:gravity="top|center_horizontal"
+        android:paddingTop="16.4dp"
+        android:text="@string/log_in"
         android:textColor="@android:color/white"
         app:layout_constraintBottom_toTopOf="@+id/bottom_guideline"
         app:layout_constraintHorizontal_bias="0.0"

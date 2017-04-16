@@ -64,7 +64,7 @@ public class FolderAdapter extends RecyclerView.Adapter<FolderAdapter.FolderView
         viewHolder.moreBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                parentFragment.showPopUpWindow(file.id);
+                parentFragment.showPopUpWindow(file);
             }
         });
     }

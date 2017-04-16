@@ -65,6 +65,7 @@ public class DocumentsFragment extends Fragment {
     public BitmapCacheService bitmapCacheService;
 
     private String selectedItemId;
+    private boolean selectModeEnabled = false;
 
     public static DocumentsFragment newInstance() {
         Bundle args = new Bundle();
@@ -106,8 +107,15 @@ public class DocumentsFragment extends Fragment {
             initDialog();
             setListeners();
             new GetFilesTask(null, null).execute();
+        } else {
+            setupHeader();
+            FileSystemStackEntry lastEntry = foldersStack.get(foldersStack.size() - 1);
+            foldersStack.remove(foldersStack.size() - 1);
+            if (foldersStack.size() == 0)
+                new GetFilesTask(null, null).execute();
+            else
+                new GetFilesTask(lastEntry.id, lastEntry.parentName).execute();
         }
-
         return rootView;
     }
 
@@ -334,18 +342,32 @@ public class DocumentsFragment extends Fragment {
             return false;
     }
 
-    public void showPopUpWindow(String itemId) {
-        selectedItemId = itemId;
-        popupWindow.setVisibility(View.VISIBLE);
+    public void showPopUpWindow(final File item) {
+        if (item.isLocked != null && item.isLocked) {
+            String text = item.isFolder ? getString(R.string.folder_locked) : getString(R.string.file_locked);
+            Toast.makeText(getContext(), text, Toast.LENGTH_LONG).show();
+        } else {
+            selectedItemId = item.id;
+            popupWindow.findViewById(R.id.deselect_block).setVisibility(selectModeEnabled ? View.VISIBLE : View.GONE);
+            popupWindow.setVisibility(View.VISIBLE);
+            popupWindow.findViewById(R.id.move_block).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    getActivity().getSupportFragmentManager().beginTransaction()
+                            .replace(R.id.container, MoveFileFragment.newInstance(item.id)).addToBackStack("documents").commit();
+                    popupWindow.setVisibility(View.GONE);
+                }
+            });
+        }
     }
 
-    public class CreateDirTask extends AsyncTask<Void, Void, Integer> {
+    private class CreateDirTask extends AsyncTask<Void, Void, Integer> {
         private AlertDialog dialog;
         private String parentId;
         private String name;
         private File folder;
 
-        public CreateDirTask(AlertDialog dialog, String name) {
+        CreateDirTask(AlertDialog dialog, String name) {
             this.name = name;
             this.dialog = dialog;
             parentId = foldersStack.get(foldersStack.size() - 1).id;
@@ -354,8 +376,6 @@ public class DocumentsFragment extends Fragment {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            if (downloadTask != null && downloadTask.getStatus() != AsyncTask.Status.FINISHED)
-                downloadTask.cancel(false);
             loopDialog.show();
         }
 
@@ -392,9 +412,10 @@ public class DocumentsFragment extends Fragment {
                 startActivity(new Intent(getContext(), AuthActivity.class));
                 getActivity().finish();
             } else if (responseCode == 409)
-                Toast.makeText(getContext(), R.string.folder_already_exists, Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), R.string.file_or_folder_already_exists, Toast.LENGTH_SHORT).show();
             else {
                 foldersStack.get(foldersStack.size() - 1).folders.add(folder);
+                setAdapters(foldersStack.get(foldersStack.size() - 1).files, foldersStack.get(foldersStack.size() - 1).folders);
                 folderAdapter.notifyDataSetChanged();
                 dialog.dismiss();
                 Toast.makeText(getContext(), R.string.folder_successfully_created, Toast.LENGTH_SHORT).show();
