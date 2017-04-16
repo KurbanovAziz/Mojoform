@@ -33,13 +33,15 @@ public class UserLoginFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        rootView = inflater.inflate(R.layout.fragment_user_login, container, false);
-        user = (User) getArguments().getSerializable("user");
+        if (rootView == null) {
+            rootView = inflater.inflate(R.layout.fragment_user_login, container, false);
+            user = (User) getArguments().getSerializable("user");
 
-        ((TextView) rootView.findViewById(R.id.user_name)).setText(user.firstName + " " + user.lastName);
-        ((TextView) rootView.findViewById(R.id.user_initials)).setText(String.format(Locale.getDefault(), "%s%s", user.firstName.charAt(0), user.lastName.charAt(0)));
+            ((TextView) rootView.findViewById(R.id.user_name)).setText(user.firstName + " " + user.lastName);
+            ((TextView) rootView.findViewById(R.id.user_initials)).setText(String.format(Locale.getDefault(), "%s%s", user.firstName.charAt(0), user.lastName.charAt(0)));
 
-        setListeners();
+            setListeners();
+        }
         return rootView;
     }
 

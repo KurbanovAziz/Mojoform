@@ -69,18 +69,27 @@ public class TasksFragment extends Fragment {
         return fragment;
     }
 
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        currentDate = Calendar.getInstance();
+        currentDate.setTime(new Date());
+    }
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        rootView = inflater.inflate(R.layout.fragment_tasks, container, false);
+        if (rootView == null) {
+            rootView = inflater.inflate(R.layout.fragment_tasks, container, false);
 
-        recyclerView = (RecyclerView) rootView.findViewById(R.id.recycler_view);
-        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        ((RadioButton) rootView.findViewById(R.id.busy)).setChecked(true);
+            recyclerView = (RecyclerView) rootView.findViewById(R.id.recycler_view);
+            recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+            ((RadioButton) rootView.findViewById(R.id.busy)).setChecked(true);
 
-        initDialog();
-        setListeners();
-        new GetTasksTask().execute();
+            initDialog();
+            setListeners();
+            updateDate(true);
+        }
 
         return rootView;
     }
@@ -141,11 +150,9 @@ public class TasksFragment extends Fragment {
 
         final ExpandableLayout expandableLayout = ((ExpandableLayout) rootView.findViewById(R.id.expandable_calendar_layout));
 
-        currentDate = Calendar.getInstance();
-        currentDate.setTime(new Date());
         final MaterialCalendarView calendarView = (MaterialCalendarView) rootView.findViewById(R.id.calendarView);
         calendarView.setTopbarVisible(false);
-        calendarView.setCurrentDate(currentDate);
+        calendarView.setCurrentDate(CalendarDay.from(currentDate), true);
 
         calendarView.setOnDateChangedListener(new OnDateSelectedListener() {
             @Override
@@ -161,9 +168,11 @@ public class TasksFragment extends Fragment {
             @Override
             public void onMonthChanged(MaterialCalendarView widget, CalendarDay date) {
                 Log.d("mojo-log", String.valueOf(date.getMonth()));
-                withDay = false;
-                currentDate = date.getCalendar();
-                updateDate(true);
+                if (CalendarDay.from(currentDate).getMonth() != date.getMonth()) {
+                    withDay = false;
+                    currentDate = date.getCalendar();
+                    updateDate(true);
+                }
             }
         });
 
@@ -171,7 +180,10 @@ public class TasksFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 withDay = false;
-                calendarView.setCurrentDate(CalendarDay.from(new Date()), true);
+                if (CalendarDay.from(new Date()).getMonth() == CalendarDay.from(currentDate).getMonth())
+                    updateDate(true);
+                else
+                    calendarView.setCurrentDate(CalendarDay.from(new Date()), true);
             }
         });
 
@@ -207,10 +219,15 @@ public class TasksFragment extends Fragment {
 
     private void updateDate(boolean needUpdate) {
         String date;
+        currentDate.set(Calendar.HOUR_OF_DAY, 0);
+        currentDate.set(Calendar.MINUTE, 0);
+        currentDate.set(Calendar.SECOND, 0);
+        currentDate.set(Calendar.MILLISECOND, 0);
 
         if (withDay)
             date = new SimpleDateFormat("dd MMMM yyyy", Locale.getDefault()).format(currentDate.getTime());
         else {
+            currentDate.set(Calendar.DAY_OF_MONTH, 1);
             String monthName;
 
             if (Locale.getDefault().getISO3Language().equals("rus")) {
@@ -255,11 +272,16 @@ public class TasksFragment extends Fragment {
                 busyTasks = new ArrayList<>();
                 String url;
 
-                SimpleDateFormat isoDateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+                SimpleDateFormat isoDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX", Locale.getDefault());
                 String dateParams;
-                if (withDay)
-                    dateParams = "&dueOn=" + isoDateFormat.format(currentDate.getTime());
-                else {
+                if (withDay) {
+                    Calendar dayCalendar = Calendar.getInstance();
+                    dayCalendar.setTime(currentDate.getTime());
+                    dateParams = "&dueAfter=" + isoDateFormat.format(dayCalendar.getTime());
+
+                    dayCalendar.add(Calendar.DAY_OF_MONTH, 1);
+                    dateParams += "&dueBefore=" + isoDateFormat.format(dayCalendar.getTime());
+                } else {
                     Calendar monthCalendar = Calendar.getInstance();
                     monthCalendar.setTime(currentDate.getTime());
                     monthCalendar.set(Calendar.DAY_OF_MONTH, 1);

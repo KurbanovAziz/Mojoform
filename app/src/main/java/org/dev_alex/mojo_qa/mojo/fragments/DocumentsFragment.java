@@ -86,26 +86,28 @@ public class DocumentsFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        rootView = (RelativeLayoutWithPopUp) inflater.inflate(R.layout.fragment_documents, container, false);
+        if (rootView == null) {
+            rootView = (RelativeLayoutWithPopUp) inflater.inflate(R.layout.fragment_documents, container, false);
 
-        popupWindow = (RelativeLayout) rootView.findViewById(R.id.popup_layout);
-        rootView.addPopUpWindow(popupWindow);
-        popupWindow.setVisibility(View.GONE);
+            popupWindow = (RelativeLayout) rootView.findViewById(R.id.popup_layout);
+            rootView.addPopUpWindow(popupWindow);
+            popupWindow.setVisibility(View.GONE);
 
-        bitmapCacheService = new BitmapCacheService();
+            bitmapCacheService = new BitmapCacheService();
 
-        isGridView = false;
-        folderRecyclerView = (RecyclerView) rootView.findViewById(R.id.folders_recycler_view);
-        folderRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+            isGridView = false;
+            folderRecyclerView = (RecyclerView) rootView.findViewById(R.id.folders_recycler_view);
+            folderRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
-        filesRecyclerView = (RecyclerView) rootView.findViewById(R.id.files_recycler_view);
-        filesRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+            filesRecyclerView = (RecyclerView) rootView.findViewById(R.id.files_recycler_view);
+            filesRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
-        setupHeader();
-        initDialog();
-        setListeners();
+            setupHeader();
+            initDialog();
+            setListeners();
+            new GetFilesTask(null, null).execute();
+        }
 
-        new GetFilesTask(null, null).execute();
         return rootView;
     }
 

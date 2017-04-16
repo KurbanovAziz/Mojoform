@@ -97,16 +97,18 @@ public class TemplateFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        rootView = inflater.inflate(R.layout.fragment_template, container, false);
-        ((MainActivity) getActivity()).drawer.getDrawerLayout().setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
-        templateId = getArguments().getString("template_id");
+        if (rootView == null) {
+            rootView = inflater.inflate(R.layout.fragment_template, container, false);
+            ((MainActivity) getActivity()).drawer.getDrawerLayout().setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
+            templateId = getArguments().getString("template_id");
 
-        initDialog();
-        setupHeader();
+            initDialog();
+            setupHeader();
 
-        setListeners();
+            setListeners();
 
-        new GetTemplateTask(templateId).execute();
+            new GetTemplateTask(templateId).execute();
+        }
         return rootView;
     }
 
