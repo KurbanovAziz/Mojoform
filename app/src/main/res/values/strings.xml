@@ -48,4 +48,5 @@
     <string name="to_cancel">Отменить</string>
     <string name="log_in">Войти</string>
     <string name="moved_successfully">Успешно перемещено!</string>
+    <string name="removed_successfully">Успешно удалено</string>
 </resources>

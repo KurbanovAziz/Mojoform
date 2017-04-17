@@ -182,7 +182,7 @@ public class DocumentsFragment extends Fragment {
             }
         });
 
-        rootView.findViewById(R.id.create_dit_btn).setOnClickListener(new View.OnClickListener() {
+        rootView.findViewById(R.id.create_dir_btn).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 showCreateDirDialog();
@@ -244,7 +244,7 @@ public class DocumentsFragment extends Fragment {
         filesRecyclerView.setAdapter(fileAdapter);
     }
 
-    private void showRenameDialog() {
+    private void showRenameDialog(File file) {
         LayoutInflater layoutInflater = LayoutInflater.from(getContext());
         final View dialogView = layoutInflater.inflate(R.layout.dialog_folder_management, null, false);
         final AlertDialog renameDialog = new AlertDialog.Builder(getContext()).create();
@@ -350,12 +350,21 @@ public class DocumentsFragment extends Fragment {
             selectedItemId = item.id;
             popupWindow.findViewById(R.id.deselect_block).setVisibility(selectModeEnabled ? View.VISIBLE : View.GONE);
             popupWindow.setVisibility(View.VISIBLE);
+
             popupWindow.findViewById(R.id.move_block).setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     getActivity().getSupportFragmentManager().beginTransaction()
                             .replace(R.id.container, MoveFileFragment.newInstance(item.id)).addToBackStack("documents").commit();
                     popupWindow.setVisibility(View.GONE);
+                }
+            });
+
+            popupWindow.findViewById(R.id.delete_block).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    popupWindow.setVisibility(View.GONE);
+                    new RemoveFileTask(item).execute();
                 }
             });
         }
@@ -420,6 +429,67 @@ public class DocumentsFragment extends Fragment {
                 dialog.dismiss();
                 Toast.makeText(getContext(), R.string.folder_successfully_created, Toast.LENGTH_SHORT).show();
             }
+        }
+    }
+
+    private class RemoveFileTask extends AsyncTask<Void, Void, Integer> {
+        private File file;
+
+        RemoveFileTask(File file) {
+            this.file = file;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            loopDialog.show();
+        }
+
+        @Override
+        protected Integer doInBackground(Void... params) {
+            try {
+                String url = "/api/fs/delete/" + file.id;
+                Response response = RequestService.createCustomTypeRequest(url, "DELETE", "");
+                return response.code();
+
+            } catch (Exception exc) {
+                exc.printStackTrace();
+                return null;
+            }
+        }
+
+        @Override
+        protected void onPostExecute(Integer responseCode) {
+            super.onPostExecute(responseCode);
+            if (loopDialog != null && loopDialog.isShowing())
+                loopDialog.dismiss();
+
+            if (responseCode == null)
+                Toast.makeText(getContext(), R.string.network_error, Toast.LENGTH_LONG).show();
+            else if (responseCode == 401) {
+                startActivity(new Intent(getContext(), AuthActivity.class));
+                getActivity().finish();
+            } else if (responseCode == 409)
+                Toast.makeText(getContext(), R.string.file_or_folder_already_exists, Toast.LENGTH_SHORT).show();
+            else if (responseCode == 204) {
+                if (file.isFolder) {
+                    for (int i = 0; i < foldersStack.get(foldersStack.size() - 1).folders.size(); i++)
+                        if (foldersStack.get(foldersStack.size() - 1).folders.get(i).id.equals(file.id)) {
+                            foldersStack.get(foldersStack.size() - 1).folders.remove(i);
+                            break;
+                        }
+                } else {
+                    for (int i = 0; i < foldersStack.get(foldersStack.size() - 1).files.size(); i++)
+                        if (foldersStack.get(foldersStack.size() - 1).files.get(i).id.equals(file.id)) {
+                            foldersStack.get(foldersStack.size() - 1).files.remove(i);
+                            break;
+                        }
+                }
+                setAdapters(foldersStack.get(foldersStack.size() - 1).files, foldersStack.get(foldersStack.size() - 1).folders);
+                Toast.makeText(getContext(), R.string.removed_successfully, Toast.LENGTH_SHORT).show();
+            } else
+                Toast.makeText(getContext(), R.string.unknown_error, Toast.LENGTH_SHORT).show();
+
         }
     }
 

@@ -62,6 +62,8 @@ public class TasksFragment extends Fragment {
     private Calendar currentDate;
     private boolean withDay = false;
 
+    private ArrayList<CalendarDay> daysWithTasks = new ArrayList<>();
+
     public static TasksFragment newInstance() {
         Bundle args = new Bundle();
         TasksFragment fragment = new TasksFragment();
@@ -211,10 +213,6 @@ public class TasksFragment extends Fragment {
             }
         });
 
-        ArrayList<CalendarDay> days = new ArrayList<>();
-        days.add(CalendarDay.from(new Date()));
-        EventDecorator decorator = new EventDecorator(Color.parseColor("#ff26c373"), days);
-        calendarView.addDecorator(decorator);
     }
 
     private void updateDate(boolean needUpdate) {
@@ -240,6 +238,21 @@ public class TasksFragment extends Fragment {
         ((TextView) rootView.findViewById(R.id.calendar_date)).setText(date);
         if (needUpdate)
             new GetTasksTask().execute();
+    }
+
+    private void updateDecorators() {
+        MaterialCalendarView calendarView = (MaterialCalendarView) rootView.findViewById(R.id.calendarView);
+        for (Task task : finishedTasks)
+            if (!daysWithTasks.contains(CalendarDay.from(task.dueDate)))
+                daysWithTasks.add(CalendarDay.from(task.dueDate));
+        for (Task task : busyTasks)
+            if (!daysWithTasks.contains(CalendarDay.from(task.dueDate)))
+                daysWithTasks.add(CalendarDay.from(task.dueDate));
+
+        calendarView.removeDecorators();
+        calendarView.invalidateDecorators();
+        EventDecorator decorator = new EventDecorator(Color.parseColor("#ff26c373"), daysWithTasks);
+        calendarView.addDecorator(decorator);
     }
 
     private void initDialog() {
@@ -335,6 +348,8 @@ public class TasksFragment extends Fragment {
                 startActivity(new Intent(getContext(), AuthActivity.class));
                 getActivity().finish();
             } else if (responseCode == 200) {
+
+                updateDecorators();
                 ((RadioButton) rootView.findViewById(R.id.busy)).setChecked(true);
                 recyclerView.setAdapter(new TaskAdapter(TasksFragment.this, busyTasks));
             } else

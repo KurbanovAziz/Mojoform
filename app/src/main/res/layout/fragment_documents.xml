@@ -50,6 +50,7 @@
                 android:id="@+id/files_recycler_view"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginBottom="96dp"
                 android:layout_marginLeft="13dp"
                 android:layout_marginRight="13dp"
                 android:clipToPadding="false"
@@ -90,7 +91,7 @@
     </LinearLayout>
 
     <ImageView
-        android:id="@+id/create_dit_btn"
+        android:id="@+id/create_dir_btn"
         android:layout_width="120dp"
         android:layout_height="120dp"
         android:layout_alignParentBottom="true"

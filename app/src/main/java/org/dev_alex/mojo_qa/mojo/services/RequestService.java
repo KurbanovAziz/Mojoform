@@ -27,6 +27,14 @@ public class RequestService {
         return client.newCall(requestBuilder.build()).execute();
     }
 
+    public static Response createCustomTypeRequest(String path, String method, String jsonStr) throws Exception {
+        OkHttpClient client = createOkHttpClient();
+        String url = App.getContext().getString(R.string.host) + path;
+        RequestBody body = RequestBody.create(JSON, jsonStr);
+        Request.Builder requestBuilder = new Request.Builder().url(url).method(method, body);
+        return client.newCall(requestBuilder.build()).execute();
+    }
+
     public static Response createGetRequest(String path) throws Exception {
         OkHttpClient client = createOkHttpClient();
         String url = App.getContext().getString(R.string.host) + path;
