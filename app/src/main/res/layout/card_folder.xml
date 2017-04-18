@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/card"
     android:layout_width="match_parent"
     android:layout_height="70dp"
     android:layout_marginBottom="-18dp"
@@ -11,12 +12,29 @@
     android:paddingRight="7dp"
     android:paddingTop="2dp">
 
-    <ImageView
-        android:layout_width="25dp"
-        android:layout_height="25dp"
-        android:layout_gravity="center_vertical"
-        android:adjustViewBounds="true"
-        android:src="@drawable/folder_icon" />
+
+    <RelativeLayout
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_gravity="center_vertical">
+
+        <ImageView
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:layout_gravity="center_vertical"
+            android:adjustViewBounds="true"
+            android:src="@drawable/folder_icon" />
+
+        <ImageView
+            android:id="@+id/selected_tick"
+            android:layout_width="13dp"
+            android:layout_height="13dp"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentRight="true"
+            android:src="@drawable/selected_tick"
+            android:visibility="gone" />
+    </RelativeLayout>
+
 
     <TextView
         android:id="@+id/folder_name"

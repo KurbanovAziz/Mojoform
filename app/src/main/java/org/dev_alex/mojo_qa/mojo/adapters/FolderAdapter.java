@@ -17,25 +17,41 @@ import java.util.ArrayList;
 
 public class FolderAdapter extends RecyclerView.Adapter<FolderAdapter.FolderViewHolder> {
     private DocumentsFragment parentFragment;
-    private ArrayList<File> files;
+    private ArrayList<File> folders;
     private boolean isGrid;
+    private boolean selectionModeEnabled;
+    private ArrayList<String> selectedIds;
 
     static class FolderViewHolder extends RecyclerView.ViewHolder {
         TextView folderName;
         ImageView moreBtn;
+        ImageView selectedTick;
+        View card;
 
         FolderViewHolder(View itemView) {
             super(itemView);
             folderName = (TextView) itemView.findViewById(R.id.folder_name);
             moreBtn = (ImageView) itemView.findViewById(R.id.more_btn);
+            card = itemView.findViewById(R.id.card);
+            selectedTick = (ImageView) itemView.findViewById(R.id.selected_tick);
         }
     }
 
 
     public FolderAdapter(DocumentsFragment parentFragment, ArrayList<File> files, boolean isGrid) {
         this.parentFragment = parentFragment;
-        this.files = files;
+        this.folders = files;
         this.isGrid = isGrid;
+        selectionModeEnabled = false;
+    }
+
+    public FolderAdapter(DocumentsFragment parentFragment, ArrayList<File> folders, boolean isGrid, ArrayList<String> selectedIds) {
+        this.parentFragment = parentFragment;
+        this.folders = folders;
+        this.isGrid = isGrid;
+
+        this.selectedIds = selectedIds;
+        selectionModeEnabled = true;
     }
 
     @Override
@@ -51,31 +67,96 @@ public class FolderAdapter extends RecyclerView.Adapter<FolderAdapter.FolderView
 
     @Override
     public void onBindViewHolder(FolderViewHolder viewHolder, int i) {
-        final File file = files.get(i);
-        viewHolder.folderName.setText(file.name);
+        final File folder = folders.get(i);
+        viewHolder.folderName.setText(folder.name);
 
-        viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                parentFragment.new GetFilesTask(file.id, file.name).execute();
-            }
-        });
+        if (isGrid)
+            if (selectionModeEnabled)
+                viewHolder.card.setBackgroundResource(selectedIds.contains(folder.id) ?
+                        R.drawable.folder_card_grid_selection_checked : R.drawable.folder_card_grid_selection_unchecked);
+            else
+                viewHolder.card.setBackgroundResource(R.drawable.folder_card_grid_background);
+        else {
+            if (selectionModeEnabled)
+                viewHolder.card.setBackgroundResource(selectedIds.contains(folder.id) ?
+                        R.drawable.folder_card_selection_checked : R.drawable.folder_card_selection_unchecked);
+            else
+                viewHolder.card.setBackgroundResource(R.drawable.folder_card_background);
+        }
 
-        viewHolder.moreBtn.setOnClickListener(new View.OnClickListener() {
+
+        viewHolder.selectedTick.setVisibility(selectionModeEnabled && selectedIds.contains(folder.id) ? View.VISIBLE : View.GONE);
+
+        if (selectionModeEnabled) {
+            viewHolder.moreBtn.setOnClickListener(null);
+            viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (selectedIds.contains(folder.id))
+                        selectedIds.remove(folder.id);
+                    else
+                        selectedIds.add(folder.id);
+
+                    notifyDataSetChanged();
+                    parentFragment.checkIfSelectionModeFinished();
+                }
+            });
+        } else {
+            viewHolder.moreBtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    parentFragment.showPopUpWindow(folder);
+                }
+            });
+            viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    parentFragment.new GetFilesTask(folder.id, folder.name).execute();
+                }
+            });
+        }
+
+
+        viewHolder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
-            public void onClick(View v) {
-                parentFragment.showPopUpWindow(file);
+            public boolean onLongClick(View v) {
+                if (!selectionModeEnabled) {
+                    parentFragment.startSelectionMode();
+                    selectedIds.add(folder.id);
+                    parentFragment.checkIfSelectionModeFinished();
+                }
+                return false;
             }
         });
     }
 
     @Override
     public int getItemCount() {
-        return files.size();
+        return folders.size();
     }
 
-    public void swapType() {
-        isGrid = !isGrid;
+    public void startSelectionMode() {
+        selectionModeEnabled = true;
+        selectedIds = new ArrayList<>();
+        notifyDataSetChanged();
+    }
+
+    public void stopSelectionMode() {
+        selectionModeEnabled = false;
+        notifyDataSetChanged();
+    }
+
+    public ArrayList<String> getSelectedIds() {
+        return selectedIds;
+    }
+
+    public ArrayList<File> getSelectedFolders() {
+        ArrayList<File> selectedFolders = new ArrayList<>();
+        for (File folder : folders)
+            if (selectedIds.contains(folder.id))
+                selectedFolders.add(folder);
+
+        return selectedFolders;
     }
 }
 

@@ -49,4 +49,6 @@
     <string name="log_in">Войти</string>
     <string name="moved_successfully">Успешно перемещено!</string>
     <string name="removed_successfully">Успешно удалено</string>
+    <string name="cannot_delete_some_files_or_folders">Некоторые файлы или папки нельзя удплить!</string>
+    <string name="cannot_move_some_files_or_folders">Некоторые файлы или папки не могут быть перемещены!</string>
 </resources>

@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/selection_menu"
+    android:layout_width="match_parent"
+    android:layout_height="85dp"
+    android:layout_alignParentBottom="true"
+    android:layout_marginBottom="5dp"
+    android:layout_marginLeft="10dp"
+    android:layout_marginRight="10dp"
+    android:background="@drawable/selection_menu_background"
+    android:orientation="horizontal"
+    android:paddingBottom="15dp"
+    android:paddingLeft="28dp"
+    android:paddingRight="18dp">
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/folder_count"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="3 папки"
+            android:textColor="@android:color/white"
+            android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/files_count"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:text="12 файлов"
+            android:textColor="@android:color/white"
+            android:textSize="16sp" />
+    </LinearLayout>
+
+    <ImageView
+        android:id="@+id/selection_move_btn"
+        android:layout_width="50dp"
+        android:layout_height="match_parent"
+        android:adjustViewBounds="true"
+        android:paddingBottom="22dp"
+        android:paddingTop="22dp"
+        android:src="@drawable/move_icon_white" />
+
+    <ImageView
+        android:id="@+id/selection_delete_btn"
+        android:layout_width="50dp"
+        android:layout_height="match_parent"
+        android:adjustViewBounds="true"
+        android:paddingBottom="22dp"
+        android:paddingTop="22dp"
+        android:src="@drawable/ic_delete" />
+
+    <ImageView
+        android:id="@+id/selection_close_btn"
+        android:layout_width="50dp"
+        android:layout_height="match_parent"
+        android:adjustViewBounds="true"
+        android:paddingBottom="24.5dp"
+        android:paddingTop="24.5dp"
+        android:src="@drawable/close_icon" />
+
+</LinearLayout>

@@ -30,10 +30,10 @@
                 android:id="@+id/folders_recycler_view"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="13dp"
-                android:layout_marginRight="13dp"
                 android:clipToPadding="false"
-                android:paddingBottom="12dp" />
+                android:paddingBottom="12dp"
+                android:paddingLeft="13dp"
+                android:paddingRight="13dp" />
 
             <TextView
                 android:id="@+id/files_block"
@@ -50,11 +50,10 @@
                 android:id="@+id/files_recycler_view"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="96dp"
-                android:layout_marginLeft="13dp"
-                android:layout_marginRight="13dp"
                 android:clipToPadding="false"
-                android:paddingBottom="12dp" />
+                android:paddingBottom="118dp"
+                android:paddingLeft="13dp"
+                android:paddingRight="13dp" />
         </LinearLayout>
     </android.support.v4.widget.NestedScrollView>
 
@@ -101,4 +100,6 @@
         android:src="@drawable/add_folder_btn" />
 
     <include layout="@layout/popup_layout" />
+
+    <include layout="@layout/selection_menu_layout" />
 </org.dev_alex.mojo_qa.mojo.custom_views.RelativeLayoutWithPopUp>

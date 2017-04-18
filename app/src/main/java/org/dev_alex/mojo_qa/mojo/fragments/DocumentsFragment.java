@@ -5,6 +5,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -45,12 +46,14 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Locale;
 
 import okhttp3.Response;
 
 public class DocumentsFragment extends Fragment {
     private RelativeLayoutWithPopUp rootView;
-    private RelativeLayout popupWindow;
+    private RelativeLayout itemPopupWindow;
+    private LinearLayout selectionMenu;
 
     private ProgressDialog loopDialog;
     private RecyclerView folderRecyclerView;
@@ -74,6 +77,48 @@ public class DocumentsFragment extends Fragment {
         return fragment;
     }
 
+    public void startSelectionMode() {
+        selectModeEnabled = true;
+        fileAdapter.startSelectionMode();
+        folderAdapter.startSelectionMode();
+        filesRecyclerView.setBackgroundResource(R.drawable.selection_mode_background);
+        folderRecyclerView.setBackgroundResource(R.drawable.selection_mode_background);
+        selectionMenu.setVisibility(View.VISIBLE);
+        updateSelectionMenuData();
+    }
+
+    public void stopSelectionMode() {
+        selectModeEnabled = false;
+
+        if (fileAdapter != null)
+            fileAdapter.stopSelectionMode();
+        if (folderAdapter != null)
+            folderAdapter.stopSelectionMode();
+
+        filesRecyclerView.setBackgroundColor(Color.TRANSPARENT);
+        folderRecyclerView.setBackgroundColor(Color.TRANSPARENT);
+
+        selectionMenu.setVisibility(View.GONE);
+    }
+
+    public void checkIfSelectionModeFinished() {
+        if (fileAdapter.getSelectedIds().isEmpty() && folderAdapter.getSelectedIds().isEmpty())
+            stopSelectionMode();
+        else
+            updateSelectionMenuData();
+    }
+
+    private void updateSelectionMenuData() {
+        int foldersCt = folderAdapter.getSelectedIds().size();
+        int filesCt = fileAdapter.getSelectedIds().size();
+
+        ((TextView) selectionMenu.findViewById(R.id.folder_count)).setText(String.format(Locale.getDefault(),
+                "%d %s", foldersCt, foldersCt % 10 == 1 ? "папка" : "папки(ок)"));
+
+        ((TextView) selectionMenu.findViewById(R.id.files_count)).setText(String.format(Locale.getDefault(),
+                "%d %s", filesCt, filesCt % 10 == 1 ? "файл" : "файла(ов)"));
+
+    }
 
     private void initDialog() {
         loopDialog = new ProgressDialog(getContext(), R.style.ProgressDialogStyle);
@@ -90,9 +135,11 @@ public class DocumentsFragment extends Fragment {
         if (rootView == null) {
             rootView = (RelativeLayoutWithPopUp) inflater.inflate(R.layout.fragment_documents, container, false);
 
-            popupWindow = (RelativeLayout) rootView.findViewById(R.id.popup_layout);
-            rootView.addPopUpWindow(popupWindow);
-            popupWindow.setVisibility(View.GONE);
+            itemPopupWindow = (RelativeLayout) rootView.findViewById(R.id.popup_layout);
+            selectionMenu = (LinearLayout) rootView.findViewById(R.id.selection_menu);
+            rootView.addPopUpWindow(itemPopupWindow);
+            itemPopupWindow.setVisibility(View.GONE);
+            selectionMenu.setVisibility(View.GONE);
 
             bitmapCacheService = new BitmapCacheService();
 
@@ -188,6 +235,55 @@ public class DocumentsFragment extends Fragment {
                 showCreateDirDialog();
             }
         });
+
+        selectionMenu.findViewById(R.id.selection_close_btn).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                stopSelectionMode();
+            }
+        });
+
+        selectionMenu.findViewById(R.id.selection_delete_btn).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ArrayList<File> selectedFiles = new ArrayList<>();
+                selectedFiles.addAll(fileAdapter.getSelectedFiles());
+                selectedFiles.addAll(folderAdapter.getSelectedFolders());
+
+                boolean isAnyoneFileLocked = false;
+                for (File file : selectedFiles) {
+                    if (file.isLocked) {
+                        isAnyoneFileLocked = true;
+                        break;
+                    }
+                }
+                if (isAnyoneFileLocked)
+                    Toast.makeText(getContext(), R.string.cannot_delete_some_files_or_folders, Toast.LENGTH_SHORT).show();
+                else
+                    Toast.makeText(getContext(), "Удалим", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        selectionMenu.findViewById(R.id.selection_move_btn).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ArrayList<File> selectedFiles = new ArrayList<>();
+                selectedFiles.addAll(fileAdapter.getSelectedFiles());
+                selectedFiles.addAll(folderAdapter.getSelectedFolders());
+
+                boolean isAnyoneFileLocked = false;
+                for (File file : selectedFiles) {
+                    if (file.isLocked) {
+                        isAnyoneFileLocked = true;
+                        break;
+                    }
+                }
+                if (isAnyoneFileLocked)
+                    Toast.makeText(getContext(), R.string.cannot_move_some_files_or_folders, Toast.LENGTH_SHORT).show();
+                else
+                    Toast.makeText(getContext(), "Переместим", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private void swapAdapterType() {
@@ -203,10 +299,10 @@ public class DocumentsFragment extends Fragment {
             filesRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         }
         if (folderAdapter != null && fileAdapter != null)
-            setAdapters(foldersStack.get(foldersStack.size() - 1).files, foldersStack.get(foldersStack.size() - 1).folders);
+            setAdapters(foldersStack.get(foldersStack.size() - 1).files, foldersStack.get(foldersStack.size() - 1).folders, true);
     }
 
-    private void setAdapters(ArrayList<File> files, ArrayList<File> folders) {
+    private void setAdapters(ArrayList<File> files, ArrayList<File> folders, boolean withSelection) {
         if ((files == null || files.isEmpty()) && (folders == null || folders.isEmpty()))
             rootView.findViewById(R.id.empty_block).setVisibility(View.VISIBLE);
         else
@@ -237,8 +333,14 @@ public class DocumentsFragment extends Fragment {
             rootView.findViewById(R.id.folders_recycler_view).setVisibility(View.VISIBLE);
         }
 
-        folderAdapter = new FolderAdapter(this, folders, isGridView);
-        fileAdapter = new FileAdapter(DocumentsFragment.this, files, isGridView);
+        if (selectModeEnabled && withSelection) {
+            folderAdapter = new FolderAdapter(this, folders, isGridView, folderAdapter.getSelectedIds());
+            fileAdapter = new FileAdapter(DocumentsFragment.this, files, isGridView, fileAdapter.getSelectedIds());
+        } else {
+            stopSelectionMode();
+            folderAdapter = new FolderAdapter(this, folders, isGridView);
+            fileAdapter = new FileAdapter(DocumentsFragment.this, files, isGridView);
+        }
 
         folderRecyclerView.setAdapter(folderAdapter);
         filesRecyclerView.setAdapter(fileAdapter);
@@ -330,7 +432,7 @@ public class DocumentsFragment extends Fragment {
         if (foldersStack != null && foldersStack.size() > 1) {
             foldersStack.remove(foldersStack.size() - 1);
             updateHeader();
-            setAdapters(foldersStack.get(foldersStack.size() - 1).files, foldersStack.get(foldersStack.size() - 1).folders);
+            setAdapters(foldersStack.get(foldersStack.size() - 1).files, foldersStack.get(foldersStack.size() - 1).folders, false);
 
             if (downloadTask != null && downloadTask.getStatus() != AsyncTask.Status.FINISHED)
                 downloadTask.cancel(false);
@@ -348,22 +450,22 @@ public class DocumentsFragment extends Fragment {
             Toast.makeText(getContext(), text, Toast.LENGTH_LONG).show();
         } else {
             selectedItemId = item.id;
-            popupWindow.findViewById(R.id.deselect_block).setVisibility(selectModeEnabled ? View.VISIBLE : View.GONE);
-            popupWindow.setVisibility(View.VISIBLE);
+            itemPopupWindow.findViewById(R.id.deselect_block).setVisibility(selectModeEnabled ? View.VISIBLE : View.GONE);
+            itemPopupWindow.setVisibility(View.VISIBLE);
 
-            popupWindow.findViewById(R.id.move_block).setOnClickListener(new View.OnClickListener() {
+            itemPopupWindow.findViewById(R.id.move_block).setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     getActivity().getSupportFragmentManager().beginTransaction()
                             .replace(R.id.container, MoveFileFragment.newInstance(item.id)).addToBackStack("documents").commit();
-                    popupWindow.setVisibility(View.GONE);
+                    itemPopupWindow.setVisibility(View.GONE);
                 }
             });
 
-            popupWindow.findViewById(R.id.delete_block).setOnClickListener(new View.OnClickListener() {
+            itemPopupWindow.findViewById(R.id.delete_block).setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    popupWindow.setVisibility(View.GONE);
+                    itemPopupWindow.setVisibility(View.GONE);
                     new RemoveFileTask(item).execute();
                 }
             });
@@ -424,7 +526,7 @@ public class DocumentsFragment extends Fragment {
                 Toast.makeText(getContext(), R.string.file_or_folder_already_exists, Toast.LENGTH_SHORT).show();
             else {
                 foldersStack.get(foldersStack.size() - 1).folders.add(folder);
-                setAdapters(foldersStack.get(foldersStack.size() - 1).files, foldersStack.get(foldersStack.size() - 1).folders);
+                setAdapters(foldersStack.get(foldersStack.size() - 1).files, foldersStack.get(foldersStack.size() - 1).folders, false);
                 folderAdapter.notifyDataSetChanged();
                 dialog.dismiss();
                 Toast.makeText(getContext(), R.string.folder_successfully_created, Toast.LENGTH_SHORT).show();
@@ -485,7 +587,7 @@ public class DocumentsFragment extends Fragment {
                             break;
                         }
                 }
-                setAdapters(foldersStack.get(foldersStack.size() - 1).files, foldersStack.get(foldersStack.size() - 1).folders);
+                setAdapters(foldersStack.get(foldersStack.size() - 1).files, foldersStack.get(foldersStack.size() - 1).folders, false);
                 Toast.makeText(getContext(), R.string.removed_successfully, Toast.LENGTH_SHORT).show();
             } else
                 Toast.makeText(getContext(), R.string.unknown_error, Toast.LENGTH_SHORT).show();
@@ -577,7 +679,7 @@ public class DocumentsFragment extends Fragment {
 
                 foldersStack.add(new FileSystemStackEntry(folders, files, fileName == null ? "" : fileName, fileId));
 
-                setAdapters(files, folders);
+                setAdapters(files, folders, false);
                 updateHeader();
             }
         }

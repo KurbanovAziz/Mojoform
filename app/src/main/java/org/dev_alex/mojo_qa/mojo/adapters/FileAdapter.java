@@ -24,6 +24,8 @@ public class FileAdapter extends RecyclerView.Adapter<FileAdapter.FileViewHolder
     private DocumentsFragment parentFragment;
     private ArrayList<File> files;
     private boolean isGrid;
+    private boolean selectionModeEnabled;
+    private ArrayList<String> selectedIds;
 
     static class FileViewHolder extends RecyclerView.ViewHolder {
         TextView fileName;
@@ -31,6 +33,8 @@ public class FileAdapter extends RecyclerView.Adapter<FileAdapter.FileViewHolder
         ImageView moreBtn;
         ImageView fileIcon;
         ImageView filePreview;
+        ImageView selectedTick;
+        View card;
 
         FileViewHolder(View itemView) {
             super(itemView);
@@ -39,6 +43,8 @@ public class FileAdapter extends RecyclerView.Adapter<FileAdapter.FileViewHolder
             moreBtn = (ImageView) itemView.findViewById(R.id.more_btn);
             fileIcon = (ImageView) itemView.findViewById(R.id.file_icon);
             filePreview = (ImageView) itemView.findViewById(R.id.file_preview);
+            card = itemView.findViewById(R.id.card);
+            selectedTick = (ImageView) itemView.findViewById(R.id.selected_tick);
         }
     }
 
@@ -47,6 +53,16 @@ public class FileAdapter extends RecyclerView.Adapter<FileAdapter.FileViewHolder
         this.parentFragment = parentFragment;
         this.files = files;
         this.isGrid = isGrid;
+        selectionModeEnabled = false;
+    }
+
+    public FileAdapter(DocumentsFragment parentFragment, ArrayList<File> files, boolean isGrid, ArrayList<String> selectedIds) {
+        this.parentFragment = parentFragment;
+        this.files = files;
+        this.isGrid = isGrid;
+
+        this.selectedIds = selectedIds;
+        selectionModeEnabled = true;
     }
 
     @Override
@@ -68,6 +84,12 @@ public class FileAdapter extends RecyclerView.Adapter<FileAdapter.FileViewHolder
         SimpleDateFormat sdf = new SimpleDateFormat("dd MMMM yyyy | HH.mm", Locale.getDefault());
 
         if (isGrid) {
+            if (selectionModeEnabled)
+                viewHolder.card.setBackgroundResource(selectedIds.contains(file.id) ?
+                        R.drawable.file_card_grid_selection_checked : R.drawable.file_card_grid_selection_unchecked);
+            else
+                viewHolder.card.setBackgroundResource(R.drawable.file_card_grid_background);
+
             FrameLayout.LayoutParams imageLayoutParams = (FrameLayout.LayoutParams) viewHolder.filePreview.getLayoutParams();
             if (parentFragment.bitmapCacheService.hasPreviewInMemCache(file.id)) {
                 imageLayoutParams.height = ViewGroup.LayoutParams.MATCH_PARENT;
@@ -80,8 +102,14 @@ public class FileAdapter extends RecyclerView.Adapter<FileAdapter.FileViewHolder
                         parentFragment.getResources().getDisplayMetrics());
             }
             viewHolder.filePreview.setLayoutParams(imageLayoutParams);
-        } else
+        } else {
             viewHolder.fileDate.setText(sdf.format(file.createdAt));
+            if (selectionModeEnabled)
+                viewHolder.card.setBackgroundResource(selectedIds.contains(file.id) ?
+                        R.drawable.file_card_selection_checked : R.drawable.file_card_selection_unchecked);
+            else
+                viewHolder.card.setBackgroundResource(R.drawable.task_card_background);
+        }
 
         if (parentFragment.bitmapCacheService.hasThumbnailInMemCache(file.id)) {
             Bitmap bitmap = parentFragment.bitmapCacheService.getThumbnailFromMemCache(file.id);
@@ -89,10 +117,39 @@ public class FileAdapter extends RecyclerView.Adapter<FileAdapter.FileViewHolder
         } else
             viewHolder.fileIcon.setImageResource(R.drawable.file_icon);
 
-        viewHolder.moreBtn.setOnClickListener(new View.OnClickListener() {
+        viewHolder.selectedTick.setVisibility(selectionModeEnabled && selectedIds.contains(file.id) ? View.VISIBLE : View.GONE);
+
+        if (selectionModeEnabled) {
+            viewHolder.moreBtn.setOnClickListener(null);
+            viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (selectedIds.contains(file.id))
+                        selectedIds.remove(file.id);
+                    else
+                        selectedIds.add(file.id);
+
+                    notifyDataSetChanged();
+                    parentFragment.checkIfSelectionModeFinished();
+                }
+            });
+        } else
+            viewHolder.moreBtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    parentFragment.showPopUpWindow(file);
+                }
+            });
+
+        viewHolder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
-            public void onClick(View v) {
-                parentFragment.showPopUpWindow(file);
+            public boolean onLongClick(View v) {
+                if (!selectionModeEnabled) {
+                    parentFragment.startSelectionMode();
+                    selectedIds.add(file.id);
+                    parentFragment.checkIfSelectionModeFinished();
+                }
+                return false;
             }
         });
     }
@@ -102,8 +159,28 @@ public class FileAdapter extends RecyclerView.Adapter<FileAdapter.FileViewHolder
         return files.size();
     }
 
-    public void swapType() {
-        isGrid = !isGrid;
+    public void startSelectionMode() {
+        selectionModeEnabled = true;
+        selectedIds = new ArrayList<>();
+        notifyDataSetChanged();
+    }
+
+    public void stopSelectionMode() {
+        selectionModeEnabled = false;
+        notifyDataSetChanged();
+    }
+
+    public ArrayList<String> getSelectedIds() {
+        return selectedIds;
+    }
+
+    public ArrayList<File> getSelectedFiles() {
+        ArrayList<File> selectedFiles = new ArrayList<>();
+        for (File file : files)
+            if (selectedIds.contains(file.id))
+                selectedFiles.add(file);
+
+        return selectedFiles;
     }
 }
 
