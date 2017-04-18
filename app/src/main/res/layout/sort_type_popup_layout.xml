@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/popup_layout"
+    android:id="@+id/sort_popup_layout"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_alignParentBottom="true"
@@ -9,15 +9,15 @@
     <ImageView
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_alignBottom="@+id/dialog_data"
-        android:layout_alignLeft="@+id/dialog_data"
-        android:layout_alignRight="@+id/dialog_data"
-        android:layout_alignTop="@+id/dialog_data"
+        android:layout_alignBottom="@+id/sort_dialog_data"
+        android:layout_alignLeft="@+id/sort_dialog_data"
+        android:layout_alignRight="@+id/sort_dialog_data"
+        android:layout_alignTop="@+id/sort_dialog_data"
         android:scaleType="fitXY"
         android:src="@drawable/float_background" />
 
     <LinearLayout
-        android:id="@+id/dialog_data"
+        android:id="@+id/sort_dialog_data"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:clipToPadding="true"
@@ -28,91 +28,76 @@
         android:paddingTop="20dp">
 
         <LinearLayout
-            android:id="@+id/move_block"
+            android:id="@+id/sort_by_create_time"
             android:layout_width="match_parent"
             android:layout_height="48dp"
             android:orientation="horizontal">
 
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:text="@string/create_date"
+                android:textColor="#4c3e60"
+                android:textSize="16sp" />
+
             <ImageView
+                android:id="@+id/sort_by_create_time_tick"
                 android:layout_width="21dp"
                 android:layout_height="21dp"
                 android:layout_gravity="center_vertical"
-                android:src="@drawable/move_icon" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:layout_marginLeft="8dp"
-                android:text="@string/move"
-                android:textColor="#4c3e60"
-                android:textSize="16sp" />
+                android:layout_marginLeft="15dp"
+                android:src="@drawable/green_tick_icon"
+                android:visibility="gone" />
         </LinearLayout>
 
+
         <LinearLayout
-            android:id="@+id/edit_block"
+            android:id="@+id/sort_by_update_time"
             android:layout_width="match_parent"
             android:layout_height="48dp"
             android:orientation="horizontal">
 
-            <ImageView
-                android:layout_width="18dp"
-                android:layout_height="18dp"
-                android:layout_gravity="center_vertical"
-                android:src="@drawable/edit_icon" />
-
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
-                android:layout_marginLeft="11dp"
-                android:text="@string/rename"
+                android:text="@string/edit_time"
                 android:textColor="#4c3e60"
                 android:textSize="16sp" />
+
+            <ImageView
+                android:id="@+id/sort_by_update_time_tick"
+                android:layout_width="21dp"
+                android:layout_height="21dp"
+                android:layout_gravity="center_vertical"
+                android:layout_marginLeft="15dp"
+                android:src="@drawable/green_tick_icon"
+                android:visibility="gone" />
         </LinearLayout>
 
         <LinearLayout
-            android:id="@+id/delete_block"
+            android:id="@+id/sort_by_name"
             android:layout_width="match_parent"
             android:layout_height="48dp"
             android:orientation="horizontal">
 
-            <ImageView
-                android:layout_width="18dp"
-                android:layout_height="18dp"
-                android:layout_gravity="center_vertical"
-                android:src="@drawable/delete_icon" />
-
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
-                android:layout_marginLeft="11dp"
-                android:text="@string/delete"
+                android:text="@string/first_letter"
                 android:textColor="#4c3e60"
                 android:textSize="16sp" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/deselect_block"
-            android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:orientation="horizontal">
 
             <ImageView
-                android:layout_width="18dp"
-                android:layout_height="18dp"
+                android:id="@+id/sort_by_name_tick"
+                android:layout_width="21dp"
+                android:layout_height="21dp"
                 android:layout_gravity="center_vertical"
-                android:src="@drawable/deselect_icon" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:layout_marginLeft="11dp"
-                android:text="@string/deselect"
-                android:textColor="#4c3e60"
-                android:textSize="16sp" />
+                android:layout_marginLeft="15dp"
+                android:src="@drawable/green_tick_icon"
+                android:visibility="visible" />
         </LinearLayout>
     </LinearLayout>
 </RelativeLayout>

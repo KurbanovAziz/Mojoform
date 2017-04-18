@@ -55,4 +55,12 @@
     <string name="not_all_files_or_folders_were_deleted">Не все файлы/папки были удалены</string>
     <string name="move_error">Не удалось переместить</string>
     <string name="not_all_files_or_folders_were_moved_due_to_conflicts">Не все файды/папки были перемещены из-за конфликтов</string>
+    <string name="create_date">Дате добавления</string>
+    <string name="edit_time">Дате изменения</string>
+    <string name="first_letter">Первой букве</string>
+    <string name="folder">папку</string>
+    <string name="file">файл</string>
+    <string name="new_name">Новое имя</string>
+    <string name="folder_successfully_renamed">Папка успешно переименована</string>
+    <string name="file_successfully_renamed">Файл успешно переименован</string>
 </resources>

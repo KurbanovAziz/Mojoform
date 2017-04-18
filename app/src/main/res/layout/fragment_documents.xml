@@ -99,7 +99,9 @@
         android:adjustViewBounds="true"
         android:src="@drawable/add_folder_btn" />
 
-    <include layout="@layout/popup_layout" />
+    <include layout="@layout/item_popup_layout" />
+
+    <include layout="@layout/sort_type_popup_layout" />
 
     <include layout="@layout/selection_menu_layout" />
 </org.dev_alex.mojo_qa.mojo.custom_views.RelativeLayoutWithPopUp>

@@ -51,8 +51,14 @@ import java.util.Locale;
 import okhttp3.Response;
 
 public class DocumentsFragment extends Fragment {
+    private final int SORT_BY_NAME = 1;
+    private final int SORT_BY_CREATED_AT = 2;
+    private final int SORT_BY_UPDATED_AT = 3;
+    private int sortType = SORT_BY_NAME;
+
     private RelativeLayoutWithPopUp rootView;
     private RelativeLayout itemPopupWindow;
+    private RelativeLayout sortTypePopupWindow;
     private LinearLayout selectionMenu;
 
     private ProgressDialog loopDialog;
@@ -138,9 +144,13 @@ public class DocumentsFragment extends Fragment {
         if (rootView == null) {
             rootView = (RelativeLayoutWithPopUp) inflater.inflate(R.layout.fragment_documents, container, false);
 
-            itemPopupWindow = (RelativeLayout) rootView.findViewById(R.id.popup_layout);
+            itemPopupWindow = (RelativeLayout) rootView.findViewById(R.id.item_popup_layout);
+            sortTypePopupWindow = (RelativeLayout) rootView.findViewById(R.id.sort_popup_layout);
             selectionMenu = (LinearLayout) rootView.findViewById(R.id.selection_menu);
             rootView.addPopUpWindow(itemPopupWindow);
+            rootView.addPopUpWindow(sortTypePopupWindow);
+
+            sortTypePopupWindow.setVisibility(View.GONE);
             itemPopupWindow.setVisibility(View.GONE);
             selectionMenu.setVisibility(View.GONE);
 
@@ -159,14 +169,18 @@ public class DocumentsFragment extends Fragment {
             new GetFilesTask(null, null).execute();
         } else {
             setupHeader();
-            FileSystemStackEntry lastEntry = foldersStack.get(foldersStack.size() - 1);
-            foldersStack.remove(foldersStack.size() - 1);
-            if (foldersStack.size() == 0)
-                new GetFilesTask(null, null).execute();
-            else
-                new GetFilesTask(lastEntry.id, lastEntry.parentName).execute();
+            updateCurrentFolder();
         }
         return rootView;
+    }
+
+    private void updateCurrentFolder() {
+        FileSystemStackEntry lastEntry = foldersStack.get(foldersStack.size() - 1);
+        foldersStack.remove(foldersStack.size() - 1);
+        if (foldersStack.size() == 0)
+            new GetFilesTask(null, null).execute();
+        else
+            new GetFilesTask(lastEntry.id, lastEntry.parentName).execute();
     }
 
     private void setupHeader() {
@@ -189,6 +203,15 @@ public class DocumentsFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 popFileStack();
+            }
+        });
+
+        getActivity().findViewById(R.id.group_by_btn).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (selectModeEnabled)
+                    stopSelectionMode();
+                sortTypePopupWindow.setVisibility(View.VISIBLE);
             }
         });
     }
@@ -292,6 +315,48 @@ public class DocumentsFragment extends Fragment {
                 }
             }
         });
+
+
+        sortTypePopupWindow.findViewById(R.id.sort_by_name).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                sortTypePopupWindow.findViewById(R.id.sort_by_create_time_tick).setVisibility(View.GONE);
+                sortTypePopupWindow.findViewById(R.id.sort_by_update_time_tick).setVisibility(View.GONE);
+
+                sortTypePopupWindow.findViewById(R.id.sort_by_name_tick).setVisibility(View.VISIBLE);
+                sortType = SORT_BY_NAME;
+                sortTypePopupWindow.setVisibility(View.GONE);
+                updateCurrentFolder();
+            }
+        });
+
+        sortTypePopupWindow.findViewById(R.id.sort_by_create_time).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                sortTypePopupWindow.findViewById(R.id.sort_by_name_tick).setVisibility(View.GONE);
+                sortTypePopupWindow.findViewById(R.id.sort_by_update_time_tick).setVisibility(View.GONE);
+
+                sortTypePopupWindow.findViewById(R.id.sort_by_create_time_tick).setVisibility(View.VISIBLE);
+
+                sortType = SORT_BY_CREATED_AT;
+                sortTypePopupWindow.setVisibility(View.GONE);
+                updateCurrentFolder();
+            }
+        });
+
+        sortTypePopupWindow.findViewById(R.id.sort_by_update_time).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                sortTypePopupWindow.findViewById(R.id.sort_by_create_time_tick).setVisibility(View.GONE);
+                sortTypePopupWindow.findViewById(R.id.sort_by_name_tick).setVisibility(View.GONE);
+
+                sortTypePopupWindow.findViewById(R.id.sort_by_update_time_tick).setVisibility(View.VISIBLE);
+
+                sortType = SORT_BY_UPDATED_AT;
+                sortTypePopupWindow.setVisibility(View.GONE);
+                updateCurrentFolder();
+            }
+        });
     }
 
     private void swapAdapterType() {
@@ -354,13 +419,16 @@ public class DocumentsFragment extends Fragment {
         filesRecyclerView.setAdapter(fileAdapter);
     }
 
-    private void showRenameDialog(File file) {
+    private void showRenameDialog(final File file) {
         LayoutInflater layoutInflater = LayoutInflater.from(getContext());
         final View dialogView = layoutInflater.inflate(R.layout.dialog_folder_management, null, false);
-        final AlertDialog renameDialog = new AlertDialog.Builder(getContext()).create();
-        renameDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-        renameDialog.setView(dialogView);
-        renameDialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
+
+        ((TextView) dialogView.findViewById(R.id.dialog_title)).setText(getString(R.string.rename) + " " + (file.isFolder ? getString(R.string.folder) : getString(R.string.file)));
+        ((EditText) dialogView.findViewById(R.id.text_input)).setHint(R.string.new_name);
+        ((EditText) dialogView.findViewById(R.id.text_input)).setText(file.name);
+        ((TextView) dialogView.findViewById(R.id.right_btn_text)).setText(R.string.rename);
+
+        final AlertDialog renameDialog = createDialogWithBlur(dialogView);
 
         dialogView.findViewById(R.id.left_btn).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -371,11 +439,12 @@ public class DocumentsFragment extends Fragment {
         dialogView.findViewById(R.id.right_btn).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                renameDialog.dismiss();
+                if (((EditText) dialogView.findViewById(R.id.text_input)).getText().toString().trim().isEmpty())
+                    Toast.makeText(getContext(), R.string.input_folder_name, Toast.LENGTH_LONG).show();
+                else
+                    new RenameFileTask(renameDialog, file, ((EditText) dialogView.findViewById(R.id.text_input)).getText().toString().trim()).execute();
             }
         });
-
-        renameDialog.show();
     }
 
     private void showCreateDirDialog() {
@@ -482,6 +551,14 @@ public class DocumentsFragment extends Fragment {
                     new RemoveFileTask(fileArrayList).execute();
                 }
             });
+
+            itemPopupWindow.findViewById(R.id.edit_block).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    itemPopupWindow.setVisibility(View.GONE);
+                    showRenameDialog(item);
+                }
+            });
         }
     }
 
@@ -539,10 +616,75 @@ public class DocumentsFragment extends Fragment {
                 Toast.makeText(getContext(), R.string.file_or_folder_already_exists, Toast.LENGTH_SHORT).show();
             else {
                 foldersStack.get(foldersStack.size() - 1).folders.add(folder);
-                setAdapters(foldersStack.get(foldersStack.size() - 1).files, foldersStack.get(foldersStack.size() - 1).folders, false);
                 folderAdapter.notifyDataSetChanged();
                 dialog.dismiss();
                 Toast.makeText(getContext(), R.string.folder_successfully_created, Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
+    private class RenameFileTask extends AsyncTask<Void, Void, Integer> {
+        private AlertDialog dialog;
+        private File file;
+        private String newName;
+
+        RenameFileTask(AlertDialog dialog, File file, String newName) {
+            this.newName = newName;
+            this.dialog = dialog;
+            this.file = file;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            loopDialog.show();
+        }
+
+        @Override
+        protected Integer doInBackground(Void... params) {
+            try {
+                String url = "/api/fs/rename/" + file.id;
+                JSONObject jsonObject = new JSONObject();
+                jsonObject.put("name", newName);
+
+                Response response = RequestService.createPostRequest(url, jsonObject.toString());
+
+                return response.code();
+            } catch (Exception exc) {
+                exc.printStackTrace();
+                return null;
+            }
+        }
+
+        @Override
+        protected void onPostExecute(Integer responseCode) {
+            super.onPostExecute(responseCode);
+            if (loopDialog != null && loopDialog.isShowing())
+                loopDialog.dismiss();
+
+            if (responseCode == null)
+                Toast.makeText(getContext(), R.string.network_error, Toast.LENGTH_LONG).show();
+            else if (responseCode == 401) {
+                startActivity(new Intent(getContext(), AuthActivity.class));
+                getActivity().finish();
+            } else if (responseCode == 409)
+                Toast.makeText(getContext(), R.string.file_or_folder_already_exists, Toast.LENGTH_SHORT).show();
+            else {
+                if (file.isFolder) {
+                    for (File folder : foldersStack.get(foldersStack.size() - 1).folders)
+                        if (folder.id.equals(file.id))
+                            folder.name = newName;
+                    folderAdapter.notifyDataSetChanged();
+                } else {
+                    for (File searchFile : foldersStack.get(foldersStack.size() - 1).files)
+                        if (searchFile.id.equals(file.id))
+                            searchFile.name = newName;
+                    fileAdapter.notifyDataSetChanged();
+                }
+
+                dialog.dismiss();
+                Toast.makeText(getContext(), file.isFolder ? getString(R.string.folder_successfully_renamed)
+                        : getString(R.string.file_successfully_renamed), Toast.LENGTH_SHORT).show();
             }
         }
     }
@@ -652,12 +794,20 @@ public class DocumentsFragment extends Fragment {
                 files = new ArrayList<>();
                 folders = new ArrayList<>();
 
+                String sortParameter = "?orderBy=";
+                if (sortType == SORT_BY_CREATED_AT)
+                    sortParameter += "createdAt DESC";
+                else if (sortType == SORT_BY_UPDATED_AT)
+                    sortParameter += "modifiedAt DESC";
+                else if (sortType == SORT_BY_NAME)
+                    sortParameter += "name ASC";
+
                 String url;
                 if (fileId == null) {
-                    url = "/api/fs/childrenmy";
+                    url = "/api/fs/childrenmy" + sortParameter;
                     foldersStack = new ArrayList<>();
                 } else
-                    url = "/api/fs/children/" + fileId;
+                    url = "/api/fs/children/" + fileId + sortParameter;
 
                 Response response = RequestService.createGetRequest(url);
 

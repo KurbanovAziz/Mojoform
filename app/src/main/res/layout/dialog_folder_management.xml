@@ -47,8 +47,11 @@
             android:layout_marginTop="25dp"
             android:background="@drawable/white_rounded_rectangle"
             android:hint="@string/old_name"
+            android:maxLines="1"
             android:paddingLeft="10dp"
             android:paddingRight="10dp"
+            android:scrollHorizontally="true"
+            android:singleLine="true"
             android:textColorHint="#c7c7cd" />
 
         <LinearLayout
