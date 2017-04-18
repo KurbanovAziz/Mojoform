@@ -18,9 +18,13 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import org.dev_alex.mojo_qa.mojo.R;
 import org.dev_alex.mojo_qa.mojo.activities.AuthActivity;
 import org.dev_alex.mojo_qa.mojo.activities.MainActivity;
+import org.dev_alex.mojo_qa.mojo.models.File;
 import org.dev_alex.mojo_qa.mojo.services.RequestService;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -33,7 +37,7 @@ public class MoveFileFragment extends Fragment {
     private int defaultLeftOffsetDp;
 
     private View rootView;
-    private String fileId;
+    private ArrayList<File> fileList;
     private ProgressDialog loopDialog;
     private String selectedFolderId;
     private ArrayList<FolderEntry> folders;
@@ -44,9 +48,14 @@ public class MoveFileFragment extends Fragment {
     private HorizontalScrollView horizontalScrollView;
 
 
-    public static MoveFileFragment newInstance(String fileId) {
+    public static MoveFileFragment newInstance(ArrayList<File> fileList) {
         Bundle args = new Bundle();
-        args.putString("file_id", fileId);
+        try {
+            args.putString("files_array", new ObjectMapper().writeValueAsString(fileList));
+        } catch (Exception exc) {
+            exc.printStackTrace();
+        }
+
 
         MoveFileFragment fragment = new MoveFileFragment();
         fragment.setArguments(args);
@@ -58,19 +67,24 @@ public class MoveFileFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         this.inflater = inflater;
         if (rootView == null) {
-            rootView = inflater.inflate(R.layout.fragment_move_file, container, false);
-            rootContainer = (LinearLayout) rootView.findViewById(R.id.folders_container);
-            scrollView = (ScrollView) rootView.findViewById(R.id.scroll_view);
-            horizontalScrollView = (HorizontalScrollView) rootView.findViewById(R.id.horizontal_scroll_view);
+            try {
+                rootView = inflater.inflate(R.layout.fragment_move_file, container, false);
+                rootContainer = (LinearLayout) rootView.findViewById(R.id.folders_container);
+                scrollView = (ScrollView) rootView.findViewById(R.id.scroll_view);
+                horizontalScrollView = (HorizontalScrollView) rootView.findViewById(R.id.horizontal_scroll_view);
 
-            defaultLeftOffsetDp = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 25, getResources().getDisplayMetrics());
-            fileId = getArguments().getString("file_id");
-            setListeners();
-            setupHeader();
-            initDialog();
-            ((MainActivity) getActivity()).drawer.getDrawerLayout().setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
-            folders = new ArrayList<>();
-            new GetFoldersTask(null).execute();
+                defaultLeftOffsetDp = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 25, getResources().getDisplayMetrics());
+                fileList = new ObjectMapper().readValue(getArguments().getString("files_array"), new TypeReference<ArrayList<File>>() {
+                });
+                setListeners();
+                setupHeader();
+                initDialog();
+                ((MainActivity) getActivity()).drawer.getDrawerLayout().setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
+                folders = new ArrayList<>();
+                new GetFoldersTask(null).execute();
+            } catch (Exception exc) {
+                exc.printStackTrace();
+            }
         }
         return rootView;
     }
@@ -254,6 +268,8 @@ public class MoveFileFragment extends Fragment {
     }
 
     private class MoveFileTask extends AsyncTask<Void, Void, Integer> {
+        private final int NO_ERRORS_CODE = 1234;
+        private int movedFilesCt;
 
         @Override
         protected void onPreExecute() {
@@ -264,12 +280,19 @@ public class MoveFileFragment extends Fragment {
         @Override
         protected Integer doInBackground(Void... params) {
             try {
-                String url = "/api/fs/move/" + fileId;
-                JSONObject jsonObject = new JSONObject();
-                jsonObject.put("parent_id", selectedFolderId);
+                movedFilesCt = 0;
+                for (File file : fileList) {
+                    String url = "/api/fs/move/" + file.id;
+                    JSONObject jsonObject = new JSONObject();
+                    jsonObject.put("parent_id", selectedFolderId);
 
-                Response response = RequestService.createPostRequest(url, jsonObject.toString());
-                return response.code();
+                    Response response = RequestService.createPostRequest(url, jsonObject.toString());
+                    if (response.code() == 401)
+                        return response.code();
+
+                    movedFilesCt++;
+                }
+                return NO_ERRORS_CODE;
             } catch (Exception exc) {
                 exc.printStackTrace();
                 return null;
@@ -289,8 +312,14 @@ public class MoveFileFragment extends Fragment {
                 getActivity().finish();
             } else if (responseCode == 409)
                 Toast.makeText(getContext(), R.string.file_or_folder_already_exists, Toast.LENGTH_SHORT).show();
-            else if (responseCode == 200) {
-                Toast.makeText(getContext(), R.string.moved_successfully, Toast.LENGTH_SHORT).show();
+            else if (responseCode == NO_ERRORS_CODE) {
+                if (movedFilesCt == 0)
+                    Toast.makeText(getContext(), R.string.move_error, Toast.LENGTH_SHORT).show();
+                else if (movedFilesCt == fileList.size())
+                    Toast.makeText(getContext(), R.string.moved_successfully, Toast.LENGTH_SHORT).show();
+                else
+                    Toast.makeText(getContext(), R.string.not_all_files_or_folders_were_moved_due_to_conflicts, Toast.LENGTH_SHORT).show();
+
                 close();
             } else
                 Toast.makeText(getContext(), R.string.unknown_error, Toast.LENGTH_SHORT).show();

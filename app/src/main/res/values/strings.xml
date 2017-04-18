@@ -51,4 +51,8 @@
     <string name="removed_successfully">Успешно удалено</string>
     <string name="cannot_delete_some_files_or_folders">Некоторые файлы или папки нельзя удплить!</string>
     <string name="cannot_move_some_files_or_folders">Некоторые файлы или папки не могут быть перемещены!</string>
+    <string name="not_deleted">Удалить не удалось</string>
+    <string name="not_all_files_or_folders_were_deleted">Не все файлы/папки были удалены</string>
+    <string name="move_error">Не удалось переместить</string>
+    <string name="not_all_files_or_folders_were_moved_due_to_conflicts">Не все файды/папки были перемещены из-за конфликтов</string>
 </resources>

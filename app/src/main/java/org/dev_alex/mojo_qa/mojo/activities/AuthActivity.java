@@ -38,9 +38,9 @@ public class AuthActivity extends AppCompatActivity {
             @Override
             public void run() {
                 if (LoginHistoryService.lastLoginUsersExists())
-                    getSupportFragmentManager().beginTransaction().replace(R.id.container, LoginHistoryFragment.newInstance()).commit();
+                    getSupportFragmentManager().beginTransaction().replace(R.id.container, LoginHistoryFragment.newInstance()).commitAllowingStateLoss();
                 else
-                    getSupportFragmentManager().beginTransaction().replace(R.id.container, LoginFragment.newInstance()).commit();
+                    getSupportFragmentManager().beginTransaction().replace(R.id.container, LoginFragment.newInstance()).commitAllowingStateLoss();
             }
         }, 3000);
     }

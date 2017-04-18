@@ -82,12 +82,13 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
 
         if (templateId != null) {
             final String finalTemplateId = templateId;
-            viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    parentFragment.showFillTemplateWindow(finalTemplateId);
-                }
-            });
+            if (!task.suspended)
+                viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        parentFragment.showFillTemplateWindow(finalTemplateId);
+                    }
+                });
         }
     }
 

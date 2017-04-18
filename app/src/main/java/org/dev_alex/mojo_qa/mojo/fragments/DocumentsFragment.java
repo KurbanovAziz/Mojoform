@@ -255,15 +255,17 @@ public class DocumentsFragment extends Fragment {
 
                 boolean isAnyoneFileLocked = false;
                 for (File file : selectedFiles) {
-                    if (file.isLocked) {
+                    if (file.isLocked != null && file.isLocked) {
                         isAnyoneFileLocked = true;
                         break;
                     }
                 }
                 if (isAnyoneFileLocked)
                     Toast.makeText(getContext(), R.string.cannot_delete_some_files_or_folders, Toast.LENGTH_SHORT).show();
-                else
-                    Toast.makeText(getContext(), "Удалим", Toast.LENGTH_SHORT).show();
+                else {
+                    new RemoveFileTask(selectedFiles).execute();
+                    stopSelectionMode();
+                }
             }
         });
 
@@ -276,15 +278,18 @@ public class DocumentsFragment extends Fragment {
 
                 boolean isAnyoneFileLocked = false;
                 for (File file : selectedFiles) {
-                    if (file.isLocked) {
+                    if (file.isLocked != null && file.isLocked) {
                         isAnyoneFileLocked = true;
                         break;
                     }
                 }
                 if (isAnyoneFileLocked)
                     Toast.makeText(getContext(), R.string.cannot_move_some_files_or_folders, Toast.LENGTH_SHORT).show();
-                else
-                    Toast.makeText(getContext(), "Переместим", Toast.LENGTH_SHORT).show();
+                else {
+                    getActivity().getSupportFragmentManager().beginTransaction()
+                            .replace(R.id.container, MoveFileFragment.newInstance(selectedFiles)).addToBackStack("documents").commit();
+                    stopSelectionMode();
+                }
             }
         });
     }
@@ -459,8 +464,11 @@ public class DocumentsFragment extends Fragment {
             itemPopupWindow.findViewById(R.id.move_block).setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    ArrayList<File> fileArrayList = new ArrayList<>();
+                    fileArrayList.add(item);
+
                     getActivity().getSupportFragmentManager().beginTransaction()
-                            .replace(R.id.container, MoveFileFragment.newInstance(item.id)).addToBackStack("documents").commit();
+                            .replace(R.id.container, MoveFileFragment.newInstance(fileArrayList)).addToBackStack("documents").commit();
                     itemPopupWindow.setVisibility(View.GONE);
                 }
             });
@@ -469,7 +477,9 @@ public class DocumentsFragment extends Fragment {
                 @Override
                 public void onClick(View v) {
                     itemPopupWindow.setVisibility(View.GONE);
-                    new RemoveFileTask(item).execute();
+                    ArrayList<File> fileArrayList = new ArrayList<>();
+                    fileArrayList.add(item);
+                    new RemoveFileTask(fileArrayList).execute();
                 }
             });
         }
@@ -538,10 +548,13 @@ public class DocumentsFragment extends Fragment {
     }
 
     private class RemoveFileTask extends AsyncTask<Void, Void, Integer> {
-        private File file;
+        private final int NO_ERRORS_CODE = 12345;
 
-        RemoveFileTask(File file) {
-            this.file = file;
+        private ArrayList<File> files;
+        private ArrayList<File> deletedFiles;
+
+        RemoveFileTask(ArrayList<File> files) {
+            this.files = files;
         }
 
         @Override
@@ -553,9 +566,16 @@ public class DocumentsFragment extends Fragment {
         @Override
         protected Integer doInBackground(Void... params) {
             try {
-                String url = "/api/fs/delete/" + file.id;
-                Response response = RequestService.createCustomTypeRequest(url, "DELETE", "");
-                return response.code();
+                deletedFiles = new ArrayList<>();
+                for (File file : files) {
+                    String url = "/api/fs/delete/" + file.id;
+                    Response response = RequestService.createCustomTypeRequest(url, "DELETE", "");
+                    if (response.code() == 404)
+                        return response.code();
+
+                    deletedFiles.add(file);
+                }
+                return NO_ERRORS_CODE;
 
             } catch (Exception exc) {
                 exc.printStackTrace();
@@ -574,24 +594,31 @@ public class DocumentsFragment extends Fragment {
             else if (responseCode == 401) {
                 startActivity(new Intent(getContext(), AuthActivity.class));
                 getActivity().finish();
-            } else if (responseCode == 409)
-                Toast.makeText(getContext(), R.string.file_or_folder_already_exists, Toast.LENGTH_SHORT).show();
-            else if (responseCode == 204) {
-                if (file.isFolder) {
-                    for (int i = 0; i < foldersStack.get(foldersStack.size() - 1).folders.size(); i++)
-                        if (foldersStack.get(foldersStack.size() - 1).folders.get(i).id.equals(file.id)) {
-                            foldersStack.get(foldersStack.size() - 1).folders.remove(i);
-                            break;
-                        }
-                } else {
-                    for (int i = 0; i < foldersStack.get(foldersStack.size() - 1).files.size(); i++)
-                        if (foldersStack.get(foldersStack.size() - 1).files.get(i).id.equals(file.id)) {
-                            foldersStack.get(foldersStack.size() - 1).files.remove(i);
-                            break;
-                        }
-                }
+            } else if (responseCode == NO_ERRORS_CODE) {
+                if (deletedFiles.isEmpty())
+                    Toast.makeText(getContext(), R.string.not_deleted, Toast.LENGTH_SHORT).show();
+                else if (deletedFiles.size() == files.size())
+                    Toast.makeText(getContext(), R.string.removed_successfully, Toast.LENGTH_SHORT).show();
+                else
+                    Toast.makeText(getContext(), R.string.not_all_files_or_folders_were_deleted, Toast.LENGTH_SHORT).show();
+
+                for (File file : deletedFiles)
+                    if (file.isFolder) {
+                        for (int i = 0; i < foldersStack.get(foldersStack.size() - 1).folders.size(); i++)
+                            if (foldersStack.get(foldersStack.size() - 1).folders.get(i).id.equals(file.id)) {
+                                foldersStack.get(foldersStack.size() - 1).folders.remove(i);
+                                break;
+                            }
+                    } else {
+                        for (int i = 0; i < foldersStack.get(foldersStack.size() - 1).files.size(); i++)
+                            if (foldersStack.get(foldersStack.size() - 1).files.get(i).id.equals(file.id)) {
+                                foldersStack.get(foldersStack.size() - 1).files.remove(i);
+                                break;
+                            }
+                    }
+
                 setAdapters(foldersStack.get(foldersStack.size() - 1).files, foldersStack.get(foldersStack.size() - 1).folders, false);
-                Toast.makeText(getContext(), R.string.removed_successfully, Toast.LENGTH_SHORT).show();
+
             } else
                 Toast.makeText(getContext(), R.string.unknown_error, Toast.LENGTH_SHORT).show();
 

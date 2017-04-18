@@ -3,7 +3,7 @@
     android:shareInterpolator="false">
 
     <alpha
-        android:duration="800"
+        android:duration="600"
         android:fromAlpha="0.9"
         android:toAlpha="0.0" />
 </set>

@@ -510,6 +510,7 @@ public class TemplateFragment extends Fragment {
 
         final ExpandableLayout expandableLayout = new ExpandableLayout(getContext());
         expandableLayout.setOrientation(ExpandableLayout.VERTICAL);
+        expandableLayout.setDuration(800);
         expandableLayout.addView(expandableContent);
         if (value.has("collapsed"))
             if (value.getBoolean("collapsed"))

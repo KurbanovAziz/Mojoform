@@ -125,7 +125,7 @@ public class FolderAdapter extends RecyclerView.Adapter<FolderAdapter.FolderView
                     selectedIds.add(folder.id);
                     parentFragment.checkIfSelectionModeFinished();
                 }
-                return false;
+                return true;
             }
         });
     }

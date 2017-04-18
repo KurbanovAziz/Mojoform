@@ -149,7 +149,7 @@ public class FileAdapter extends RecyclerView.Adapter<FileAdapter.FileViewHolder
                     selectedIds.add(file.id);
                     parentFragment.checkIfSelectionModeFinished();
                 }
-                return false;
+                return true;
             }
         });
     }
