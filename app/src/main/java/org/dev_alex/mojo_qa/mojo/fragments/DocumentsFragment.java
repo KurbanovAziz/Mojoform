@@ -85,6 +85,8 @@ public class DocumentsFragment extends Fragment {
         folderRecyclerView.setBackgroundResource(R.drawable.selection_mode_background);
         selectionMenu.setVisibility(View.VISIBLE);
         updateSelectionMenuData();
+
+        rootView.findViewById(R.id.create_dir_btn).setVisibility(View.GONE);
     }
 
     public void stopSelectionMode() {
@@ -99,6 +101,7 @@ public class DocumentsFragment extends Fragment {
         folderRecyclerView.setBackgroundColor(Color.TRANSPARENT);
 
         selectionMenu.setVisibility(View.GONE);
+        rootView.findViewById(R.id.create_dir_btn).setVisibility(View.VISIBLE);
     }
 
     public void checkIfSelectionModeFinished() {
