@@ -82,7 +82,9 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
 
         if (templateId != null) {
             final String finalTemplateId = templateId;
-            if (!task.suspended)
+            if (task.suspended == null || task.suspended)
+                viewHolder.itemView.setOnClickListener(null);
+            else
                 viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
