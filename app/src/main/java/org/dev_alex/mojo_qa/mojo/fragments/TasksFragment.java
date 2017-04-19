@@ -65,6 +65,8 @@ public class TasksFragment extends Fragment {
 
     private ArrayList<CalendarDay> daysWithTasks = new ArrayList<>();
 
+    public boolean needUpdate = false;
+
     public static TasksFragment newInstance() {
         Bundle args = new Bundle();
         TasksFragment fragment = new TasksFragment();
@@ -93,6 +95,9 @@ public class TasksFragment extends Fragment {
             setListeners();
             updateDate(true);
         }
+
+        if (needUpdate)
+            updateDate(true);
 
         return rootView;
     }
@@ -271,9 +276,9 @@ public class TasksFragment extends Fragment {
         loopDialog.setCancelable(false);
     }
 
-    public void showFillTemplateWindow(String templateId) {
+    public void showFillTemplateWindow(String templateId, String taskId) {
         getActivity().getSupportFragmentManager().beginTransaction()
-                .replace(R.id.container, TemplateFragment.newInstance(templateId)).addToBackStack(null).commit();
+                .replace(R.id.container, TemplateFragment.newInstance(templateId, taskId)).addToBackStack(null).commit();
     }
 
     private class GetTasksTask extends AsyncTask<Void, Void, Integer> {

@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Date;
 
 public class Task {
-    public Long id;
+    public String id;
     public Long durationInMillis;
     public Long workTimeInMillis;
     public String url;

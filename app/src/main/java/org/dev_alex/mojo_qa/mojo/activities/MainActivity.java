@@ -54,7 +54,7 @@ public class MainActivity extends AppCompatActivity {
                     public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
                         switch ((int) drawerItem.getIdentifier()) {
                             case 1:
-                                getSupportFragmentManager().beginTransaction().replace(R.id.container, TasksFragment.newInstance()).commit();
+                                getSupportFragmentManager().beginTransaction().replace(R.id.container, TasksFragment.newInstance(), "tasks").commit();
                                 break;
                             case 2:
                                 getSupportFragmentManager().beginTransaction().replace(R.id.container, DocumentsFragment.newInstance()).commit();

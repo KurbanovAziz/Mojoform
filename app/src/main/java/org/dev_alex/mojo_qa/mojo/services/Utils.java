@@ -28,4 +28,15 @@ public class Utils {
         }
         return resultJsonArray;
     }
+
+    public static boolean containsValue(JSONArray jsonArray, String value) {
+        try {
+            for (int j = 0; j < jsonArray.length(); j++)
+                if (jsonArray.getString(j).equals(value))
+                    return true;
+        } catch (Exception exc) {
+            exc.printStackTrace();
+        }
+        return false;
+    }
 }

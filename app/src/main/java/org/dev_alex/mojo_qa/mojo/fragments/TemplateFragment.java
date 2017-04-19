@@ -47,6 +47,7 @@ import android.widget.Toast;
 import net.cachapa.expandablelayout.ExpandableLayout;
 
 import org.dev_alex.mojo_qa.mojo.App;
+import org.dev_alex.mojo_qa.mojo.Data;
 import org.dev_alex.mojo_qa.mojo.R;
 import org.dev_alex.mojo_qa.mojo.activities.AuthActivity;
 import org.dev_alex.mojo_qa.mojo.activities.ImageViewActivity;
@@ -61,11 +62,12 @@ import org.json.JSONObject;
 
 import java.io.File;
 import java.net.HttpURLConnection;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.Locale;
 import java.util.Random;
-import java.util.UUID;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import okhttp3.Response;
@@ -73,12 +75,14 @@ import okhttp3.Response;
 import static android.app.Activity.RESULT_OK;
 
 public class TemplateFragment extends Fragment {
+    private SimpleDateFormat isoDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ", Locale.getDefault());
     private final int PHOTO_REQUEST_CODE = 10;
     private final int IMAGE_SHOW_REQUEST_CODE = 11;
 
     private View rootView;
     private ProgressDialog loopDialog;
     private String templateId;
+    private String taskId;
     private ArrayList<Page> pages;
     private int currentPagePos;
     private JSONObject template;
@@ -89,9 +93,10 @@ public class TemplateFragment extends Fragment {
     private ProgressDialog progressDialog;
 
 
-    public static TemplateFragment newInstance(String templateId) {
+    public static TemplateFragment newInstance(String templateId, String taskId) {
         Bundle args = new Bundle();
         args.putString("template_id", templateId);
+        args.putString("task_id", taskId);
 
         TemplateFragment fragment = new TemplateFragment();
         fragment.setArguments(args);
@@ -105,6 +110,7 @@ public class TemplateFragment extends Fragment {
             rootView = inflater.inflate(R.layout.fragment_template, container, false);
             ((MainActivity) getActivity()).drawer.getDrawerLayout().setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
             templateId = getArguments().getString("template_id");
+            taskId = getArguments().getString("task_id");
 
             initDialog();
             setupHeader();
@@ -207,12 +213,7 @@ public class TemplateFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 if (templateId != null) {
-                    SharedPreferences mSettings;
-                    mSettings = App.getContext().getSharedPreferences("templates", Context.MODE_PRIVATE);
-                    SharedPreferences.Editor editor = mSettings.edit();
-
-                    editor.putString(templateId, template.toString());
-                    editor.apply();
+                    saveTemplateState();
                     getActivity().getSupportFragmentManager().popBackStack();
                 }
             }
@@ -221,9 +222,11 @@ public class TemplateFragment extends Fragment {
         rootView.findViewById(R.id.finish_btn).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (checkIfTemplateIsFilled())
-                    Toast.makeText(getContext(), "Все ок", Toast.LENGTH_SHORT).show();
-                else
+                Pair<Boolean, ArrayList<JSONObject>> result = checkIfTemplateIsFilled(template);
+
+                if (result.first) {
+                    new SendImageTask(result.second).execute();
+                } else
                     Toast.makeText(getContext(), R.string.not_all_required_fields_are_filled, Toast.LENGTH_LONG).show();
             }
         });
@@ -262,26 +265,49 @@ public class TemplateFragment extends Fragment {
             }
     }
 
-
-    private boolean checkIfTemplateIsFilled() {
+    private void saveTemplateState() {
         try {
+            if (!template.has("StartTime"))
+                template.put("StartTime", isoDateFormat.format(new Date()));
+            SharedPreferences mSettings;
+            mSettings = App.getContext().getSharedPreferences("templates", Context.MODE_PRIVATE);
+            SharedPreferences.Editor editor = mSettings.edit();
+
+            editor.putString(templateId, template.toString());
+            editor.apply();
+        } catch (Exception exc) {
+            exc.printStackTrace();
+        }
+    }
+
+
+    private Pair<Boolean, ArrayList<JSONObject>> checkIfTemplateIsFilled(JSONObject template) {
+        try {
+            ArrayList<JSONObject> photoObjects = new ArrayList<>();
+
             if (template != null) {
                 JSONArray pagesJson = template.getJSONArray("items");
                 for (int i = 0; i < pagesJson.length(); i++) {
                     JSONObject pageJson = pagesJson.getJSONObject(i).getJSONObject("page");
-                    if (pageJson.has("items"))
-                        if (!checkIfContainerIsFilled(pageJson.getJSONArray("items")))
-                            return false;
+                    if (pageJson.has("items")) {
+                        Pair<Boolean, ArrayList<JSONObject>> result = checkIfContainerIsFilled(pageJson.getJSONArray("items"));
+                        if (!result.first)
+                            return new Pair<>(false, null);
+                        else
+                            photoObjects.addAll(result.second);
+                    }
                 }
-                return true;
+                return new Pair<>(true, photoObjects);
             }
         } catch (Exception exc) {
             exc.printStackTrace();
         }
-        return false;
+        return new Pair<>(false, null);
     }
 
-    private boolean checkIfContainerIsFilled(JSONArray dataJson) throws Exception {
+    private Pair<Boolean, ArrayList<JSONObject>> checkIfContainerIsFilled(JSONArray dataJson) throws Exception {
+        ArrayList<JSONObject> photoObjects = new ArrayList<>();
+
         ArrayList<String> fields = new ArrayList<>();
         for (int i = 0; i < dataJson.length(); i++) {
             JSONObject value = dataJson.getJSONObject(i);
@@ -296,13 +322,17 @@ public class TemplateFragment extends Fragment {
             final JSONObject value = dataJson.getJSONObject(i).getJSONObject(fields.get(i));
             switch (fields.get(i)) {
                 case "category":
-                    if (!checkIfContainerIsFilled(value.getJSONArray("items")))
-                        return false;
+
+                    Pair<Boolean, ArrayList<JSONObject>> result = checkIfContainerIsFilled(value.getJSONArray("items"));
+                    if (!result.first)
+                        return new Pair<>(false, null);
+                    else
+                        photoObjects.addAll(result.second);
                     break;
 
                 case "question":
                     if (!value.has("value") && !(value.has("is_required") && !value.getBoolean("is_required")))
-                        return false;
+                        return new Pair<>(false, null);
                     break;
 
                 case "text":
@@ -310,28 +340,30 @@ public class TemplateFragment extends Fragment {
 
                 case "lineedit":
                     if (!value.has("value") && !(value.has("is_required") && !value.getBoolean("is_required")))
-                        return false;
+                        return new Pair<>(false, null);
                     break;
 
                 case "textarea":
                     if (!value.has("value") && !(value.has("is_required") && !value.getBoolean("is_required")))
-                        return false;
+                        return new Pair<>(false, null);
                     break;
 
                 case "checkbox":
                     if (!value.has("value") && !(value.has("is_required") && !value.getBoolean("is_required")))
-                        return false;
+                        return new Pair<>(false, null);
                     break;
 
                 case "slider":
                     if (!value.has("value") && !(value.has("is_required") && !value.getBoolean("is_required")))
-                        return false;
+                        return new Pair<>(false, null);
                     break;
 
                 case "photo":
                     if ((!value.has("image_paths") || (value.has("image_paths") && value.getJSONArray("image_paths").length() == 0))
                             && !(value.has("is_required") && !value.getBoolean("is_required")))
-                        return false;
+                        return new Pair<>(false, null);
+                    else
+                        photoObjects.add(value);
                     break;
 
                 case "richedit":
@@ -341,7 +373,7 @@ public class TemplateFragment extends Fragment {
                     Log.d("jeka", fields.get(i));
             }
         }
-        return true;
+        return new Pair<>(true, photoObjects);
     }
 
     private void renderTemplate() {
@@ -910,44 +942,75 @@ public class TemplateFragment extends Fragment {
 
     private class SendImageTask extends AsyncTask<Void, Integer, Integer> {
         private final int SUCCESS = 0;
-        private final int ERROR = 1;
+        private ArrayList<JSONObject> imgsObjects;
+        private int successfullySentImgCt, totalSize;
 
-        private ArrayList<File> imgFiles;
-        private ArrayList<String> sendedImageIds;
-
-        SendImageTask(JSONArray jsonArray) {
-            for (int i = 0; i < jsonArray.length(); i++) {
-                try {
-                    imgFiles.add(new File(jsonArray.getString(i)));
-                } catch (Exception exc) {
-                    exc.printStackTrace();
-                }
-            }
+        SendImageTask(ArrayList<JSONObject> imgsObjects) {
+            this.imgsObjects = imgsObjects;
         }
 
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            progressDialog.setMax(imgFiles.size());
+            totalSize = 0;
+
+            try {
+                for (JSONObject jsonObject : imgsObjects)
+                    if (jsonObject.has("image_paths"))
+                        for (int i = 0; i < jsonObject.getJSONArray("image_paths").length(); i++)
+                            if (!jsonObject.has("sent_images") ||
+                                    (jsonObject.has("sent_images") && !Utils.containsValue(jsonObject.getJSONArray("sent_images"), jsonObject.getJSONArray("image_paths").getString(i))))
+                                totalSize++;
+
+            } catch (Exception exc) {
+                exc.printStackTrace();
+            }
+            progressDialog.setMax(totalSize + 1);
             progressDialog.show();
         }
 
         @Override
         protected Integer doInBackground(Void... params) {
-            sendedImageIds = new ArrayList<>();
+            try {
+                successfullySentImgCt = 0;
+                for (JSONObject jsonObject : imgsObjects)
+                    if (jsonObject.has("image_paths"))
+                        for (int i = 0; i < jsonObject.getJSONArray("image_paths").length(); i++)
+                            if (!jsonObject.has("sent_images") ||
+                                    (jsonObject.has("sent_images") && !Utils.containsValue(jsonObject.getJSONArray("sent_images"), jsonObject.getJSONArray("image_paths").getString(i)))) {
+                                String imagePath = jsonObject.getJSONArray("image_paths").getString(i);
+                                try {
+                                    File imageFile = new File(imagePath);
+                                    Response response = RequestService.createSendFileRequest("/api/fs/upload/binary/28e95811-cabb-49b2-b927-8d321327267c", imageFile);
+                                    String imageId = new JSONObject(response.body().string()).getJSONObject("entry").getString("id");
 
-            for (int i = 0; i < imgFiles.size(); i++) {
-                try {
-                    String randomUUID = UUID.randomUUID().toString();
-                    sendedImageIds.add(randomUUID);
-                    String url = "/api/fs/upload/binary/" + randomUUID;
+                                    if (response.code() == 200) {
+                                        successfullySentImgCt++;
+                                        if (jsonObject.has("sent_images"))
+                                            jsonObject.getJSONArray("sent_images").put(imagePath);
+                                        else {
+                                            JSONArray sentImages = new JSONArray();
+                                            sentImages.put(imagePath);
+                                            jsonObject.put("sent_images", sentImages);
+                                        }
 
-                    Response response = RequestService.createSendFileRequest(url, imgFiles.get(i));
-                    publishProgress(i);
+                                        if (jsonObject.has("values"))
+                                            jsonObject.getJSONArray("values").put(imageId);
+                                        else {
+                                            JSONArray values = new JSONArray();
+                                            values.put(imageId);
+                                            jsonObject.put("values", values);
+                                        }
+                                    }
 
-                } catch (Exception exc) {
-                    return ERROR;
-                }
+                                    Log.d("mojo-log", String.valueOf(response.code()));
+                                    publishProgress(i);
+                                } catch (Exception exc) {
+                                    exc.printStackTrace();
+                                }
+                            }
+            } catch (Exception exc) {
+                exc.printStackTrace();
             }
             return SUCCESS;
         }
@@ -955,14 +1018,95 @@ public class TemplateFragment extends Fragment {
         @Override
         protected void onProgressUpdate(Integer... values) {
             super.onProgressUpdate(values);
-            progressDialog.setProgress(values[0]);
+            progressDialog.setProgress(values[0] + 1);
         }
 
         @Override
         protected void onPostExecute(Integer result) {
             super.onPostExecute(result);
+            if (successfullySentImgCt < totalSize) {
+                saveTemplateState();
+                if (progressDialog != null && progressDialog.isShowing())
+                    progressDialog.dismiss();
+                Toast.makeText(getContext(), R.string.error_not_all_images_were_sent, Toast.LENGTH_SHORT).show();
+            } else {
+                new CompleteTemplateTask().execute();
+            }
+        }
+    }
+
+    private class CompleteTemplateTask extends AsyncTask<Void, Integer, Integer> {
+        private JSONObject currentTemplateCopy;
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            try {
+                currentTemplateCopy = new JSONObject(template.toString());
+                Pair<Boolean, ArrayList<JSONObject>> result = checkIfTemplateIsFilled(currentTemplateCopy);
+                ArrayList<JSONObject> imageBlocks = result.second;
+                for (JSONObject jsonObject : imageBlocks) {
+                    if (jsonObject.has("sent_images"))
+                        jsonObject.remove("sent_images");
+
+                    if (jsonObject.has("image_paths"))
+                        jsonObject.remove("image_paths");
+                }
+
+                currentTemplateCopy.put("executor", Data.currentUser.userName);
+                if (!template.has("StartTime"))
+                    currentTemplateCopy.put("StartTime", isoDateFormat.format(new Date()));
+                if (!currentTemplateCopy.has("DueTime"))
+                    currentTemplateCopy.put("DueTime", isoDateFormat.format(new Date()));
+                if (!currentTemplateCopy.has("CompleteTime"))
+                    currentTemplateCopy.put("CompleteTime", isoDateFormat.format(new Date()));
+
+            } catch (Exception exc) {
+                exc.printStackTrace();
+            }
+        }
+
+        @Override
+        protected Integer doInBackground(Void... params) {
+            try {
+                JSONObject jsonObject = new JSONObject();
+                jsonObject.put("template", currentTemplateCopy.toString());
+                Response response = RequestService.createPostRequest("/api/document/create/" + templateId, jsonObject.toString());
+                if (response.code() == 200) {
+                    String finishTaskJson = "{\n" +
+                            "  \"action\" : \"complete\",\n" +
+                            "  \"variables\" : []\n" +
+                            "}";
+
+                    response = RequestService.createPostRequest("/runtime/tasks/" + taskId, finishTaskJson);
+                }
+                return response.code();
+
+            } catch (Exception exc) {
+                exc.printStackTrace();
+                return null;
+            }
+        }
+
+        @Override
+        protected void onPostExecute(Integer responseCode) {
+            super.onPostExecute(responseCode);
             if (progressDialog != null && progressDialog.isShowing())
                 progressDialog.dismiss();
+
+            saveTemplateState();
+
+            if (responseCode == null)
+                Toast.makeText(getContext(), R.string.network_error, Toast.LENGTH_LONG).show();
+            else if (responseCode == 401) {
+                startActivity(new Intent(getContext(), AuthActivity.class));
+                getActivity().finish();
+            } else if (responseCode == 200) {
+                ((TasksFragment) getActivity().getSupportFragmentManager().findFragmentByTag("tasks")).needUpdate = true;
+                getActivity().getSupportFragmentManager().popBackStack();
+            } else
+                Toast.makeText(getContext(), R.string.unknown_error, Toast.LENGTH_LONG).show();
+
         }
     }
 
