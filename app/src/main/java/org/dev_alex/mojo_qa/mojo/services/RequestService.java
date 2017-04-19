@@ -4,6 +4,7 @@ import org.dev_alex.mojo_qa.mojo.App;
 import org.dev_alex.mojo_qa.mojo.Data;
 import org.dev_alex.mojo_qa.mojo.R;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,6 +12,7 @@ import okhttp3.Cookie;
 import okhttp3.CookieJar;
 import okhttp3.HttpUrl;
 import okhttp3.MediaType;
+import okhttp3.MultipartBody;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
@@ -18,12 +20,25 @@ import okhttp3.Response;
 
 public class RequestService {
     private final static MediaType JSON = MediaType.parse("application/json; charset=utf-8");
+    private final static MediaType MEDIA_TYPE = MediaType.parse("image/jpg");
+
 
     public static Response createPostRequest(String path, String jsonStr) throws Exception {
         OkHttpClient client = createOkHttpClient();
         String url = App.getContext().getString(R.string.host) + path;
         RequestBody body = RequestBody.create(JSON, jsonStr);
         Request.Builder requestBuilder = new Request.Builder().url(url).post(body);
+        return client.newCall(requestBuilder.build()).execute();
+    }
+
+    public static Response createSendFileRequest(String path, File file) throws Exception {
+        OkHttpClient client = createOkHttpClient();
+        String url = App.getContext().getString(R.string.host) + path;
+        RequestBody requestBody = new MultipartBody.Builder()
+                .setType(MultipartBody.FORM)
+                .addFormDataPart("file", file.getName(), RequestBody.create(MEDIA_TYPE, file))
+                .build();
+        Request.Builder requestBuilder = new Request.Builder().url(url).post(requestBody);
         return client.newCall(requestBuilder.build()).execute();
     }
 

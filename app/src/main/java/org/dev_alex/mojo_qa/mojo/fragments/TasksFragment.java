@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.IdRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -162,7 +163,13 @@ public class TasksFragment extends Fragment {
                 expandableLayout.collapse();
                 currentDate = date.getCalendar();
                 withDay = true;
-                updateDate(true);
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        updateDate(true);
+
+                    }
+                }, 500);
             }
         });
 
@@ -285,7 +292,7 @@ public class TasksFragment extends Fragment {
                 busyTasks = new ArrayList<>();
                 String url;
 
-                SimpleDateFormat isoDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX", Locale.getDefault());
+                SimpleDateFormat isoDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ", Locale.getDefault());
                 String dateParams;
                 if (withDay) {
                     Calendar dayCalendar = Calendar.getInstance();
@@ -348,7 +355,6 @@ public class TasksFragment extends Fragment {
                 startActivity(new Intent(getContext(), AuthActivity.class));
                 getActivity().finish();
             } else if (responseCode == 200) {
-
                 updateDecorators();
                 ((RadioButton) rootView.findViewById(R.id.busy)).setChecked(true);
                 recyclerView.setAdapter(new TaskAdapter(TasksFragment.this, busyTasks));

@@ -10,7 +10,7 @@
     <string name="password">пароль</string>
     <string name="not_all_fields_filled">Заполнены не все поля</string>
     <string name="loading_please_wait">Загрузка, пожалуйста подождите…</string>
-    <string name="network_error">Отсутвует интернет соединение, либо сервер недоступен</string>
+    <string name="network_error">Отсутствует интернет соединение, либо сервер недоступен</string>
     <string name="invalid_username_or_password">Неверное имя пользователя или пароль</string>
     <string name="tasks">Задачи</string>
     <string name="documents">Документы</string>
@@ -63,4 +63,5 @@
     <string name="new_name">Новое имя</string>
     <string name="folder_successfully_renamed">Папка успешно переименована</string>
     <string name="file_successfully_renamed">Файл успешно переименован</string>
+    <string name="not_all_required_fields_are_filled">Не все необходимые поля заполнены!</string>
 </resources>

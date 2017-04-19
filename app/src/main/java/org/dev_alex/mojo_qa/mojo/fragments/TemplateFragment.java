@@ -65,6 +65,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Locale;
 import java.util.Random;
+import java.util.UUID;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import okhttp3.Response;
@@ -84,6 +85,9 @@ public class TemplateFragment extends Fragment {
 
     private Pair<LinearLayout, JSONObject> currentPhotoBlock;
     private String cameraImagePath;
+
+    private ProgressDialog progressDialog;
+
 
     public static TemplateFragment newInstance(String templateId) {
         Bundle args = new Bundle();
@@ -213,6 +217,16 @@ public class TemplateFragment extends Fragment {
                 }
             }
         });
+
+        rootView.findViewById(R.id.finish_btn).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (checkIfTemplateIsFilled())
+                    Toast.makeText(getContext(), "Все ок", Toast.LENGTH_SHORT).show();
+                else
+                    Toast.makeText(getContext(), R.string.not_all_required_fields_are_filled, Toast.LENGTH_LONG).show();
+            }
+        });
     }
 
     private void initDialog() {
@@ -222,6 +236,112 @@ public class TemplateFragment extends Fragment {
         loopDialog.setIndeterminate(true);
         loopDialog.setCanceledOnTouchOutside(false);
         loopDialog.setCancelable(false);
+
+        progressDialog = new ProgressDialog(getContext(), R.style.ProgressDialogStyle);
+        progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+        progressDialog.setMessage(getString(R.string.loading_please_wait));
+        progressDialog.setIndeterminate(false);
+        progressDialog.setCanceledOnTouchOutside(false);
+        progressDialog.setCancelable(false);
+    }
+
+    private void setPage(Page page) {
+        FrameLayout rootContainer = (FrameLayout) rootView.findViewById(R.id.root_container);
+        rootContainer.removeAllViewsInLayout();
+        rootContainer.addView(page.layout);
+
+        ((TextView) rootView.findViewById(R.id.page_name)).setText(page.name);
+        currentPagePos = pages.indexOf(page);
+        for (int i = 0; i < ((LinearLayout) rootView.findViewById(R.id.page_container)).getChildCount(); i++)
+            if (currentPagePos == i) {
+                ((LinearLayout) rootView.findViewById(R.id.page_container)).getChildAt(i).setBackgroundColor(Color.parseColor("#ff322452"));
+                ((LinearLayout) rootView.findViewById(R.id.page_container)).getChildAt(i).setAlpha(1);
+            } else {
+                ((LinearLayout) rootView.findViewById(R.id.page_container)).getChildAt(i).setBackgroundColor(Color.TRANSPARENT);
+                ((LinearLayout) rootView.findViewById(R.id.page_container)).getChildAt(i).setAlpha(0.83f);
+            }
+    }
+
+
+    private boolean checkIfTemplateIsFilled() {
+        try {
+            if (template != null) {
+                JSONArray pagesJson = template.getJSONArray("items");
+                for (int i = 0; i < pagesJson.length(); i++) {
+                    JSONObject pageJson = pagesJson.getJSONObject(i).getJSONObject("page");
+                    if (pageJson.has("items"))
+                        if (!checkIfContainerIsFilled(pageJson.getJSONArray("items")))
+                            return false;
+                }
+                return true;
+            }
+        } catch (Exception exc) {
+            exc.printStackTrace();
+        }
+        return false;
+    }
+
+    private boolean checkIfContainerIsFilled(JSONArray dataJson) throws Exception {
+        ArrayList<String> fields = new ArrayList<>();
+        for (int i = 0; i < dataJson.length(); i++) {
+            JSONObject value = dataJson.getJSONObject(i);
+            Iterator<String> iterator = value.keys();
+            while (iterator.hasNext()) {
+                String currentKey = iterator.next();
+                fields.add(currentKey);
+            }
+        }
+
+        for (int i = 0; i < fields.size(); i++) {
+            final JSONObject value = dataJson.getJSONObject(i).getJSONObject(fields.get(i));
+            switch (fields.get(i)) {
+                case "category":
+                    if (!checkIfContainerIsFilled(value.getJSONArray("items")))
+                        return false;
+                    break;
+
+                case "question":
+                    if (!value.has("value") && !(value.has("is_required") && !value.getBoolean("is_required")))
+                        return false;
+                    break;
+
+                case "text":
+                    break;
+
+                case "lineedit":
+                    if (!value.has("value") && !(value.has("is_required") && !value.getBoolean("is_required")))
+                        return false;
+                    break;
+
+                case "textarea":
+                    if (!value.has("value") && !(value.has("is_required") && !value.getBoolean("is_required")))
+                        return false;
+                    break;
+
+                case "checkbox":
+                    if (!value.has("value") && !(value.has("is_required") && !value.getBoolean("is_required")))
+                        return false;
+                    break;
+
+                case "slider":
+                    if (!value.has("value") && !(value.has("is_required") && !value.getBoolean("is_required")))
+                        return false;
+                    break;
+
+                case "photo":
+                    if ((!value.has("image_paths") || (value.has("image_paths") && value.getJSONArray("image_paths").length() == 0))
+                            && !(value.has("is_required") && !value.getBoolean("is_required")))
+                        return false;
+                    break;
+
+                case "richedit":
+                    break;
+
+                default:
+                    Log.d("jeka", fields.get(i));
+            }
+        }
+        return true;
     }
 
     private void renderTemplate() {
@@ -279,23 +399,6 @@ public class TemplateFragment extends Fragment {
         }
     }
 
-    private void setPage(Page page) {
-        FrameLayout rootContainer = (FrameLayout) rootView.findViewById(R.id.root_container);
-        rootContainer.removeAllViewsInLayout();
-        rootContainer.addView(page.layout);
-
-        ((TextView) rootView.findViewById(R.id.page_name)).setText(page.name);
-        currentPagePos = pages.indexOf(page);
-        for (int i = 0; i < ((LinearLayout) rootView.findViewById(R.id.page_container)).getChildCount(); i++)
-            if (currentPagePos == i) {
-                ((LinearLayout) rootView.findViewById(R.id.page_container)).getChildAt(i).setBackgroundColor(Color.parseColor("#ff322452"));
-                ((LinearLayout) rootView.findViewById(R.id.page_container)).getChildAt(i).setAlpha(1);
-            } else {
-                ((LinearLayout) rootView.findViewById(R.id.page_container)).getChildAt(i).setBackgroundColor(Color.TRANSPARENT);
-                ((LinearLayout) rootView.findViewById(R.id.page_container)).getChildAt(i).setAlpha(0.83f);
-            }
-    }
-
     private void fillContainer(LinearLayout container, JSONArray dataJson) throws Exception {
         ArrayList<String> fields = new ArrayList<>();
         for (int i = 0; i < dataJson.length(); i++) {
@@ -314,7 +417,7 @@ public class TemplateFragment extends Fragment {
                     createCategory(value, container);
                     break;
 
-                case "select":
+                case "question":
                     createSelectBtnContainer(value, container);
                     break;
 
@@ -802,6 +905,64 @@ public class TemplateFragment extends Fragment {
             } else {
                 renderTemplate();
             }
+        }
+    }
+
+    private class SendImageTask extends AsyncTask<Void, Integer, Integer> {
+        private final int SUCCESS = 0;
+        private final int ERROR = 1;
+
+        private ArrayList<File> imgFiles;
+        private ArrayList<String> sendedImageIds;
+
+        SendImageTask(JSONArray jsonArray) {
+            for (int i = 0; i < jsonArray.length(); i++) {
+                try {
+                    imgFiles.add(new File(jsonArray.getString(i)));
+                } catch (Exception exc) {
+                    exc.printStackTrace();
+                }
+            }
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            progressDialog.setMax(imgFiles.size());
+            progressDialog.show();
+        }
+
+        @Override
+        protected Integer doInBackground(Void... params) {
+            sendedImageIds = new ArrayList<>();
+
+            for (int i = 0; i < imgFiles.size(); i++) {
+                try {
+                    String randomUUID = UUID.randomUUID().toString();
+                    sendedImageIds.add(randomUUID);
+                    String url = "/api/fs/upload/binary/" + randomUUID;
+
+                    Response response = RequestService.createSendFileRequest(url, imgFiles.get(i));
+                    publishProgress(i);
+
+                } catch (Exception exc) {
+                    return ERROR;
+                }
+            }
+            return SUCCESS;
+        }
+
+        @Override
+        protected void onProgressUpdate(Integer... values) {
+            super.onProgressUpdate(values);
+            progressDialog.setProgress(values[0]);
+        }
+
+        @Override
+        protected void onPostExecute(Integer result) {
+            super.onPostExecute(result);
+            if (progressDialog != null && progressDialog.isShowing())
+                progressDialog.dismiss();
         }
     }
 
