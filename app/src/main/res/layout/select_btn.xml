@@ -1,10 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RadioButton xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="0dp"
     android:layout_height="70dp"
-    android:layout_weight="1"
-    android:background="@drawable/select_btn"
-    android:button="@null"
-    android:gravity="top|center_horizontal"
-    android:paddingTop="17dp"
-    android:textColor="@color/select_button_text_color" />
+    android:layout_weight="1">
+
+    <RadioButton
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/select_btn"
+        android:button="@null" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginBottom="18dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:gravity="center"
+        android:textColor="#4c3e60" />
+</FrameLayout>

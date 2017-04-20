@@ -79,32 +79,53 @@
                     android:src="@drawable/left_arrow" />
             </FrameLayout>
 
-
-            <TextView
-                android:id="@+id/hold_task_btn"
+            <FrameLayout
                 android:layout_width="0dp"
                 android:layout_height="72dp"
                 android:layout_marginTop="12dp"
-                android:layout_weight="1"
-                android:background="@drawable/blue_btn_with_shadow"
-                android:gravity="top|center_horizontal"
-                android:paddingTop="15.5dp"
-                android:text="@string/hold_task"
-                android:textColor="@android:color/white"
-                android:textSize="17sp" />
+                android:layout_weight="1">
 
-            <TextView
-                android:id="@+id/finish_btn"
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@drawable/blue_btn_with_shadow" />
+
+                <TextView
+                    android:id="@+id/hold_task_btn"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginLeft="8dp"
+                    android:layout_marginRight="8dp"
+                    android:gravity="center"
+                    android:paddingBottom="16.5dp"
+                    android:text="@string/hold_task"
+                    android:textColor="@android:color/white"
+                    android:textSize="17sp" />
+            </FrameLayout>
+
+            <FrameLayout
                 android:layout_width="0dp"
                 android:layout_height="72dp"
                 android:layout_marginTop="12dp"
-                android:layout_weight="1"
-                android:background="@drawable/green_btn_with_shadow"
-                android:gravity="top|center_horizontal"
-                android:paddingTop="15.5dp"
-                android:text="@string/finish"
-                android:textColor="@android:color/white"
-                android:textSize="17sp" />
+                android:layout_weight="1">
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@drawable/green_btn_with_shadow" />
+
+                <TextView
+                    android:id="@+id/finish_btn"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginLeft="8dp"
+                    android:layout_marginRight="8dp"
+                    android:gravity="center"
+                    android:paddingBottom="16.5dp"
+                    android:text="@string/finish"
+                    android:textColor="@android:color/white"
+                    android:textSize="17sp" />
+            </FrameLayout>
 
             <FrameLayout
                 android:id="@+id/right_arrow"

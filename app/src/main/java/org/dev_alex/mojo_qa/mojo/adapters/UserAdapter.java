@@ -48,7 +48,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
         final User user = users.get(i);
 
         viewHolder.userName.setText(user.firstName + " " + user.lastName);
-        viewHolder.userInitials.setText(String.format(Locale.getDefault(), "%s%s", user.firstName.charAt(0), user.lastName.charAt(0)));
+        viewHolder.userInitials.setText(String.format(Locale.getDefault(), "%s%s", user.firstName.isEmpty() ? "" : user.firstName.charAt(0), user.lastName.isEmpty() ? "" : user.lastName.charAt(0)));
 
         viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override

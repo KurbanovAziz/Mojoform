@@ -273,7 +273,7 @@ public class TemplateFragment extends Fragment {
             mSettings = App.getContext().getSharedPreferences("templates", Context.MODE_PRIVATE);
             SharedPreferences.Editor editor = mSettings.edit();
 
-            editor.putString(templateId, template.toString());
+            editor.putString(templateId + Data.currentUser.userName, template.toString());
             editor.apply();
         } catch (Exception exc) {
             exc.printStackTrace();
@@ -784,8 +784,11 @@ public class TemplateFragment extends Fragment {
                 public void onCheckedChanged(CompoundButton selectedButton, boolean isChecked) {
                     if (isChecked) {
                         for (CompoundButton compoundButton : buttons)
-                            if (!compoundButton.equals(selectedButton))
+                            if (!compoundButton.equals(selectedButton)) {
                                 compoundButton.setChecked(false);
+                                ((TextView) ((FrameLayout) compoundButton.getParent()).getChildAt(1)).setTextColor(Color.parseColor("#4c3e60"));
+                            } else
+                                ((TextView) ((FrameLayout) compoundButton.getParent()).getChildAt(1)).setTextColor(Color.WHITE);
 
                         try {
                             String btnId = (String) selectedButton.getTag();
@@ -808,7 +811,10 @@ public class TemplateFragment extends Fragment {
                     selectBtnContainer.addView(currentRow);
                 }
 
-                RadioButton selectBtn = (RadioButton) getActivity().getLayoutInflater().inflate(R.layout.select_btn, currentRow, false);
+                FrameLayout selectBtnFrame = (FrameLayout) getActivity().getLayoutInflater().inflate(R.layout.select_btn, currentRow, false);
+                RadioButton selectBtn = (RadioButton) selectBtnFrame.getChildAt(0);
+                TextView selectBtnText = (TextView) selectBtnFrame.getChildAt(1);
+
                 selectBtn.setOnCheckedChangeListener(radioButtonListener);
                 selectBtn.setTag(option.getString("id"));
                 buttons.add(selectBtn);
@@ -816,10 +822,11 @@ public class TemplateFragment extends Fragment {
                 selectBtn.setChecked(value.has("value") && value.getString("value").equals(option.getString("id")));
 
                 if (option.has("caption"))
-                    selectBtn.setText(option.getString("caption"));
+                    selectBtnText.setText(option.getString("caption"));
                 else
-                    selectBtn.setText("Нет текста:(");
-                currentRow.addView(selectBtn);
+                    selectBtnText.setText("Нет текста:(");
+
+                currentRow.addView(selectBtnFrame);
             }
             if (options.length() % 2 == 1) {
                 Space space = new Space(getContext());
@@ -903,7 +910,7 @@ public class TemplateFragment extends Fragment {
             try {
                 SharedPreferences mSettings;
                 mSettings = App.getContext().getSharedPreferences("templates", Context.MODE_PRIVATE);
-                String templateJson = mSettings.getString(templateId, "");
+                String templateJson = mSettings.getString(templateId + Data.currentUser.userName, "");
                 if (!templateJson.equals("")) {
                     template = new JSONObject(templateJson);
                     return HttpURLConnection.HTTP_OK;

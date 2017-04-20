@@ -93,7 +93,12 @@ public class TasksFragment extends Fragment {
 
             initDialog();
             setListeners();
-            updateDate(true);
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    updateDate(true);
+                }
+            }, 500);
         }
 
         if (needUpdate)

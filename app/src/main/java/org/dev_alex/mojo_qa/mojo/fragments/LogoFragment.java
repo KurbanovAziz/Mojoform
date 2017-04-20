@@ -16,6 +16,7 @@ public class LogoFragment extends Fragment {
         Bundle args = new Bundle();
         LogoFragment fragment = new LogoFragment();
         fragment.setArguments(args);
+
         return fragment;
     }
 
