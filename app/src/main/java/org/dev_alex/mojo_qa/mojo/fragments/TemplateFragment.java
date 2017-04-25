@@ -67,7 +67,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.Locale;
-import java.util.Random;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import okhttp3.Response;
@@ -393,7 +392,7 @@ public class TemplateFragment extends Fragment {
 
                     JSONObject pageJson = pagesJson.getJSONObject(i).getJSONObject("page");
                     if (pageJson.has("items"))
-                        fillContainer(rootContainer, pageJson.getJSONArray("items"));
+                        fillContainer(rootContainer, pageJson.getJSONArray("items"), 0);
 
                     final Page page = new Page(pageJson.getString("caption"), pageJson.getString("id"), rootContainer);
                     pages.add(page);
@@ -431,7 +430,7 @@ public class TemplateFragment extends Fragment {
         }
     }
 
-    private void fillContainer(LinearLayout container, JSONArray dataJson) throws Exception {
+    private void fillContainer(LinearLayout container, JSONArray dataJson, int offset) throws Exception {
         ArrayList<String> fields = new ArrayList<>();
         for (int i = 0; i < dataJson.length(); i++) {
             JSONObject value = dataJson.getJSONObject(i);
@@ -446,7 +445,7 @@ public class TemplateFragment extends Fragment {
             final JSONObject value = dataJson.getJSONObject(i).getJSONObject(fields.get(i));
             switch (fields.get(i)) {
                 case "category":
-                    createCategory(value, container);
+                    createCategory(value, container, offset);
                     break;
 
                 case "question":
@@ -625,9 +624,29 @@ public class TemplateFragment extends Fragment {
         }
     }
 
-    private void createCategory(JSONObject value, LinearLayout container) throws Exception {
-        Random rnd = new Random();
-        int color = Color.argb(255, rnd.nextInt(256), rnd.nextInt(256), rnd.nextInt(256));
+    private void createCategory(JSONObject value, LinearLayout container, int offset) throws Exception {
+        int color;
+        switch (offset) {
+            case 0:
+                color = Color.parseColor("#B7B5EC");
+                break;
+            case 1:
+                color = Color.parseColor("#C3E1FE");
+                break;
+            case 2:
+                color = Color.parseColor("#DBF5D8");
+                break;
+            case 3:
+                color = Color.parseColor("#F3D8F5");
+                break;
+            case 4:
+                color = Color.parseColor("#F4EAD8");
+                break;
+
+            default:
+                color = Color.parseColor("#F4EAD8");
+                break;
+        }
 
         LinearLayout categoryHeader = (LinearLayout) getActivity().getLayoutInflater().inflate(R.layout.category_header, container, false);
         ((LayerDrawable) categoryHeader.getBackground()).findDrawableByLayerId(R.id.background).setColorFilter(color, PorterDuff.Mode.SRC_IN);
@@ -640,7 +659,7 @@ public class TemplateFragment extends Fragment {
         LinearLayout expandableContent = (LinearLayout) getActivity().getLayoutInflater().inflate(R.layout.expandable_content, container, false);
         ((LayerDrawable) expandableContent.getBackground()).findDrawableByLayerId(R.id.background).setColorFilter(color, PorterDuff.Mode.SRC_IN);
 
-        fillContainer(expandableContent, value.getJSONArray("items"));
+        fillContainer(expandableContent, value.getJSONArray("items"), offset + 1);
 
 
         final ExpandableLayout expandableLayout = new ExpandableLayout(getContext());
