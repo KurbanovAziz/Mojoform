@@ -74,6 +74,7 @@ import okhttp3.Response;
 import static android.app.Activity.RESULT_OK;
 
 public class TemplateFragment extends Fragment {
+    private final String MEDIA_PATH_JSON_ARRAY = "media_paths";
     private SimpleDateFormat isoDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ", Locale.getDefault());
     private final int VIDEO_REQUEST_CODE = 10;
     private final int PHOTO_REQUEST_CODE = 11;
@@ -163,7 +164,7 @@ public class TemplateFragment extends Fragment {
                 JSONArray deletedImages = new JSONArray(data.getStringExtra("deleted_images"));
                 for (int i = 0; i < deletedImages.length(); i++) {
                     String imagePath = deletedImages.getString(i);
-                    currentMediaBlock.second.put("media_paths", Utils.removeItemWithValue(currentMediaBlock.second.getJSONArray("media_paths"), imagePath));
+                    currentMediaBlock.second.put(MEDIA_PATH_JSON_ARRAY, Utils.removeItemWithValue(currentMediaBlock.second.getJSONArray(MEDIA_PATH_JSON_ARRAY), imagePath));
 
                     LinearLayout imageContainer = (LinearLayout) ((HorizontalScrollView) currentMediaBlock.first.getChildAt(1)).getChildAt(0);
                     for (int j = 0; j < imageContainer.getChildCount(); j++)
@@ -174,6 +175,9 @@ public class TemplateFragment extends Fragment {
                 exc.printStackTrace();
             }
         }
+
+        if (requestCode == DOCUMENT_REQUEST_CODE && resultCode == RESULT_OK && data != null)
+            createDocumentPreview(data.getData().getPath(), true);
     }
 
     private void setupHeader() {
@@ -362,7 +366,7 @@ public class TemplateFragment extends Fragment {
                     break;
 
                 case "photo":
-                    if ((!value.has("media_paths") || (value.has("media_paths") && value.getJSONArray("media_paths").length() == 0))
+                    if ((!value.has(MEDIA_PATH_JSON_ARRAY) || (value.has(MEDIA_PATH_JSON_ARRAY) && value.getJSONArray(MEDIA_PATH_JSON_ARRAY).length() == 0))
                             && !(value.has("is_required") && !value.getBoolean("is_required")))
                         return new Pair<>(false, null);
                     else
@@ -803,18 +807,24 @@ public class TemplateFragment extends Fragment {
         buttonsContainer.getChildAt(2).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-                intent.setType("file/*");
-                startActivityForResult(intent, DOCUMENT_REQUEST_CODE);
+                if (checkExternalPermissions()) {
+                    currentMediaBlock = new Pair<>(mediaLayout, value);
+
+                    Intent intent = new Intent("com.sec.android.app.myfiles.PICK_DATA");
+                    intent.putExtra("CONTENT_TYPE", "*/*");
+                    intent.addCategory(Intent.CATEGORY_DEFAULT);
+                    startActivityForResult(intent, DOCUMENT_REQUEST_CODE);
+                } else
+                    requestPermissions();
             }
         });
 
         container.addView(mediaLayout);
 
-        if (value.has("media_paths")) {
+        if (value.has(MEDIA_PATH_JSON_ARRAY)) {
             currentMediaBlock = new Pair<>(mediaLayout, value);
-            for (int j = 0; j < value.getJSONArray("media_paths").length(); j++)
-                new ProcessingBitmapTask(value.getJSONArray("media_paths").getString(j), false).execute();
+            for (int j = 0; j < value.getJSONArray(MEDIA_PATH_JSON_ARRAY).length(); j++)
+                new ProcessingBitmapTask(value.getJSONArray(MEDIA_PATH_JSON_ARRAY).getString(j), false).execute();
         }
     }
 
@@ -930,7 +940,12 @@ public class TemplateFragment extends Fragment {
             public void onClick(View v) {
                 try {
                     Intent showPhotoIntent = new Intent(getContext(), ImageViewActivity.class);
-                    showPhotoIntent.putExtra("images", currentValue.getJSONArray("media_paths").toString());
+                    JSONArray imageSrc = new JSONArray();
+                    for (int i = 0; i < currentValue.getJSONArray(MEDIA_PATH_JSON_ARRAY).length(); i++)
+                        if (Utils.isImage(currentValue.getJSONArray(MEDIA_PATH_JSON_ARRAY).getString(i)))
+                            imageSrc.put(currentValue.getJSONArray(MEDIA_PATH_JSON_ARRAY).getString(i));
+
+                    showPhotoIntent.putExtra("images", imageSrc.toString());
                     startActivityForResult(showPhotoIntent, IMAGE_SHOW_REQUEST_CODE);
                     currentMediaBlock = new Pair<>(currentLayout, currentValue);
                 } catch (JSONException e) {
@@ -942,7 +957,38 @@ public class TemplateFragment extends Fragment {
         return circleImageView;
     }
 
-    private void createDcoumentPreview(String path) {
+    private void createDocumentPreview(String path, boolean copyToCache) {
+        try {
+            String fileName = path.substring(path.lastIndexOf("/") + 1);
+            File file = new File(path);
+            String filePathInCache;
+
+            if (copyToCache) {
+                filePathInCache = getContext().getCacheDir() + "/" + fileName;
+
+                int i = 1;
+                while (new File(filePathInCache).exists())
+                    filePathInCache = filePathInCache.substring(0, filePathInCache.lastIndexOf(".")) + "(" + i++ + ")"
+                            + filePathInCache.substring(filePathInCache.lastIndexOf("."));
+
+                Utils.copy(file, new File(filePathInCache));
+            } else
+                filePathInCache = path;
+
+            LinearLayout fileContainer = (LinearLayout) currentMediaBlock.first.getChildAt(4);
+            LinearLayout fileLayout = (LinearLayout) getActivity().getLayoutInflater().inflate(R.layout.file_layout, fileContainer, false);
+
+            ((TextView) fileLayout.getChildAt(1)).setText(filePathInCache.substring(filePathInCache.lastIndexOf("/") + 1));
+            fileLayout.setTag(filePathInCache);
+
+            if (copyToCache)
+                addMediaPath(filePathInCache);
+
+            fileContainer.addView(fileLayout);
+
+        } catch (Exception exc) {
+            Toast.makeText(getContext(), "Ошибка при добавлении файла: " + exc.getLocalizedMessage(), Toast.LENGTH_LONG).show();
+        }
 
     }
 
@@ -1017,10 +1063,10 @@ public class TemplateFragment extends Fragment {
 
             try {
                 for (JSONObject jsonObject : mediaObjects)
-                    if (jsonObject.has("media_paths"))
-                        for (int i = 0; i < jsonObject.getJSONArray("media_paths").length(); i++)
+                    if (jsonObject.has(MEDIA_PATH_JSON_ARRAY))
+                        for (int i = 0; i < jsonObject.getJSONArray(MEDIA_PATH_JSON_ARRAY).length(); i++)
                             if (!jsonObject.has("sent_medias") ||
-                                    (jsonObject.has("sent_medias") && !Utils.containsValue(jsonObject.getJSONArray("sent_medias"), jsonObject.getJSONArray("media_paths").getString(i))))
+                                    (jsonObject.has("sent_medias") && !Utils.containsValue(jsonObject.getJSONArray("sent_medias"), jsonObject.getJSONArray(MEDIA_PATH_JSON_ARRAY).getString(i))))
                                 totalSize++;
 
             } catch (Exception exc) {
@@ -1035,11 +1081,11 @@ public class TemplateFragment extends Fragment {
             try {
                 successfullySentMediaCt = 0;
                 for (JSONObject jsonObject : mediaObjects)
-                    if (jsonObject.has("media_paths"))
-                        for (int i = 0; i < jsonObject.getJSONArray("media_paths").length(); i++)
+                    if (jsonObject.has(MEDIA_PATH_JSON_ARRAY))
+                        for (int i = 0; i < jsonObject.getJSONArray(MEDIA_PATH_JSON_ARRAY).length(); i++)
                             if (!jsonObject.has("sent_medias") ||
-                                    (jsonObject.has("sent_medias") && !Utils.containsValue(jsonObject.getJSONArray("sent_medias"), jsonObject.getJSONArray("media_paths").getString(i)))) {
-                                String mediaPath = jsonObject.getJSONArray("media_paths").getString(i);
+                                    (jsonObject.has("sent_medias") && !Utils.containsValue(jsonObject.getJSONArray("sent_medias"), jsonObject.getJSONArray(MEDIA_PATH_JSON_ARRAY).getString(i)))) {
+                                String mediaPath = jsonObject.getJSONArray(MEDIA_PATH_JSON_ARRAY).getString(i);
                                 try {
                                     File mediaFile = new File(mediaPath);
                                     Response response = RequestService.createSendFileRequest("/api/fs/upload/binary/28e95811-cabb-49b2-b927-8d321327267c", mediaFile);
@@ -1110,8 +1156,8 @@ public class TemplateFragment extends Fragment {
                     if (jsonObject.has("sent_medias"))
                         jsonObject.remove("sent_medias");
 
-                    if (jsonObject.has("media_paths"))
-                        jsonObject.remove("media_paths");
+                    if (jsonObject.has(MEDIA_PATH_JSON_ARRAY))
+                        jsonObject.remove(MEDIA_PATH_JSON_ARRAY);
                 }
 
                 currentTemplateCopy.put("executor", Data.currentUser.userName);
@@ -1230,19 +1276,24 @@ public class TemplateFragment extends Fragment {
                     ((LinearLayout) ((HorizontalScrollView) currentMediaBlock.first.getChildAt(1)).getChildAt(0)).addView(circleImageView);
 
                     if (copyToChache)
-                        if (currentMediaBlock.second.has("media_paths"))
-                            currentMediaBlock.second.getJSONArray("media_paths").put(cachedImgPath);
-                        else {
-                            JSONArray mediaPaths = new JSONArray();
-                            mediaPaths.put(cachedImgPath);
-                            currentMediaBlock.second.put("media_paths", mediaPaths);
-                        }
+                        addMediaPath(cachedImgPath);
+
                 } else
                     Toast.makeText(getContext(), "При обработке фото произошла ошибка: " + errorMessage, Toast.LENGTH_SHORT).show();
             } catch (Exception exc) {
                 exc.printStackTrace();
                 Toast.makeText(getContext(), "При обработке фото произошла ошибка: " + exc.getMessage(), Toast.LENGTH_SHORT).show();
             }
+        }
+    }
+
+    private void addMediaPath(String mediaPath) throws JSONException {
+        if (currentMediaBlock.second.has(MEDIA_PATH_JSON_ARRAY))
+            currentMediaBlock.second.getJSONArray(MEDIA_PATH_JSON_ARRAY).put(mediaPath);
+        else {
+            JSONArray mediaPaths = new JSONArray();
+            mediaPaths.put(mediaPath);
+            currentMediaBlock.second.put(MEDIA_PATH_JSON_ARRAY, mediaPaths);
         }
     }
 }
