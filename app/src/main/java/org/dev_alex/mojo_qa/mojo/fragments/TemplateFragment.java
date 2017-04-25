@@ -75,8 +75,10 @@ import static android.app.Activity.RESULT_OK;
 
 public class TemplateFragment extends Fragment {
     private SimpleDateFormat isoDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ", Locale.getDefault());
-    private final int PHOTO_REQUEST_CODE = 10;
-    private final int IMAGE_SHOW_REQUEST_CODE = 11;
+    private final int VIDEO_REQUEST_CODE = 10;
+    private final int PHOTO_REQUEST_CODE = 11;
+    private final int DOCUMENT_REQUEST_CODE = 12;
+    private final int IMAGE_SHOW_REQUEST_CODE = 110;
 
     private View rootView;
     private ProgressDialog loopDialog;
@@ -86,8 +88,9 @@ public class TemplateFragment extends Fragment {
     private int currentPagePos;
     private JSONObject template;
 
-    private Pair<LinearLayout, JSONObject> currentPhotoBlock;
+    private Pair<LinearLayout, JSONObject> currentMediaBlock;
     private String cameraImagePath;
+    private String cameraVideoPath;
 
     private ProgressDialog progressDialog;
 
@@ -160,11 +163,12 @@ public class TemplateFragment extends Fragment {
                 JSONArray deletedImages = new JSONArray(data.getStringExtra("deleted_images"));
                 for (int i = 0; i < deletedImages.length(); i++) {
                     String imagePath = deletedImages.getString(i);
-                    currentPhotoBlock.second.put("image_paths", Utils.removeItemWithValue(currentPhotoBlock.second.getJSONArray("image_paths"), imagePath));
+                    currentMediaBlock.second.put("media_paths", Utils.removeItemWithValue(currentMediaBlock.second.getJSONArray("media_paths"), imagePath));
 
-                    for (int j = 0; j < currentPhotoBlock.first.getChildCount(); j++)
-                        if (currentPhotoBlock.first.getChildAt(j).getTag().equals(imagePath))
-                            currentPhotoBlock.first.removeViewAt(j);
+                    LinearLayout imageContainer = (LinearLayout) ((HorizontalScrollView) currentMediaBlock.first.getChildAt(1)).getChildAt(0);
+                    for (int j = 0; j < imageContainer.getChildCount(); j++)
+                        if (imageContainer.getChildAt(j).getTag().equals(imagePath))
+                            imageContainer.removeViewAt(j);
                 }
             } catch (Exception exc) {
                 exc.printStackTrace();
@@ -224,7 +228,7 @@ public class TemplateFragment extends Fragment {
                 Pair<Boolean, ArrayList<JSONObject>> result = checkIfTemplateIsFilled(template);
 
                 if (result.first) {
-                    new SendImageTask(result.second).execute();
+                    new SendMediaTask(result.second).execute();
                 } else
                     Toast.makeText(getContext(), R.string.not_all_required_fields_are_filled, Toast.LENGTH_LONG).show();
             }
@@ -358,7 +362,7 @@ public class TemplateFragment extends Fragment {
                     break;
 
                 case "photo":
-                    if ((!value.has("image_paths") || (value.has("image_paths") && value.getJSONArray("image_paths").length() == 0))
+                    if ((!value.has("media_paths") || (value.has("media_paths") && value.getJSONArray("media_paths").length() == 0))
                             && !(value.has("is_required") && !value.getBoolean("is_required")))
                         return new Pair<>(false, null);
                     else
@@ -567,33 +571,7 @@ public class TemplateFragment extends Fragment {
                     break;
 
                 case "photo":
-                    final LinearLayout photoLayout = (LinearLayout) getActivity().getLayoutInflater().inflate(R.layout.photo_layout, container, false);
-
-                    if (value.has("caption"))
-                        ((TextView) ((LinearLayout) photoLayout.getChildAt(0)).getChildAt(1)).setText(value.getString("caption"));
-                    else
-                        ((TextView) ((LinearLayout) photoLayout.getChildAt(0)).getChildAt(1)).setText("Нет текста");
-
-                    ((LinearLayout) photoLayout.getChildAt(0)).getChildAt(0).setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            if (checkExternalPermissions()) {
-                                currentPhotoBlock = new Pair<>((LinearLayout) ((HorizontalScrollView) photoLayout.getChildAt(1)).getChildAt(0), value);
-                                Pair<Intent, File> intentFilePair = BitmapService.getPickImageIntent(getContext());
-                                cameraImagePath = intentFilePair.second.getAbsolutePath();
-                                startActivityForResult(intentFilePair.first, PHOTO_REQUEST_CODE);
-                            } else
-                                requestPermissions();
-                        }
-                    });
-
-                    container.addView(photoLayout);
-
-                    if (value.has("image_paths")) {
-                        currentPhotoBlock = new Pair<>((LinearLayout) ((HorizontalScrollView) photoLayout.getChildAt(1)).getChildAt(0), value);
-                        for (int j = 0; j < value.getJSONArray("image_paths").length(); j++)
-                            new ProcessingBitmapTask(value.getJSONArray("image_paths").getString(j), false).execute();
-                    }
+                    createMediaBlock(value, container);
                     break;
 
                 case "richedit":
@@ -787,6 +765,59 @@ public class TemplateFragment extends Fragment {
         }
     }
 
+    private void createMediaBlock(final JSONObject value, LinearLayout container) throws Exception {
+        final LinearLayout mediaLayout = (LinearLayout) getActivity().getLayoutInflater().inflate(R.layout.media_layout, container, false);
+
+        if (value.has("caption"))
+            ((TextView) ((LinearLayout) mediaLayout.getChildAt(0)).getChildAt(0)).setText(value.getString("caption"));
+        else
+            ((TextView) ((LinearLayout) mediaLayout.getChildAt(0)).getChildAt(0)).setText("Нет текста");
+
+        LinearLayout buttonsContainer = (LinearLayout) ((LinearLayout) mediaLayout.getChildAt(0)).getChildAt(1);
+        buttonsContainer.getChildAt(0).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (checkExternalPermissions()) {
+                    currentMediaBlock = new Pair<>(mediaLayout, value);
+                    Pair<Intent, File> intentFilePair = BitmapService.getPickImageIntent(getContext());
+                    cameraImagePath = intentFilePair.second.getAbsolutePath();
+                    startActivityForResult(intentFilePair.first, PHOTO_REQUEST_CODE);
+                } else
+                    requestPermissions();
+            }
+        });
+
+        buttonsContainer.getChildAt(1).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (checkExternalPermissions()) {
+                    currentMediaBlock = new Pair<>(mediaLayout, value);
+                    Pair<Intent, File> intentFilePair = BitmapService.getPickVideoIntent(getContext());
+                    cameraVideoPath = intentFilePair.second.getAbsolutePath();
+                    startActivityForResult(intentFilePair.first, VIDEO_REQUEST_CODE);
+                } else
+                    requestPermissions();
+            }
+        });
+
+        buttonsContainer.getChildAt(2).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+                intent.setType("file/*");
+                startActivityForResult(intent, DOCUMENT_REQUEST_CODE);
+            }
+        });
+
+        container.addView(mediaLayout);
+
+        if (value.has("media_paths")) {
+            currentMediaBlock = new Pair<>(mediaLayout, value);
+            for (int j = 0; j < value.getJSONArray("media_paths").length(); j++)
+                new ProcessingBitmapTask(value.getJSONArray("media_paths").getString(j), false).execute();
+        }
+    }
+
     private void createSelectBtnContainer(final JSONObject value, LinearLayout container) throws Exception {
         LinearLayout selectBtnLayout = (LinearLayout) getActivity().getLayoutInflater().inflate(R.layout.select_layout, container, false);
         LinearLayout selectBtnContainer = (LinearLayout) selectBtnLayout.getChildAt(1);
@@ -892,16 +923,16 @@ public class TemplateFragment extends Fragment {
         //circleImageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
         circleImageView.setImageBitmap(photo);
 
-        final JSONObject currentValue = currentPhotoBlock.second;
-        final LinearLayout currentLayout = currentPhotoBlock.first;
+        final JSONObject currentValue = currentMediaBlock.second;
+        final LinearLayout currentLayout = currentMediaBlock.first;
         circleImageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 try {
                     Intent showPhotoIntent = new Intent(getContext(), ImageViewActivity.class);
-                    showPhotoIntent.putExtra("images", currentValue.getJSONArray("image_paths").toString());
+                    showPhotoIntent.putExtra("images", currentValue.getJSONArray("media_paths").toString());
                     startActivityForResult(showPhotoIntent, IMAGE_SHOW_REQUEST_CODE);
-                    currentPhotoBlock = new Pair<>(currentLayout, currentValue);
+                    currentMediaBlock = new Pair<>(currentLayout, currentValue);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -909,6 +940,10 @@ public class TemplateFragment extends Fragment {
         });
 
         return circleImageView;
+    }
+
+    private void createDcoumentPreview(String path) {
+
     }
 
     private class GetTemplateTask extends AsyncTask<Void, Void, Integer> {
@@ -966,13 +1001,13 @@ public class TemplateFragment extends Fragment {
         }
     }
 
-    private class SendImageTask extends AsyncTask<Void, Integer, Integer> {
+    private class SendMediaTask extends AsyncTask<Void, Integer, Integer> {
         private final int SUCCESS = 0;
-        private ArrayList<JSONObject> imgsObjects;
-        private int successfullySentImgCt, totalSize;
+        private ArrayList<JSONObject> mediaObjects;
+        private int successfullySentMediaCt, totalSize;
 
-        SendImageTask(ArrayList<JSONObject> imgsObjects) {
-            this.imgsObjects = imgsObjects;
+        SendMediaTask(ArrayList<JSONObject> mediaObjects) {
+            this.mediaObjects = mediaObjects;
         }
 
         @Override
@@ -981,11 +1016,11 @@ public class TemplateFragment extends Fragment {
             totalSize = 0;
 
             try {
-                for (JSONObject jsonObject : imgsObjects)
-                    if (jsonObject.has("image_paths"))
-                        for (int i = 0; i < jsonObject.getJSONArray("image_paths").length(); i++)
-                            if (!jsonObject.has("sent_images") ||
-                                    (jsonObject.has("sent_images") && !Utils.containsValue(jsonObject.getJSONArray("sent_images"), jsonObject.getJSONArray("image_paths").getString(i))))
+                for (JSONObject jsonObject : mediaObjects)
+                    if (jsonObject.has("media_paths"))
+                        for (int i = 0; i < jsonObject.getJSONArray("media_paths").length(); i++)
+                            if (!jsonObject.has("sent_medias") ||
+                                    (jsonObject.has("sent_medias") && !Utils.containsValue(jsonObject.getJSONArray("sent_medias"), jsonObject.getJSONArray("media_paths").getString(i))))
                                 totalSize++;
 
             } catch (Exception exc) {
@@ -998,33 +1033,33 @@ public class TemplateFragment extends Fragment {
         @Override
         protected Integer doInBackground(Void... params) {
             try {
-                successfullySentImgCt = 0;
-                for (JSONObject jsonObject : imgsObjects)
-                    if (jsonObject.has("image_paths"))
-                        for (int i = 0; i < jsonObject.getJSONArray("image_paths").length(); i++)
-                            if (!jsonObject.has("sent_images") ||
-                                    (jsonObject.has("sent_images") && !Utils.containsValue(jsonObject.getJSONArray("sent_images"), jsonObject.getJSONArray("image_paths").getString(i)))) {
-                                String imagePath = jsonObject.getJSONArray("image_paths").getString(i);
+                successfullySentMediaCt = 0;
+                for (JSONObject jsonObject : mediaObjects)
+                    if (jsonObject.has("media_paths"))
+                        for (int i = 0; i < jsonObject.getJSONArray("media_paths").length(); i++)
+                            if (!jsonObject.has("sent_medias") ||
+                                    (jsonObject.has("sent_medias") && !Utils.containsValue(jsonObject.getJSONArray("sent_medias"), jsonObject.getJSONArray("media_paths").getString(i)))) {
+                                String mediaPath = jsonObject.getJSONArray("media_paths").getString(i);
                                 try {
-                                    File imageFile = new File(imagePath);
-                                    Response response = RequestService.createSendFileRequest("/api/fs/upload/binary/28e95811-cabb-49b2-b927-8d321327267c", imageFile);
-                                    String imageId = new JSONObject(response.body().string()).getJSONObject("entry").getString("id");
+                                    File mediaFile = new File(mediaPath);
+                                    Response response = RequestService.createSendFileRequest("/api/fs/upload/binary/28e95811-cabb-49b2-b927-8d321327267c", mediaFile);
+                                    String mediaId = new JSONObject(response.body().string()).getJSONObject("entry").getString("id");
 
                                     if (response.code() == 200) {
-                                        successfullySentImgCt++;
-                                        if (jsonObject.has("sent_images"))
-                                            jsonObject.getJSONArray("sent_images").put(imagePath);
+                                        successfullySentMediaCt++;
+                                        if (jsonObject.has("sent_medias"))
+                                            jsonObject.getJSONArray("sent_medias").put(mediaPath);
                                         else {
                                             JSONArray sentImages = new JSONArray();
-                                            sentImages.put(imagePath);
-                                            jsonObject.put("sent_images", sentImages);
+                                            sentImages.put(mediaPath);
+                                            jsonObject.put("sent_medias", sentImages);
                                         }
 
                                         if (jsonObject.has("values"))
-                                            jsonObject.getJSONArray("values").put(imageId);
+                                            jsonObject.getJSONArray("values").put(mediaId);
                                         else {
                                             JSONArray values = new JSONArray();
-                                            values.put(imageId);
+                                            values.put(mediaId);
                                             jsonObject.put("values", values);
                                         }
                                     }
@@ -1050,7 +1085,7 @@ public class TemplateFragment extends Fragment {
         @Override
         protected void onPostExecute(Integer result) {
             super.onPostExecute(result);
-            if (successfullySentImgCt < totalSize) {
+            if (successfullySentMediaCt < totalSize) {
                 saveTemplateState();
                 if (progressDialog != null && progressDialog.isShowing())
                     progressDialog.dismiss();
@@ -1070,13 +1105,13 @@ public class TemplateFragment extends Fragment {
             try {
                 currentTemplateCopy = new JSONObject(template.toString());
                 Pair<Boolean, ArrayList<JSONObject>> result = checkIfTemplateIsFilled(currentTemplateCopy);
-                ArrayList<JSONObject> imageBlocks = result.second;
-                for (JSONObject jsonObject : imageBlocks) {
-                    if (jsonObject.has("sent_images"))
-                        jsonObject.remove("sent_images");
+                ArrayList<JSONObject> mediaBlocks = result.second;
+                for (JSONObject jsonObject : mediaBlocks) {
+                    if (jsonObject.has("sent_medias"))
+                        jsonObject.remove("sent_medias");
 
-                    if (jsonObject.has("image_paths"))
-                        jsonObject.remove("image_paths");
+                    if (jsonObject.has("media_paths"))
+                        jsonObject.remove("media_paths");
                 }
 
                 currentTemplateCopy.put("executor", Data.currentUser.userName);
@@ -1141,6 +1176,7 @@ public class TemplateFragment extends Fragment {
         private Bitmap photo;
         private String picturePath;
         private boolean copyToChache;
+        private String errorMessage;
 
 
         ProcessingBitmapTask(String picturePath, boolean withCopyInChache) {
@@ -1168,14 +1204,18 @@ public class TemplateFragment extends Fragment {
                 if (copyToChache) {
                     options.inSampleSize = BitmapService.calculateInSampleSize(tmpOptions, 1200);
                     cachedImgPath = BitmapService.saveBitmapToCache(BitmapService.modifyOrientation(BitmapFactory.decodeFile(picturePath, options), picturePath));
-                    if (cachedImgPath == null)
+
+                    if (cachedImgPath == null) {
+                        errorMessage = "Не удалось сохранить изображение";
                         return null;
+                    }
                 } else
                     cameraImagePath = picturePath;
 
                 return 1;
 
             } catch (Exception exc) {
+                errorMessage = exc.getMessage();
                 return null;
             }
         }
@@ -1187,20 +1227,21 @@ public class TemplateFragment extends Fragment {
                 if (resCode != null) {
                     CircleImageView circleImageView = createImgFrame(photo);
                     circleImageView.setTag(cachedImgPath);
-                    currentPhotoBlock.first.addView(circleImageView);
-
+                    ((LinearLayout) ((HorizontalScrollView) currentMediaBlock.first.getChildAt(1)).getChildAt(0)).addView(circleImageView);
 
                     if (copyToChache)
-                        if (currentPhotoBlock.second.has("image_paths"))
-                            currentPhotoBlock.second.getJSONArray("image_paths").put(cachedImgPath);
+                        if (currentMediaBlock.second.has("media_paths"))
+                            currentMediaBlock.second.getJSONArray("media_paths").put(cachedImgPath);
                         else {
-                            JSONArray imagePaths = new JSONArray();
-                            imagePaths.put(cachedImgPath);
-                            currentPhotoBlock.second.put("image_paths", imagePaths);
+                            JSONArray mediaPaths = new JSONArray();
+                            mediaPaths.put(cachedImgPath);
+                            currentMediaBlock.second.put("media_paths", mediaPaths);
                         }
-                }
+                } else
+                    Toast.makeText(getContext(), "При обработке фото произошла ошибка: " + errorMessage, Toast.LENGTH_SHORT).show();
             } catch (Exception exc) {
                 exc.printStackTrace();
+                Toast.makeText(getContext(), "При обработке фото произошла ошибка: " + exc.getMessage(), Toast.LENGTH_SHORT).show();
             }
         }
     }

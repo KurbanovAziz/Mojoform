@@ -57,6 +57,37 @@ public class BitmapService {
         return new Pair<>(chooserIntent, cameraFile);
     }
 
+    public static Pair<Intent, File> getPickVideoIntent(Context context) {
+        Intent chooserIntent = null;
+
+        List<Intent> intentList = new ArrayList<>();
+
+        Intent galleryIntent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        galleryIntent.setType("video/*");
+
+
+        Intent takePhotoIntent = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
+        takePhotoIntent.putExtra("return-data", true);
+        File cameraFile = new File(context.getExternalCacheDir(), String.valueOf(System.currentTimeMillis()) + ".mp4");
+        Uri fileUri = FileProvider.getUriForFile(context, context.getApplicationContext().getPackageName() + ".provider", cameraFile);
+        takePhotoIntent.putExtra(MediaStore.EXTRA_OUTPUT, fileUri);
+
+
+        intentList = addIntentsToList(context, intentList, galleryIntent);
+        intentList = addIntentsToList(context, intentList, takePhotoIntent);
+
+        if (intentList.size() > 0) {
+            chooserIntent = Intent.createChooser(intentList.remove(intentList.size() - 1),
+                    context.getString(R.string.pick_image));
+            chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, intentList.toArray(new Parcelable[]{}));
+            chooserIntent.setFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+            chooserIntent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        }
+
+
+        return new Pair<>(chooserIntent, cameraFile);
+    }
+
     private static List<Intent> addIntentsToList(Context context, List<Intent> list, Intent intent) {
         List<ResolveInfo> resInfo = context.getPackageManager().queryIntentActivities(intent, 0);
         for (ResolveInfo resolveInfo : resInfo) {
