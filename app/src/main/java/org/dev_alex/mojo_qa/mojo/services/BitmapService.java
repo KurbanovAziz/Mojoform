@@ -66,15 +66,15 @@ public class BitmapService {
         galleryIntent.setType("video/*");
 
 
-        Intent takePhotoIntent = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
-        takePhotoIntent.putExtra("return-data", true);
+        Intent takeVideoIntent = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
+        takeVideoIntent.putExtra("return-data", true);
         File cameraFile = new File(context.getExternalCacheDir(), String.valueOf(System.currentTimeMillis()) + ".mp4");
         Uri fileUri = FileProvider.getUriForFile(context, context.getApplicationContext().getPackageName() + ".provider", cameraFile);
-        takePhotoIntent.putExtra(MediaStore.EXTRA_OUTPUT, fileUri);
+        takeVideoIntent.putExtra(MediaStore.EXTRA_OUTPUT, fileUri);
 
 
         intentList = addIntentsToList(context, intentList, galleryIntent);
-        intentList = addIntentsToList(context, intentList, takePhotoIntent);
+        intentList = addIntentsToList(context, intentList, takeVideoIntent);
 
         if (intentList.size() > 0) {
             chooserIntent = Intent.createChooser(intentList.remove(intentList.size() - 1),

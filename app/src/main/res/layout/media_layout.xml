@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
@@ -7,15 +8,8 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginLeft="-7dp"
         android:orientation="vertical">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:text="цацуацуацуацуа"
-            android:textColor="#ff4c3d5f"
-            android:textSize="17sp" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -23,33 +17,117 @@
             android:orientation="horizontal">
 
             <ImageView
-                android:layout_width="95dp"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="-11dp"
+                android:layout_width="87dp"
+                android:layout_height="87dp"
                 android:adjustViewBounds="true"
-                android:src="@drawable/take_photo_icon" />
+                android:src="@drawable/media_brn" />
 
-            <ImageView
-                android:layout_width="52dp"
-                android:layout_height="52dp"
-                android:layout_marginTop="11dp"
-                android:background="@color/accent" />
-
-            <ImageView
-                android:layout_width="52dp"
-                android:layout_height="52dp"
-                android:layout_marginLeft="15dp"
-                android:layout_marginTop="11dp"
-                android:background="@android:color/holo_red_dark" />
-
-            <ImageView
-                android:layout_width="52dp"
-                android:layout_height="52dp"
-                android:layout_marginLeft="15dp"
-                android:layout_marginTop="11dp"
-                android:background="@android:color/darker_gray" />
-
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginBottom="10dp"
+                android:text="@string/add_media"
+                android:textColor="@color/accent" />
         </LinearLayout>
+
+        <net.cachapa.expandablelayout.ExpandableLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="-10dp"
+            android:orientation="vertical"
+            app:el_duration="600"
+            app:el_expanded="false">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <ImageView
+                        android:layout_width="77dp"
+                        android:layout_height="77dp"
+                        android:adjustViewBounds="true"
+                        android:src="@drawable/add_photo_btn" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:layout_marginBottom="10dp"
+                        android:text="@string/add_photo"
+                        android:textColor="@color/accent" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="-15dp"
+                    android:orientation="horizontal">
+
+                    <ImageView
+                        android:layout_width="77dp"
+                        android:layout_height="77dp"
+                        android:adjustViewBounds="true"
+                        android:src="@drawable/add_video_btn" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:layout_marginBottom="10dp"
+                        android:text="@string/add_video"
+                        android:textColor="@color/accent" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="-15dp"
+                    android:orientation="horizontal">
+
+                    <ImageView
+                        android:layout_width="77dp"
+                        android:layout_height="77dp"
+                        android:adjustViewBounds="true"
+                        android:src="@drawable/add_audio_btn" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:layout_marginBottom="10dp"
+                        android:text="@string/add_audio"
+                        android:textColor="@color/accent" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="-15dp"
+                    android:orientation="horizontal">
+
+                    <ImageView
+                        android:layout_width="77dp"
+                        android:layout_height="77dp"
+                        android:adjustViewBounds="true"
+                        android:src="@drawable/add_file_btn" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:layout_marginBottom="10dp"
+                        android:text="@string/add_file"
+                        android:textColor="@color/accent" />
+                </LinearLayout>
+            </LinearLayout>
+        </net.cachapa.expandablelayout.ExpandableLayout>
 
     </LinearLayout>
 
@@ -82,4 +160,5 @@
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:visibility="visible" />
+
 </LinearLayout>

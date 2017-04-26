@@ -1,6 +1,8 @@
 package org.dev_alex.mojo_qa.mojo.services;
 
 
+import android.webkit.MimeTypeMap;
+
 import org.json.JSONArray;
 
 import java.io.File;
@@ -64,5 +66,17 @@ public class Utils {
     public static boolean isImage(String path) {
         return path.endsWith(".jpg") || path.endsWith(".jpeg") ||
                 path.endsWith(".bmp") || path.endsWith(".png");
+    }
+
+    public static String getMimeType(String path) {
+        String type = null;
+        String extension = MimeTypeMap.getFileExtensionFromUrl(path);
+        if (extension != null) {
+            type = MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension);
+        }
+
+        if (type == null)
+            type = "*/*";
+        return type;
     }
 }
