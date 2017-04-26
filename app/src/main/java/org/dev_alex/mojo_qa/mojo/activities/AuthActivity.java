@@ -37,10 +37,14 @@ public class AuthActivity extends AppCompatActivity {
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                if (LoginHistoryService.lastLoginUsersExists())
-                    getSupportFragmentManager().beginTransaction().replace(R.id.container, LoginHistoryFragment.newInstance()).commitAllowingStateLoss();
-                else
-                    getSupportFragmentManager().beginTransaction().replace(R.id.container, LoginFragment.newInstance()).commitAllowingStateLoss();
+                try {
+                    if (LoginHistoryService.lastLoginUsersExists())
+                        getSupportFragmentManager().beginTransaction().replace(R.id.container, LoginHistoryFragment.newInstance()).commitAllowingStateLoss();
+                    else
+                        getSupportFragmentManager().beginTransaction().replace(R.id.container, LoginFragment.newInstance()).commitAllowingStateLoss();
+                } catch (Exception exc) {
+                    exc.printStackTrace();
+                }
             }
         }, 3000);
     }

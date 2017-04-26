@@ -1,5 +1,7 @@
 package org.dev_alex.mojo_qa.mojo.services;
 
+import android.util.Log;
+
 import org.dev_alex.mojo_qa.mojo.App;
 import org.dev_alex.mojo_qa.mojo.Data;
 import org.dev_alex.mojo_qa.mojo.R;
@@ -20,7 +22,7 @@ import okhttp3.Response;
 
 public class RequestService {
     private final static MediaType JSON = MediaType.parse("application/json; charset=utf-8");
-    private final static MediaType MEDIA_TYPE = MediaType.parse("image/jpg");
+    private final static MediaType MEDIA_TYPE = MediaType.parse("application/octet-stream");
 
 
     public static Response createPostRequest(String path, String jsonStr) throws Exception {
@@ -32,6 +34,9 @@ public class RequestService {
     }
 
     public static Response createSendFileRequest(String path, File file) throws Exception {
+        Log.d("mojo-log", "send file to server. file exists: " + String.valueOf(file.exists()));
+        Log.d("mojo-log", "send file to server. file about " + file.toString());
+
         OkHttpClient client = createOkHttpClient();
         String url = App.getContext().getString(R.string.host) + path;
         RequestBody requestBody = new MultipartBody.Builder()
@@ -39,7 +44,9 @@ public class RequestService {
                 .addFormDataPart("file", file.getName(), RequestBody.create(MEDIA_TYPE, file))
                 .build();
         Request.Builder requestBuilder = new Request.Builder().url(url).post(requestBody);
-        return client.newCall(requestBuilder.build()).execute();
+        Request request = requestBuilder.build();
+        Log.d("mojo-log", "send file to server. request: " + request.toString());
+        return client.newCall(request).execute();
     }
 
     public static Response createCustomTypeRequest(String path, String method, String jsonStr) throws Exception {

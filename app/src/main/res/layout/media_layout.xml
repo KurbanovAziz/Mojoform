@@ -8,12 +8,13 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="-7dp"
+        android:layout_marginLeft="-6dp"
         android:orientation="vertical">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginLeft="-5dp"
             android:orientation="horizontal">
 
             <ImageView
@@ -34,14 +35,16 @@
         <net.cachapa.expandablelayout.ExpandableLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginLeft="18dp"
             android:layout_marginTop="-10dp"
             android:orientation="vertical"
             app:el_duration="600"
-            app:el_expanded="false">
+            app:el_expanded="true">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginBottom="20dp"
                 android:orientation="vertical">
 
                 <LinearLayout
@@ -50,8 +53,8 @@
                     android:orientation="horizontal">
 
                     <ImageView
-                        android:layout_width="77dp"
-                        android:layout_height="77dp"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
                         android:adjustViewBounds="true"
                         android:src="@drawable/add_photo_btn" />
 
@@ -59,7 +62,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical"
-                        android:layout_marginBottom="10dp"
+                        android:layout_marginLeft="10dp"
                         android:text="@string/add_photo"
                         android:textColor="@color/accent" />
                 </LinearLayout>
@@ -67,12 +70,12 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="-15dp"
+                    android:layout_marginTop="15dp"
                     android:orientation="horizontal">
 
                     <ImageView
-                        android:layout_width="77dp"
-                        android:layout_height="77dp"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
                         android:adjustViewBounds="true"
                         android:src="@drawable/add_video_btn" />
 
@@ -80,7 +83,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical"
-                        android:layout_marginBottom="10dp"
+                        android:layout_marginLeft="10dp"
                         android:text="@string/add_video"
                         android:textColor="@color/accent" />
                 </LinearLayout>
@@ -88,12 +91,12 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="-15dp"
+                    android:layout_marginTop="15dp"
                     android:orientation="horizontal">
 
                     <ImageView
-                        android:layout_width="77dp"
-                        android:layout_height="77dp"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
                         android:adjustViewBounds="true"
                         android:src="@drawable/add_audio_btn" />
 
@@ -101,7 +104,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical"
-                        android:layout_marginBottom="10dp"
+                        android:layout_marginLeft="10dp"
                         android:text="@string/add_audio"
                         android:textColor="@color/accent" />
                 </LinearLayout>
@@ -109,12 +112,12 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="-15dp"
+                    android:layout_marginTop="15dp"
                     android:orientation="horizontal">
 
                     <ImageView
-                        android:layout_width="77dp"
-                        android:layout_height="77dp"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
                         android:adjustViewBounds="true"
                         android:src="@drawable/add_file_btn" />
 
@@ -122,7 +125,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical"
-                        android:layout_marginBottom="10dp"
+                        android:layout_marginLeft="10dp"
                         android:text="@string/add_file"
                         android:textColor="@color/accent" />
                 </LinearLayout>
@@ -134,30 +137,39 @@
     <HorizontalScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
         android:layout_marginTop="-13dp">
 
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="10dp"
+            android:orientation="horizontal" />
+    </HorizontalScrollView>
+
+    <HorizontalScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:orientation="horizontal" />
     </HorizontalScrollView>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginLeft="10dp"
         android:orientation="vertical"
         android:visibility="visible" />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:visibility="visible" />
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_marginLeft="10dp"
         android:orientation="vertical"
         android:visibility="visible" />
 

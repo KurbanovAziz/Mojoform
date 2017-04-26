@@ -25,12 +25,15 @@ import android.support.v4.content.FileProvider;
 import android.support.v4.util.Pair;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.Space;
+import android.support.v7.widget.PopupMenu;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.text.method.DigitsKeyListener;
 import android.util.Log;
 import android.util.TypedValue;
+import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebView;
@@ -181,7 +184,6 @@ public class TemplateFragment extends Fragment {
 
                 createVideoPreview(videoPath, true);
             }
-
         }
 
         if (requestCode == IMAGE_SHOW_REQUEST_CODE && resultCode == RESULT_OK && data != null) {
@@ -189,7 +191,7 @@ public class TemplateFragment extends Fragment {
                 JSONArray deletedImages = new JSONArray(data.getStringExtra("deleted_images"));
                 for (int i = 0; i < deletedImages.length(); i++) {
                     String imagePath = deletedImages.getString(i);
-                    currentMediaBlock.second.put(MEDIA_PATH_JSON_ARRAY, Utils.removeItemWithValue(currentMediaBlock.second.getJSONArray(MEDIA_PATH_JSON_ARRAY), imagePath));
+                    deleteMediaPath(currentMediaBlock.second, imagePath);
 
                     LinearLayout imageContainer = (LinearLayout) ((HorizontalScrollView) currentMediaBlock.first.getChildAt(1)).getChildAt(0);
                     for (int j = 0; j < imageContainer.getChildCount(); j++)
@@ -822,7 +824,6 @@ public class TemplateFragment extends Fragment {
             }
         });
 
-
         buttonsContainer.getChildAt(0).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -880,8 +881,18 @@ public class TemplateFragment extends Fragment {
 
         if (value.has(MEDIA_PATH_JSON_ARRAY)) {
             currentMediaBlock = new Pair<>(mediaLayout, value);
-            for (int j = 0; j < value.getJSONArray(MEDIA_PATH_JSON_ARRAY).length(); j++)
-                new ProcessingBitmapTask(value.getJSONArray(MEDIA_PATH_JSON_ARRAY).getString(j), false).execute();
+            for (int j = 0; j < value.getJSONArray(MEDIA_PATH_JSON_ARRAY).length(); j++) {
+                String mediaPath = value.getJSONArray(MEDIA_PATH_JSON_ARRAY).getString(j);
+                String mimeType = Utils.getMimeType(mediaPath);
+                if (mimeType.startsWith("image"))
+                    new ProcessingBitmapTask(mediaPath, false).execute();
+                else if (mimeType.startsWith("audio"))
+                    createAudioPreview(mediaPath, false);
+                else if (mimeType.startsWith("video"))
+                    createVideoPreview(mediaPath, false);
+                else
+                    createDocumentPreview(mediaPath, false);
+            }
         }
     }
 
@@ -1040,8 +1051,8 @@ public class TemplateFragment extends Fragment {
             final String finalFilePathInCache = filePathInCache;
             final Uri fileUri = FileProvider.getUriForFile(getContext(), getContext().getApplicationContext().getPackageName() + ".provider", new File(filePathInCache));
 
-            LinearLayout fileContainer = (LinearLayout) currentMediaBlock.first.getChildAt(4);
-            LinearLayout fileLayout = (LinearLayout) getActivity().getLayoutInflater().inflate(R.layout.file_layout, fileContainer, false);
+            final LinearLayout fileContainer = (LinearLayout) currentMediaBlock.first.getChildAt(4);
+            final LinearLayout fileLayout = (LinearLayout) getActivity().getLayoutInflater().inflate(R.layout.file_layout, fileContainer, false);
 
             ((TextView) fileLayout.getChildAt(1)).setText(filePathInCache.substring(filePathInCache.lastIndexOf("/") + 1));
             fileLayout.setTag(filePathInCache);
@@ -1055,8 +1066,26 @@ public class TemplateFragment extends Fragment {
                         startActivity(viewIntent);
                     } catch (Exception exc) {
                         exc.printStackTrace();
-                        Toast.makeText(getContext(), "Нет приложения, которе может открыть этот файл", Toast.LENGTH_LONG).show();
+                        Toast.makeText(getContext(), "Нет приложения, которое может открыть этот файл", Toast.LENGTH_LONG).show();
                     }
+                }
+            });
+
+            final JSONObject currentMediaObject = currentMediaBlock.second;
+            fileLayout.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View view) {
+                    showPopupMenu(view, new PopupMenu.OnMenuItemClickListener() {
+                        @Override
+                        public boolean onMenuItemClick(MenuItem item) {
+                            if (item.getItemId() == R.id.action_delete) {
+                                deleteMediaPath(currentMediaObject, finalFilePathInCache);
+                                fileContainer.removeView(fileLayout);
+                            }
+                            return true;
+                        }
+                    });
+                    return true;
                 }
             });
 
@@ -1085,8 +1114,8 @@ public class TemplateFragment extends Fragment {
 
             final Uri fileUri = FileProvider.getUriForFile(getContext(), getContext().getApplicationContext().getPackageName() + ".provider", new File(audioPathInCache));
 
-            LinearLayout audioContainer = (LinearLayout) currentMediaBlock.first.getChildAt(3);
-            LinearLayout audioLayout = (LinearLayout) getActivity().getLayoutInflater().inflate(R.layout.audio_layout, audioContainer, false);
+            final LinearLayout audioContainer = (LinearLayout) currentMediaBlock.first.getChildAt(3);
+            final LinearLayout audioLayout = (LinearLayout) getActivity().getLayoutInflater().inflate(R.layout.audio_layout, audioContainer, false);
 
             String fileName = "Запись " + new SimpleDateFormat("dd-MM-yyyy HH:mm:ss", Locale.getDefault()).format(
                     new Date(Long.parseLong(audioPathInCache.substring(audioPathInCache.lastIndexOf("/") + 1,
@@ -1106,6 +1135,25 @@ public class TemplateFragment extends Fragment {
                         exc.printStackTrace();
                         Toast.makeText(getContext(), "Нет установленного аудиоплеера", Toast.LENGTH_LONG).show();
                     }
+                }
+            });
+
+            final JSONObject currentMediaObject = currentMediaBlock.second;
+            final String finalAudioPathInCache = audioPathInCache;
+            audioLayout.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View view) {
+                    showPopupMenu(view, new PopupMenu.OnMenuItemClickListener() {
+                        @Override
+                        public boolean onMenuItemClick(MenuItem item) {
+                            if (item.getItemId() == R.id.action_delete) {
+                                deleteMediaPath(currentMediaObject, finalAudioPathInCache);
+                                audioContainer.removeView(audioLayout);
+                            }
+                            return true;
+                        }
+                    });
+                    return true;
                 }
             });
 
@@ -1132,9 +1180,9 @@ public class TemplateFragment extends Fragment {
                 videoPathInCache = path;
 
             final Uri videoUri = FileProvider.getUriForFile(getContext(), getContext().getApplicationContext().getPackageName() + ".provider", new File(videoPathInCache));
-            LinearLayout videoContainer = (LinearLayout) currentMediaBlock.first.getChildAt(2);
+            final LinearLayout videoContainer = (LinearLayout) ((HorizontalScrollView) currentMediaBlock.first.getChildAt(2)).getChildAt(0);
 
-            RelativeLayout videoPreview = (RelativeLayout) getActivity().getLayoutInflater().inflate(R.layout.video_preview_layout, videoContainer, false);
+            final RelativeLayout videoPreview = (RelativeLayout) getActivity().getLayoutInflater().inflate(R.layout.video_preview_layout, videoContainer, false);
             Bitmap curThumb = ThumbnailUtils.createVideoThumbnail(videoPathInCache, MediaStore.Video.Thumbnails.FULL_SCREEN_KIND);
             ((ImageView) videoPreview.getChildAt(0)).setImageBitmap(curThumb);
 
@@ -1144,6 +1192,7 @@ public class TemplateFragment extends Fragment {
                     try {
                         Intent viewIntent = new Intent(Intent.ACTION_VIEW, videoUri);
                         viewIntent.setDataAndType(videoUri, "video/*");
+                        viewIntent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                         startActivity(viewIntent);
                     } catch (Exception exc) {
                         exc.printStackTrace();
@@ -1151,7 +1200,29 @@ public class TemplateFragment extends Fragment {
                     }
                 }
             });
+
+            final JSONObject currentMediaObject = currentMediaBlock.second;
+            final String finalVideoPathInCache = videoPathInCache;
+            videoPreview.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View view) {
+                    showPopupMenu(view, new PopupMenu.OnMenuItemClickListener() {
+                        @Override
+                        public boolean onMenuItemClick(MenuItem item) {
+                            if (item.getItemId() == R.id.action_delete) {
+                                deleteMediaPath(currentMediaObject, finalVideoPathInCache);
+                                videoContainer.removeView(videoPreview);
+                            }
+                            return true;
+                        }
+                    });
+                    return true;
+                }
+            });
+
             videoContainer.addView(videoPreview);
+            if (copyToCache)
+                addMediaPath(videoPathInCache);
 
         } catch (Exception exc) {
             Toast.makeText(getContext(), "Ошибка при добавлении вижео: " + exc.getLocalizedMessage(), Toast.LENGTH_LONG).show();
@@ -1159,6 +1230,35 @@ public class TemplateFragment extends Fragment {
 
     }
 
+    private void addMediaPath(String mediaPath) throws JSONException {
+        if (currentMediaBlock.second.has(MEDIA_PATH_JSON_ARRAY))
+            currentMediaBlock.second.getJSONArray(MEDIA_PATH_JSON_ARRAY).put(mediaPath);
+        else {
+            JSONArray mediaPaths = new JSONArray();
+            mediaPaths.put(mediaPath);
+            currentMediaBlock.second.put(MEDIA_PATH_JSON_ARRAY, mediaPaths);
+        }
+        saveTemplateState();
+    }
+
+    private void deleteMediaPath(JSONObject currentMediaBlock, String mediaPath) {
+        try {
+            if (currentMediaBlock.has(MEDIA_PATH_JSON_ARRAY))
+                currentMediaBlock.put(MEDIA_PATH_JSON_ARRAY, Utils.removeItemWithValue(currentMediaBlock.getJSONArray(MEDIA_PATH_JSON_ARRAY), mediaPath));
+            saveTemplateState();
+            new File(mediaPath).delete();
+        } catch (Exception exc) {
+            exc.printStackTrace();
+        }
+    }
+
+    private void showPopupMenu(View v, PopupMenu.OnMenuItemClickListener onMenuItemClickListener) {
+        PopupMenu popupMenu = new PopupMenu(getContext(), v);
+        popupMenu.inflate(R.menu.delete_menu);
+        popupMenu.setOnMenuItemClickListener(onMenuItemClickListener);
+        popupMenu.setGravity(Gravity.RIGHT);
+        popupMenu.show();
+    }
 
     private class GetTemplateTask extends AsyncTask<Void, Void, Integer> {
         private String templateId;
@@ -1247,6 +1347,8 @@ public class TemplateFragment extends Fragment {
         @Override
         protected Integer doInBackground(Void... params) {
             try {
+                String nodeId = "28e95811-cabb-49b2-b927-8d321327267c";
+
                 successfullySentMediaCt = 0;
                 for (JSONObject jsonObject : mediaObjects)
                     if (jsonObject.has(MEDIA_PATH_JSON_ARRAY))
@@ -1256,10 +1358,11 @@ public class TemplateFragment extends Fragment {
                                 String mediaPath = jsonObject.getJSONArray(MEDIA_PATH_JSON_ARRAY).getString(i);
                                 try {
                                     File mediaFile = new File(mediaPath);
-                                    Response response = RequestService.createSendFileRequest("/api/fs/upload/binary/28e95811-cabb-49b2-b927-8d321327267c", mediaFile);
-                                    String mediaId = new JSONObject(response.body().string()).getJSONObject("entry").getString("id");
+                                    Response response = RequestService.createSendFileRequest("/api/fs/upload/binary/" + nodeId, mediaFile);
 
                                     if (response.code() == 200) {
+                                        String mediaId = new JSONObject(response.body().string()).getJSONObject("entry").getString("id");
+
                                         successfullySentMediaCt++;
                                         if (jsonObject.has("sent_medias"))
                                             jsonObject.getJSONArray("sent_medias").put(mediaPath);
@@ -1279,10 +1382,10 @@ public class TemplateFragment extends Fragment {
                                     }
 
                                     Log.d("mojo-log", String.valueOf(response.code()));
-                                    publishProgress(i);
                                 } catch (Exception exc) {
                                     exc.printStackTrace();
                                 }
+                                publishProgress(i);
                             }
             } catch (Exception exc) {
                 exc.printStackTrace();
@@ -1344,9 +1447,11 @@ public class TemplateFragment extends Fragment {
         @Override
         protected Integer doInBackground(Void... params) {
             try {
+                String nodeId = "28e95811-cabb-49b2-b927-8d321327267c";
+
                 JSONObject jsonObject = new JSONObject();
                 jsonObject.put("template", currentTemplateCopy.toString());
-                Response response = RequestService.createPostRequest("/api/document/create/" + templateId, jsonObject.toString());
+                Response response = RequestService.createPostRequest("/api/fs-mojo/create/" + nodeId + "/document", jsonObject.toString());
                 if (response.code() == 200) {
                     String finishTaskJson = "{\n" +
                             "  \"action\" : \"complete\",\n" +
@@ -1424,7 +1529,7 @@ public class TemplateFragment extends Fragment {
                         return null;
                     }
                 } else
-                    cameraImagePath = picturePath;
+                    cachedImgPath = picturePath;
 
                 return 1;
 
@@ -1452,16 +1557,6 @@ public class TemplateFragment extends Fragment {
                 exc.printStackTrace();
                 Toast.makeText(getContext(), "При обработке фото произошла ошибка: " + exc.getMessage(), Toast.LENGTH_SHORT).show();
             }
-        }
-    }
-
-    private void addMediaPath(String mediaPath) throws JSONException {
-        if (currentMediaBlock.second.has(MEDIA_PATH_JSON_ARRAY))
-            currentMediaBlock.second.getJSONArray(MEDIA_PATH_JSON_ARRAY).put(mediaPath);
-        else {
-            JSONArray mediaPaths = new JSONArray();
-            mediaPaths.put(mediaPath);
-            currentMediaBlock.second.put(MEDIA_PATH_JSON_ARRAY, mediaPaths);
         }
     }
 }
