@@ -875,14 +875,24 @@ public class TemplateFragment extends Fragment {
             public void onClick(View v) {
                 if (checkExternalPermissions()) {
                     try {
-                        currentMediaBlock = new Pair<>(mediaLayout, value);
-
                         Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-                        intent.putExtra("CONTENT_TYPE", "*/*");
                         intent.setType("*/*");
-                        intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                        //  intent.addCategory(Intent.CATEGORY_DEFAULT);
-                        startActivityForResult(intent, DOCUMENT_REQUEST_CODE);
+                        intent.addCategory(Intent.CATEGORY_OPENABLE);
+
+                        Intent sIntent = new Intent("com.sec.android.app.myfiles.PICK_DATA");
+                        //sIntent.putExtra("CONTENT_TYPE", "*/*");
+                        sIntent.addCategory(Intent.CATEGORY_DEFAULT);
+
+                        Intent chooserIntent;
+                        if (getActivity().getPackageManager().resolveActivity(sIntent, 0) != null) {
+                            // it is device with samsung file manager
+                            chooserIntent = Intent.createChooser(sIntent, "Open file");
+                            chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, new Intent[]{intent});
+                        } else
+                            chooserIntent = Intent.createChooser(intent, "Open file");
+                        
+                        startActivityForResult(chooserIntent, DOCUMENT_REQUEST_CODE);
+
                     } catch (Exception exc) {
                         Toast.makeText(getContext(), "У вас нет файлового менеджера, чтобы выбрать файл", Toast.LENGTH_SHORT).show();
                     }
