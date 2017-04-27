@@ -616,7 +616,7 @@ public class DocumentsFragment extends Fragment {
                 Toast.makeText(getContext(), R.string.file_or_folder_already_exists, Toast.LENGTH_SHORT).show();
             else {
                 foldersStack.get(foldersStack.size() - 1).folders.add(folder);
-                folderAdapter.notifyDataSetChanged();
+                setAdapters(foldersStack.get(foldersStack.size() - 1).files, foldersStack.get(foldersStack.size() - 1).folders, false);
                 dialog.dismiss();
                 Toast.makeText(getContext(), R.string.folder_successfully_created, Toast.LENGTH_SHORT).show();
             }

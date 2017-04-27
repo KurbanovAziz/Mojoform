@@ -101,13 +101,14 @@ public class AuthActivity extends AppCompatActivity {
                 Toast.makeText(AuthActivity.this, R.string.network_error, Toast.LENGTH_LONG).show();
             else if (responseCode == 401)
                 Toast.makeText(AuthActivity.this, R.string.invalid_username_or_password, Toast.LENGTH_LONG).show();
-            else {
+            else if (responseCode == 202) {
                 Data.currentUser = user;
                 LoginHistoryService.addUser(user);
                 Log.d("mojo-log", user.token);
                 startActivity(new Intent(AuthActivity.this, MainActivity.class));
                 finish();
-            }
+            } else
+                Toast.makeText(AuthActivity.this, getString(R.string.unknown_error) + "  code: " + responseCode, Toast.LENGTH_LONG).show();
         }
     }
 }

@@ -139,29 +139,25 @@ public class TemplateFragment extends Fragment {
                 new ProcessingBitmapTask(cameraImagePath, true).execute();
             else {
                 Uri selectedImage = data.getData();
-                String picturePath = selectedImage.getPath();
-                if (picturePath.endsWith(".png") || picturePath.endsWith(".jpg") || picturePath.endsWith(".jpeg") || picturePath.endsWith(".bmp"))
-                    new ProcessingBitmapTask(picturePath, true).execute();
-                else {
-                    String[] filePathColumn = {MediaStore.Images.Media.DATA};
-                    Cursor cursor = getActivity().getContentResolver().query(selectedImage, filePathColumn, null, null, null);
+                String[] filePathColumn = {MediaStore.Images.Media.DATA};
+                Cursor cursor = getActivity().getContentResolver().query(selectedImage, filePathColumn, null, null, null);
 
-                    if (cursor == null) {
-                        Toast.makeText(getContext(), "что-то пошло не так", Toast.LENGTH_SHORT).show();
-                        return;
-                    }
-                    cursor.moveToFirst();
-                    int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
-                    picturePath = cursor.getString(columnIndex);
-                    cursor.close();
-
-                    String expansion = picturePath.substring(picturePath.lastIndexOf('.') + 1);
-                    if (!expansion.equals("jpg") && !expansion.equals("png") && !expansion.equals("jpeg") && !expansion.equals("bmp")) {
-                        Toast.makeText(getContext(), "Пожалуйста, выберите файл в формет jpg, png или bmp", Toast.LENGTH_SHORT).show();
-                        return;
-                    }
-                    new ProcessingBitmapTask(picturePath, true).execute();
+                if (cursor == null) {
+                    Toast.makeText(getContext(), "что-то пошло не так", Toast.LENGTH_SHORT).show();
+                    return;
                 }
+                cursor.moveToFirst();
+                int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
+                String picturePath = cursor.getString(columnIndex);
+                cursor.close();
+
+                String expansion = picturePath.substring(picturePath.lastIndexOf('.') + 1);
+                if (!expansion.equals("jpg") && !expansion.equals("png") && !expansion.equals("jpeg") && !expansion.equals("bmp")) {
+                    Toast.makeText(getContext(), "Пожалуйста, выберите файл в формет jpg, png или bmp", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                new ProcessingBitmapTask(picturePath, true).execute();
+
             }
         }
 
@@ -828,10 +824,14 @@ public class TemplateFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 if (checkExternalPermissions()) {
-                    currentMediaBlock = new Pair<>(mediaLayout, value);
-                    Pair<Intent, File> intentFilePair = BitmapService.getPickImageIntent(getContext());
-                    cameraImagePath = intentFilePair.second.getAbsolutePath();
-                    startActivityForResult(intentFilePair.first, PHOTO_REQUEST_CODE);
+                    try {
+                        currentMediaBlock = new Pair<>(mediaLayout, value);
+                        Pair<Intent, File> intentFilePair = BitmapService.getPickImageIntent(getContext());
+                        cameraImagePath = intentFilePair.second.getAbsolutePath();
+                        startActivityForResult(intentFilePair.first, PHOTO_REQUEST_CODE);
+                    } catch (Exception exc) {
+                        Toast.makeText(getContext(), "У вас нет камеры", Toast.LENGTH_SHORT).show();
+                    }
                 } else
                     requestExternalPermissions();
             }
@@ -841,10 +841,14 @@ public class TemplateFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 if (checkExternalPermissions()) {
-                    currentMediaBlock = new Pair<>(mediaLayout, value);
-                    Pair<Intent, File> intentFilePair = BitmapService.getPickVideoIntent(getContext());
-                    cameraVideoPath = intentFilePair.second.getAbsolutePath();
-                    startActivityForResult(intentFilePair.first, VIDEO_REQUEST_CODE);
+                    try {
+                        currentMediaBlock = new Pair<>(mediaLayout, value);
+                        Pair<Intent, File> intentFilePair = BitmapService.getPickVideoIntent(getContext());
+                        cameraVideoPath = intentFilePair.second.getAbsolutePath();
+                        startActivityForResult(intentFilePair.first, VIDEO_REQUEST_CODE);
+                    } catch (Exception exc) {
+                        Toast.makeText(getContext(), "У вас нет камеры", Toast.LENGTH_SHORT).show();
+                    }
                 } else
                     requestExternalPermissions();
             }
@@ -854,9 +858,13 @@ public class TemplateFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 if (checkAudioPermissions()) {
-                    currentMediaBlock = new Pair<>(mediaLayout, value);
-                    Intent intent = new Intent(MediaStore.Audio.Media.RECORD_SOUND_ACTION);
-                    startActivityForResult(intent, AUDIO_REQUEST_CODE);
+                    try {
+                        currentMediaBlock = new Pair<>(mediaLayout, value);
+                        Intent intent = new Intent(MediaStore.Audio.Media.RECORD_SOUND_ACTION);
+                        startActivityForResult(intent, AUDIO_REQUEST_CODE);
+                    } catch (Exception exc) {
+                        Toast.makeText(getContext(), "У вас нет приложения для записи аудио", Toast.LENGTH_SHORT).show();
+                    }
                 } else
                     requestAudioPermissions();
             }
@@ -866,12 +874,18 @@ public class TemplateFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 if (checkExternalPermissions()) {
-                    currentMediaBlock = new Pair<>(mediaLayout, value);
+                    try {
+                        currentMediaBlock = new Pair<>(mediaLayout, value);
 
-                    Intent intent = new Intent("com.sec.android.app.myfiles.PICK_DATA");
-                    intent.putExtra("CONTENT_TYPE", "*/*");
-                    intent.addCategory(Intent.CATEGORY_DEFAULT);
-                    startActivityForResult(intent, DOCUMENT_REQUEST_CODE);
+                        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+                        intent.putExtra("CONTENT_TYPE", "*/*");
+                        intent.setType("*/*");
+                        intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                        //  intent.addCategory(Intent.CATEGORY_DEFAULT);
+                        startActivityForResult(intent, DOCUMENT_REQUEST_CODE);
+                    } catch (Exception exc) {
+                        Toast.makeText(getContext(), "У вас нет файлового менеджера, чтобы выбрать файл", Toast.LENGTH_SHORT).show();
+                    }
                 } else
                     requestExternalPermissions();
             }
