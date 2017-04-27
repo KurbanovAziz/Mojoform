@@ -6,7 +6,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
@@ -138,18 +137,11 @@ public class TemplateFragment extends Fragment {
             if (data == null)
                 new ProcessingBitmapTask(cameraImagePath, true).execute();
             else {
-                Uri selectedImage = data.getData();
-                String[] filePathColumn = {MediaStore.Images.Media.DATA};
-                Cursor cursor = getActivity().getContentResolver().query(selectedImage, filePathColumn, null, null, null);
-
-                if (cursor == null) {
+                String picturePath = Utils.getRealPathFromIntentData(getContext(), data.getData());
+                if (picturePath == null) {
                     Toast.makeText(getContext(), "что-то пошло не так", Toast.LENGTH_SHORT).show();
                     return;
                 }
-                cursor.moveToFirst();
-                int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
-                String picturePath = cursor.getString(columnIndex);
-                cursor.close();
 
                 String expansion = picturePath.substring(picturePath.lastIndexOf('.') + 1);
                 if (!expansion.equals("jpg") && !expansion.equals("png") && !expansion.equals("jpeg") && !expansion.equals("bmp")) {
@@ -165,20 +157,11 @@ public class TemplateFragment extends Fragment {
             if (data == null || data.getAction() != null && data.getAction().equals("inline-data"))
                 createVideoPreview(cameraVideoPath, true);
             else {
-                Uri selectedImage = data.getData();
-                String[] filePathColumn = {MediaStore.Images.Media.DATA};
-                Cursor cursor = getActivity().getContentResolver().query(selectedImage, filePathColumn, null, null, null);
-
-                if (cursor == null) {
+                String videoPath = Utils.getRealPathFromIntentData(getContext(), data.getData());
+                if (videoPath == null)
                     Toast.makeText(getContext(), "что-то пошло не так", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-                cursor.moveToFirst();
-                int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
-                String videoPath = cursor.getString(columnIndex);
-                cursor.close();
-
-                createVideoPreview(videoPath, true);
+                else
+                    createVideoPreview(videoPath, true);
             }
         }
 
@@ -199,23 +182,20 @@ public class TemplateFragment extends Fragment {
             }
         }
 
-        if (requestCode == DOCUMENT_REQUEST_CODE && resultCode == RESULT_OK && data != null)
-            createDocumentPreview(data.getData().getPath(), true);
+        if (requestCode == DOCUMENT_REQUEST_CODE && resultCode == RESULT_OK && data != null) {
+            String documentPath = Utils.getRealPathFromIntentData(getContext(), data.getData());
+            if (documentPath == null)
+                Toast.makeText(getContext(), "что-то пошло не так", Toast.LENGTH_SHORT).show();
+            else
+                createDocumentPreview(documentPath, true);
+        }
 
         if (requestCode == AUDIO_REQUEST_CODE && resultCode == RESULT_OK) {
-            Uri selectedImage = data.getData();
-            String[] filePathColumn = {MediaStore.Images.Media.DATA};
-            Cursor cursor = getActivity().getContentResolver().query(selectedImage, filePathColumn, null, null, null);
-
-            if (cursor == null) {
+            String audioPath = Utils.getRealPathFromIntentData(getContext(), data.getData());
+            if (audioPath == null)
                 Toast.makeText(getContext(), "что-то пошло не так", Toast.LENGTH_SHORT).show();
-                return;
-            }
-            cursor.moveToFirst();
-            int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
-            String audioPath = cursor.getString(columnIndex);
-            cursor.close();
-            createAudioPreview(audioPath, true);
+            else
+                createAudioPreview(audioPath, true);
         }
     }
 

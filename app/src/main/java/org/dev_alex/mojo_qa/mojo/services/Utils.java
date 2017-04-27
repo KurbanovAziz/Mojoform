@@ -1,6 +1,10 @@
 package org.dev_alex.mojo_qa.mojo.services;
 
 
+import android.content.Context;
+import android.database.Cursor;
+import android.net.Uri;
+import android.provider.MediaStore;
 import android.webkit.MimeTypeMap;
 
 import org.json.JSONArray;
@@ -78,5 +82,20 @@ public class Utils {
         if (type == null)
             type = "*/*";
         return type;
+    }
+
+    public static String getRealPathFromIntentData(Context context, Uri selectedFile) {
+        String[] filePathColumn = {MediaStore.Images.Media.DATA};
+        Cursor cursor = context.getContentResolver().query(selectedFile, filePathColumn, null, null, null);
+
+        if (cursor == null)
+            return null;
+
+        cursor.moveToFirst();
+        int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
+        String realPath = cursor.getString(columnIndex);
+        cursor.close();
+
+        return realPath;
     }
 }
