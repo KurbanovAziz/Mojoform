@@ -41,7 +41,7 @@
     <string name="file_or_folder_already_exists">Файл или папка с таким именем уже сущесвует</string>
     <string name="pick_image">Выбрать изображение</string>
     <string name="of">из</string>
-    <string name="unknown_error">Непредвиденная ошибка</string>
+    <string name="unknown_error">Непредвиденная ошибка, попробуйте позже</string>
     <string name="folder_locked">Папка заблокирована, операции с ней запрещены</string>
     <string name="file_locked">Файл заблокирован, операции с ним запрещены</string>
     <string name="move_here">Переместить сюда</string>
@@ -70,4 +70,5 @@
     <string name="add_video">Прикрепите видео</string>
     <string name="add_audio">Прикрепите аудио</string>
     <string name="add_file">Прикрепите файл</string>
+    <string name="clear">Очистить</string>
 </resources>

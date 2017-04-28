@@ -12,6 +12,7 @@ import java.util.List;
 
 import okhttp3.Cookie;
 import okhttp3.CookieJar;
+import okhttp3.Credentials;
 import okhttp3.HttpUrl;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
@@ -21,16 +22,25 @@ import okhttp3.RequestBody;
 import okhttp3.Response;
 
 public class RequestService {
-    private final static MediaType JSON = MediaType.parse("application/json; charset=utf-8");
+    private final static MediaType JSON = MediaType.parse("application/json");
     private final static MediaType MEDIA_TYPE = MediaType.parse("application/octet-stream");
 
 
     public static Response createPostRequest(String path, String jsonStr) throws Exception {
-        OkHttpClient client = createOkHttpClient();
         String url = App.getContext().getString(R.string.host) + path;
+        return createPostRequestWithCustomUrl(url, jsonStr);
+    }
+
+    public static Response createPostRequestWithCustomUrl(String url, String jsonStr) throws Exception {
+        OkHttpClient client = createOkHttpClient();
         RequestBody body = RequestBody.create(JSON, jsonStr);
-        Request.Builder requestBuilder = new Request.Builder().url(url).post(body);
-        return client.newCall(requestBuilder.build()).execute();
+        Request.Builder requestBuilder = new Request.Builder().url(url).post(body)
+                .addHeader("Content-Type", "application/json")
+                .addHeader("Authorization", Credentials.basic("kermit", "kermit"));
+        
+        Request request = requestBuilder.build();
+        Log.d("mojo-log", "send file to server. request: " + request.toString());
+        return client.newCall(request).execute();
     }
 
     public static Response createSendFileRequest(String path, File file) throws Exception {

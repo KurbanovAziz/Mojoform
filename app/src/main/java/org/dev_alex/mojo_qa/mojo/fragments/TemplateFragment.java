@@ -28,6 +28,7 @@ import android.support.v7.widget.PopupMenu;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.text.method.DigitsKeyListener;
+import android.util.Base64;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
@@ -48,6 +49,8 @@ import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.github.gcacace.signaturepad.views.SignaturePad;
 
 import net.cachapa.expandablelayout.ExpandableLayout;
 
@@ -79,6 +82,7 @@ import static android.app.Activity.RESULT_OK;
 
 public class TemplateFragment extends Fragment {
     private final String MEDIA_PATH_JSON_ARRAY = "media_paths";
+    private final String SIGNATURE_PREVIEW_JSON_ARRAY = "sign_state";
     private SimpleDateFormat isoDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ", Locale.getDefault());
     private final int VIDEO_REQUEST_CODE = 10;
     private final int PHOTO_REQUEST_CODE = 11;
@@ -183,11 +187,26 @@ public class TemplateFragment extends Fragment {
         }
 
         if (requestCode == DOCUMENT_REQUEST_CODE && resultCode == RESULT_OK && data != null) {
-            String documentPath = Utils.getRealPathFromIntentData(getContext(), data.getData());
+            String documentPath;
+
+            if (new File(data.getData().getPath()).exists())
+                documentPath = data.getData().getPath();
+            else
+                documentPath = Utils.getPathFromUri(getContext(), data.getData());
+
             if (documentPath == null)
                 Toast.makeText(getContext(), "что-то пошло не так", Toast.LENGTH_SHORT).show();
-            else
-                createDocumentPreview(documentPath, true);
+            else {
+                String mimeType = Utils.getMimeType(documentPath);
+                if (mimeType.startsWith("image"))
+                    new ProcessingBitmapTask(documentPath, true).execute();
+                else if (mimeType.startsWith("audio"))
+                    createAudioPreview(documentPath, true);
+                else if (mimeType.startsWith("video"))
+                    createVideoPreview(documentPath, true);
+                else
+                    createDocumentPreview(documentPath, true);
+            }
         }
 
         if (requestCode == AUDIO_REQUEST_CODE && resultCode == RESULT_OK) {
@@ -304,102 +323,6 @@ public class TemplateFragment extends Fragment {
         } catch (Exception exc) {
             exc.printStackTrace();
         }
-    }
-
-
-    private Pair<Boolean, ArrayList<JSONObject>> checkIfTemplateIsFilled(JSONObject template) {
-        try {
-            ArrayList<JSONObject> photoObjects = new ArrayList<>();
-
-            if (template != null) {
-                JSONArray pagesJson = template.getJSONArray("items");
-                for (int i = 0; i < pagesJson.length(); i++) {
-                    JSONObject pageJson = pagesJson.getJSONObject(i).getJSONObject("page");
-                    if (pageJson.has("items")) {
-                        Pair<Boolean, ArrayList<JSONObject>> result = checkIfContainerIsFilled(pageJson.getJSONArray("items"));
-                        if (!result.first)
-                            return new Pair<>(false, null);
-                        else
-                            photoObjects.addAll(result.second);
-                    }
-                }
-                return new Pair<>(true, photoObjects);
-            }
-        } catch (Exception exc) {
-            exc.printStackTrace();
-        }
-        return new Pair<>(false, null);
-    }
-
-    private Pair<Boolean, ArrayList<JSONObject>> checkIfContainerIsFilled(JSONArray dataJson) throws Exception {
-        ArrayList<JSONObject> photoObjects = new ArrayList<>();
-
-        ArrayList<String> fields = new ArrayList<>();
-        for (int i = 0; i < dataJson.length(); i++) {
-            JSONObject value = dataJson.getJSONObject(i);
-            Iterator<String> iterator = value.keys();
-            while (iterator.hasNext()) {
-                String currentKey = iterator.next();
-                fields.add(currentKey);
-            }
-        }
-
-        for (int i = 0; i < fields.size(); i++) {
-            final JSONObject value = dataJson.getJSONObject(i).getJSONObject(fields.get(i));
-            switch (fields.get(i)) {
-                case "category":
-
-                    Pair<Boolean, ArrayList<JSONObject>> result = checkIfContainerIsFilled(value.getJSONArray("items"));
-                    if (!result.first)
-                        return new Pair<>(false, null);
-                    else
-                        photoObjects.addAll(result.second);
-                    break;
-
-                case "question":
-                    if (!value.has("value") && !(value.has("is_required") && !value.getBoolean("is_required")))
-                        return new Pair<>(false, null);
-                    break;
-
-                case "text":
-                    break;
-
-                case "lineedit":
-                    if (!value.has("value") && !(value.has("is_required") && !value.getBoolean("is_required")))
-                        return new Pair<>(false, null);
-                    break;
-
-                case "textarea":
-                    if (!value.has("value") && !(value.has("is_required") && !value.getBoolean("is_required")))
-                        return new Pair<>(false, null);
-                    break;
-
-                case "checkbox":
-                    if (!value.has("value") && !(value.has("is_required") && !value.getBoolean("is_required")))
-                        return new Pair<>(false, null);
-                    break;
-
-                case "slider":
-                    if (!value.has("value") && !(value.has("is_required") && !value.getBoolean("is_required")))
-                        return new Pair<>(false, null);
-                    break;
-
-                case "photo":
-                    if ((!value.has(MEDIA_PATH_JSON_ARRAY) || (value.has(MEDIA_PATH_JSON_ARRAY) && value.getJSONArray(MEDIA_PATH_JSON_ARRAY).length() == 0))
-                            && !(value.has("is_required") && !value.getBoolean("is_required")))
-                        return new Pair<>(false, null);
-                    else
-                        photoObjects.add(value);
-                    break;
-
-                case "richedit":
-                    break;
-
-                default:
-                    Log.d("jeka", fields.get(i));
-            }
-        }
-        return new Pair<>(true, photoObjects);
     }
 
     private void renderTemplate() {
@@ -613,6 +536,10 @@ public class TemplateFragment extends Fragment {
                     Log.d("jeka", fields.get(i));
                     break;
 
+                case "signature":
+                    createSignature(value, container);
+                    break;
+
                 default:
                     Log.d("jeka", fields.get(i));
             }
@@ -788,6 +715,60 @@ public class TemplateFragment extends Fragment {
         }
     }
 
+    private void createSignature(final JSONObject value, LinearLayout container) throws Exception {
+        final LinearLayout signatureContainer = (LinearLayout) getActivity().getLayoutInflater().inflate(R.layout.signature_layout, container, false);
+        final SignaturePad signaturePad = (SignaturePad) signatureContainer.getChildAt(1);
+
+        if (value.has("caption"))
+            ((TextView) signatureContainer.getChildAt(0)).setText(value.getString("caption"));
+        else
+            ((TextView) signatureContainer.getChildAt(0)).setText("Нет текста");
+
+        signatureContainer.getChildAt(2).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                signaturePad.clear();
+            }
+        });
+
+        signaturePad.setOnSignedListener(new SignaturePad.OnSignedListener() {
+            @Override
+            public void onStartSigning() {
+
+            }
+
+            @Override
+            public void onSigned() {
+                try {
+                    Bitmap bitmap = signaturePad.getSignatureBitmap();
+                    value.put("sign_state", BitmapService.getBitmapBytesEncodedBase64(bitmap));
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onClear() {
+                try {
+                    Bitmap bitmap = signaturePad.getSignatureBitmap();
+                    value.put("sign_state", BitmapService.getBitmapBytesEncodedBase64(bitmap));
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+
+        container.addView(signatureContainer);
+
+        if (value.has(SIGNATURE_PREVIEW_JSON_ARRAY)) {
+            String imageEncoded = value.getString(SIGNATURE_PREVIEW_JSON_ARRAY);
+            byte[] decodedByte = Base64.decode(imageEncoded, 0);
+            Bitmap bitmap = BitmapFactory.decodeByteArray(decodedByte, 0, decodedByte.length);
+            if (bitmap != null)
+                signaturePad.setSignatureBitmap(bitmap);
+        }
+    }
+
     private void createMediaBlock(final JSONObject value, LinearLayout container) throws Exception {
         final LinearLayout mediaLayout = (LinearLayout) getActivity().getLayoutInflater().inflate(R.layout.media_layout, container, false);
 
@@ -855,22 +836,23 @@ public class TemplateFragment extends Fragment {
             public void onClick(View v) {
                 if (checkExternalPermissions()) {
                     try {
+                        currentMediaBlock = new Pair<>(mediaLayout, value);
+
                         Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
                         intent.setType("*/*");
                         intent.addCategory(Intent.CATEGORY_OPENABLE);
 
                         Intent sIntent = new Intent("com.sec.android.app.myfiles.PICK_DATA");
-                        //sIntent.putExtra("CONTENT_TYPE", "*/*");
                         sIntent.addCategory(Intent.CATEGORY_DEFAULT);
 
                         Intent chooserIntent;
                         if (getActivity().getPackageManager().resolveActivity(sIntent, 0) != null) {
                             // it is device with samsung file manager
-                            chooserIntent = Intent.createChooser(sIntent, "Open file");
+                            chooserIntent = Intent.createChooser(sIntent, "Выбрать файл");
                             chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, new Intent[]{intent});
                         } else
-                            chooserIntent = Intent.createChooser(intent, "Open file");
-                        
+                            chooserIntent = Intent.createChooser(intent, "Выбрать файл");
+
                         startActivityForResult(chooserIntent, DOCUMENT_REQUEST_CODE);
 
                     } catch (Exception exc) {
@@ -1336,10 +1318,14 @@ public class TemplateFragment extends Fragment {
             try {
                 for (JSONObject jsonObject : mediaObjects)
                     if (jsonObject.has(MEDIA_PATH_JSON_ARRAY))
-                        for (int i = 0; i < jsonObject.getJSONArray(MEDIA_PATH_JSON_ARRAY).length(); i++)
+                        for (int i = 0; i < jsonObject.getJSONArray(MEDIA_PATH_JSON_ARRAY).length(); i++) {
                             if (!jsonObject.has("sent_medias") ||
                                     (jsonObject.has("sent_medias") && !Utils.containsValue(jsonObject.getJSONArray("sent_medias"), jsonObject.getJSONArray(MEDIA_PATH_JSON_ARRAY).getString(i))))
                                 totalSize++;
+                        }
+                    else if (jsonObject.has(SIGNATURE_PREVIEW_JSON_ARRAY))
+                        if (!jsonObject.has("was_sent"))
+                            totalSize++;
 
             } catch (Exception exc) {
                 exc.printStackTrace();
@@ -1351,12 +1337,13 @@ public class TemplateFragment extends Fragment {
         @Override
         protected Integer doInBackground(Void... params) {
             try {
+                int sentCt = 0;
                 String nodeId = "28e95811-cabb-49b2-b927-8d321327267c";
 
                 successfullySentMediaCt = 0;
                 for (JSONObject jsonObject : mediaObjects)
                     if (jsonObject.has(MEDIA_PATH_JSON_ARRAY))
-                        for (int i = 0; i < jsonObject.getJSONArray(MEDIA_PATH_JSON_ARRAY).length(); i++)
+                        for (int i = 0; i < jsonObject.getJSONArray(MEDIA_PATH_JSON_ARRAY).length(); i++) {
                             if (!jsonObject.has("sent_medias") ||
                                     (jsonObject.has("sent_medias") && !Utils.containsValue(jsonObject.getJSONArray("sent_medias"), jsonObject.getJSONArray(MEDIA_PATH_JSON_ARRAY).getString(i)))) {
                                 String mediaPath = jsonObject.getJSONArray(MEDIA_PATH_JSON_ARRAY).getString(i);
@@ -1389,8 +1376,28 @@ public class TemplateFragment extends Fragment {
                                 } catch (Exception exc) {
                                     exc.printStackTrace();
                                 }
-                                publishProgress(i);
+                                publishProgress(sentCt++);
                             }
+                        }
+                    else if (jsonObject.has(SIGNATURE_PREVIEW_JSON_ARRAY) && !jsonObject.has("was_sent")) {
+                        String imageEncoded = jsonObject.getString(SIGNATURE_PREVIEW_JSON_ARRAY);
+                        byte[] decodedByte = Base64.decode(imageEncoded, 0);
+                        Bitmap bitmap = BitmapFactory.decodeByteArray(decodedByte, 0, decodedByte.length);
+                        if (bitmap != null) {
+                            File mediaFile = BitmapService.saveBitmapToFile(getContext(), bitmap);
+                            Response response = RequestService.createSendFileRequest("/api/fs/upload/binary/" + nodeId, mediaFile);
+                            if (response.code() == 200) {
+                                mediaFile.delete();
+                                String mediaId = new JSONObject(response.body().string()).getJSONObject("entry").getString("id");
+                                successfullySentMediaCt++;
+                                jsonObject.put("value", mediaId);
+                                jsonObject.put("was_sent", true);
+                            }
+                            Log.d("mojo-log", String.valueOf(response.code()));
+                        }
+                        publishProgress(sentCt++);
+                    }
+
             } catch (Exception exc) {
                 exc.printStackTrace();
             }
@@ -1411,37 +1418,42 @@ public class TemplateFragment extends Fragment {
                 if (progressDialog != null && progressDialog.isShowing())
                     progressDialog.dismiss();
                 Toast.makeText(getContext(), R.string.error_not_all_images_were_sent, Toast.LENGTH_SHORT).show();
-            } else {
+            } else
                 new CompleteTemplateTask().execute();
-            }
+
         }
     }
 
     private class CompleteTemplateTask extends AsyncTask<Void, Integer, Integer> {
-        private JSONObject currentTemplateCopy;
+        private JSONObject resultJson;
 
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
             try {
-                currentTemplateCopy = new JSONObject(template.toString());
-                Pair<Boolean, ArrayList<JSONObject>> result = checkIfTemplateIsFilled(currentTemplateCopy);
-                ArrayList<JSONObject> mediaBlocks = result.second;
-                for (JSONObject jsonObject : mediaBlocks) {
-                    if (jsonObject.has("sent_medias"))
-                        jsonObject.remove("sent_medias");
+                resultJson = new JSONObject();
+                JSONArray values = getTemplateElementValues(template);
+                resultJson.put("values", values);
 
-                    if (jsonObject.has(MEDIA_PATH_JSON_ARRAY))
-                        jsonObject.remove(MEDIA_PATH_JSON_ARRAY);
-                }
+                resultJson.put("template_id", templateId);
+                resultJson.put("name", template.getString("name"));
+                resultJson.put("executor", Data.currentUser.userName);
+                if (template.has("StartTime"))
+                    resultJson.put("StartTime", template.getString("StartTime"));
+                else
+                    resultJson.put("StartTime", isoDateFormat.format(new Date()));
 
-                currentTemplateCopy.put("executor", Data.currentUser.userName);
-                if (!template.has("StartTime"))
-                    currentTemplateCopy.put("StartTime", isoDateFormat.format(new Date()));
-                if (!currentTemplateCopy.has("DueTime"))
-                    currentTemplateCopy.put("DueTime", isoDateFormat.format(new Date()));
-                if (!currentTemplateCopy.has("CompleteTime"))
-                    currentTemplateCopy.put("CompleteTime", isoDateFormat.format(new Date()));
+                if (resultJson.has("DueTime"))
+                    resultJson.put("DueTime", template.getString("DueTime"));
+                else
+                    resultJson.put("DueTime", isoDateFormat.format(new Date()));
+
+                if (resultJson.has("CompleteTime"))
+                    resultJson.put("CompleteTime", template.getString("CompleteTime"));
+                else
+                    resultJson.put("CompleteTime", isoDateFormat.format(new Date()));
+
+                Log.d("mojo-log", "result template: " + resultJson.toString());
 
             } catch (Exception exc) {
                 exc.printStackTrace();
@@ -1452,17 +1464,16 @@ public class TemplateFragment extends Fragment {
         protected Integer doInBackground(Void... params) {
             try {
                 String nodeId = "28e95811-cabb-49b2-b927-8d321327267c";
+                Response response = RequestService.createPostRequest("/api/fs-mojo/create/" + nodeId + "/document", resultJson.toString());
+                String responseBody = response.body().string();
+                if (response.code() == 201 || response.code() == 200 || response.code() == 409) {
+                    JSONObject jsonObject = new JSONObject();
+                    jsonObject.put("action", "complete");
+                    jsonObject.put("variables", new JSONArray());
 
-                JSONObject jsonObject = new JSONObject();
-                jsonObject.put("template", currentTemplateCopy.toString());
-                Response response = RequestService.createPostRequest("/api/fs-mojo/create/" + nodeId + "/document", jsonObject.toString());
-                if (response.code() == 200) {
-                    String finishTaskJson = "{\n" +
-                            "  \"action\" : \"complete\",\n" +
-                            "  \"variables\" : []\n" +
-                            "}";
-
-                    response = RequestService.createPostRequest("/runtime/tasks/" + taskId, finishTaskJson);
+                    response = RequestService.createPostRequestWithCustomUrl("https://activiti.dev-alex.org/activiti-rest/service/runtime/tasks/" + taskId, jsonObject.toString());
+                    int responseCode = response.code();
+                    Log.d("mojo-log", "task complete response code: " + responseCode);
                 }
                 return response.code();
 
@@ -1562,5 +1573,244 @@ public class TemplateFragment extends Fragment {
                 Toast.makeText(getContext(), "При обработке фото произошла ошибка: " + exc.getMessage(), Toast.LENGTH_SHORT).show();
             }
         }
+    }
+
+
+    private Pair<Boolean, ArrayList<JSONObject>> checkIfTemplateIsFilled(JSONObject template) {
+        try {
+            ArrayList<JSONObject> photoObjects = new ArrayList<>();
+
+            if (template != null) {
+                JSONArray pagesJson = template.getJSONArray("items");
+                for (int i = 0; i < pagesJson.length(); i++) {
+                    JSONObject pageJson = pagesJson.getJSONObject(i).getJSONObject("page");
+                    if (pageJson.has("items")) {
+                        Pair<Boolean, ArrayList<JSONObject>> result = checkIfContainerIsFilled(pageJson.getJSONArray("items"));
+                        if (!result.first)
+                            return new Pair<>(false, null);
+                        else
+                            photoObjects.addAll(result.second);
+                    }
+                }
+                return new Pair<>(true, photoObjects);
+            }
+        } catch (Exception exc) {
+            exc.printStackTrace();
+        }
+        return new Pair<>(false, null);
+    }
+
+    private Pair<Boolean, ArrayList<JSONObject>> checkIfContainerIsFilled(JSONArray dataJson) throws Exception {
+        ArrayList<JSONObject> photoObjects = new ArrayList<>();
+
+        ArrayList<String> fields = new ArrayList<>();
+        for (int i = 0; i < dataJson.length(); i++) {
+            JSONObject value = dataJson.getJSONObject(i);
+            Iterator<String> iterator = value.keys();
+            while (iterator.hasNext()) {
+                String currentKey = iterator.next();
+                fields.add(currentKey);
+            }
+        }
+
+        for (int i = 0; i < fields.size(); i++) {
+            final JSONObject value = dataJson.getJSONObject(i).getJSONObject(fields.get(i));
+            switch (fields.get(i)) {
+                case "category":
+
+                    Pair<Boolean, ArrayList<JSONObject>> result = checkIfContainerIsFilled(value.getJSONArray("items"));
+                    if (!result.first)
+                        return new Pair<>(false, null);
+                    else
+                        photoObjects.addAll(result.second);
+                    break;
+
+                case "question":
+                    if (!value.has("value") && !(value.has("is_required") && !value.getBoolean("is_required")))
+                        return new Pair<>(false, null);
+                    break;
+
+                case "text":
+                    break;
+
+                case "lineedit":
+                    if (!value.has("value") && !(value.has("is_required") && !value.getBoolean("is_required")))
+                        return new Pair<>(false, null);
+                    break;
+
+                case "textarea":
+                    if (!value.has("value") && !(value.has("is_required") && !value.getBoolean("is_required")))
+                        return new Pair<>(false, null);
+                    break;
+
+                case "checkbox":
+                    if (!value.has("value") && !(value.has("is_required") && !value.getBoolean("is_required")))
+                        return new Pair<>(false, null);
+                    break;
+
+                case "slider":
+                    if (!value.has("value") && !(value.has("is_required") && !value.getBoolean("is_required")))
+                        return new Pair<>(false, null);
+                    break;
+
+                case "photo":
+                    if ((!value.has(MEDIA_PATH_JSON_ARRAY) || (value.has(MEDIA_PATH_JSON_ARRAY) && value.getJSONArray(MEDIA_PATH_JSON_ARRAY).length() == 0))
+                            && !(value.has("is_required") && !value.getBoolean("is_required")))
+                        return new Pair<>(false, null);
+                    else
+                        photoObjects.add(value);
+                    break;
+
+                case "signature":
+                    if (!value.has(SIGNATURE_PREVIEW_JSON_ARRAY) && !(value.has("is_required") && !value.getBoolean("is_required")))
+                        return new Pair<>(false, null);
+                    else
+                        photoObjects.add(value);
+                    break;
+
+                case "richedit":
+                    break;
+
+                default:
+                    Log.d("jeka", fields.get(i));
+            }
+        }
+        return new Pair<>(true, photoObjects);
+    }
+
+
+    private JSONArray getTemplateElementValues(JSONObject template) {
+        JSONArray resultValues = new JSONArray();
+
+        try {
+            if (template != null) {
+                JSONArray pagesJson = template.getJSONArray("items");
+                for (int i = 0; i < pagesJson.length(); i++) {
+                    JSONObject pageJson = pagesJson.getJSONObject(i).getJSONObject("page");
+                    if (pageJson.has("items")) {
+                        JSONArray pageValues = getContainerElementValues(pageJson.getJSONArray("items"));
+                        resultValues = Utils.addAllItemsToJson(resultValues, pageValues);
+                    }
+                }
+            }
+        } catch (Exception exc) {
+            exc.printStackTrace();
+        }
+
+        return resultValues;
+    }
+
+    private JSONArray getContainerElementValues(JSONArray dataJson) throws Exception {
+        JSONArray containerValues = new JSONArray();
+
+        ArrayList<String> fields = new ArrayList<>();
+        for (int i = 0; i < dataJson.length(); i++) {
+            JSONObject value = dataJson.getJSONObject(i);
+            Iterator<String> iterator = value.keys();
+            while (iterator.hasNext()) {
+                String currentKey = iterator.next();
+                fields.add(currentKey);
+            }
+        }
+
+        for (int i = 0; i < fields.size(); i++) {
+            final JSONObject value = dataJson.getJSONObject(i).getJSONObject(fields.get(i));
+            switch (fields.get(i)) {
+                case "category":
+
+                    JSONArray categoryValues = getContainerElementValues(value.getJSONArray("items"));
+                    containerValues = Utils.addAllItemsToJson(categoryValues, containerValues);
+                    break;
+
+                case "question":
+                    if (value.has("value")) {
+                        JSONObject objectValue = new JSONObject();
+                        objectValue.put("id", value.getString("id"));
+                        objectValue.put("value", value.getString("value"));
+                        objectValue.put("type", "question");
+
+                        containerValues.put(objectValue);
+                    }
+                    break;
+
+                case "text":
+                    break;
+
+                case "lineedit":
+                    if (value.has("value")) {
+                        JSONObject objectValue = new JSONObject();
+                        objectValue.put("id", value.getString("id"));
+                        objectValue.put("value", value.getString("value"));
+                        objectValue.put("type", "text");
+
+                        containerValues.put(objectValue);
+                    }
+                    break;
+
+                case "textarea":
+                    if (value.has("value")) {
+                        JSONObject objectValue = new JSONObject();
+                        objectValue.put("id", value.getString("id"));
+                        objectValue.put("value", value.getString("value"));
+                        objectValue.put("type", "text");
+
+                        containerValues.put(objectValue);
+                    }
+                    break;
+
+                case "checkbox":
+                    if (value.has("value")) {
+                        JSONObject objectValue = new JSONObject();
+                        objectValue.put("id", value.getString("id"));
+                        objectValue.put("value", value.getBoolean("value"));
+                        objectValue.put("type", "checkbox");
+
+                        containerValues.put(objectValue);
+                    }
+                    break;
+
+                case "slider":
+                    if (value.has("value")) {
+                        JSONObject objectValue = new JSONObject();
+                        objectValue.put("id", value.getString("id"));
+                        objectValue.put("value", value.getString("value"));
+                        objectValue.put("type", "float");
+
+                        containerValues.put(objectValue);
+                    }
+                    break;
+
+                case "photo":
+                    if (value.has("values")) {
+                        for (int j = 0; j < value.getJSONArray("values").length(); j++) {
+                            JSONObject objectValue = new JSONObject();
+                            objectValue.put("id", value.getString("id"));
+                            objectValue.put("value", value.getJSONArray("values").getString(j));
+                            objectValue.put("type", "media_id");
+
+                            containerValues.put(objectValue);
+                        }
+                    }
+                    break;
+
+                case "richedit":
+                    break;
+
+                case "signature":
+                    if (value.has("value")) {
+                        JSONObject objectValue = new JSONObject();
+                        objectValue.put("id", value.getString("id"));
+                        objectValue.put("value", value.getString("value"));
+                        objectValue.put("type", "media_id");
+
+                        containerValues.put(objectValue);
+                    }
+                    break;
+
+                default:
+                    Log.d("jeka", fields.get(i));
+            }
+        }
+        return containerValues;
     }
 }

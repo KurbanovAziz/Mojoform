@@ -52,5 +52,6 @@ dependencies {
     compile 'com.fasterxml.jackson.core:jackson-databind:2.9.0.pr2'
     compile 'net.cachapa.expandablelayout:expandablelayout:2.8'
     compile 'de.hdodenhof:circleimageview:2.1.0'
+    compile 'com.github.gcacace:signature-pad:1.2.1'
     testCompile 'junit:junit:4.12'
 }

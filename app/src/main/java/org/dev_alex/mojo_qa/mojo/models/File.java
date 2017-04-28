@@ -1,12 +1,11 @@
 package org.dev_alex.mojo_qa.mojo.models;
 
-import android.support.v4.util.Pair;
-
-import org.json.JSONObject;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import java.util.ArrayList;
 import java.util.Date;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class File {
     public String name;
 
@@ -26,6 +25,22 @@ public class File {
 
     public Content content;
 
-    public Pair<String, JSONObject> properties;
+    //public JSONObject properties;
     public ArrayList<String> aspectNames;
+
+/*    public void setProperties(String string) {
+        try {
+            properties = new JSONObject(string);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void setProperties(JSONObject jsonObject) {
+        try {
+            properties = new JSONObject(jsonObject.toString());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }*/
 }

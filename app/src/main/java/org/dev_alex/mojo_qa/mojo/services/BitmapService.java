@@ -13,11 +13,13 @@ import android.os.Parcelable;
 import android.provider.MediaStore;
 import android.support.v4.content.FileProvider;
 import android.support.v4.util.Pair;
+import android.util.Base64;
 import android.util.TypedValue;
 
 import org.dev_alex.mojo_qa.mojo.App;
 import org.dev_alex.mojo_qa.mojo.R;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -230,5 +232,30 @@ public class BitmapService {
             return null;
         }
         return f.getAbsolutePath();
+    }
+
+    public static String getBitmapBytesEncodedBase64(Bitmap bitmap) {
+        ByteArrayOutputStream blob = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.PNG, 100, blob);
+        byte[] b = blob.toByteArray();
+        return Base64.encodeToString(b, Base64.DEFAULT);
+    }
+
+    public static File saveBitmapToFile(Context context, Bitmap bitmap) throws Exception {
+        File f = new File(context.getExternalCacheDir(), String.valueOf(System.currentTimeMillis()) + ".png");
+        if (f.createNewFile()) {
+            ByteArrayOutputStream bos = new ByteArrayOutputStream();
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100, bos);
+            byte[] bitmapData = bos.toByteArray();
+
+            //write the bytes in file
+            FileOutputStream fos = new FileOutputStream(f);
+            fos.write(bitmapData);
+            fos.flush();
+            fos.close();
+
+            return f;
+        } else
+            throw new Exception("Не удалось создать файл");
     }
 }
