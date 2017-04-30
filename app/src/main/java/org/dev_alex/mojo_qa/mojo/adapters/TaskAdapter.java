@@ -2,6 +2,8 @@ package org.dev_alex.mojo_qa.mojo.adapters;
 
 
 import android.content.Context;
+import android.graphics.Color;
+import android.graphics.drawable.GradientDrawable;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,6 +18,7 @@ import org.dev_alex.mojo_qa.mojo.models.Variable;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Locale;
 
 
@@ -58,6 +61,9 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
         final Task task = tasks.get(i);
         String templateId = null;
         viewHolder.taskActiveCircle.setVisibility((task.suspended == null || task.suspended) ? View.INVISIBLE : View.VISIBLE);
+        if (task.suspended != null && !task.suspended) {
+            ((GradientDrawable) viewHolder.taskActiveCircle.getBackground()).setColor(task.dueDate.after(new Date()) ? Color.GREEN : Color.RED);
+        }
 
         SimpleDateFormat sdf = new SimpleDateFormat("dd MMMM yyyy | HH.mm", Locale.getDefault());
         viewHolder.taskDate.setText(sdf.format(task.dueDate));
@@ -75,7 +81,6 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
                 for (Variable variable : task.variables) {
                     if (variable.name.equals("TemplateName"))
                         viewHolder.taskTitle.setText(variable.value);
-                    if (variable.name.equals("TemplateId"))
                         templateId = variable.value;
                 }
         }

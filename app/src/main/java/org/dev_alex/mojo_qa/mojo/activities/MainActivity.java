@@ -31,7 +31,7 @@ public class MainActivity extends AppCompatActivity {
 
         initDrawer();
         drawer.setSelection(2, false);
-        getSupportFragmentManager().beginTransaction().replace(R.id.container, DocumentsFragment.newInstance()).commit();
+        getSupportFragmentManager().beginTransaction().replace(R.id.container, TasksFragment.newInstance()).commit();
     }
 
     private void initDrawer() {

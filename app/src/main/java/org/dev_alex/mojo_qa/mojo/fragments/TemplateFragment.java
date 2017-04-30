@@ -308,6 +308,18 @@ public class TemplateFragment extends Fragment {
                 ((LinearLayout) rootView.findViewById(R.id.page_container)).getChildAt(i).setBackgroundColor(Color.TRANSPARENT);
                 ((LinearLayout) rootView.findViewById(R.id.page_container)).getChildAt(i).setAlpha(0.83f);
             }
+
+        updateArrows();
+    }
+
+    private void updateArrows() {
+        if (pages != null && !pages.isEmpty()) {
+            rootView.findViewById(R.id.left_arrow).setVisibility(currentPagePos > 0 ? View.VISIBLE : View.INVISIBLE);
+            rootView.findViewById(R.id.right_arrow).setVisibility(currentPagePos < pages.size() - 1 ? View.VISIBLE : View.INVISIBLE);
+        } else {
+            rootView.findViewById(R.id.left_arrow).setVisibility(View.INVISIBLE);
+            rootView.findViewById(R.id.right_arrow).setVisibility(View.INVISIBLE);
+        }
     }
 
     private void saveTemplateState() {

@@ -63,7 +63,8 @@ public class TasksFragment extends Fragment {
     private Calendar currentDate;
     private boolean withDay = false;
 
-    private ArrayList<CalendarDay> daysWithTasks = new ArrayList<>();
+    private ArrayList<CalendarDay> daysWithOverdueTasks = new ArrayList<>();
+    private ArrayList<CalendarDay> daysWithActualTasks = new ArrayList<>();
 
     public boolean needUpdate = false;
 
@@ -259,17 +260,19 @@ public class TasksFragment extends Fragment {
 
     private void updateDecorators() {
         MaterialCalendarView calendarView = (MaterialCalendarView) rootView.findViewById(R.id.calendarView);
-        for (Task task : finishedTasks)
-            if (!daysWithTasks.contains(CalendarDay.from(task.dueDate)))
-                daysWithTasks.add(CalendarDay.from(task.dueDate));
         for (Task task : busyTasks)
-            if (!daysWithTasks.contains(CalendarDay.from(task.dueDate)))
-                daysWithTasks.add(CalendarDay.from(task.dueDate));
+            if (task.dueDate.after(new Date())) {
+                if (!daysWithActualTasks.contains(CalendarDay.from(task.dueDate)))
+                    daysWithActualTasks.add(CalendarDay.from(task.dueDate));
+            } else if (!daysWithOverdueTasks.contains(CalendarDay.from(task.dueDate)))
+                daysWithOverdueTasks.add(CalendarDay.from(task.dueDate));
 
         calendarView.removeDecorators();
         calendarView.invalidateDecorators();
-        EventDecorator decorator = new EventDecorator(Color.parseColor("#ff26c373"), daysWithTasks);
-        calendarView.addDecorator(decorator);
+
+        EventDecorator actualTasksDecorator = new EventDecorator(Color.parseColor("#ff26c373"), daysWithActualTasks);
+        EventDecorator overdueTasksDecorator = new EventDecorator(Color.RED, daysWithOverdueTasks);
+        calendarView.addDecorators(actualTasksDecorator, overdueTasksDecorator);
     }
 
     private void initDialog() {
