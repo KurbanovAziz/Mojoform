@@ -34,7 +34,7 @@ public class LoginHistoryFragment extends Fragment {
 
             recyclerView = (RecyclerView) rootView.findViewById(R.id.recycler_view);
             recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-            recyclerView.setAdapter(new UserAdapter(this, LoginHistoryService.getLastLoginedUsers()));
+            recyclerView.setAdapter(new UserAdapter(this, LoginHistoryService.getLastLoggedUsers()));
             setListeners();
         }
         return rootView;

@@ -16,7 +16,7 @@ public class LoginHistoryService {
     private final static String LOGIN_PREFERENCES = "user_history";
     private final static String USERS = "users";
 
-    public static ArrayList<User> getLastLoginedUsers() {
+    public static ArrayList<User> getLastLoggedUsers() {
         try {
             SharedPreferences mSettings;
             mSettings = App.getContext().getSharedPreferences(LOGIN_PREFERENCES, Context.MODE_PRIVATE);
@@ -40,7 +40,7 @@ public class LoginHistoryService {
 
             ArrayList<User> users = null;
             if (lastLoginUsersExists())
-                users = getLastLoginedUsers();
+                users = getLastLoggedUsers();
 
             if (users == null)
                 users = new ArrayList<>();
@@ -57,6 +57,6 @@ public class LoginHistoryService {
     }
 
     public static boolean lastLoginUsersExists() {
-        return (getLastLoginedUsers() != null);
+        return (getLastLoggedUsers() != null);
     }
 }

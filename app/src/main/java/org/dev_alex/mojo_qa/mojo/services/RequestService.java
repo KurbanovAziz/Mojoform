@@ -3,7 +3,6 @@ package org.dev_alex.mojo_qa.mojo.services;
 import android.util.Log;
 
 import org.dev_alex.mojo_qa.mojo.App;
-import org.dev_alex.mojo_qa.mojo.Data;
 import org.dev_alex.mojo_qa.mojo.R;
 
 import java.io.File;
@@ -37,7 +36,7 @@ public class RequestService {
         Request.Builder requestBuilder = new Request.Builder().url(url).post(body)
                 .addHeader("Content-Type", "application/json")
                 .addHeader("Authorization", Credentials.basic("kermit", "kermit"));
-        
+
         Request request = requestBuilder.build();
         Log.d("mojo-log", "send file to server. request: " + request.toString());
         return client.newCall(request).execute();
@@ -76,7 +75,7 @@ public class RequestService {
 
 
     private static OkHttpClient createOkHttpClient() {
-        if (Data.currentUser != null)
+        if (TokenService.isTokenExists())
             return new OkHttpClient().newBuilder()
                     .cookieJar(new CookieJar() {
                         @Override
@@ -103,7 +102,7 @@ public class RequestService {
                 .domain(domain)
                 .path("/")
                 .name("auth_token")
-                .value(Data.currentUser.token)
+                .value(TokenService.getToken() + "")
                 .secure()
                 .build();
     }

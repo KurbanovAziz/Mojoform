@@ -17,6 +17,9 @@ import org.dev_alex.mojo_qa.mojo.R;
 import org.dev_alex.mojo_qa.mojo.custom_views.CustomDrawerItem;
 import org.dev_alex.mojo_qa.mojo.fragments.DocumentsFragment;
 import org.dev_alex.mojo_qa.mojo.fragments.TasksFragment;
+import org.dev_alex.mojo_qa.mojo.fragments.TemplateFragment;
+import org.dev_alex.mojo_qa.mojo.services.AlarmService;
+import org.dev_alex.mojo_qa.mojo.services.TokenService;
 
 public class MainActivity extends AppCompatActivity {
     public Drawer drawer;
@@ -25,6 +28,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        AlarmService.scheduleAlarm(this);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
             getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
@@ -32,6 +36,13 @@ public class MainActivity extends AppCompatActivity {
         initDrawer();
         drawer.setSelection(2, false);
         getSupportFragmentManager().beginTransaction().replace(R.id.container, TasksFragment.newInstance()).commit();
+        if (getIntent().hasExtra(AlarmService.TEMPLATE_ID)) {
+            String templateId = getIntent().getStringExtra(AlarmService.TEMPLATE_ID);
+            String taskId = getIntent().getStringExtra(AlarmService.TASK_ID);
+
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.container, TemplateFragment.newInstance(templateId, taskId)).addToBackStack(null).commit();
+        }
     }
 
     private void initDrawer() {
@@ -60,6 +71,7 @@ public class MainActivity extends AppCompatActivity {
                                 getSupportFragmentManager().beginTransaction().replace(R.id.container, DocumentsFragment.newInstance()).commit();
                                 break;
                             case 3:
+                                TokenService.deleteToken();
                                 startActivity(new Intent(MainActivity.this, AuthActivity.class));
                                 finish();
                                 break;

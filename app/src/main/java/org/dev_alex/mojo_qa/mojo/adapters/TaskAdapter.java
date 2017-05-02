@@ -81,6 +81,7 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
                 for (Variable variable : task.variables) {
                     if (variable.name.equals("TemplateName"))
                         viewHolder.taskTitle.setText(variable.value);
+                    if (variable.name.equals("TemplateId"))
                         templateId = variable.value;
                 }
         }
