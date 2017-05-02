@@ -15,7 +15,6 @@ import android.os.SystemClock;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -47,7 +46,7 @@ public class AlarmService extends Service {
     public final static String NOTIFICATIONS_CT = "notifications_count";
 
     public final static String TASK_ID = "task_id";
-    public final static String TEMPLATE_ID = "task_id";
+    public final static String TEMPLATE_ID = "template_id";
     public final static String TASK_NAME = "task_name";
     public final static String MESSAGE = "message";
 
@@ -160,11 +159,11 @@ public class AlarmService extends Service {
         notificationIntent.putExtra(TASK_ID, taskId);
         notificationIntent.putExtra(TEMPLATE_ID, templateId);
         notificationIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        PendingIntent contentIntent = PendingIntent.getActivity(context, 0, notificationIntent, PendingIntent.FLAG_CANCEL_CURRENT);
+        PendingIntent contentIntent = PendingIntent.getActivity(context, (int) new Date().getTime(), notificationIntent, PendingIntent.FLAG_CANCEL_CURRENT);
 
         Notification.Builder builder = new Notification.Builder(context);
         builder.setContentIntent(contentIntent)
-                .setSmallIcon(R.drawable.logo)
+                .setSmallIcon(R.drawable.logo_small)
                 .setLargeIcon(getNotificationIcon())
                 .setAutoCancel(true)
                 .setVibrate(new long[]{1000, 1000, 1000, 1000, 1000})
@@ -179,15 +178,17 @@ public class AlarmService extends Service {
     private Bitmap getNotificationIcon() {
         LayoutInflater inflater = (LayoutInflater) getApplicationContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         RelativeLayout notificationLayout = (RelativeLayout) inflater.inflate(R.layout.notification_icon_layout, null);
-        notificationLayout.setLayoutParams(new RelativeLayout.LayoutParams(getResources().getDisplayMetrics().widthPixels, ViewGroup.LayoutParams.WRAP_CONTENT));
         ((TextView) notificationLayout.findViewById(R.id.notifications_ct)).setText(String.valueOf(getNotificationsCt()));
 
-        Bitmap notificationIcon;
         notificationLayout.setDrawingCacheEnabled(true);
-        notificationLayout.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_LOW);
-        notificationLayout.buildDrawingCache();
+        notificationLayout.measure(View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED),
+                View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
+        notificationLayout.layout(0, 0, notificationLayout.getMeasuredWidth(), notificationLayout.getMeasuredHeight());
+        notificationLayout.buildDrawingCache(true);
+
+        Bitmap notificationIcon;
         try {
-            notificationIcon = notificationLayout.getDrawingCache();
+            notificationIcon = Bitmap.createBitmap(notificationLayout.getDrawingCache());
             return notificationIcon;
         } finally {
             notificationLayout.setDrawingCacheEnabled(false);
@@ -227,16 +228,11 @@ public class AlarmService extends Service {
     }
 
     private String getTaskTemplateId(Task task) {
-        if (task.processInstanceId == null) {
-            return task.name;
-        } else {
-            if (task.variables != null)
-                for (Variable variable : task.variables) {
-                    if (variable.name.equals("TemplateId"))
-                        return (variable.value);
-                }
-            return "";
+        for (Variable variable : task.variables) {
+            if (variable.name.equals("TemplateId"))
+                return (variable.value);
         }
+        return "";
     }
 
     private class KeepTokenAliveTask extends AsyncTask<Void, Void, Void> {

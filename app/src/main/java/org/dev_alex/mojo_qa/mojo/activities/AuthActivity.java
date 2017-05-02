@@ -26,12 +26,10 @@ import okhttp3.Response;
 public class AuthActivity extends AppCompatActivity {
     private ProgressDialog loopDialog;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_auth);
-
         initDialog();
 
         getSupportFragmentManager().beginTransaction().replace(R.id.container, LogoFragment.newInstance()).commit();
@@ -126,7 +124,9 @@ public class AuthActivity extends AppCompatActivity {
                     Data.currentUser = user;
                     LoginHistoryService.addUser(user);
                     TokenService.updateToken(user.token, user.userName);
-                    startActivity(new Intent(AuthActivity.this, MainActivity.class));
+                    Intent intent = new Intent(AuthActivity.this, MainActivity.class);
+                    intent.putExtras(getIntent());
+                    startActivity(intent);
                     finish();
                 } else {
                     TokenService.deleteToken();
