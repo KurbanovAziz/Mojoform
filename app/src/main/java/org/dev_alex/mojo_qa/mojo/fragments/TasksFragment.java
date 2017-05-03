@@ -172,13 +172,12 @@ public class TasksFragment extends Fragment {
             @Override
             public void onDateSelected(@NonNull MaterialCalendarView widget, @NonNull CalendarDay date, boolean selected) {
                 expandableLayout.collapse();
-                currentDate = date.getCalendar();
+                currentDate.setTime(date.getDate());
                 withDay = true;
                 new Handler().postDelayed(new Runnable() {
                     @Override
                     public void run() {
                         updateDate(true);
-
                     }
                 }, 500);
             }
@@ -190,7 +189,7 @@ public class TasksFragment extends Fragment {
                 Log.d("mojo-log", String.valueOf(date.getMonth()));
                 if (CalendarDay.from(currentDate).getMonth() != date.getMonth()) {
                     withDay = false;
-                    currentDate = date.getCalendar();
+                    currentDate.setTime(date.getDate());
                     updateDate(true);
                 }
             }
@@ -200,6 +199,7 @@ public class TasksFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 withDay = false;
+                calendarView.clearSelection();
                 if (CalendarDay.from(new Date()).getMonth() == CalendarDay.from(currentDate).getMonth())
                     updateDate(true);
                 else
@@ -243,6 +243,7 @@ public class TasksFragment extends Fragment {
         if (withDay)
             date = new SimpleDateFormat("dd MMMM yyyy", Locale.getDefault()).format(currentDate.getTime());
         else {
+            ((MaterialCalendarView) rootView.findViewById(R.id.calendarView)).clearSelection();
             currentDate.set(Calendar.DAY_OF_MONTH, 1);
             String monthName;
 

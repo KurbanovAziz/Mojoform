@@ -915,18 +915,6 @@ public class TemplateFragment extends Fragment {
                 @Override
                 public void onCheckedChanged(CompoundButton selectedButton, boolean isChecked) {
                     try {
-                        if (value.has("optionals") && value.getJSONArray("optionals").length() > 0) {
-                            JSONArray optionals = value.getJSONArray("optionals");
-                            for (int i = 0; i < optionals.length(); i++) {
-                                JSONObject optional = optionals.getJSONObject(i);
-                                if (optional.has("keys") && optional.getJSONArray("keys").length() > 0 && value.has("values")
-                                        && Utils.containsAllValues(value.getJSONArray("values"), optional.getJSONArray("keys"))) {
-                                    optionalContainer.removeAllViewsInLayout();
-                                    fillContainer(optionalContainer, optional.getJSONArray("items"), offset + 1);
-                                }
-                            }
-                        }
-
                         if (isChecked) {
                             ((TextView) ((FrameLayout) selectedButton.getParent()).getChildAt(2)).setTextColor(Color.WHITE);
                             for (Pair<CheckBox, JSONObject> pair : buttons)
@@ -968,6 +956,19 @@ public class TemplateFragment extends Fragment {
                                 value.put("values", Utils.removeItemWithValue(value.getJSONArray("values"), (String) selectedButton.getTag()));
                         }
 
+                        optionalContainer.removeAllViewsInLayout();
+                        optionalContainer.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+                        if (value.has("optionals") && value.getJSONArray("optionals").length() > 0) {
+                            JSONArray optionals = value.getJSONArray("optionals");
+                            for (int i = 0; i < optionals.length(); i++) {
+                                JSONObject optional = optionals.getJSONObject(i).getJSONObject("optional");
+                                if (optional.has("keys") && optional.getJSONArray("keys").length() > 0 && value.has("values")
+                                        && Utils.containsAllValues(value.getJSONArray("values"), optional.getJSONArray("keys"))) {
+                                    fillContainer(optionalContainer, optional.getJSONArray("items"), offset + 1);
+                                }
+                            }
+                        }
+
 
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -978,10 +979,7 @@ public class TemplateFragment extends Fragment {
             LinearLayout currentRow = new LinearLayout(getContext());
 
             JSONArray options = value.getJSONArray("options");
-            for (
-                    int j = 0; j < options.length(); j++)
-
-            {
+            for (int j = 0; j < options.length(); j++) {
                 JSONObject option = options.getJSONObject(j);
                 if (j % 2 == 0) {
                     currentRow = new LinearLayout(getContext());
@@ -1006,9 +1004,7 @@ public class TemplateFragment extends Fragment {
 
                 currentRow.addView(selectBtnFrame);
             }
-            if (options.length() % 2 == 1)
-
-            {
+            if (options.length() % 2 == 1) {
                 Space space = new Space(getContext());
                 LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT);
                 layoutParams.weight = 1;
@@ -1694,6 +1690,23 @@ public class TemplateFragment extends Fragment {
                 case "question":
                     if (!value.has("values") && !(value.has("is_required") && !value.getBoolean("is_required")))
                         return new Pair<>(false, null);
+
+                    if (value.has("optionals") && value.getJSONArray("optionals").length() > 0) {
+                        JSONArray optionals = value.getJSONArray("optionals");
+                        for (int j = 0; j < optionals.length(); j++) {
+                            JSONObject optional = optionals.getJSONObject(j).getJSONObject("optional");
+                            if (optional.has("keys") && optional.getJSONArray("keys").length() > 0 && value.has("values")
+                                    && Utils.containsAllValues(value.getJSONArray("values"), optional.getJSONArray("keys"))) {
+
+                                Pair<Boolean, ArrayList<JSONObject>> optionalResult = checkIfContainerIsFilled(optional.getJSONArray("items"));
+                                if (!optionalResult.first)
+                                    return new Pair<>(false, null);
+                                else
+                                    photoObjects.addAll(optionalResult.second);
+                            }
+                        }
+                    }
+
                     break;
 
                 case "text":
@@ -1783,9 +1796,8 @@ public class TemplateFragment extends Fragment {
             final JSONObject value = dataJson.getJSONObject(i).getJSONObject(fields.get(i));
             switch (fields.get(i)) {
                 case "category":
-
                     JSONArray categoryValues = getContainerElementValues(value.getJSONArray("items"));
-                    containerValues = Utils.addAllItemsToJson(categoryValues, containerValues);
+                    containerValues = Utils.addAllItemsToJson(containerValues, categoryValues);
                     break;
 
                 case "question":
@@ -1797,6 +1809,19 @@ public class TemplateFragment extends Fragment {
                             objectValue.put("type", "question");
 
                             containerValues.put(objectValue);
+                        }
+
+                        if (value.has("optionals") && value.getJSONArray("optionals").length() > 0) {
+                            JSONArray optionals = value.getJSONArray("optionals");
+                            for (int j = 0; j < optionals.length(); j++) {
+                                JSONObject optional = optionals.getJSONObject(j).getJSONObject("optional");
+                                if (optional.has("keys") && optional.getJSONArray("keys").length() > 0 && value.has("values")
+                                        && Utils.containsAllValues(value.getJSONArray("values"), optional.getJSONArray("keys"))) {
+
+                                    JSONArray optionalValues = getContainerElementValues(optional.getJSONArray("items"));
+                                    containerValues = Utils.addAllItemsToJson(containerValues, optionalValues);
+                                }
+                            }
                         }
                     }
                     break;
