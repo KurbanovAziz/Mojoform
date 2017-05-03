@@ -388,6 +388,8 @@ public class TemplateFragment extends Fragment {
                 }
             }
         } catch (Exception exc) {
+            Toast.makeText(getContext(), "Некорректный шаблон", Toast.LENGTH_SHORT).show();
+            getActivity().getSupportFragmentManager().popBackStack();
             exc.printStackTrace();
         }
     }
@@ -908,6 +910,8 @@ public class TemplateFragment extends Fragment {
             int maxAnswersCt = 1;
             if (value.has("answers_count") && value.getInt("answers_count") > 0)
                 maxAnswersCt = value.getInt("answers_count");
+            if (value.has("answers_count") && value.getInt("answers_count") < 0)
+                maxAnswersCt = 100500;
 
             final ArrayList<Pair<CheckBox, JSONObject>> buttons = new ArrayList<>();
             final int finalMaxAnswersCt = maxAnswersCt;
@@ -916,16 +920,9 @@ public class TemplateFragment extends Fragment {
                 public void onCheckedChanged(CompoundButton selectedButton, boolean isChecked) {
                     try {
                         if (isChecked) {
-                            ((TextView) ((FrameLayout) selectedButton.getParent()).getChildAt(2)).setTextColor(Color.WHITE);
                             for (Pair<CheckBox, JSONObject> pair : buttons)
-                                if (pair.first.equals(selectedButton)) {
-                                    GradientDrawable bgShape = (GradientDrawable) ((ImageView) ((FrameLayout) selectedButton.getParent()).getChildAt(1)).getDrawable();
-                                    if (pair.second.has("color"))
-                                        bgShape.setColor(Color.parseColor(pair.second.getString("color")));
-                                    else
-                                        bgShape.setColor(Color.parseColor("#FF0000"));
-
-                                }
+                                if (pair.first.equals(selectedButton))
+                                    styleSelectBtn(selectedButton, true, pair.second);
 
                             JSONArray selectedBtnIds = new JSONArray();
                             String btnId = (String) selectedButton.getTag();
@@ -948,9 +945,7 @@ public class TemplateFragment extends Fragment {
 
                             value.put("values", selectedBtnIds);
                         } else {
-                            ((TextView) ((FrameLayout) selectedButton.getParent()).getChildAt(2)).setTextColor(Color.parseColor("#4c3e60"));
-                            GradientDrawable bgShape = (GradientDrawable) ((ImageView) ((FrameLayout) selectedButton.getParent()).getChildAt(1)).getDrawable();
-                            bgShape.setColor(Color.WHITE);
+                            styleSelectBtn(selectedButton, false, null);
 
                             if (value.has("values"))
                                 value.put("values", Utils.removeItemWithValue(value.getJSONArray("values"), (String) selectedButton.getTag()));
@@ -986,24 +981,37 @@ public class TemplateFragment extends Fragment {
                     currentRow.setOrientation(LinearLayout.HORIZONTAL);
                     selectBtnContainer.addView(currentRow);
                 }
-
                 FrameLayout selectBtnFrame = (FrameLayout) getActivity().getLayoutInflater().inflate(R.layout.select_btn, currentRow, false);
+
                 final CheckBox selectBtn = (CheckBox) selectBtnFrame.getChildAt(0);
                 TextView selectBtnText = (TextView) selectBtnFrame.getChildAt(2);
-
-                selectBtn.setOnCheckedChangeListener(checkButtonListener);
-                selectBtn.setTag(option.getString("id"));
-                buttons.add(new Pair<>(selectBtn, option));
-
-                selectBtn.setChecked(value.has("values") && Utils.containsValue(value.getJSONArray("values"), option.getString("id")));
-
                 if (option.has("caption"))
                     selectBtnText.setText(option.getString("caption"));
                 else
                     selectBtnText.setText("Нет текста:(");
 
                 currentRow.addView(selectBtnFrame);
+
+                buttons.add(new Pair<>(selectBtn, option));
+                selectBtn.setTag(option.getString("id"));
+                selectBtn.setChecked(value.has("values") && Utils.containsValue(value.getJSONArray("values"), option.getString("id")));
+                styleSelectBtn(selectBtn, selectBtn.isChecked(), option);
+                selectBtn.setOnCheckedChangeListener(checkButtonListener);
             }
+
+            optionalContainer.removeAllViewsInLayout();
+            optionalContainer.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+            if (value.has("optionals") && value.getJSONArray("optionals").length() > 0) {
+                JSONArray optionals = value.getJSONArray("optionals");
+                for (int i = 0; i < optionals.length(); i++) {
+                    JSONObject optional = optionals.getJSONObject(i).getJSONObject("optional");
+                    if (optional.has("keys") && optional.getJSONArray("keys").length() > 0 && value.has("values")
+                            && Utils.containsAllValues(value.getJSONArray("values"), optional.getJSONArray("keys"))) {
+                        fillContainer(optionalContainer, optional.getJSONArray("items"), offset + 1);
+                    }
+                }
+            }
+
             if (options.length() % 2 == 1) {
                 Space space = new Space(getContext());
                 LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT);
@@ -1013,6 +1021,29 @@ public class TemplateFragment extends Fragment {
             }
         }
         container.addView(selectBtnLayout);
+    }
+
+    private void styleSelectBtn(CompoundButton checkButton, boolean isChecked, JSONObject buttonJson) {
+        try {
+            GradientDrawable bgShape = (GradientDrawable) ContextCompat.getDrawable(getContext(), R.drawable.shape_white_oval).mutate();
+
+            if (isChecked) {
+                ((TextView) ((FrameLayout) checkButton.getParent()).getChildAt(2)).setTextColor(Color.WHITE);
+
+                if (buttonJson.has("color"))
+                    bgShape.setColor(Color.parseColor(buttonJson.getString("color")));
+                else
+                    bgShape.setColor(Color.parseColor("#FF0000"));
+            } else {
+                bgShape.setColor(Color.WHITE);
+                ((TextView) ((FrameLayout) checkButton.getParent()).getChildAt(2)).setTextColor(Color.parseColor("#4c3e60"));
+            }
+
+
+            ((FrameLayout) checkButton.getParent()).getChildAt(1).setBackground(bgShape);
+        } catch (Exception exc) {
+            exc.printStackTrace();
+        }
     }
 
     public static String formatFloat(float d) {
@@ -1352,9 +1383,10 @@ public class TemplateFragment extends Fragment {
             if (loopDialog != null && loopDialog.isShowing())
                 loopDialog.dismiss();
 
-            if (responseCode == null)
+            if (responseCode == null) {
                 Toast.makeText(getContext(), R.string.network_error, Toast.LENGTH_LONG).show();
-            else if (responseCode == 401) {
+                getActivity().getSupportFragmentManager().popBackStack();
+            } else if (responseCode == 401) {
                 startActivity(new Intent(getContext(), AuthActivity.class));
                 getActivity().finish();
             } else {

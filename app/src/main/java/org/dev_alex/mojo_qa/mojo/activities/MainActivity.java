@@ -40,8 +40,9 @@ public class MainActivity extends AppCompatActivity {
             String templateId = getIntent().getStringExtra(AlarmService.TEMPLATE_ID);
             String taskId = getIntent().getStringExtra(AlarmService.TASK_ID);
 
-            getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.container, TemplateFragment.newInstance(templateId, taskId)).addToBackStack(null).commit();
+            if (templateId != null && !templateId.isEmpty() && taskId != null && !taskId.isEmpty())
+                getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.container, TemplateFragment.newInstance(templateId, taskId)).addToBackStack(null).commit();
         }
     }
 

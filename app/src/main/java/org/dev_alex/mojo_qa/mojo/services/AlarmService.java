@@ -46,8 +46,8 @@ public class AlarmService extends Service {
     public final static String NOTIFICATIONS_CT = "notifications_count";
 
     public final static String TASK_ID = "task_id";
-    public final static String TEMPLATE_ID = "template_id";
     public final static String TASK_NAME = "task_name";
+    public final static String TEMPLATE_ID = "template_id";
     public final static String MESSAGE = "message";
 
     @Override
@@ -57,29 +57,34 @@ public class AlarmService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        Log.d("mojo-alarm-log", "onStartCommand " + intent.toString());
+        if (intent != null && intent.hasExtra(TASK_ID)) {
+            Log.d("mojo-alarm-log", "onStartCommand task_id =" + intent.getStringExtra(TASK_ID));
 
-        if (intent.hasExtra(TASK_ID)) {
             String taskId = intent.getStringExtra(TASK_ID);
+            String taskName = intent.getStringExtra(TASK_NAME);
+            String templateId = intent.getStringExtra(TEMPLATE_ID);
             String message = intent.getStringExtra(MESSAGE);
-            if (message.startsWith("overdue"))
-                new CheckIfTaskFinishedTask(taskId, message, intent.getStringExtra(TASK_NAME)).execute();
-            else
-                new CheckIfTaskFinishedTask(taskId, message).execute();
+            new CheckIfTaskFinishedTask(taskId, taskName, templateId, message).execute();
         } else {
+            Log.d("mojo-alarm-log", "onStartCommand update tasks" + new Date().toString());
             if (TokenService.isTokenExists()) {
                 new UpdateTasksTask().execute();
                 new KeepTokenAliveTask().execute();
             }
         }
-        return START_NOT_STICKY;
+
+       /* Intent ii = new Intent(getApplicationContext(), AlarmService.class);
+        ii.putExtra(TASK_ID, "54091");
+        ii.putExtra(MESSAGE, "test");
+        createAlarmTask(new Random(), ii, new Date().getTime() + 25 * 1000, 1000);*/
+        return START_STICKY;
     }
 
     public static void scheduleAlarm(Context context) {
         AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         Intent i = new Intent(context, AlarmService.class);
-        PendingIntent pi = PendingIntent.getService(context, 5857500, i, 0);
-        am.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), 10 * 60 * 1000, pi);
+        PendingIntent pi = PendingIntent.getService(context, 5857500, i, PendingIntent.FLAG_UPDATE_CURRENT);
+        am.setInexactRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), 10 * 60 * 1000, pi);
     }
 
 
@@ -92,6 +97,7 @@ public class AlarmService extends Service {
     }
 
     private void scheduleTask(Task task) {
+        Random random = new Random(SystemClock.elapsedRealtime());
         Log.d("mojo-alarm-log", "scheduleTask " + task.id);
 
         SharedPreferences mSettings;
@@ -101,22 +107,28 @@ public class AlarmService extends Service {
         if (task.dueDate.getTime() - new Date().getTime() > 60 * 60 * 1000) {
             Intent intent = new Intent(getApplicationContext(), AlarmService.class);
             intent.putExtra(TASK_ID, task.id);
-            intent.putExtra(MESSAGE, getTaskName(task) + ". Время 1 час.");
-            createAlarmTask(intent, task.dueDate.getTime() - 60 * 60 * 1000);
+            intent.putExtra(TASK_NAME, getTaskName(task));
+            intent.putExtra(TEMPLATE_ID, getTaskTemplateId(task));
+            intent.putExtra(MESSAGE, "Через час.");
+            createAlarmTask(random, intent, task.dueDate.getTime() - 60 * 60 * 1000);
         }
 
         if (task.dueDate.getTime() - new Date().getTime() > 15 * 60 * 1000) {
             Intent intent = new Intent(getApplicationContext(), AlarmService.class);
             intent.putExtra(TASK_ID, task.id);
-            intent.putExtra(MESSAGE, getTaskName(task) + ". Время 15 минут.");
-            createAlarmTask(intent, task.dueDate.getTime() - 15 * 60 * 1000);
+            intent.putExtra(TASK_NAME, getTaskName(task));
+            intent.putExtra(TEMPLATE_ID, getTaskTemplateId(task));
+            intent.putExtra(MESSAGE, "Через 15 минут.");
+            createAlarmTask(random, intent, task.dueDate.getTime() - 15 * 60 * 1000);
         }
 
         if (task.dueDate.after(new Date())) {
             Intent intent = new Intent(getApplicationContext(), AlarmService.class);
             intent.putExtra(TASK_ID, task.id);
-            intent.putExtra(MESSAGE, getTaskName(task) + ". Сейчас.");
-            createAlarmTask(intent, task.dueDate.getTime());
+            intent.putExtra(TASK_NAME, getTaskName(task));
+            intent.putExtra(TEMPLATE_ID, getTaskTemplateId(task));
+            intent.putExtra(MESSAGE, "Сейчас.");
+            createAlarmTask(random, intent, task.dueDate.getTime());
         }
 
         boolean overdueAlarmSent = false;
@@ -127,9 +139,10 @@ public class AlarmService extends Service {
             else {
                 Intent intent = new Intent(getApplicationContext(), AlarmService.class);
                 intent.putExtra(TASK_ID, task.id);
-                intent.putExtra(MESSAGE, "overdue");
                 intent.putExtra(TASK_NAME, getTaskName(task));
-                createAlarmTask(intent, overDueTime);
+                intent.putExtra(TEMPLATE_ID, getTaskTemplateId(task));
+                intent.putExtra(MESSAGE, "overdue");
+                createAlarmTask(random, intent, overDueTime, 60 * 60 * 1000);
                 overdueAlarmSent = true;
             }
         }
@@ -138,20 +151,28 @@ public class AlarmService extends Service {
         editor.apply();
     }
 
-    private void createAlarmTask(Intent intent, long triggerAt) {
+    private void createAlarmTask(Random random, Intent intent, long triggerAt) {
         SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss", Locale.getDefault());
         Log.d("mojo-alarm-log", "scheduleTask time= " + sdf.format(triggerAt));
 
-
-        Random random = new Random(SystemClock.elapsedRealtime());
-        PendingIntent pi = PendingIntent.getService(getBaseContext(), (int) Math.abs(SystemClock.elapsedRealtime() * random.nextInt(1002)), intent, 0);
-
-        AlarmManager am = (AlarmManager) getBaseContext().getSystemService(Context.ALARM_SERVICE);
+        PendingIntent pi = PendingIntent.getService(getApplicationContext(), (int) Math.abs(SystemClock.elapsedRealtime() * random.nextInt(10012)), intent, 0);
+        AlarmManager am = (AlarmManager) getApplicationContext().getSystemService(Context.ALARM_SERVICE);
         am.set(AlarmManager.RTC_WAKEUP, triggerAt, pi);
     }
 
-    private void showNotification(String message, String taskId, String templateId) {
+    private void createAlarmTask(Random random, Intent intent, long triggerAt, long interval) {
+        SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss", Locale.getDefault());
+        Log.d("mojo-alarm-log", "scheduleTask time= " + sdf.format(triggerAt));
+
+        PendingIntent pi = PendingIntent.getService(getApplicationContext(), (int) Math.abs(SystemClock.elapsedRealtime() * random.nextInt(10012)), intent, 0);
+        AlarmManager am = (AlarmManager) getApplicationContext().getSystemService(Context.ALARM_SERVICE);
+        am.setInexactRepeating(AlarmManager.RTC_WAKEUP, triggerAt, interval, pi);
+    }
+
+    private void showNotification(String taskName, String message, String taskId, String templateId) {
         Log.d("mojo-alarm-log", "showNotification " + message);
+        if (taskName.isEmpty())
+            taskName = "NoName";
 
         Context context = getApplicationContext();
 
@@ -167,7 +188,7 @@ public class AlarmService extends Service {
                 .setLargeIcon(getNotificationIcon())
                 .setAutoCancel(true)
                 .setVibrate(new long[]{1000, 1000, 1000, 1000, 1000})
-                .setContentTitle("Напоминание о задаче")
+                .setContentTitle(taskName)
                 .setContentText(message);
 
         Notification notification = builder.build();
@@ -308,24 +329,21 @@ public class AlarmService extends Service {
     private class CheckIfTaskFinishedTask extends AsyncTask<Void, Void, Boolean> {
         private Task task;
         private String taskId;
-        private String message;
         private String taskName;
+        private String templateId;
+        private String message;
 
-        CheckIfTaskFinishedTask(String taskId, String message, String taskName) {
+        CheckIfTaskFinishedTask(String taskId, String taskName, String templateId, String message) {
             this.taskId = taskId;
-            this.message = message;
             this.taskName = taskName;
-        }
-
-        CheckIfTaskFinishedTask(String taskId, String message) {
-            this.taskId = taskId;
+            this.templateId = templateId;
             this.message = message;
         }
 
         @Override
         protected Boolean doInBackground(Void... params) {
             try {
-                String url = "https://activiti.dev-alex.org/activiti-rest/service/runtime/tasks/" + taskId + "?includeProcessVariables=TRUE";
+                String url = "https://activiti.dev-alex.org/activiti-rest/service/runtime/tasks/" + taskId;
 
                 OkHttpClient client = new OkHttpClient();
                 Request request = new Request.Builder().header("Authorization", Credentials.basic("kermit", "kermit"))
@@ -334,6 +352,7 @@ public class AlarmService extends Service {
                 Response response = client.newCall(request).execute();
                 if (response.code() == 200) {
                     task = new ObjectMapper().readValue(response.body().string(), Task.class);
+                    Log.d("mojo-alarm-log", "CheckIfTaskFinishedTask task= " + task.toString());
                     return true;
                 }
                 return false;
@@ -354,25 +373,9 @@ public class AlarmService extends Service {
                     if (message.startsWith("overdue")) {
                         Log.d("mojo-test-log", "currentDate " + new Date().getTime() + " dueDate " + task.dueDate.getTime());
                         int hoursCt = (int) Math.abs((new Date().getTime() - task.dueDate.getTime()) / (60 * 60 * 1000));
-                        message = String.format(Locale.getDefault(), "%s. Просрочено %d час%s(ов)", taskName, hoursCt, hoursCt == 1 ? "" : "a");
-
-                        long overDueTime = task.dueDate.getTime() + (hoursCt + 1) * (60 * 60 * 1000);
-                        Intent intent = new Intent(getApplicationContext(), AlarmService.class);
-                        intent.putExtra(TASK_ID, task.id);
-                        intent.putExtra(MESSAGE, "overdue");
-                        intent.putExtra(TASK_NAME, getTaskName(task));
-                        createAlarmTask(intent, overDueTime);
+                        message = String.format(Locale.getDefault(), "Просрочено %d час%s(ов)", hoursCt, hoursCt == 1 ? "" : "a");
                     }
-                    showNotification(message, taskId, getTaskTemplateId(task));
-                }
-            } else {
-                if (message.startsWith("overdue")) {
-                    long overDueTime = new Date().getTime() + (5 * 60 * 1000);
-                    Intent intent = new Intent(getApplicationContext(), AlarmService.class);
-                    intent.putExtra(TASK_ID, task.id);
-                    intent.putExtra(MESSAGE, "overdue");
-                    intent.putExtra(TASK_NAME, taskName);
-                    createAlarmTask(intent, overDueTime);
+                    showNotification(taskName, message, taskId, templateId);
                 }
             }
         }
