@@ -10,6 +10,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
+import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.LayerDrawable;
 import android.media.ThumbnailUtils;
 import android.net.Uri;
@@ -927,7 +928,16 @@ public class TemplateFragment extends Fragment {
                         }
 
                         if (isChecked) {
-                            ((TextView) ((FrameLayout) selectedButton.getParent()).getChildAt(1)).setTextColor(Color.WHITE);
+                            ((TextView) ((FrameLayout) selectedButton.getParent()).getChildAt(2)).setTextColor(Color.WHITE);
+                            for (Pair<CheckBox, JSONObject> pair : buttons)
+                                if (pair.first.equals(selectedButton)) {
+                                    GradientDrawable bgShape = (GradientDrawable) ((ImageView) ((FrameLayout) selectedButton.getParent()).getChildAt(1)).getDrawable();
+                                    if (pair.second.has("color"))
+                                        bgShape.setColor(Color.parseColor(pair.second.getString("color")));
+                                    else
+                                        bgShape.setColor(Color.parseColor("#FF0000"));
+
+                                }
 
                             JSONArray selectedBtnIds = new JSONArray();
                             String btnId = (String) selectedButton.getTag();
@@ -950,7 +960,10 @@ public class TemplateFragment extends Fragment {
 
                             value.put("values", selectedBtnIds);
                         } else {
-                            ((TextView) ((FrameLayout) selectedButton.getParent()).getChildAt(1)).setTextColor(Color.parseColor("#4c3e60"));
+                            ((TextView) ((FrameLayout) selectedButton.getParent()).getChildAt(2)).setTextColor(Color.parseColor("#4c3e60"));
+                            GradientDrawable bgShape = (GradientDrawable) ((ImageView) ((FrameLayout) selectedButton.getParent()).getChildAt(1)).getDrawable();
+                            bgShape.setColor(Color.WHITE);
+
                             if (value.has("values"))
                                 value.put("values", Utils.removeItemWithValue(value.getJSONArray("values"), (String) selectedButton.getTag()));
                         }
@@ -965,7 +978,10 @@ public class TemplateFragment extends Fragment {
             LinearLayout currentRow = new LinearLayout(getContext());
 
             JSONArray options = value.getJSONArray("options");
-            for (int j = 0; j < options.length(); j++) {
+            for (
+                    int j = 0; j < options.length(); j++)
+
+            {
                 JSONObject option = options.getJSONObject(j);
                 if (j % 2 == 0) {
                     currentRow = new LinearLayout(getContext());
@@ -975,7 +991,7 @@ public class TemplateFragment extends Fragment {
 
                 FrameLayout selectBtnFrame = (FrameLayout) getActivity().getLayoutInflater().inflate(R.layout.select_btn, currentRow, false);
                 final CheckBox selectBtn = (CheckBox) selectBtnFrame.getChildAt(0);
-                TextView selectBtnText = (TextView) selectBtnFrame.getChildAt(1);
+                TextView selectBtnText = (TextView) selectBtnFrame.getChildAt(2);
 
                 selectBtn.setOnCheckedChangeListener(checkButtonListener);
                 selectBtn.setTag(option.getString("id"));
@@ -990,7 +1006,9 @@ public class TemplateFragment extends Fragment {
 
                 currentRow.addView(selectBtnFrame);
             }
-            if (options.length() % 2 == 1) {
+            if (options.length() % 2 == 1)
+
+            {
                 Space space = new Space(getContext());
                 LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT);
                 layoutParams.weight = 1;
