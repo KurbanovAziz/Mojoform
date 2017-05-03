@@ -35,7 +35,7 @@ public class MainActivity extends AppCompatActivity {
 
         initDrawer();
         drawer.setSelection(2, false);
-        getSupportFragmentManager().beginTransaction().replace(R.id.container, TasksFragment.newInstance()).commit();
+        getSupportFragmentManager().beginTransaction().replace(R.id.container, TasksFragment.newInstance(), "tasks").commit();
         if (getIntent().hasExtra(AlarmService.TEMPLATE_ID)) {
             String templateId = getIntent().getStringExtra(AlarmService.TEMPLATE_ID);
             String taskId = getIntent().getStringExtra(AlarmService.TASK_ID);

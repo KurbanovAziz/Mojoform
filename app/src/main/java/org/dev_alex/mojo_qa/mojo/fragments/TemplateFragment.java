@@ -1688,7 +1688,8 @@ public class TemplateFragment extends Fragment {
                     break;
 
                 case "question":
-                    if (!value.has("values") && !(value.has("is_required") && !value.getBoolean("is_required")))
+                    if ((!value.has("values") || value.has("values") && value.getJSONArray("values").length() == 0)
+                            && !(value.has("is_required") && !value.getBoolean("is_required")))
                         return new Pair<>(false, null);
 
                     if (value.has("optionals") && value.getJSONArray("optionals").length() > 0) {
