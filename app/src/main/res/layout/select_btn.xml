@@ -4,7 +4,7 @@
     android:layout_height="62dp"
     android:layout_weight="1">
 
-    <RadioButton
+    <CheckBox
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@drawable/select_btn"

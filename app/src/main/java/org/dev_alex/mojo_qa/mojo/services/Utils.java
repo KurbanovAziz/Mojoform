@@ -67,6 +67,18 @@ public class Utils {
         return false;
     }
 
+    public static boolean containsAllValues(JSONArray jsonArray, JSONArray checkValues) {
+        try {
+            for (int j = 0; j < checkValues.length(); j++)
+                if (!containsValue(jsonArray,checkValues.getString(j)))
+                    return false;
+            return true;
+        } catch (Exception exc) {
+            exc.printStackTrace();
+            return false;
+        }
+    }
+
     public static void copy(File src, File dst) throws IOException {
         InputStream in = new FileInputStream(src);
         OutputStream out = new FileOutputStream(dst);

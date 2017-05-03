@@ -44,7 +44,6 @@ import android.widget.FrameLayout;
 import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.RadioButton;
 import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
@@ -411,7 +410,7 @@ public class TemplateFragment extends Fragment {
                     break;
 
                 case "question":
-                    createSelectBtnContainer(value, container);
+                    createSelectBtnContainer(value, container, offset);
                     break;
 
                 case "text":
@@ -894,9 +893,10 @@ public class TemplateFragment extends Fragment {
         }
     }
 
-    private void createSelectBtnContainer(final JSONObject value, LinearLayout container) throws Exception {
+    private void createSelectBtnContainer(final JSONObject value, LinearLayout container, final int offset) throws Exception {
         LinearLayout selectBtnLayout = (LinearLayout) getActivity().getLayoutInflater().inflate(R.layout.select_layout, container, false);
         LinearLayout selectBtnContainer = (LinearLayout) selectBtnLayout.getChildAt(1);
+        final LinearLayout optionalContainer = (LinearLayout) selectBtnLayout.getChildAt(2);
 
         if (value.has("caption"))
             ((TextView) selectBtnLayout.getChildAt(0)).setText(value.getString("caption"));
@@ -904,24 +904,60 @@ public class TemplateFragment extends Fragment {
             ((TextView) selectBtnLayout.getChildAt(0)).setText("Нет заголовка");
 
         if (value.has("options")) {
-            final ArrayList<RadioButton> buttons = new ArrayList<>();
-            CompoundButton.OnCheckedChangeListener radioButtonListener = new CompoundButton.OnCheckedChangeListener() {
+            int maxAnswersCt = 1;
+            if (value.has("answers_count") && value.getInt("answers_count") > 0)
+                maxAnswersCt = value.getInt("answers_count");
+
+            final ArrayList<Pair<CheckBox, JSONObject>> buttons = new ArrayList<>();
+            final int finalMaxAnswersCt = maxAnswersCt;
+            CompoundButton.OnCheckedChangeListener checkButtonListener = new CompoundButton.OnCheckedChangeListener() {
                 @Override
                 public void onCheckedChanged(CompoundButton selectedButton, boolean isChecked) {
-                    if (isChecked) {
-                        for (CompoundButton compoundButton : buttons)
-                            if (!compoundButton.equals(selectedButton)) {
-                                compoundButton.setChecked(false);
-                                ((TextView) ((FrameLayout) compoundButton.getParent()).getChildAt(1)).setTextColor(Color.parseColor("#4c3e60"));
-                            } else
-                                ((TextView) ((FrameLayout) compoundButton.getParent()).getChildAt(1)).setTextColor(Color.WHITE);
-
-                        try {
-                            String btnId = (String) selectedButton.getTag();
-                            value.put("value", btnId);
-                        } catch (JSONException e) {
-                            e.printStackTrace();
+                    try {
+                        if (value.has("optionals") && value.getJSONArray("optionals").length() > 0) {
+                            JSONArray optionals = value.getJSONArray("optionals");
+                            for (int i = 0; i < optionals.length(); i++) {
+                                JSONObject optional = optionals.getJSONObject(i);
+                                if (optional.has("keys") && optional.getJSONArray("keys").length() > 0 && value.has("values")
+                                        && Utils.containsAllValues(value.getJSONArray("values"), optional.getJSONArray("keys"))) {
+                                    optionalContainer.removeAllViewsInLayout();
+                                    fillContainer(optionalContainer, optional.getJSONArray("items"), offset + 1);
+                                }
+                            }
                         }
+
+                        if (isChecked) {
+                            ((TextView) ((FrameLayout) selectedButton.getParent()).getChildAt(1)).setTextColor(Color.WHITE);
+
+                            JSONArray selectedBtnIds = new JSONArray();
+                            String btnId = (String) selectedButton.getTag();
+                            selectedBtnIds.put(btnId);
+                            int currentlySelected = 1;
+
+                            for (Pair<CheckBox, JSONObject> pair : buttons) {
+                                CompoundButton compoundButton = pair.first;
+
+                                if (!compoundButton.equals(selectedButton)) {
+                                    if (compoundButton.isChecked()) {
+                                        currentlySelected++;
+                                        if (currentlySelected > finalMaxAnswersCt)
+                                            compoundButton.setChecked(false);
+                                        else
+                                            selectedBtnIds.put(compoundButton.getTag());
+                                    }
+                                }
+                            }
+
+                            value.put("values", selectedBtnIds);
+                        } else {
+                            ((TextView) ((FrameLayout) selectedButton.getParent()).getChildAt(1)).setTextColor(Color.parseColor("#4c3e60"));
+                            if (value.has("values"))
+                                value.put("values", Utils.removeItemWithValue(value.getJSONArray("values"), (String) selectedButton.getTag()));
+                        }
+
+
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
                 }
             };
@@ -938,14 +974,14 @@ public class TemplateFragment extends Fragment {
                 }
 
                 FrameLayout selectBtnFrame = (FrameLayout) getActivity().getLayoutInflater().inflate(R.layout.select_btn, currentRow, false);
-                RadioButton selectBtn = (RadioButton) selectBtnFrame.getChildAt(0);
+                final CheckBox selectBtn = (CheckBox) selectBtnFrame.getChildAt(0);
                 TextView selectBtnText = (TextView) selectBtnFrame.getChildAt(1);
 
-                selectBtn.setOnCheckedChangeListener(radioButtonListener);
+                selectBtn.setOnCheckedChangeListener(checkButtonListener);
                 selectBtn.setTag(option.getString("id"));
-                buttons.add(selectBtn);
+                buttons.add(new Pair<>(selectBtn, option));
 
-                selectBtn.setChecked(value.has("value") && value.getString("value").equals(option.getString("id")));
+                selectBtn.setChecked(value.has("values") && Utils.containsValue(value.getJSONArray("values"), option.getString("id")));
 
                 if (option.has("caption"))
                     selectBtnText.setText(option.getString("caption"));
@@ -1638,7 +1674,7 @@ public class TemplateFragment extends Fragment {
                     break;
 
                 case "question":
-                    if (!value.has("value") && !(value.has("is_required") && !value.getBoolean("is_required")))
+                    if (!value.has("values") && !(value.has("is_required") && !value.getBoolean("is_required")))
                         return new Pair<>(false, null);
                     break;
 
@@ -1735,13 +1771,15 @@ public class TemplateFragment extends Fragment {
                     break;
 
                 case "question":
-                    if (value.has("value")) {
-                        JSONObject objectValue = new JSONObject();
-                        objectValue.put("id", value.getString("id"));
-                        objectValue.put("value", value.getString("value"));
-                        objectValue.put("type", "question");
+                    if (value.has("values")) {
+                        for (int j = 0; j < value.getJSONArray("values").length(); j++) {
+                            JSONObject objectValue = new JSONObject();
+                            objectValue.put("id", value.getString("id"));
+                            objectValue.put("value", value.getJSONArray("values").getString(j));
+                            objectValue.put("type", "question");
 
-                        containerValues.put(objectValue);
+                            containerValues.put(objectValue);
+                        }
                     }
                     break;
 

@@ -365,6 +365,15 @@ public class AlarmService extends Service {
                     }
                     showNotification(message, taskId, getTaskTemplateId(task));
                 }
+            } else {
+                if (message.startsWith("overdue")) {
+                    long overDueTime = new Date().getTime() + (5 * 60 * 1000);
+                    Intent intent = new Intent(getApplicationContext(), AlarmService.class);
+                    intent.putExtra(TASK_ID, task.id);
+                    intent.putExtra(MESSAGE, "overdue");
+                    intent.putExtra(TASK_NAME, taskName);
+                    createAlarmTask(intent, overDueTime);
+                }
             }
         }
     }

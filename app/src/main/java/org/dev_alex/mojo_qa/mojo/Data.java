@@ -6,225 +6,77 @@ public class Data {
     public static User currentUser;
     public static String tt = "{\n" +
             "  \"collapsed\": false,\n" +
-            "  \"id\": \"Template1\",\n" +
+            "  \"id\": \"ba7fcbfb-dd54-4828-8567-823144603ec6\",\n" +
             "  \"items\": [\n" +
             "    {\n" +
             "      \"page\": {\n" +
             "        \"caption\": \"Страница 1\",\n" +
             "        \"collapsed\": false,\n" +
-            "        \"id\": \"1\",\n" +
+            "        \"id\": \"ba0b9249-708f-bf7c-1533-901f5c429093\",\n" +
             "        \"items\": [\n" +
             "          {\n" +
-            "            \"category\": {\n" +
+            "            \"question\": {\n" +
+            "              \"answers_count\": 2,\n" +
+            "              \"caption\": \"Вопрос\",\n" +
             "              \"collapsed\": false,\n" +
-            "              \"id\": \"0a894d4a-f435-60a5-6bbd-aeebdef68a09\",\n" +
-            "              \"items\": []\n" +
+            "              \"id\": \"f4d3b36c-506a-5a48-5fd1-95083cfaa1a1\",\n" +
+            "              \"optionals\": [],\n" +
+            "              \"options\": [\n" +
+            "                {\n" +
+            "                  \"caption\": \"Красный\",\n" +
+            "                  \"color\": \"#d0021b\",\n" +
+            "                  \"id\": \"279a80ac-1e20-2967-c3fd-210212d73ef0\"\n" +
+            "                },\n" +
+            "                {\n" +
+            "                  \"caption\": \"Зеленый\",\n" +
+            "                  \"color\": \"#417505\",\n" +
+            "                  \"id\": \"ee16f14d-7a88-5fd3-8871-c08287fab1a1\"\n" +
+            "                },\n" +
+            "                {\n" +
+            "                  \"caption\": \"Желтый\",\n" +
+            "                  \"color\": \"#f8e71c\",\n" +
+            "                  \"id\": \"0438eaf5-855f-1348-be77-859c4191ad95\"\n" +
+            "                },\n" +
+            "                {\n" +
+            "                  \"caption\": \"Синий\",\n" +
+            "                  \"color\": \"#4a90e2\",\n" +
+            "                  \"id\": \"c5341e59-e35d-c9d2-d093-f9c81bdcbedb\"\n" +
+            "                },\n" +
+            "                {\n" +
+            "                  \"caption\": \"Белый\",\n" +
+            "                  \"color\": \"#ffffff\",\n" +
+            "                  \"id\": \"26aa81bf-cd3a-1fac-dc21-533ca0ff7ec7\"\n" +
+            "                },\n" +
+            "                {\n" +
+            "                  \"caption\": \"Черный\",\n" +
+            "                  \"color\": \"#000000\",\n" +
+            "                  \"id\": \"3f686a33-88b9-64f2-a727-8a0ca7514fff\"\n" +
+            "                },\n" +
+            "                {\n" +
+            "                  \"caption\": \"Оранжевый\",\n" +
+            "                  \"color\": \"#f5a623\",\n" +
+            "                  \"id\": \"56d0abb4-69e3-3245-eaa1-75672dd7747e\"\n" +
+            "                },\n" +
+            "                {\n" +
+            "                  \"caption\": \"Фиолетовый\",\n" +
+            "                  \"color\": \"#bd10e0\",\n" +
+            "                  \"id\": \"b9f56795-9e1f-204d-7f87-e69ff0c77295\"\n" +
+            "                }\n" +
+            "              ],\n" +
+            "              \"typeView\": \"list\"\n" +
             "            }\n" +
             "          },\n" +
             "          {\n" +
-            "            \"category\": {\n" +
-            "              \"collapsed\": false,\n" +
-            "              \"id\": \"33039538-8a06-a8a7-d14d-a3543fe76440\",\n" +
-            "              \"items\": [\n" +
-            "                {\n" +
-            "                  \"category\": {\n" +
-            "                    \"collapsed\": false,\n" +
-            "                    \"id\": \"f875f183-44db-4001-994b-8d65ab025d29\",\n" +
-            "                    \"items\": [\n" +
-            "                      {\n" +
-            "                        \"slider\": {\n" +
-            "                          \"collapsed\": true,\n" +
-            "                          \"id\": \"1a7f2208-49e7-726e-c137-d682525dca68\",\n" +
-            "                          \"max_value\": 10.0,\n" +
-            "                          \"measure\": \"\",\n" +
-            "                          \"min_value\": 1.0,\n" +
-            "                          \"step\": 1.0\n" +
-            "                        }\n" +
-            "                      },\n" +
-            "                      {\n" +
-            "                        \"slider\": {\n" +
-            "                          \"collapsed\": true,\n" +
-            "                          \"id\": \"bebd38fd-a8a2-9ecd-bc79-8c6e89fe786b\",\n" +
-            "                          \"max_value\": 10.0,\n" +
-            "                          \"measure\": \"\",\n" +
-            "                          \"min_value\": 1.0,\n" +
-            "                          \"step\": 1.0\n" +
-            "                        }\n" +
-            "                      },\n" +
-            "                      {\n" +
-            "                        \"slider\": {\n" +
-            "                          \"collapsed\": true,\n" +
-            "                          \"id\": \"66791f1a-b635-452f-e09f-4b143845aeea\",\n" +
-            "                          \"max_value\": 10.0,\n" +
-            "                          \"measure\": \"\",\n" +
-            "                          \"min_value\": 1.0,\n" +
-            "                          \"step\": 1.0\n" +
-            "                        }\n" +
-            "                      },\n" +
-            "                      {\n" +
-            "                        \"checkbox\": {\n" +
-            "                          \"collapsed\": true,\n" +
-            "                          \"id\": \"e137660a-b978-2d8d-df04-a3a0390c8fe5\"\n" +
-            "                        }\n" +
-            "                      },\n" +
-            "                      {\n" +
-            "                        \"select\": {\n" +
-            "                          \"caption\": \"test select\",\n" +
-            "                          \"id\": \"slc\",\n" +
-            "                          \"options\": [\n" +
-            "                            {\n" +
-            "                              \"caption\": \"option 1\",\n" +
-            "                              \"id\": \"id1\"\n" +
-            "                            },\n" +
-            "                            {\n" +
-            "                              \"caption\": \"option 2\",\n" +
-            "                              \"id\": \"id2\"\n" +
-            "                            },\n" +
-            "                            {\n" +
-            "                              \"caption\": \"option 3\",\n" +
-            "                              \"id\": \"id3\"\n" +
-            "                            }\n" +
-            "                          ]\n" +
-            "                        }\n" +
-            "                      },\n" +
-            "                      {\n" +
-            "                        \"checkbox\": {\n" +
-            "                          \"collapsed\": true,\n" +
-            "                          \"id\": \"00cde0e6-8d28-528a-a174-c3d14ed5a416\"\n" +
-            "                        }\n" +
-            "                      }\n" +
-            "                    ]\n" +
-            "                  }\n" +
-            "                },\n" +
-            "                {\n" +
-            "                  \"photo\": {\n" +
-            "                    \"collapsed\": true,\n" +
-            "                    \"id\": \"d909b3c3-6ed4-ff77-5ae9-9cf077aa35a6\",\n" +
-            "                    \"is_required\": false\n" +
-            "                  }\n" +
-            "                },\n" +
-            "                {\n" +
-            "                  \"textarea\": {\n" +
-            "                    \"collapsed\": true,\n" +
-            "                    \"id\": \"7f941111-d239-ebb2-0f00-aded15b822fb\",\n" +
-            "                    \"is_required\": false\n" +
-            "                  }\n" +
-            "                }\n" +
-            "              ]\n" +
-            "            }\n" +
-            "          }\n" +
-            "        ]\n" +
-            "      }\n" +
-            "    },\n" +
-            "    {\n" +
-            "      \"page\": {\n" +
-            "        \"caption\": \"ХАРУМАМБУРУУУУУ У УУУ У У\",\n" +
-            "        \"collapsed\": false,\n" +
-            "        \"id\": \"1\",\n" +
-            "        \"items\": [\n" +
-            "          {\n" +
-            "            \"category\": {\n" +
-            "              \"collapsed\": false,\n" +
-            "              \"id\": \"0a894d4a-f435-60a5-6bbd-aeebdef68a09\",\n" +
-            "              \"items\": []\n" +
-            "            }\n" +
-            "          },\n" +
-            "          {\n" +
-            "            \"category\": {\n" +
-            "              \"collapsed\": false,\n" +
-            "              \"id\": \"33039538-8a06-a8a7-d14d-a3543fe76440\",\n" +
-            "              \"items\": [\n" +
-            "                {\n" +
-            "                  \"category\": {\n" +
-            "                    \"collapsed\": false,\n" +
-            "                    \"id\": \"f875f183-44db-4001-994b-8d65ab025d29\",\n" +
-            "                    \"items\": [\n" +
-            "                      {\n" +
-            "                        \"slider\": {\n" +
-            "                          \"collapsed\": true,\n" +
-            "                          \"id\": \"1a7f2208-49e7-726e-c137-d682525dca68\",\n" +
-            "                          \"max_value\": 10.0,\n" +
-            "                          \"measure\": \"\",\n" +
-            "                          \"min_value\": 1.0,\n" +
-            "                          \"step\": 1.0\n" +
-            "                        }\n" +
-            "                      },\n" +
-            "                      {\n" +
-            "                        \"slider\": {\n" +
-            "                          \"collapsed\": true,\n" +
-            "                          \"id\": \"bebd38fd-a8a2-9ecd-bc79-8c6e89fe786b\",\n" +
-            "                          \"max_value\": 10.0,\n" +
-            "                          \"measure\": \"\",\n" +
-            "                          \"min_value\": 1.0,\n" +
-            "                          \"step\": 1.0\n" +
-            "                        }\n" +
-            "                      },\n" +
-            "                      {\n" +
-            "                        \"slider\": {\n" +
-            "                          \"collapsed\": true,\n" +
-            "                          \"id\": \"66791f1a-b635-452f-e09f-4b143845aeea\",\n" +
-            "                          \"max_value\": 10.0,\n" +
-            "                          \"measure\": \"\",\n" +
-            "                          \"min_value\": 1.0,\n" +
-            "                          \"step\": 1.0\n" +
-            "                        }\n" +
-            "                      },\n" +
-            "                      {\n" +
-            "                        \"checkbox\": {\n" +
-            "                          \"collapsed\": true,\n" +
-            "                          \"id\": \"e137660a-b978-2d8d-df04-a3a0390c8fe5\"\n" +
-            "                        }\n" +
-            "                      },\n" +
-            "                      {\n" +
-            "                        \"select\": {\n" +
-            "                          \"caption\": \"test select\",\n" +
-            "                          \"id\": \"slc\",\n" +
-            "                          \"options\": [\n" +
-            "                            {\n" +
-            "                              \"caption\": \"option 1\",\n" +
-            "                              \"id\": \"id1\"\n" +
-            "                            },\n" +
-            "                            {\n" +
-            "                              \"caption\": \"option 2\",\n" +
-            "                              \"id\": \"id2\"\n" +
-            "                            },\n" +
-            "                            {\n" +
-            "                              \"caption\": \"option 3\",\n" +
-            "                              \"id\": \"id3\"\n" +
-            "                            }\n" +
-            "                          ]\n" +
-            "                        }\n" +
-            "                      },\n" +
-            "                      {\n" +
-            "                        \"checkbox\": {\n" +
-            "                          \"collapsed\": true,\n" +
-            "                          \"id\": \"00cde0e6-8d28-528a-a174-c3d14ed5a416\"\n" +
-            "                        }\n" +
-            "                      }\n" +
-            "                    ]\n" +
-            "                  }\n" +
-            "                },\n" +
-            "                {\n" +
-            "                  \"photo\": {\n" +
-            "                    \"collapsed\": true,\n" +
-            "                    \"id\": \"d909b3c3-6ed4-ff77-5ae9-9cf077aa35a6\",\n" +
-            "                    \"is_required\": false\n" +
-            "                  }\n" +
-            "                },\n" +
-            "                {\n" +
-            "                  \"textarea\": {\n" +
-            "                    \"collapsed\": true,\n" +
-            "                    \"id\": \"7f941111-d239-ebb2-0f00-aded15b822fb\",\n" +
-            "                    \"is_required\": false\n" +
-            "                  }\n" +
-            "                }\n" +
-            "              ]\n" +
+            "            \"textarea\": {\n" +
+            "              \"collapsed\": true,\n" +
+            "              \"id\": \"e619aa3b-7de6-9344-9da8-1e4a32a36867\",\n" +
+            "              \"is_required\": false\n" +
             "            }\n" +
             "          }\n" +
             "        ]\n" +
             "      }\n" +
             "    }\n" +
             "  ],\n" +
-            "  \"name\": \"тестирование шаблонов 3\"\n" +
+            "  \"name\": \"Вопрос с цветом\"\n" +
             "}";
 }
