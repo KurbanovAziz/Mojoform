@@ -330,7 +330,7 @@ public class TasksFragment extends Fragment {
                         url = "https://activiti.dev-alex.org/activiti-rest/service/history/" +
                                 "historic-task-instances?taskAssignee=" + Data.currentUser.userName + "&includeProcessVariables=TRUE" + dateParams;
                     else
-                        url = "https://activiti.dev-alex.org/activiti-rest/service/runtime/tasks?taskAssignee="
+                        url = "https://activiti.dev-alex.org/activiti-rest/service/runtime/tasks?assignee="
                                 + Data.currentUser.userName + "&includeProcessVariables=TRUE" + dateParams;
 
                     OkHttpClient client = new OkHttpClient();
