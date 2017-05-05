@@ -9,6 +9,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.IBinder;
 import android.os.SystemClock;
@@ -183,9 +184,13 @@ public class AlarmService extends Service {
         PendingIntent contentIntent = PendingIntent.getActivity(context, (int) new Date().getTime(), notificationIntent, PendingIntent.FLAG_CANCEL_CURRENT);
 
         Notification.Builder builder = new Notification.Builder(context);
+        Bitmap notificationIcon = getNotificationIcon();
+        if (notificationIcon == null)
+            notificationIcon = BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher);
+
         builder.setContentIntent(contentIntent)
                 .setSmallIcon(R.drawable.logo_small)
-                .setLargeIcon(getNotificationIcon())
+                .setLargeIcon(notificationIcon)
                 .setAutoCancel(true)
                 .setVibrate(new long[]{1000, 1000, 1000, 1000, 1000})
                 .setContentTitle(taskName)
@@ -210,6 +215,7 @@ public class AlarmService extends Service {
         Bitmap notificationIcon;
         try {
             notificationIcon = Bitmap.createBitmap(notificationLayout.getDrawingCache());
+            BitmapService.resizeBitmap(notificationIcon, 128);
             return notificationIcon;
         } finally {
             notificationLayout.setDrawingCacheEnabled(false);

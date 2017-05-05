@@ -327,8 +327,8 @@ public class TasksFragment extends Fragment {
 
                 for (int i = 0; i < 2; i++) {
                     if (i == 0)
-                        url = "https://activiti.dev-alex.org/activiti-rest/service/history/" +
-                                "historic-task-instances?taskAssignee=" + Data.currentUser.userName + "&includeProcessVariables=TRUE" + dateParams;
+                        url = "https://activiti.dev-alex.org/activiti-rest/service//history/" +
+                                "historic-task-instances?finished=TRUE&taskAssignee="+ Data.currentUser.userName + "&includeProcessVariables=TRUE" + dateParams;
                     else
                         url = "https://activiti.dev-alex.org/activiti-rest/service/runtime/tasks?assignee="
                                 + Data.currentUser.userName + "&includeProcessVariables=TRUE" + dateParams;

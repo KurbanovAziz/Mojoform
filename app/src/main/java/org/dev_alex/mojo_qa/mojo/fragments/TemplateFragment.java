@@ -423,12 +423,12 @@ public class TemplateFragment extends Fragment {
                     String html;
 
                     if (value.has("text"))
-                        html = value.getString("text");
+                        html = "<html><head></head><body> " + value.getString("text") + " </body></html>";
                     else
                         html = "Нет текста";
 
                     text.getSettings().setJavaScriptEnabled(true);
-                    text.loadDataWithBaseURL(null, html, mime, encoding, null);
+                    text.loadDataWithBaseURL("", html, mime, encoding, null);
                     container.addView(text);
                     break;
 
@@ -540,12 +540,12 @@ public class TemplateFragment extends Fragment {
                     encoding = "utf-8";
 
                     if (value.has("html"))
-                        html = value.getString("html");
+                        html = "<html><head></head><body> " + value.getString("html") + " </body></html>";
                     else
                         html = "Нет текста";
 
                     richEdit.getSettings().setJavaScriptEnabled(true);
-                    richEdit.loadDataWithBaseURL(null, html, mime, encoding, null);
+                    richEdit.loadDataWithBaseURL("", html, mime, encoding, null);
                     container.addView(richEdit);
                     Log.d("jeka", fields.get(i));
                     break;
@@ -633,9 +633,11 @@ public class TemplateFragment extends Fragment {
         else
             ((TextView) seekBarContainer.getChildAt(0)).setText("Нет текста");
 
+        if (value.has("measure"))
+            ((TextView) ((LinearLayout) ((LinearLayout) seekBarContainer.getChildAt(4)).getChildAt(1)).getChildAt(1)).setText(value.getString("measure"));
 
         final SeekBar seekBar = ((SeekBar) seekBarContainer.getChildAt(1));
-        final EditText changeValue = (EditText) ((LinearLayout) seekBarContainer.getChildAt(4)).getChildAt(1);
+        final EditText changeValue = (EditText) ((LinearLayout) ((LinearLayout) seekBarContainer.getChildAt(4)).getChildAt(1)).getChildAt(0);
 
         final float minValue = (float) value.getDouble("min_value");
         final float maxValue = (float) value.getDouble("max_value");
