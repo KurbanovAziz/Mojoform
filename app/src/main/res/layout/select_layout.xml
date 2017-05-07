@@ -21,6 +21,16 @@
         android:layout_marginTop="10dp"
         android:orientation="vertical" />
 
+    <TextView
+        android:layout_width="140dp"
+        android:layout_height="52dp"
+        android:layout_gravity="center_horizontal"
+        android:background="@drawable/green_btn_with_shadow"
+        android:gravity="center"
+        android:paddingBottom="13dp"
+        android:text="@string/select"
+        android:textColor="@android:color/white" />
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

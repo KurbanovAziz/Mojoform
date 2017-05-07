@@ -71,4 +71,5 @@
     <string name="add_audio">Прикрепите аудио</string>
     <string name="add_file">Прикрепите файл</string>
     <string name="clear">Очистить</string>
+    <string name="select">Выбрать</string>
 </resources>

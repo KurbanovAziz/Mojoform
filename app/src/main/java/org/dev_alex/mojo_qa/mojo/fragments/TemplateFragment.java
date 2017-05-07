@@ -316,7 +316,22 @@ public class TemplateFragment extends Fragment {
         if (pages != null && !pages.isEmpty()) {
             rootView.findViewById(R.id.left_arrow).setVisibility(currentPagePos > 0 ? View.VISIBLE : View.INVISIBLE);
             rootView.findViewById(R.id.right_arrow).setVisibility(currentPagePos < pages.size() - 1 ? View.VISIBLE : View.INVISIBLE);
+
+            if (currentPagePos == pages.size() - 1) {
+                rootView.findViewById(R.id.left_space).setVisibility(View.GONE);
+                rootView.findViewById(R.id.right_space).setVisibility(View.GONE);
+                rootView.findViewById(R.id.finish_btn_container).setVisibility(View.VISIBLE);
+            } else {
+                rootView.findViewById(R.id.left_space).setVisibility(View.VISIBLE);
+                rootView.findViewById(R.id.right_space).setVisibility(View.VISIBLE);
+                rootView.findViewById(R.id.finish_btn_container).setVisibility(View.GONE);
+            }
         } else {
+            rootView.findViewById(R.id.left_space).setVisibility(View.GONE);
+            rootView.findViewById(R.id.right_space).setVisibility(View.GONE);
+            rootView.findViewById(R.id.finish_btn_container).setVisibility(View.VISIBLE);
+
+
             rootView.findViewById(R.id.left_arrow).setVisibility(View.INVISIBLE);
             rootView.findViewById(R.id.right_arrow).setVisibility(View.INVISIBLE);
         }
@@ -429,27 +444,24 @@ public class TemplateFragment extends Fragment {
                         caption.setPadding(paddings, 0, paddings, 0);
                     }
 
-                    WebView text = new WebView(getContext());
-                    LinearLayout.LayoutParams textLayoutParams = new LinearLayout.LayoutParams
-                            (ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                    if (value.has("text")) {
+                        WebView text = new WebView(getContext());
+                        LinearLayout.LayoutParams textLayoutParams = new LinearLayout.LayoutParams
+                                (ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
 
-                    textLayoutParams.leftMargin = paddings;
-                    textLayoutParams.rightMargin = paddings;
-                    textLayoutParams.topMargin = paddings;
-                    text.setLayoutParams(textLayoutParams);
+                        textLayoutParams.leftMargin = paddings;
+                        textLayoutParams.rightMargin = paddings;
+                        textLayoutParams.topMargin = paddings;
+                        text.setLayoutParams(textLayoutParams);
 
-                    String mime = "text/html";
-                    String encoding = "utf-8";
-                    String html;
+                        String mime = "text/html";
+                        String encoding = "utf-8";
+                        String html = "<html><head></head><body> " + value.getString("text") + " </body></html>";
 
-                    if (value.has("text"))
-                        html = "<html><head></head><body> " + value.getString("text") + " </body></html>";
-                    else
-                        html = "Нет текста";
-
-                    text.getSettings().setJavaScriptEnabled(true);
-                    text.loadDataWithBaseURL("", html, mime, encoding, null);
-                    container.addView(text);
+                        text.getSettings().setJavaScriptEnabled(true);
+                        text.loadDataWithBaseURL("", html, mime, encoding, null);
+                        container.addView(text);
+                    }
                     break;
 
                 case "lineedit":
@@ -564,27 +576,25 @@ public class TemplateFragment extends Fragment {
                         caption.setPadding(paddings, 0, paddings, 0);
                     }
 
-                    WebView richEdit = new WebView(getContext());
-                    LinearLayout.LayoutParams richEditLayoutParams = new LinearLayout.LayoutParams
-                            (ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                    if (value.has("html")) {
+                        WebView richEdit = new WebView(getContext());
+                        LinearLayout.LayoutParams richEditLayoutParams = new LinearLayout.LayoutParams
+                                (ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
 
-                    richEditLayoutParams.leftMargin = paddings;
-                    richEditLayoutParams.rightMargin = paddings;
-                    richEditLayoutParams.topMargin = paddings;
-                    richEdit.setLayoutParams(richEditLayoutParams);
+                        richEditLayoutParams.leftMargin = paddings;
+                        richEditLayoutParams.rightMargin = paddings;
+                        richEditLayoutParams.topMargin = paddings;
+                        richEdit.setLayoutParams(richEditLayoutParams);
 
-                    mime = "text/html";
-                    encoding = "utf-8";
+                        String mime = "text/html";
+                        String encoding = "utf-8";
 
-                    if (value.has("html"))
-                        html = "<html><head></head><body> " + value.getString("html") + " </body></html>";
-                    else
-                        html = "Нет текста";
+                        String html = "<html><head></head><body> " + value.getString("html") + " </body></html>";
 
-                    richEdit.getSettings().setJavaScriptEnabled(true);
-                    richEdit.loadDataWithBaseURL("", html, mime, encoding, null);
-                    container.addView(richEdit);
-                    Log.d("jeka", fields.get(i));
+                        richEdit.getSettings().setJavaScriptEnabled(true);
+                        richEdit.loadDataWithBaseURL("", html, mime, encoding, null);
+                        container.addView(richEdit);
+                    }
                     break;
 
                 case "signature":
@@ -936,9 +946,16 @@ public class TemplateFragment extends Fragment {
     }
 
     private void createSelectBtnContainer(final JSONObject value, LinearLayout container, final int offset) throws Exception {
+        boolean isList = value.has("typeView") && value.getString("typeView").equals("list");
+
+        final LinearLayout listSelectBtnLayout = (LinearLayout) getActivity().getLayoutInflater()
+                .inflate(R.layout.select_btn_popup_layout, (ViewGroup) rootView.findViewById(R.id.select_btn_popup), false);
+        final LinearLayout listSelectBtnContainer = (LinearLayout) listSelectBtnLayout.findViewById(R.id.list_select_btn_container);
+
         LinearLayout selectBtnLayout = (LinearLayout) getActivity().getLayoutInflater().inflate(R.layout.select_layout, container, false);
-        LinearLayout selectBtnContainer = (LinearLayout) selectBtnLayout.getChildAt(1);
-        final LinearLayout optionalContainer = (LinearLayout) selectBtnLayout.getChildAt(2);
+        final LinearLayout selectBtnContainer = (LinearLayout) selectBtnLayout.getChildAt(1);
+        TextView showPopupSelectListBtn = (TextView) selectBtnLayout.getChildAt(2);
+        final LinearLayout optionalContainer = (LinearLayout) selectBtnLayout.getChildAt(3);
 
         if (value.has("caption"))
             ((TextView) selectBtnLayout.getChildAt(0)).setText(value.getString("caption"));
@@ -1003,24 +1020,16 @@ public class TemplateFragment extends Fragment {
                             }
                         }
 
-
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
                 }
             };
 
-            LinearLayout currentRow = new LinearLayout(getContext());
-
             JSONArray options = value.getJSONArray("options");
             for (int j = 0; j < options.length(); j++) {
                 JSONObject option = options.getJSONObject(j);
-                if (j % 2 == 0) {
-                    currentRow = new LinearLayout(getContext());
-                    currentRow.setOrientation(LinearLayout.HORIZONTAL);
-                    selectBtnContainer.addView(currentRow);
-                }
-                FrameLayout selectBtnFrame = (FrameLayout) getActivity().getLayoutInflater().inflate(R.layout.select_btn, currentRow, false);
+                FrameLayout selectBtnFrame = (FrameLayout) getActivity().getLayoutInflater().inflate(R.layout.select_btn, selectBtnContainer, false);
 
                 final CheckBox selectBtn = (CheckBox) selectBtnFrame.getChildAt(0);
                 TextView selectBtnText = (TextView) selectBtnFrame.getChildAt(2);
@@ -1029,7 +1038,18 @@ public class TemplateFragment extends Fragment {
                 else
                     selectBtnText.setText("Нет текста:(");
 
-                currentRow.addView(selectBtnFrame);
+                if (j == 0) {
+                    if (isList)
+                        ((LinearLayout.LayoutParams) selectBtnFrame.getLayoutParams()).topMargin =
+                                (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 25, getResources().getDisplayMetrics());
+                    else
+                        ((LinearLayout.LayoutParams) selectBtnFrame.getLayoutParams()).topMargin = 0;
+                }
+
+                if (isList)
+                    listSelectBtnContainer.addView(selectBtnFrame);
+                else
+                    selectBtnContainer.addView(selectBtnFrame);
 
                 buttons.add(new Pair<>(selectBtn, option));
                 selectBtn.setTag(option.getString("id"));
@@ -1050,16 +1070,101 @@ public class TemplateFragment extends Fragment {
                     }
                 }
             }
-
-            if (options.length() % 2 == 1) {
-                Space space = new Space(getContext());
-                LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT);
-                layoutParams.weight = 1;
-                space.setLayoutParams(layoutParams);
-                currentRow.addView(space);
-            }
         }
+
+        showPopupSelectListBtn.setVisibility(isList ? View.VISIBLE : View.GONE);
+        if (isList) {
+            applySelectResultsInListView(value, selectBtnContainer);
+
+            showPopupSelectListBtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    try {
+                        ((ViewGroup) rootView.findViewById(R.id.select_btn_popup)).removeAllViewsInLayout();
+                        ((ViewGroup) rootView.findViewById(R.id.select_btn_popup)).addView(listSelectBtnLayout);
+                        JSONArray valueBackups = value.has("values") ? value.getJSONArray("values") : new JSONArray();
+                        value.put("values_backup", valueBackups);
+                    } catch (Exception exc) {
+                        exc.printStackTrace();
+                    }
+                }
+            });
+            if (value.has("caption"))
+                ((TextView) listSelectBtnLayout.findViewById(R.id.select_layout_caption)).setText(value.getString("caption"));
+            else
+                ((TextView) listSelectBtnLayout.findViewById(R.id.select_layout_caption)).setText("Нет заголовка");
+
+            listSelectBtnLayout.findViewById(R.id.select_layout_close).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    try {
+                        ((ViewGroup) rootView.findViewById(R.id.select_btn_popup)).removeAllViewsInLayout();
+                        value.put("values", value.getJSONArray("values_backup"));
+                    } catch (Exception exc) {
+                        exc.printStackTrace();
+                    }
+                }
+            });
+
+            listSelectBtnLayout.findViewById(R.id.select_layout_close).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    try {
+                        ((ViewGroup) rootView.findViewById(R.id.select_btn_popup)).removeAllViewsInLayout();
+                        value.put("values", value.getJSONArray("values_backup"));
+                    } catch (Exception exc) {
+                        exc.printStackTrace();
+                    }
+                }
+            });
+
+            listSelectBtnLayout.findViewById(R.id.select_layout_accept).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    try {
+                        ((ViewGroup) rootView.findViewById(R.id.select_btn_popup)).removeAllViewsInLayout();
+                        applySelectResultsInListView(value, selectBtnContainer);
+                    } catch (Exception exc) {
+                        exc.printStackTrace();
+                    }
+                }
+            });
+        }
+
         container.addView(selectBtnLayout);
+    }
+
+    private void applySelectResultsInListView(JSONObject value, LinearLayout answersContainer) {
+        try {
+            boolean isFirst = true;
+            answersContainer.removeAllViewsInLayout();
+            JSONArray options = value.getJSONArray("options");
+            if (value.has("values")) {
+                for (int i = 0; i < options.length(); i++) {
+                    JSONObject option = options.getJSONObject(i);
+                    if (Utils.containsValue(value.getJSONArray("values"), option.getString("id"))) {
+                        FrameLayout selectBtnFrame = (FrameLayout) getActivity().getLayoutInflater().inflate(R.layout.select_btn, answersContainer, false);
+                        CheckBox selectBtn = (CheckBox) selectBtnFrame.getChildAt(0);
+                        TextView selectBtnText = (TextView) selectBtnFrame.getChildAt(2);
+
+                        if (option.has("caption"))
+                            selectBtnText.setText(option.getString("caption"));
+                        else
+                            selectBtnText.setText("Нет текста:(");
+
+                        if (isFirst) {
+                            ((LinearLayout.LayoutParams) selectBtnFrame.getLayoutParams()).topMargin = 0;
+                            isFirst = false;
+                        }
+
+                        styleSelectBtn(selectBtn, true, option);
+                        answersContainer.addView(selectBtnFrame);
+                    }
+                }
+            }
+        } catch (Exception exc) {
+            exc.printStackTrace();
+        }
     }
 
     private void styleSelectBtn(CompoundButton checkButton, boolean isChecked, JSONObject buttonJson) {
@@ -1790,10 +1895,15 @@ public class TemplateFragment extends Fragment {
                 case "lineedit":
                     if (!value.has("value") && !(value.has("is_required") && !value.getBoolean("is_required")))
                         return new Pair<>(false, null);
+                    if (value.has("value") && value.getString("value").trim().isEmpty())
+                        return new Pair<>(false, null);
+
                     break;
 
                 case "textarea":
                     if (!value.has("value") && !(value.has("is_required") && !value.getBoolean("is_required")))
+                        return new Pair<>(false, null);
+                    if (value.has("value") && value.getString("value").trim().isEmpty())
                         return new Pair<>(false, null);
                     break;
 
