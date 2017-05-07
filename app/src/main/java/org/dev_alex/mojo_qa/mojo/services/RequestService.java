@@ -35,7 +35,7 @@ public class RequestService {
         RequestBody body = RequestBody.create(JSON, jsonStr);
         Request.Builder requestBuilder = new Request.Builder().url(url).post(body)
                 .addHeader("Content-Type", "application/json")
-                .addHeader("Authorization", Credentials.basic("kermit", "kermit"));
+                .addHeader("Authorization", Credentials.basic("kermit", "ker2017permit"));
 
         Request request = requestBuilder.build();
         Log.d("mojo-log", "send file to server. request: " + request.toString());

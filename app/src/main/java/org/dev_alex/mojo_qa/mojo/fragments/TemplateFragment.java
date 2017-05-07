@@ -406,7 +406,9 @@ public class TemplateFragment extends Fragment {
         }
 
         for (int i = 0; i < fields.size(); i++) {
+            int paddings = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 10, getResources().getDisplayMetrics());
             final JSONObject value = dataJson.getJSONObject(i).getJSONObject(fields.get(i));
+
             switch (fields.get(i)) {
                 case "category":
                     createCategory(value, container, offset);
@@ -417,7 +419,25 @@ public class TemplateFragment extends Fragment {
                     break;
 
                 case "text":
+
+                    if (value.has("caption")) {
+                        TextView caption = new TextView(getContext());
+                        caption.setText(value.getString("caption"));
+                        caption.setTextColor(ContextCompat.getColor(getContext(), R.color.accent));
+                        caption.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
+                        container.addView(caption);
+                        caption.setPadding(paddings, 0, paddings, 0);
+                    }
+
                     WebView text = new WebView(getContext());
+                    LinearLayout.LayoutParams textLayoutParams = new LinearLayout.LayoutParams
+                            (ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+
+                    textLayoutParams.leftMargin = paddings;
+                    textLayoutParams.rightMargin = paddings;
+                    textLayoutParams.topMargin = paddings;
+                    text.setLayoutParams(textLayoutParams);
+
                     String mime = "text/html";
                     String encoding = "utf-8";
                     String html;
@@ -535,7 +555,24 @@ public class TemplateFragment extends Fragment {
                     break;
 
                 case "richedit":
+                    if (value.has("caption")) {
+                        TextView caption = new TextView(getContext());
+                        caption.setText(value.getString("caption"));
+                        caption.setTextColor(ContextCompat.getColor(getContext(), R.color.accent));
+                        caption.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
+                        container.addView(caption);
+                        caption.setPadding(paddings, 0, paddings, 0);
+                    }
+
                     WebView richEdit = new WebView(getContext());
+                    LinearLayout.LayoutParams richEditLayoutParams = new LinearLayout.LayoutParams
+                            (ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+
+                    richEditLayoutParams.leftMargin = paddings;
+                    richEditLayoutParams.rightMargin = paddings;
+                    richEditLayoutParams.topMargin = paddings;
+                    richEdit.setLayoutParams(richEditLayoutParams);
+
                     mime = "text/html";
                     encoding = "utf-8";
 
@@ -1391,8 +1428,11 @@ public class TemplateFragment extends Fragment {
             } else if (responseCode == 401) {
                 startActivity(new Intent(getContext(), AuthActivity.class));
                 getActivity().finish();
-            } else {
+            } else if (responseCode == 200) {
                 renderTemplate();
+            } else {
+                Toast.makeText(getContext(), R.string.unknown_error, Toast.LENGTH_LONG).show();
+                getActivity().getSupportFragmentManager().popBackStack();
             }
         }
     }

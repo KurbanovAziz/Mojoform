@@ -334,7 +334,7 @@ public class TasksFragment extends Fragment {
                                 + Data.currentUser.userName + "&includeProcessVariables=TRUE" + dateParams;
 
                     OkHttpClient client = new OkHttpClient();
-                    Request request = new Request.Builder().header("Authorization", Credentials.basic("kermit", "kermit"))
+                    Request request = new Request.Builder().header("Authorization", Credentials.basic("kermit", "ker2017permit"))
                             .url(url).build();
 
                     response = client.newCall(request).execute();

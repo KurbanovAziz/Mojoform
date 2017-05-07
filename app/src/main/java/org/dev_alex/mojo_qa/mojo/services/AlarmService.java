@@ -23,6 +23,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.dev_alex.mojo_qa.mojo.App;
+import org.dev_alex.mojo_qa.mojo.Data;
 import org.dev_alex.mojo_qa.mojo.R;
 import org.dev_alex.mojo_qa.mojo.activities.AuthActivity;
 import org.dev_alex.mojo_qa.mojo.models.Task;
@@ -294,11 +295,11 @@ public class AlarmService extends Service {
                 monthCalendar.add(Calendar.MONTH, 1);
                 dateParams += "&dueBefore=" + isoDateFormat.format(monthCalendar.getTime());
 
-                String url = "https://activiti.dev-alex.org/activiti-rest/service/runtime/tasks?taskAssignee="
-                        + userName + "&includeProcessVariables=TRUE" + dateParams;
+                String url = "https://activiti.dev-alex.org/activiti-rest/service/runtime/tasks?assignee="
+                        + Data.currentUser.userName + "&includeProcessVariables=TRUE" + dateParams;
 
                 OkHttpClient client = new OkHttpClient();
-                Request request = new Request.Builder().header("Authorization", Credentials.basic("kermit", "kermit"))
+                Request request = new Request.Builder().header("Authorization", Credentials.basic("kermit", "ker2017permit"))
                         .url(url).build();
 
                 Response response = client.newCall(request).execute();
@@ -325,7 +326,8 @@ public class AlarmService extends Service {
                     if (!checkIfTaskScheduled(task.id))
                         scheduleTask(task);
                     if (task.dueDate.getTime() - new Date().getTime() < 60 * 60 * 1000)
-                        notificationsCt++;
+                        if (task.assignee.toLowerCase().equals(TokenService.getUsername().toLowerCase()))
+                            notificationsCt++;
                 }
                 setNotificationsCt(notificationsCt);
             }
@@ -352,7 +354,7 @@ public class AlarmService extends Service {
                 String url = "https://activiti.dev-alex.org/activiti-rest/service/runtime/tasks/" + taskId;
 
                 OkHttpClient client = new OkHttpClient();
-                Request request = new Request.Builder().header("Authorization", Credentials.basic("kermit", "kermit"))
+                Request request = new Request.Builder().header("Authorization", Credentials.basic("kermit", "ker2017permit"))
                         .url(url).build();
 
                 Response response = client.newCall(request).execute();
@@ -375,7 +377,7 @@ public class AlarmService extends Service {
             Log.d("mojo-alarm-log", "CheckIfTaskFinishedTask " + result);
 
             if (result) {
-                if (task.suspended != null && !task.suspended) {
+                if (task.suspended != null && !task.suspended && task.assignee.toLowerCase().equals(TokenService.getUsername().toLowerCase())) {
                     if (message.startsWith("overdue")) {
                         Log.d("mojo-test-log", "currentDate " + new Date().getTime() + " dueDate " + task.dueDate.getTime());
                         int hoursCt = (int) Math.abs((new Date().getTime() - task.dueDate.getTime()) / (60 * 60 * 1000));
