@@ -46,6 +46,7 @@ import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+import android.widget.ScrollView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -946,9 +947,9 @@ public class TemplateFragment extends Fragment {
     }
 
     private void createSelectBtnContainer(final JSONObject value, LinearLayout container, final int offset) throws Exception {
-        boolean isList = value.has("typeView") && value.getString("typeView").equals("list");
+        boolean isList = !(value.has("typeView") && value.getString("typeView").equals("list"));
 
-        final LinearLayout listSelectBtnLayout = (LinearLayout) getActivity().getLayoutInflater()
+        final ScrollView listSelectBtnLayout = (ScrollView) getActivity().getLayoutInflater()
                 .inflate(R.layout.select_btn_popup_layout, (ViewGroup) rootView.findViewById(R.id.select_btn_popup), false);
         final LinearLayout listSelectBtnContainer = (LinearLayout) listSelectBtnLayout.findViewById(R.id.list_select_btn_container);
 

@@ -34,7 +34,7 @@ public class MainActivity extends AppCompatActivity {
             getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
 
         initDrawer();
-        drawer.setSelection(2, false);
+        drawer.setSelection(1, false);
         getSupportFragmentManager().beginTransaction().replace(R.id.container, TasksFragment.newInstance(), "tasks").commit();
         if (getIntent().hasExtra(AlarmService.TEMPLATE_ID)) {
             String templateId = getIntent().getStringExtra(AlarmService.TEMPLATE_ID);
