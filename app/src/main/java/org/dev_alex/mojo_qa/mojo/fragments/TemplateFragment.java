@@ -15,6 +15,7 @@ import android.graphics.drawable.LayerDrawable;
 import android.media.ThumbnailUtils;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
@@ -37,6 +38,7 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.CookieManager;
 import android.webkit.WebView;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
@@ -64,6 +66,7 @@ import org.dev_alex.mojo_qa.mojo.activities.MainActivity;
 import org.dev_alex.mojo_qa.mojo.models.Page;
 import org.dev_alex.mojo_qa.mojo.services.BitmapService;
 import org.dev_alex.mojo_qa.mojo.services.RequestService;
+import org.dev_alex.mojo_qa.mojo.services.TokenService;
 import org.dev_alex.mojo_qa.mojo.services.Utils;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -435,7 +438,6 @@ public class TemplateFragment extends Fragment {
                     break;
 
                 case "text":
-
                     if (value.has("caption")) {
                         TextView caption = new TextView(getContext());
                         caption.setText(value.getString("caption"));
@@ -497,7 +499,8 @@ public class TemplateFragment extends Fragment {
                             }
                         }
                     });
-                    container.addView(editTextSingleLineContainer);
+
+                    container.addView(boxInContainerWithId(editTextSingleLineContainer, value.getString("id")));
                     break;
 
                 case "textarea":
@@ -532,7 +535,8 @@ public class TemplateFragment extends Fragment {
                             }
                         }
                     });
-                    container.addView(editTextMultiLineContainer);
+
+                    container.addView(boxInContainerWithId(editTextMultiLineContainer, value.getString("id")));
                     break;
 
                 case "checkbox":
@@ -556,7 +560,12 @@ public class TemplateFragment extends Fragment {
 
                     if (value.has("value"))
                         ((CheckBox) checkBoxContainer.getChildAt(0)).setChecked(value.getBoolean("value"));
-                    container.addView(checkBoxContainer);
+                    else {
+                        ((CheckBox) checkBoxContainer.getChildAt(0)).setChecked(true);
+                        ((CheckBox) checkBoxContainer.getChildAt(0)).setChecked(false);
+                    }
+
+                    container.addView(boxInContainerWithId(checkBoxContainer, value.getString("id")));
                     break;
 
                 case "slider":
@@ -593,6 +602,12 @@ public class TemplateFragment extends Fragment {
                         String html = "<html><head></head><body> " + value.getString("html") + " </body></html>";
 
                         richEdit.getSettings().setJavaScriptEnabled(true);
+                        String cookieString = "auth_token=" + TokenService.getToken();
+                        CookieManager.getInstance().setCookie(getString(R.string.host) + "/", cookieString);
+                        CookieManager.getInstance().setAcceptCookie(true);
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
+                            CookieManager.getInstance().setAcceptThirdPartyCookies(richEdit, true);
+
                         richEdit.loadDataWithBaseURL("", html, mime, encoding, null);
                         container.addView(richEdit);
                     }
@@ -769,7 +784,7 @@ public class TemplateFragment extends Fragment {
             }
         });
 
-        container.addView(seekBarContainer);
+        container.addView(boxInContainerWithId(seekBarContainer, value.getString("id")));
         if (value.has("value")) {
             changeValue.setText(value.getString("value"));
             seekBar.setProgress(Math.round(Float.parseFloat(value.getString("value")) - minValue) * digitsOffset);
@@ -822,7 +837,7 @@ public class TemplateFragment extends Fragment {
             }
         });
 
-        container.addView(signatureContainer);
+        container.addView(boxInContainerWithId(signatureContainer, "id"));
 
         if (value.has(SIGNATURE_PREVIEW_JSON_ARRAY)) {
             String imageEncoded = value.getString(SIGNATURE_PREVIEW_JSON_ARRAY);
@@ -927,7 +942,7 @@ public class TemplateFragment extends Fragment {
             }
         });
 
-        container.addView(mediaLayout);
+        container.addView(boxInContainerWithId(mediaLayout, "id"));
 
         if (value.has(MEDIA_PATH_JSON_ARRAY)) {
             currentMediaBlock = new Pair<>(mediaLayout, value);
@@ -1132,7 +1147,7 @@ public class TemplateFragment extends Fragment {
             });
         }
 
-        container.addView(selectBtnLayout);
+        container.addView(boxInContainerWithId(selectBtnLayout, value.getString("id")));
     }
 
     private void applySelectResultsInListView(JSONObject value, LinearLayout answersContainer) {
@@ -1223,6 +1238,37 @@ public class TemplateFragment extends Fragment {
         }
     }
 
+    private FrameLayout boxInContainerWithId(ViewGroup content, String tag) {
+        int topAndBottomPaddings = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 5, getResources().getDisplayMetrics());
+        FrameLayout boxLayout = new FrameLayout(getContext());
+        boxLayout.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+        boxLayout.addView(content);
+        boxLayout.setTag(tag);
+        boxLayout.setPadding(0, topAndBottomPaddings, 0, topAndBottomPaddings);
+        return boxLayout;
+    }
+
+    private void setBlockMarkedAsRequired(String tag) {
+        ViewGroup container = null;
+        for (Page page : pages) {
+            container = (ViewGroup) page.layout.findViewWithTag(tag);
+            if (container != null)
+                break;
+        }
+        if (container != null)
+            container.setBackgroundColor(Color.parseColor("#FEDADA"));
+    }
+
+    private void resetRequiredBlock(String tag) {
+        ViewGroup container = null;
+        for (Page page : pages) {
+            container = (ViewGroup) page.layout.findViewWithTag(tag);
+            if (container != null)
+                break;
+        }
+        if (container != null)
+            container.setBackgroundColor(Color.TRANSPARENT);
+    }
 
     private FrameLayout createImgFrame(Bitmap photo) {
         LinearLayout imageContainer = (LinearLayout) ((HorizontalScrollView) currentMediaBlock.first.getChildAt(1)).getChildAt(0);
@@ -1821,6 +1867,7 @@ public class TemplateFragment extends Fragment {
     private Pair<Boolean, ArrayList<JSONObject>> checkIfTemplateIsFilled(JSONObject template) {
         try {
             ArrayList<JSONObject> photoObjects = new ArrayList<>();
+            boolean totalResult = true;
 
             if (template != null) {
                 JSONArray pagesJson = template.getJSONArray("items");
@@ -1829,12 +1876,13 @@ public class TemplateFragment extends Fragment {
                     if (pageJson.has("items")) {
                         Pair<Boolean, ArrayList<JSONObject>> result = checkIfContainerIsFilled(pageJson.getJSONArray("items"));
                         if (!result.first)
-                            return new Pair<>(false, null);
+                            totalResult = false;
                         else
                             photoObjects.addAll(result.second);
                     }
                 }
-                return new Pair<>(true, photoObjects);
+                if (totalResult)
+                    return new Pair<>(true, photoObjects);
             }
         } catch (Exception exc) {
             exc.printStackTrace();
@@ -1843,6 +1891,7 @@ public class TemplateFragment extends Fragment {
     }
 
     private Pair<Boolean, ArrayList<JSONObject>> checkIfContainerIsFilled(JSONArray dataJson) throws Exception {
+        boolean totalResult = true;
         ArrayList<JSONObject> photoObjects = new ArrayList<>();
 
         ArrayList<String> fields = new ArrayList<>();
@@ -1857,20 +1906,24 @@ public class TemplateFragment extends Fragment {
 
         for (int i = 0; i < fields.size(); i++) {
             final JSONObject value = dataJson.getJSONObject(i).getJSONObject(fields.get(i));
+            resetRequiredBlock(value.getString("id"));
+
             switch (fields.get(i)) {
                 case "category":
 
                     Pair<Boolean, ArrayList<JSONObject>> result = checkIfContainerIsFilled(value.getJSONArray("items"));
                     if (!result.first)
-                        return new Pair<>(false, null);
+                        totalResult = false;
                     else
                         photoObjects.addAll(result.second);
                     break;
 
                 case "question":
                     if ((!value.has("values") || value.has("values") && value.getJSONArray("values").length() == 0)
-                            && !(value.has("is_required") && !value.getBoolean("is_required")))
-                        return new Pair<>(false, null);
+                            && !(value.has("is_required") && !value.getBoolean("is_required"))) {
+                        totalResult = false;
+                        setBlockMarkedAsRequired(value.getString("id"));
+                    }
 
                     if (value.has("optionals") && value.getJSONArray("optionals").length() > 0) {
                         JSONArray optionals = value.getJSONArray("optionals");
@@ -1880,9 +1933,9 @@ public class TemplateFragment extends Fragment {
                                     && Utils.containsAllValues(value.getJSONArray("values"), optional.getJSONArray("keys"))) {
 
                                 Pair<Boolean, ArrayList<JSONObject>> optionalResult = checkIfContainerIsFilled(optional.getJSONArray("items"));
-                                if (!optionalResult.first)
-                                    return new Pair<>(false, null);
-                                else
+                                if (!optionalResult.first) {
+                                    totalResult = false;
+                                } else
                                     photoObjects.addAll(optionalResult.second);
                             }
                         }
@@ -1894,42 +1947,47 @@ public class TemplateFragment extends Fragment {
                     break;
 
                 case "lineedit":
-                    if (!value.has("value") && !(value.has("is_required") && !value.getBoolean("is_required")))
-                        return new Pair<>(false, null);
-                    if (value.has("value") && value.getString("value").trim().isEmpty())
-                        return new Pair<>(false, null);
+                    if (!value.has("value") && !(value.has("is_required") && !value.getBoolean("is_required"))) {
+                        totalResult = false;
+                        setBlockMarkedAsRequired(value.getString("id"));
+                    }
+                    if (value.has("value") && value.getString("value").trim().isEmpty()) {
+                        totalResult = false;
+                        setBlockMarkedAsRequired(value.getString("id"));
+                    }
 
                     break;
 
                 case "textarea":
-                    if (!value.has("value") && !(value.has("is_required") && !value.getBoolean("is_required")))
-                        return new Pair<>(false, null);
-                    if (value.has("value") && value.getString("value").trim().isEmpty())
-                        return new Pair<>(false, null);
+                    if (!value.has("value") && !(value.has("is_required") && !value.getBoolean("is_required"))) {
+                        totalResult = false;
+                        setBlockMarkedAsRequired(value.getString("id"));
+                    }
+                    if (value.has("value") && value.getString("value").trim().isEmpty()) {
+                        totalResult = false;
+                        setBlockMarkedAsRequired(value.getString("id"));
+                    }
                     break;
 
                 case "checkbox":
-                    if (!value.has("value") && !(value.has("is_required") && !value.getBoolean("is_required")))
-                        return new Pair<>(false, null);
+                    if (!value.has("value") && !(value.has("is_required") && !value.getBoolean("is_required"))) {
+                        totalResult = false;
+                        setBlockMarkedAsRequired(value.getString("id"));
+                    }
                     break;
 
                 case "slider":
-                    if (!value.has("value") && !(value.has("is_required") && !value.getBoolean("is_required")))
-                        return new Pair<>(false, null);
-                    break;
-
-                case "photo":
-                    if ((!value.has(MEDIA_PATH_JSON_ARRAY) || (value.has(MEDIA_PATH_JSON_ARRAY) && value.getJSONArray(MEDIA_PATH_JSON_ARRAY).length() == 0))
-                            && !(value.has("is_required") && !value.getBoolean("is_required")))
-                        return new Pair<>(false, null);
-                    else
-                        photoObjects.add(value);
+                    if (!value.has("value") && !(value.has("is_required") && !value.getBoolean("is_required"))) {
+                        totalResult = false;
+                        setBlockMarkedAsRequired(value.getString("id"));
+                    }
                     break;
 
                 case "signature":
-                    if (!value.has(SIGNATURE_PREVIEW_JSON_ARRAY) && !(value.has("is_required") && !value.getBoolean("is_required")))
-                        return new Pair<>(false, null);
-                    else
+                    if (!value.has(SIGNATURE_PREVIEW_JSON_ARRAY) && !(value.has("is_required") && !value.getBoolean("is_required"))) {
+                        totalResult = false;
+                        setBlockMarkedAsRequired(value.getString("id"));
+                    } else
                         photoObjects.add(value);
                     break;
 
@@ -1940,7 +1998,10 @@ public class TemplateFragment extends Fragment {
                     Log.d("jeka", fields.get(i));
             }
         }
-        return new Pair<>(true, photoObjects);
+        if (totalResult)
+            return new Pair<>(true, photoObjects);
+        else
+            return new Pair<>(false, null);
     }
 
 
