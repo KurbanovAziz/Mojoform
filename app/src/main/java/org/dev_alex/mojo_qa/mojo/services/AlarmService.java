@@ -299,7 +299,7 @@ public class AlarmService extends Service {
                         + Data.currentUser.userName + "&includeProcessVariables=TRUE" + dateParams;
 
                 OkHttpClient client = new OkHttpClient();
-                Request request = new Request.Builder().header("Authorization", Credentials.basic("kermit", "ker2017permit"))
+                Request request = new Request.Builder().header("Authorization", Credentials.basic(Data.taskAuthLogin, Data.taskAuthPass))
                         .url(url).build();
 
                 Response response = client.newCall(request).execute();
@@ -354,7 +354,7 @@ public class AlarmService extends Service {
                 String url = "https://activiti.dev-alex.org/activiti-rest/service/runtime/tasks/" + taskId;
 
                 OkHttpClient client = new OkHttpClient();
-                Request request = new Request.Builder().header("Authorization", Credentials.basic("kermit", "ker2017permit"))
+                Request request = new Request.Builder().header("Authorization",Credentials.basic(Data.taskAuthLogin, Data.taskAuthPass))
                         .url(url).build();
 
                 Response response = client.newCall(request).execute();

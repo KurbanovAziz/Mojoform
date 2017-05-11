@@ -4,6 +4,10 @@ import org.dev_alex.mojo_qa.mojo.models.User;
 
 public class Data {
     public static User currentUser;
+    public static String taskAuthLogin;
+    public static String taskAuthPass = "p234235dfgdeg";
+
+
     public static String tt = "{\n" +
             "  \"collapsed\": false,\n" +
             "  \"id\": \"ba7fcbfb-dd54-4828-8567-823144603ec6\",\n" +

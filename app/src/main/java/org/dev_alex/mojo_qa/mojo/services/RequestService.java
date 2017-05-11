@@ -3,6 +3,7 @@ package org.dev_alex.mojo_qa.mojo.services;
 import android.util.Log;
 
 import org.dev_alex.mojo_qa.mojo.App;
+import org.dev_alex.mojo_qa.mojo.Data;
 import org.dev_alex.mojo_qa.mojo.R;
 
 import java.io.File;
@@ -35,7 +36,7 @@ public class RequestService {
         RequestBody body = RequestBody.create(JSON, jsonStr);
         Request.Builder requestBuilder = new Request.Builder().url(url).post(body)
                 .addHeader("Content-Type", "application/json")
-                .addHeader("Authorization", Credentials.basic("kermit", "ker2017permit"));
+                .addHeader("Authorization", Credentials.basic(Data.taskAuthLogin, Data.taskAuthPass));
 
         Request request = requestBuilder.build();
         Log.d("mojo-log", "send file to server. request: " + request.toString());

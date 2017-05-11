@@ -122,8 +122,8 @@ public class AuthActivity extends AppCompatActivity {
             if (loginWithinToken) {
                 if (responseCode == 202) {
                     Data.currentUser = user;
-                    LoginHistoryService.addUser(user);
                     TokenService.updateToken(user.token, user.userName);
+                    Data.taskAuthLogin = user.userName;
                     Intent intent = new Intent(AuthActivity.this, MainActivity.class);
                     intent.putExtras(getIntent());
                     startActivity(intent);
@@ -139,6 +139,7 @@ public class AuthActivity extends AppCompatActivity {
                     Toast.makeText(AuthActivity.this, R.string.invalid_username_or_password, Toast.LENGTH_LONG).show();
                 else if (responseCode == 202) {
                     Data.currentUser = user;
+                    Data.taskAuthLogin = user.userName;
                     LoginHistoryService.addUser(user);
                     TokenService.updateToken(user.token, user.userName);
                     Intent intent = new Intent(AuthActivity.this, MainActivity.class);
