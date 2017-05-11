@@ -26,7 +26,7 @@
                 android:textColor="@android:color/white"
                 android:textSize="17sp" />
 
-            <android.support.v7.widget.RecyclerView
+            <org.dev_alex.mojo_qa.mojo.custom_views.MaxHeightRecycleView
                 android:id="@+id/folders_recycler_view"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -44,7 +44,8 @@
                 android:paddingLeft="25dp"
                 android:text="@string/files"
                 android:textColor="@android:color/white"
-                android:textSize="17sp" />
+                android:textSize="17sp"
+                android:visibility="gone" />
 
             <org.dev_alex.mojo_qa.mojo.custom_views.MaxHeightRecycleView
                 android:id="@+id/files_recycler_view"
@@ -53,7 +54,8 @@
                 android:clipToPadding="false"
                 android:paddingBottom="118dp"
                 android:paddingLeft="13dp"
-                android:paddingRight="13dp" />
+                android:paddingRight="13dp"
+                android:visibility="gone" />
         </LinearLayout>
     </android.support.v4.widget.NestedScrollView>
 

@@ -36,6 +36,7 @@ import org.dev_alex.mojo_qa.mojo.R;
 import org.dev_alex.mojo_qa.mojo.activities.AuthActivity;
 import org.dev_alex.mojo_qa.mojo.adapters.FileAdapter;
 import org.dev_alex.mojo_qa.mojo.adapters.FolderAdapter;
+import org.dev_alex.mojo_qa.mojo.custom_views.MaxHeightRecycleView;
 import org.dev_alex.mojo_qa.mojo.custom_views.RelativeLayoutWithPopUp;
 import org.dev_alex.mojo_qa.mojo.models.File;
 import org.dev_alex.mojo_qa.mojo.models.FileSystemStackEntry;
@@ -241,7 +242,11 @@ public class DocumentsFragment extends Fragment {
             public boolean onKey(View v, int keyCode, KeyEvent event) {
                 if (event.getAction() == KeyEvent.ACTION_UP)
                     if (keyCode == KeyEvent.KEYCODE_BACK)
-                        return popFileStack();
+                        if (selectModeEnabled) {
+                            stopSelectionMode();
+                            return true;
+                        } else
+                            return popFileStack();
 
                 return false;
             }
@@ -252,6 +257,7 @@ public class DocumentsFragment extends Fragment {
             @Override
             public void onScrollChanged() {
                 filesRecyclerView.setNestedScrollingEnabled(!scrollView.canScrollVertically(1));
+                folderRecyclerView.setNestedScrollingEnabled(!scrollView.canScrollVertically(-1));
             }
         });
 
@@ -381,26 +387,30 @@ public class DocumentsFragment extends Fragment {
         else
             rootView.findViewById(R.id.empty_block).setVisibility(View.GONE);
 
+        ((MaxHeightRecycleView) folderRecyclerView).setMaxHeightEnabled(true);
+        ((MaxHeightRecycleView) filesRecyclerView).setMaxHeightEnabled(true);
+        LinearLayout.LayoutParams folderParams = (LinearLayout.LayoutParams) folderRecyclerView.getLayoutParams();
+        folderParams.height = ViewGroup.LayoutParams.WRAP_CONTENT;
+        LinearLayout.LayoutParams filesParams = (LinearLayout.LayoutParams) filesRecyclerView.getLayoutParams();
+        filesParams.height = ViewGroup.LayoutParams.WRAP_CONTENT;
 
         if (files == null || files.isEmpty()) {
             rootView.findViewById(R.id.files_block).setVisibility(View.GONE);
             rootView.findViewById(R.id.files_recycler_view).setVisibility(View.GONE);
 
-            LinearLayout.LayoutParams layoutParams = (LinearLayout.LayoutParams) folderRecyclerView.getLayoutParams();
-            layoutParams.height = LinearLayout.LayoutParams.MATCH_PARENT;
-            folderRecyclerView.setLayoutParams(layoutParams);
+            ((MaxHeightRecycleView) folderRecyclerView).setMaxHeightEnabled(false);
+            folderParams.height = (int) (getResources().getDisplayMetrics().heightPixels * 0.84);
         } else {
             rootView.findViewById(R.id.files_block).setVisibility(View.VISIBLE);
             rootView.findViewById(R.id.files_recycler_view).setVisibility(View.VISIBLE);
-
-            LinearLayout.LayoutParams layoutParams = (LinearLayout.LayoutParams) folderRecyclerView.getLayoutParams();
-            layoutParams.height = LinearLayout.LayoutParams.WRAP_CONTENT;
-            folderRecyclerView.setLayoutParams(layoutParams);
         }
 
         if (folders == null || folders.isEmpty()) {
             rootView.findViewById(R.id.folders_block).setVisibility(View.GONE);
             rootView.findViewById(R.id.folders_recycler_view).setVisibility(View.GONE);
+
+            ((MaxHeightRecycleView) filesRecyclerView).setMaxHeightEnabled(false);
+            filesParams.height = (int) (getResources().getDisplayMetrics().heightPixels * 0.84);
         } else {
             rootView.findViewById(R.id.folders_block).setVisibility(View.VISIBLE);
             rootView.findViewById(R.id.folders_recycler_view).setVisibility(View.VISIBLE);
@@ -414,6 +424,9 @@ public class DocumentsFragment extends Fragment {
             folderAdapter = new FolderAdapter(this, folders, isGridView);
             fileAdapter = new FileAdapter(DocumentsFragment.this, files, isGridView);
         }
+
+        folderRecyclerView.setLayoutParams(folderParams);
+        filesRecyclerView.setLayoutParams(filesParams);
 
         folderRecyclerView.setAdapter(folderAdapter);
         filesRecyclerView.setAdapter(fileAdapter);
