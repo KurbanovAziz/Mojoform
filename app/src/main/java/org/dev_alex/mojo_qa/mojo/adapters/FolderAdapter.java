@@ -116,18 +116,18 @@ public class FolderAdapter extends RecyclerView.Adapter<FolderAdapter.FolderView
             });
         }
 
-
-        viewHolder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-                if (!selectionModeEnabled) {
-                    parentFragment.startSelectionMode();
-                    selectedIds.add(folder.id);
-                    parentFragment.checkIfSelectionModeFinished();
+        if (!folder.nodeType.equals("cm:org"))
+            viewHolder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    if (!selectionModeEnabled) {
+                        parentFragment.startSelectionMode();
+                        selectedIds.add(folder.id);
+                        parentFragment.checkIfSelectionModeFinished();
+                    }
+                    return true;
                 }
-                return true;
-            }
-        });
+            });
     }
 
     @Override

@@ -99,7 +99,8 @@
         android:layout_alignParentEnd="true"
         android:layout_alignParentRight="true"
         android:adjustViewBounds="true"
-        android:src="@drawable/add_folder_btn" />
+        android:src="@drawable/add_folder_btn"
+        android:visibility="gone" />
 
     <include layout="@layout/item_popup_layout" />
 

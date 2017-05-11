@@ -44,6 +44,7 @@ import org.dev_alex.mojo_qa.mojo.services.BitmapCacheService;
 import org.dev_alex.mojo_qa.mojo.services.BlurHelper;
 import org.dev_alex.mojo_qa.mojo.services.RequestService;
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
@@ -108,7 +109,7 @@ public class DocumentsFragment extends Fragment {
         folderRecyclerView.setBackgroundColor(Color.TRANSPARENT);
 
         selectionMenu.setVisibility(View.GONE);
-        rootView.findViewById(R.id.create_dir_btn).setVisibility(View.VISIBLE);
+        rootView.findViewById(R.id.create_dir_btn).setVisibility(foldersStack.size() > 1 ? View.VISIBLE : View.GONE);
     }
 
     public void checkIfSelectionModeFinished() {
@@ -365,6 +366,23 @@ public class DocumentsFragment extends Fragment {
         });
     }
 
+    private File convertOrganizationToFolder(JSONObject orgJson) {
+        try {
+            File orgFolder = new File();
+            orgFolder.isFolder = true;
+            orgFolder.isLocked = true;
+            orgFolder.isFile = false;
+            orgFolder.nodeType = "cm:org";
+            orgFolder.id = orgJson.getJSONObject("site").getString("node_id");
+            orgFolder.name = orgJson.getJSONObject("site").getString("title");
+
+            return orgFolder;
+        } catch (JSONException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
     private void swapAdapterType() {
         isGridView = !isGridView;
         ((ImageView) getActivity().findViewById(R.id.list_grid_icon))
@@ -382,6 +400,8 @@ public class DocumentsFragment extends Fragment {
     }
 
     private void setAdapters(ArrayList<File> files, ArrayList<File> folders, boolean withSelection) {
+        rootView.findViewById(R.id.create_dir_btn).setVisibility(foldersStack.size() > 1 ? View.VISIBLE : View.GONE);
+
         if ((files == null || files.isEmpty()) && (folders == null || folders.isEmpty()))
             rootView.findViewById(R.id.empty_block).setVisibility(View.VISIBLE);
         else
@@ -574,6 +594,7 @@ public class DocumentsFragment extends Fragment {
             });
         }
     }
+
 
     private class CreateDirTask extends AsyncTask<Void, Void, Integer> {
         private AlertDialog dialog;
@@ -817,7 +838,7 @@ public class DocumentsFragment extends Fragment {
 
                 String url;
                 if (fileId == null) {
-                    url = "/api/fs/childrenmy" + sortParameter;
+                    url = "//api/user/orgs" + sortParameter;
                     foldersStack = new ArrayList<>();
                 } else
                     url = "/api/fs/children/" + fileId + sortParameter;
@@ -828,8 +849,13 @@ public class DocumentsFragment extends Fragment {
                     ObjectMapper mapper = new ObjectMapper();
                     JSONObject resultJson = new JSONObject(response.body().string());
                     JSONArray tasksEntriesJson = resultJson.getJSONObject("list").getJSONArray("entries");
+
                     for (int i = 0; i < tasksEntriesJson.length(); i++)
-                        allFiles.add(mapper.readValue(tasksEntriesJson.getJSONObject(i).getJSONObject("entry").toString(), File.class));
+                        if (fileId == null) {
+                            JSONObject organization = tasksEntriesJson.getJSONObject(i).getJSONObject("entry");
+                            allFiles.add(convertOrganizationToFolder(organization));
+                        } else
+                            allFiles.add(mapper.readValue(tasksEntriesJson.getJSONObject(i).getJSONObject("entry").toString(), File.class));
 
                     fileIdsWithPreviews = new ArrayList<>();
                     for (File file : allFiles) {
@@ -841,11 +867,6 @@ public class DocumentsFragment extends Fragment {
                         else
                             files.add(file);
                     }
-                }
-
-                if (fileId == null) {
-                    response = RequestService.createGetRequest("/api/fs/infomy");
-                    fileId = new JSONObject(response.body().string()).getJSONObject("entry").getString("id");
                 }
 
                 return response.code();
@@ -928,6 +949,7 @@ public class DocumentsFragment extends Fragment {
             fileAdapter.notifyDataSetChanged();
             folderAdapter.notifyDataSetChanged();
         }
+
     }
 
     @Override
