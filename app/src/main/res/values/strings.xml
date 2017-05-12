@@ -73,4 +73,5 @@
     <string name="clear">Очистить</string>
     <string name="select">Выбрать</string>
     <string name="hold">Отложить</string>
+    <string name="nothing_found">Ничего не найдено</string>
 </resources>

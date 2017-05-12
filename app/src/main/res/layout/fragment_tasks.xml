@@ -118,8 +118,7 @@
             android:layout_weight="1"
             android:background="@drawable/task_switch_button_background"
             android:button="@null"
-            android:gravity="right|center_vertical"
-            android:paddingRight="18dp"
+            android:gravity="center"
             android:text="@string/all"
             android:textColor="@color/toggle_button_text_color" />
     </RadioGroup>

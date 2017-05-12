@@ -142,7 +142,7 @@ public class TemplateFragment extends Fragment {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == PHOTO_REQUEST_CODE && resultCode == RESULT_OK) {
-            if (data == null)
+            if (new File(cameraImagePath).exists())
                 new ProcessingBitmapTask(cameraImagePath, true).execute();
             else {
                 String picturePath = Utils.getRealPathFromIntentData(getContext(), data.getData());
@@ -162,7 +162,7 @@ public class TemplateFragment extends Fragment {
         }
 
         if (requestCode == VIDEO_REQUEST_CODE && resultCode == RESULT_OK) {
-            if (data == null || data.getAction() != null && data.getAction().equals("inline-data"))
+            if (new File(cameraVideoPath).exists())
                 createVideoPreview(cameraVideoPath, true);
             else {
                 String videoPath = Utils.getRealPathFromIntentData(getContext(), data.getData());
@@ -608,7 +608,7 @@ public class TemplateFragment extends Fragment {
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
                             CookieManager.getInstance().setAcceptThirdPartyCookies(richEdit, true);
 
-                        richEdit.loadDataWithBaseURL("", html, mime, encoding, null);
+                        richEdit.loadDataWithBaseURL(getString(R.string.host), html, mime, encoding, null);
                         container.addView(richEdit);
                     }
                     break;
@@ -850,6 +850,9 @@ public class TemplateFragment extends Fragment {
 
     private void createMediaBlock(final JSONObject value, LinearLayout container) throws Exception {
         final LinearLayout mediaLayout = (LinearLayout) getActivity().getLayoutInflater().inflate(R.layout.media_layout, container, false);
+
+        if (value.has("caption"))
+            ((TextView) ((ViewGroup) ((ViewGroup) mediaLayout.getChildAt(0)).getChildAt(0)).getChildAt(1)).setText(value.getString("caption"));
 
         final ExpandableLayout expandableLayout = (ExpandableLayout) ((LinearLayout) mediaLayout.getChildAt(0)).getChildAt(1);
         LinearLayout buttonsContainer = (LinearLayout) expandableLayout.getChildAt(0);

@@ -72,7 +72,7 @@ public class BitmapService {
 
 
         Intent takeVideoIntent = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
-        takeVideoIntent.putExtra("return-data", true);
+        takeVideoIntent.putExtra("return-data", false);
         File cameraFile = new File(context.getExternalCacheDir(), String.valueOf(System.currentTimeMillis()) + ".mp4");
         Uri fileUri = FileProvider.getUriForFile(context, context.getApplicationContext().getPackageName() + ".provider", cameraFile);
         takeVideoIntent.putExtra(MediaStore.EXTRA_OUTPUT, fileUri);

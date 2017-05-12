@@ -216,6 +216,14 @@ public class DocumentsFragment extends Fragment {
                 sortTypePopupWindow.setVisibility(View.VISIBLE);
             }
         });
+
+        getActivity().findViewById(R.id.search_btn).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                getActivity().getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.container, SearchFragment.newInstance()).addToBackStack(null).commit();
+            }
+        });
     }
 
     private void updateHeader() {
@@ -957,5 +965,12 @@ public class DocumentsFragment extends Fragment {
         super.onDestroy();
         if (downloadTask != null && downloadTask.getStatus() != AsyncTask.Status.FINISHED)
             downloadTask.cancel(false);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        getActivity().findViewById(R.id.main_menu_search_block).setVisibility(View.GONE);
+        getActivity().findViewById(R.id.main_menu_buttons_block).setVisibility(View.VISIBLE);
     }
 }
