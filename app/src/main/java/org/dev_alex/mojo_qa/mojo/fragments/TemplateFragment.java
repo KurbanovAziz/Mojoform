@@ -130,7 +130,7 @@ public class TemplateFragment extends Fragment {
 
             initDialog();
             setupHeader();
-
+            Utils.setupCloseKeyboardUI(getActivity(), rootView);
             setListeners();
 
             new GetTemplateTask(templateId).execute();
@@ -376,6 +376,7 @@ public class TemplateFragment extends Fragment {
                         fillContainer(rootContainer, pageJson.getJSONArray("items"), 0);
 
                     final Page page = new Page(pageJson.getString("caption"), pageJson.getString("id"), rootContainer);
+                    Utils.setupCloseKeyboardUI(getActivity(), rootContainer);
                     pages.add(page);
 
                     LinearLayout pageContainer = (LinearLayout) rootView.findViewById(R.id.page_container);

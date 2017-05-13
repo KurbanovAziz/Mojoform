@@ -8,16 +8,19 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -28,6 +31,7 @@ import org.dev_alex.mojo_qa.mojo.adapters.SearchFileAdapter;
 import org.dev_alex.mojo_qa.mojo.models.File;
 import org.dev_alex.mojo_qa.mojo.services.BitmapCacheService;
 import org.dev_alex.mojo_qa.mojo.services.RequestService;
+import org.dev_alex.mojo_qa.mojo.services.Utils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -38,8 +42,11 @@ import okhttp3.Response;
 public class SearchFragment extends Fragment {
     private View rootView;
     private RecyclerView recyclerView;
+    private RelativeLayout recyclerViewBlock;
     private DownloadImagesTask downloadTask;
     private ProgressBar progressBar;
+    private SearchFilesTask searchTask = null;
+
     public BitmapCacheService bitmapCacheService;
 
 
@@ -57,9 +64,13 @@ public class SearchFragment extends Fragment {
         rootView = inflater.inflate(R.layout.fragment_search, container, false);
         recyclerView = (RecyclerView) rootView.findViewById(R.id.recycler_view);
         progressBar = (ProgressBar) rootView.findViewById(R.id.update_progress);
+        progressBar.getIndeterminateDrawable().setColorFilter(ContextCompat.getColor(getContext(), R.color.colorAccent), android.graphics.PorterDuff.Mode.MULTIPLY);
+
         bitmapCacheService = new BitmapCacheService();
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        recyclerViewBlock = (RelativeLayout) rootView.findViewById(R.id.recycler_view_block);
 
+        Utils.setupCloseKeyboardUI(getActivity(), rootView);
         setListeners();
         return rootView;
     }
@@ -85,6 +96,7 @@ public class SearchFragment extends Fragment {
         getActivity().findViewById(R.id.search_back_btn).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Utils.hideSoftKeyboard(getActivity());
                 getActivity().getSupportFragmentManager().popBackStack();
             }
         });
@@ -103,18 +115,21 @@ public class SearchFragment extends Fragment {
             @Override
             public void afterTextChanged(Editable s) {
                 if (s.length() >= 3) {
-
+                    if (searchTask != null && searchTask.getStatus() != AsyncTask.Status.FINISHED)
+                        searchTask.cancel(true);
+                    searchTask = new SearchFilesTask(s.toString());
+                    searchTask.execute();
                 }
             }
         });
     }
 
-    public class SearchFilesTask extends AsyncTask<Void, Void, Integer> {
+    private class SearchFilesTask extends AsyncTask<Void, Void, Integer> {
         ArrayList<String> fileIdsWithPreviews;
         private ArrayList<File> files;
         private String searchStr;
 
-        public SearchFilesTask(String searchStr) {
+        SearchFilesTask(String searchStr) {
             this.searchStr = searchStr;
         }
 
@@ -152,7 +167,7 @@ public class SearchFragment extends Fragment {
                             fileIdsWithPreviews.add(file.id);
 
                         if (file.isFolder) {
-
+                            Log.d("mojo-log", "folder found");
                         } else
                             files.add(file);
                     }
@@ -181,9 +196,9 @@ public class SearchFragment extends Fragment {
 
                 if (files.isEmpty()) {
                     rootView.findViewById(R.id.empty_block).setVisibility(View.VISIBLE);
-                    recyclerView.setVisibility(View.GONE);
+                    recyclerViewBlock.setVisibility(View.GONE);
                 } else
-                    recyclerView.setVisibility(View.VISIBLE);
+                    recyclerViewBlock.setVisibility(View.VISIBLE);
 
 
                 recyclerView.setAdapter(new SearchFileAdapter(SearchFragment.this, files));
@@ -218,16 +233,7 @@ public class SearchFragment extends Fragment {
                     } catch (Exception exc) {
                         exc.printStackTrace();
                     }
-                if (!bitmapCacheService.hasPreviewInMemCache(fileId))
-                    try {
-                        Response previewResponse = RequestService.createGetRequest("/api/fs/preview/" + fileId);
-                        byte[] imageBytes = previewResponse.body().bytes();
-                        Bitmap bitmap = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length);
-                        if (bitmap != null)
-                            bitmapCacheService.addPreviewToMemoryCache(fileId, bitmap);
-                    } catch (Exception exc) {
-                        exc.printStackTrace();
-                    }
+
                 publishProgress();
                 if (isCancelled())
                     return null;

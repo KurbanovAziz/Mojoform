@@ -13,6 +13,7 @@ import android.widget.Toast;
 import org.dev_alex.mojo_qa.mojo.R;
 import org.dev_alex.mojo_qa.mojo.activities.AuthActivity;
 import org.dev_alex.mojo_qa.mojo.models.User;
+import org.dev_alex.mojo_qa.mojo.services.Utils;
 
 import java.util.Locale;
 
@@ -40,6 +41,7 @@ public class UserLoginFragment extends Fragment {
             ((TextView) rootView.findViewById(R.id.user_name)).setText(user.firstName + " " + user.lastName);
             ((TextView) rootView.findViewById(R.id.user_initials)).setText(String.format(Locale.getDefault(), "%s%s", user.firstName.isEmpty() ? "" : user.firstName.charAt(0), user.lastName.isEmpty() ? "" : user.lastName.charAt(0)));
 
+            Utils.setupCloseKeyboardUI(getActivity(), rootView);
             setListeners();
         }
         return rootView;

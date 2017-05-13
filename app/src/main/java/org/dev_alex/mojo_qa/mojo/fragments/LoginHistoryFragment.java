@@ -13,6 +13,7 @@ import android.widget.Button;
 import org.dev_alex.mojo_qa.mojo.R;
 import org.dev_alex.mojo_qa.mojo.adapters.UserAdapter;
 import org.dev_alex.mojo_qa.mojo.services.LoginHistoryService;
+import org.dev_alex.mojo_qa.mojo.services.Utils;
 
 public class LoginHistoryFragment extends Fragment {
     private View rootView;
@@ -35,6 +36,7 @@ public class LoginHistoryFragment extends Fragment {
             recyclerView = (RecyclerView) rootView.findViewById(R.id.recycler_view);
             recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
             recyclerView.setAdapter(new UserAdapter(this, LoginHistoryService.getLastLoggedUsers()));
+            Utils.setupCloseKeyboardUI(getActivity(), rootView);
             setListeners();
         }
         return rootView;

@@ -11,6 +11,7 @@ import android.widget.Toast;
 
 import org.dev_alex.mojo_qa.mojo.R;
 import org.dev_alex.mojo_qa.mojo.activities.AuthActivity;
+import org.dev_alex.mojo_qa.mojo.services.Utils;
 
 public class LoginFragment extends Fragment {
     private View rootView;
@@ -29,6 +30,7 @@ public class LoginFragment extends Fragment {
         if (rootView == null) {
             rootView = inflater.inflate(R.layout.fragment_login, container, false);
             setListeners();
+            Utils.setupCloseKeyboardUI(getActivity(), rootView);
         }
         return rootView;
     }

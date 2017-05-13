@@ -1,6 +1,7 @@
 package org.dev_alex.mojo_qa.mojo.services;
 
 
+import android.app.Activity;
 import android.content.ContentUris;
 import android.content.Context;
 import android.database.Cursor;
@@ -9,7 +10,12 @@ import android.os.Build;
 import android.os.Environment;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
+import android.view.MotionEvent;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.webkit.MimeTypeMap;
+import android.widget.EditText;
 
 import org.json.JSONArray;
 
@@ -21,6 +27,39 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 public class Utils {
+
+    public static void hideSoftKeyboard(Activity activity) {
+        try {
+            InputMethodManager inputMethodManager =
+                    (InputMethodManager) activity.getSystemService(
+                            Activity.INPUT_METHOD_SERVICE);
+            inputMethodManager.hideSoftInputFromWindow(
+                    activity.getCurrentFocus().getWindowToken(), 0);
+        } catch (Exception exc) {
+            exc.printStackTrace();
+        }
+    }
+
+    public static void setupCloseKeyboardUI(final Activity activity, View rootView) {
+
+        // Set up touch listener for non-text box views to hide keyboard.
+        if (!(rootView instanceof EditText)) {
+            rootView.setOnTouchListener(new View.OnTouchListener() {
+                public boolean onTouch(View v, MotionEvent event) {
+                    hideSoftKeyboard(activity);
+                    return false;
+                }
+            });
+        }
+
+        //If a layout container, iterate over children and seed recursion.
+        if (rootView instanceof ViewGroup) {
+            for (int i = 0; i < ((ViewGroup) rootView).getChildCount(); i++) {
+                View innerView = ((ViewGroup) rootView).getChildAt(i);
+                setupCloseKeyboardUI(activity, innerView);
+            }
+        }
+    }
 
     public static JSONArray addAllItemsToJson(JSONArray toJsonArray, JSONArray fromJsonArray) {
         try {
@@ -70,7 +109,7 @@ public class Utils {
     public static boolean containsAllValues(JSONArray jsonArray, JSONArray checkValues) {
         try {
             for (int j = 0; j < checkValues.length(); j++)
-                if (!containsValue(jsonArray,checkValues.getString(j)))
+                if (!containsValue(jsonArray, checkValues.getString(j)))
                     return false;
             return true;
         } catch (Exception exc) {
