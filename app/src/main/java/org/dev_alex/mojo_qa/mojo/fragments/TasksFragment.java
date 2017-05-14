@@ -1,7 +1,6 @@
 package org.dev_alex.mojo_qa.mojo.fragments;
 
 import android.app.ProgressDialog;
-import android.content.Intent;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -33,7 +32,6 @@ import net.cachapa.expandablelayout.ExpandableLayout;
 import org.dev_alex.mojo_qa.mojo.Data;
 import org.dev_alex.mojo_qa.mojo.EventDecorator;
 import org.dev_alex.mojo_qa.mojo.R;
-import org.dev_alex.mojo_qa.mojo.activities.AuthActivity;
 import org.dev_alex.mojo_qa.mojo.adapters.TaskAdapter;
 import org.dev_alex.mojo_qa.mojo.models.Task;
 import org.json.JSONArray;
@@ -366,8 +364,7 @@ public class TasksFragment extends Fragment {
             if (responseCode == null)
                 Toast.makeText(getContext(), R.string.network_error, Toast.LENGTH_LONG).show();
             else if (responseCode == 401) {
-                startActivity(new Intent(getContext(), AuthActivity.class));
-                getActivity().finish();
+                Toast.makeText(getContext(), R.string.tasks_are_temporary_unavailable, Toast.LENGTH_LONG).show();
             } else if (responseCode == 200) {
                 updateDecorators();
                 ((RadioButton) rootView.findViewById(R.id.busy)).setChecked(true);

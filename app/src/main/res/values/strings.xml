@@ -74,4 +74,5 @@
     <string name="select">Выбрать</string>
     <string name="hold">Отложить</string>
     <string name="nothing_found">Ничего не найдено</string>
+    <string name="tasks_are_temporary_unavailable">Задачи временно недоступны</string>
 </resources>
