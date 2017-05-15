@@ -438,36 +438,6 @@ public class TemplateFragment extends Fragment {
                     createSelectBtnContainer(value, container, offset);
                     break;
 
-                case "text":
-                    if (value.has("caption")) {
-                        TextView caption = new TextView(getContext());
-                        caption.setText(value.getString("caption"));
-                        caption.setTextColor(ContextCompat.getColor(getContext(), R.color.accent));
-                        caption.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
-                        container.addView(caption);
-                        caption.setPadding(paddings, 0, paddings, 0);
-                    }
-
-                    if (value.has("text")) {
-                        WebView text = new WebView(getContext());
-                        LinearLayout.LayoutParams textLayoutParams = new LinearLayout.LayoutParams
-                                (ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-
-                        textLayoutParams.leftMargin = paddings;
-                        textLayoutParams.rightMargin = paddings;
-                        textLayoutParams.topMargin = paddings;
-                        text.setLayoutParams(textLayoutParams);
-
-                        String mime = "text/html";
-                        String encoding = "utf-8";
-                        String html = "<html><head></head><body> " + value.getString("text") + " </body></html>";
-
-                        text.getSettings().setJavaScriptEnabled(true);
-                        text.loadDataWithBaseURL("", html, mime, encoding, null);
-                        container.addView(text);
-                    }
-                    break;
-
                 case "lineedit":
                     LinearLayout editTextSingleLineContainer = (LinearLayout) getActivity().getLayoutInflater().inflate(R.layout.lineedit, container, false);
 
@@ -601,6 +571,8 @@ public class TemplateFragment extends Fragment {
                         String encoding = "utf-8";
 
                         String html = "<html><head></head><body> " + value.getString("html") + " </body></html>";
+                        html = html.replace(getString(R.string.host), "");
+                        html = html.replace("/api", getString(R.string.host) + "/api");
 
                         richEdit.getSettings().setJavaScriptEnabled(true);
                         String cookieString = "auth_token=" + TokenService.getToken();
@@ -609,7 +581,7 @@ public class TemplateFragment extends Fragment {
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
                             CookieManager.getInstance().setAcceptThirdPartyCookies(richEdit, true);
 
-                        richEdit.loadDataWithBaseURL(getString(R.string.host), html, mime, encoding, null);
+                        richEdit.loadDataWithBaseURL("", html, mime, encoding, null);
                         container.addView(richEdit);
                     }
                     break;
@@ -655,6 +627,7 @@ public class TemplateFragment extends Fragment {
         }
 
         LinearLayout categoryHeader = (LinearLayout) getActivity().getLayoutInflater().inflate(R.layout.category_header, container, false);
+        categoryHeader.setTag(value.getString("id") + "_head");
         ((LayerDrawable) categoryHeader.getBackground()).findDrawableByLayerId(R.id.background).setColorFilter(color, PorterDuff.Mode.SRC_IN);
 
         if (value.has("name"))
@@ -663,6 +636,7 @@ public class TemplateFragment extends Fragment {
             ((TextView) categoryHeader.getChildAt(1)).setText("Нет заголовка");
 
         LinearLayout expandableContent = (LinearLayout) getActivity().getLayoutInflater().inflate(R.layout.expandable_content, container, false);
+        expandableContent.setTag(value.getString("id") + "_cont");
         ((LayerDrawable) expandableContent.getBackground()).findDrawableByLayerId(R.id.background).setColorFilter(color, PorterDuff.Mode.SRC_IN);
 
         fillContainer(expandableContent, value.getJSONArray("items"), offset + 1);
@@ -946,7 +920,7 @@ public class TemplateFragment extends Fragment {
             }
         });
 
-        container.addView(boxInContainerWithId(mediaLayout, "id"));
+        container.addView(boxInContainerWithId(mediaLayout, value.getString("id")));
 
         if (value.has(MEDIA_PATH_JSON_ARRAY)) {
             currentMediaBlock = new Pair<>(mediaLayout, value);
@@ -1261,6 +1235,61 @@ public class TemplateFragment extends Fragment {
         }
         if (container != null)
             container.setBackgroundColor(Color.parseColor("#FEDADA"));
+    }
+
+    private void setCategoryMarkedAsRequired(String tag) {
+        ViewGroup categoryHeader = getCategoryByTag(tag + "_head");
+        ViewGroup categoryContainer = getCategoryByTag(tag + "_cont");
+
+        if (categoryHeader != null)
+            ((LayerDrawable) categoryHeader.getBackground()).findDrawableByLayerId(R.id.background).setColorFilter(Color.parseColor("#FEDADA"), PorterDuff.Mode.SRC_IN);
+
+        if (categoryContainer != null)
+            ((LayerDrawable) categoryContainer.getBackground()).findDrawableByLayerId(R.id.background).setColorFilter(Color.parseColor("#FEDADA"), PorterDuff.Mode.SRC_IN);
+    }
+
+    private void resetCategoryColor(String tag, int offset) {
+        ViewGroup categoryHeader = getCategoryByTag(tag + "_head");
+        ViewGroup categoryContainer = getCategoryByTag(tag + "_cont");
+
+        int color;
+        switch (offset) {
+            case 0:
+                color = Color.parseColor("#B7B5EC");
+                break;
+            case 1:
+                color = Color.parseColor("#C3E1FE");
+                break;
+            case 2:
+                color = Color.parseColor("#DBF5D8");
+                break;
+            case 3:
+                color = Color.parseColor("#F3D8F5");
+                break;
+            case 4:
+                color = Color.parseColor("#F4EAD8");
+                break;
+
+            default:
+                color = Color.parseColor("#F4EAD8");
+                break;
+        }
+
+        if (categoryHeader != null)
+            ((LayerDrawable) categoryHeader.getBackground()).findDrawableByLayerId(R.id.background).setColorFilter(color, PorterDuff.Mode.SRC_IN);
+
+        if (categoryContainer != null)
+            ((LayerDrawable) categoryContainer.getBackground()).findDrawableByLayerId(R.id.background).setColorFilter(color, PorterDuff.Mode.SRC_IN);
+    }
+
+    private ViewGroup getCategoryByTag(String tag) {
+        ViewGroup container = null;
+        for (Page page : pages) {
+            container = (ViewGroup) page.layout.findViewWithTag(tag);
+            if (container != null)
+                return container;
+        }
+        return null;
     }
 
     private void resetRequiredBlock(String tag) {
@@ -1789,6 +1818,11 @@ public class TemplateFragment extends Fragment {
                 startActivity(new Intent(getContext(), AuthActivity.class));
                 getActivity().finish();
             } else if (responseCode == 200) {
+                SharedPreferences mSettings;
+                mSettings = App.getContext().getSharedPreferences("templates", Context.MODE_PRIVATE);
+                SharedPreferences.Editor editor = mSettings.edit();
+                editor.putString(templateId + Data.currentUser.userName, "");
+                editor.apply();
                 ((TasksFragment) getActivity().getSupportFragmentManager().findFragmentByTag("tasks")).needUpdate = true;
                 getActivity().getSupportFragmentManager().popBackStack();
             } else
@@ -1878,7 +1912,7 @@ public class TemplateFragment extends Fragment {
                 for (int i = 0; i < pagesJson.length(); i++) {
                     JSONObject pageJson = pagesJson.getJSONObject(i).getJSONObject("page");
                     if (pageJson.has("items")) {
-                        Pair<Boolean, ArrayList<JSONObject>> result = checkIfContainerIsFilled(pageJson.getJSONArray("items"));
+                        Pair<Boolean, ArrayList<JSONObject>> result = checkIfContainerIsFilled(pageJson.getJSONArray("items"), 0);
                         if (!result.first)
                             totalResult = false;
                         else
@@ -1894,7 +1928,7 @@ public class TemplateFragment extends Fragment {
         return new Pair<>(false, null);
     }
 
-    private Pair<Boolean, ArrayList<JSONObject>> checkIfContainerIsFilled(JSONArray dataJson) throws Exception {
+    private Pair<Boolean, ArrayList<JSONObject>> checkIfContainerIsFilled(JSONArray dataJson, int offset) throws Exception {
         boolean totalResult = true;
         ArrayList<JSONObject> photoObjects = new ArrayList<>();
 
@@ -1911,14 +1945,15 @@ public class TemplateFragment extends Fragment {
         for (int i = 0; i < fields.size(); i++) {
             final JSONObject value = dataJson.getJSONObject(i).getJSONObject(fields.get(i));
             resetRequiredBlock(value.getString("id"));
+            resetCategoryColor(value.getString("id"), offset);
 
             switch (fields.get(i)) {
                 case "category":
-
-                    Pair<Boolean, ArrayList<JSONObject>> result = checkIfContainerIsFilled(value.getJSONArray("items"));
-                    if (!result.first)
+                    Pair<Boolean, ArrayList<JSONObject>> result = checkIfContainerIsFilled(value.getJSONArray("items"), offset + 1);
+                    if (!result.first) {
                         totalResult = false;
-                    else
+                        setCategoryMarkedAsRequired(value.getString("id"));
+                    } else
                         photoObjects.addAll(result.second);
                     break;
 
@@ -1936,7 +1971,7 @@ public class TemplateFragment extends Fragment {
                             if (optional.has("keys") && optional.getJSONArray("keys").length() > 0 && value.has("values")
                                     && Utils.containsAllValues(value.getJSONArray("values"), optional.getJSONArray("keys"))) {
 
-                                Pair<Boolean, ArrayList<JSONObject>> optionalResult = checkIfContainerIsFilled(optional.getJSONArray("items"));
+                                Pair<Boolean, ArrayList<JSONObject>> optionalResult = checkIfContainerIsFilled(optional.getJSONArray("items"), offset + 1);
                                 if (!optionalResult.first) {
                                     totalResult = false;
                                 } else
@@ -1945,6 +1980,14 @@ public class TemplateFragment extends Fragment {
                         }
                     }
 
+                    break;
+
+                case "photo":
+                    if ((!value.has("values") || value.has("values") && value.getJSONArray("values").length() == 0)
+                            && !(value.has("is_required") && !value.getBoolean("is_required"))) {
+                        totalResult = false;
+                        setBlockMarkedAsRequired(value.getString("id"));
+                    }
                     break;
 
                 case "text":

@@ -9,6 +9,7 @@ import android.support.annotation.IdRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -100,8 +101,11 @@ public class TasksFragment extends Fragment {
             }, 500);
         }
 
-        if (needUpdate)
-            updateDate(true);
+        if (needUpdate) {
+            ((MaterialCalendarView) rootView.findViewById(R.id.calendarView)).removeDecorators();
+            ((MaterialCalendarView) rootView.findViewById(R.id.calendarView)).invalidateDecorators();
+            rootView.findViewById(R.id.calendar_reset_btn).callOnClick();
+        }
 
         return rootView;
     }
@@ -226,6 +230,15 @@ public class TasksFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 expandableLayout.toggle();
+            }
+        });
+
+
+        ((SwipeRefreshLayout) rootView.findViewById(R.id.swipe_refresh)).setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                ((SwipeRefreshLayout) rootView.findViewById(R.id.swipe_refresh)).setRefreshing(false);
+                updateDate(true);
             }
         });
 

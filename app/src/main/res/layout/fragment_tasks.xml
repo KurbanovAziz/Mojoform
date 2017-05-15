@@ -75,6 +75,23 @@
         <include layout="@layout/calendar_expanding_part" />
     </net.cachapa.expandablelayout.ExpandableLayout>
 
+    <android.support.v4.widget.SwipeRefreshLayout
+        android:id="@+id/swipe_refresh"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent">
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/recycler_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"
+            android:clipToPadding="false"
+            android:paddingTop="8dp">
+
+        </android.support.v7.widget.RecyclerView>
+    </android.support.v4.widget.SwipeRefreshLayout>
+
     <RadioGroup
         android:id="@+id/task_toggle"
         android:layout_width="match_parent"
@@ -123,12 +140,4 @@
             android:textColor="@color/toggle_button_text_color" />
     </RadioGroup>
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/recycler_view"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginLeft="8dp"
-        android:layout_marginRight="8dp">
-
-    </android.support.v7.widget.RecyclerView>
 </org.dev_alex.mojo_qa.mojo.custom_views.LinearLayoutWithExpandingCalendar>
