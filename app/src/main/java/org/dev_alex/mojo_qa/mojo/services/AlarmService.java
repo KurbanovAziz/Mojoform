@@ -294,9 +294,10 @@ public class AlarmService extends Service {
 
                 monthCalendar.add(Calendar.MONTH, 1);
                 dateParams += "&dueBefore=" + isoDateFormat.format(monthCalendar.getTime());
+                String sortParams = "&sort=dueDate&order=desc&size=100";
 
                 String url = "https://activiti.dev-alex.org/activiti-rest/service/runtime/tasks?assignee="
-                        + Data.currentUser.userName + "&includeProcessVariables=TRUE" + dateParams;
+                        + Data.currentUser.userName + "&includeProcessVariables=TRUE" + dateParams + sortParams;
 
                 OkHttpClient client = new OkHttpClient();
                 Request request = new Request.Builder().header("Authorization", Credentials.basic(Data.taskAuthLogin, Data.taskAuthPass))
@@ -354,7 +355,7 @@ public class AlarmService extends Service {
                 String url = "https://activiti.dev-alex.org/activiti-rest/service/runtime/tasks/" + taskId;
 
                 OkHttpClient client = new OkHttpClient();
-                Request request = new Request.Builder().header("Authorization",Credentials.basic(Data.taskAuthLogin, Data.taskAuthPass))
+                Request request = new Request.Builder().header("Authorization", Credentials.basic(Data.taskAuthLogin, Data.taskAuthPass))
                         .url(url).build();
 
                 Response response = client.newCall(request).execute();

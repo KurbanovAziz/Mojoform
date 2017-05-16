@@ -335,14 +335,15 @@ public class TasksFragment extends Fragment {
                     monthCalendar.add(Calendar.MONTH, 1);
                     dateParams += "&dueBefore=" + isoDateFormat.format(monthCalendar.getTime());
                 }
+                String sortParams = "&sort=dueDate&order=desc&size=100";
 
                 for (int i = 0; i < 2; i++) {
                     if (i == 0)
                         url = "https://activiti.dev-alex.org/activiti-rest/service//history/" +
-                                "historic-task-instances?finished=TRUE&taskAssignee=" + Data.currentUser.userName + "&includeProcessVariables=TRUE" + dateParams;
+                                "historic-task-instances?finished=TRUE&taskAssignee=" + Data.currentUser.userName + "&includeProcessVariables=TRUE" + dateParams + sortParams;
                     else
                         url = "https://activiti.dev-alex.org/activiti-rest/service/runtime/tasks?assignee="
-                                + Data.currentUser.userName + "&includeProcessVariables=TRUE" + dateParams;
+                                + Data.currentUser.userName + "&includeProcessVariables=TRUE" + dateParams + sortParams;
 
                     OkHttpClient client = new OkHttpClient();
                     Request request = new Request.Builder().header("Authorization", Credentials.basic(Data.taskAuthLogin, Data.taskAuthPass))
