@@ -7,10 +7,12 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.FileProvider;
 import android.support.v4.widget.NestedScrollView;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.GridLayoutManager;
@@ -43,16 +45,21 @@ import org.dev_alex.mojo_qa.mojo.models.FileSystemStackEntry;
 import org.dev_alex.mojo_qa.mojo.services.BitmapCacheService;
 import org.dev_alex.mojo_qa.mojo.services.BlurHelper;
 import org.dev_alex.mojo_qa.mojo.services.RequestService;
+import org.dev_alex.mojo_qa.mojo.services.Utils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Locale;
+import java.util.UUID;
 
 import okhttp3.Response;
+import okio.BufferedSink;
+import okio.Okio;
 
 public class DocumentsFragment extends Fragment {
+    private final int FILE_OPEN_REQUEST_CODE = 1;
     private final int SORT_BY_NAME = 1;
     private final int SORT_BY_CREATED_AT = 2;
     private final int SORT_BY_UPDATED_AT = 3;
@@ -77,6 +84,8 @@ public class DocumentsFragment extends Fragment {
 
     private String selectedItemId;
     private boolean selectModeEnabled = false;
+
+    private java.io.File openingFile;
 
     public static DocumentsFragment newInstance() {
         Bundle args = new Bundle();
@@ -138,6 +147,18 @@ public class DocumentsFragment extends Fragment {
         loopDialog.setIndeterminate(true);
         loopDialog.setCanceledOnTouchOutside(false);
         loopDialog.setCancelable(false);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == FILE_OPEN_REQUEST_CODE) {
+            try {
+                openingFile.delete();
+            } catch (Exception exc) {
+                exc.printStackTrace();
+            }
+        }
     }
 
     @Nullable
@@ -904,6 +925,75 @@ public class DocumentsFragment extends Fragment {
                 setAdapters(files, folders, false);
                 updateHeader();
             }
+        }
+    }
+
+    public class OpenFileTask extends AsyncTask<Void, Void, Integer> {
+        private File file;
+        private java.io.File resultFile;
+
+        public OpenFileTask(File file) {
+            this.file = file;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            loopDialog.show();
+            String resultFileName = UUID.randomUUID().toString() + "." + Utils.getFileExstation(file.name);
+            resultFile = new java.io.File(getContext().getCacheDir(), resultFileName);
+        }
+
+        @Override
+        protected Integer doInBackground(Void... params) {
+            try {
+                String url = "/api/fs/content/" + file.id;
+                Response response = RequestService.createGetRequest(url);
+
+                if (response.code() == 200) {
+                    BufferedSink sink = Okio.buffer(Okio.sink(resultFile));
+                    sink.writeAll(response.body().source());
+                    sink.close();
+                }
+                response.body().close();
+
+                return response.code();
+            } catch (Exception exc) {
+                exc.printStackTrace();
+                return null;
+            }
+        }
+
+        @Override
+        protected void onPostExecute(Integer responseCode) {
+            super.onPostExecute(responseCode);
+            if (loopDialog != null && loopDialog.isShowing())
+                loopDialog.dismiss();
+
+            if (responseCode == null)
+                Toast.makeText(getContext(), R.string.network_error, Toast.LENGTH_LONG).show();
+            else if (responseCode == 401) {
+                startActivity(new Intent(getContext(), AuthActivity.class));
+                getActivity().finish();
+            } else if (responseCode == 200) {
+                try {
+                    Intent viewIntent = new Intent(Intent.ACTION_VIEW);
+                    Uri fileUri = FileProvider.getUriForFile(getContext(), getContext().getApplicationContext().getPackageName() + ".provider", resultFile);
+                    viewIntent.setDataAndType(fileUri, Utils.getMimeType(resultFile.getAbsolutePath()));
+                    viewIntent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                    openingFile = resultFile;
+                    startActivityForResult(viewIntent, FILE_OPEN_REQUEST_CODE);
+                } catch (Exception exc) {
+                    exc.printStackTrace();
+                    Toast.makeText(getContext(), "Нет приложения, которое может открыть этот файл", Toast.LENGTH_LONG).show();
+                    try {
+                        resultFile.delete();
+                    } catch (Exception exc1) {
+                        exc1.printStackTrace();
+                    }
+                }
+            } else
+                Toast.makeText(getContext(), R.string.unknown_error, Toast.LENGTH_LONG).show();
         }
     }
 

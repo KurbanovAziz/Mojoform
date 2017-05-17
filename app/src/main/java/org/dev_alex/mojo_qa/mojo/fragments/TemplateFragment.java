@@ -142,7 +142,7 @@ public class TemplateFragment extends Fragment {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == PHOTO_REQUEST_CODE && resultCode == RESULT_OK) {
-            if (new File(cameraImagePath).exists())
+            if (data == null || new File(cameraImagePath).exists())
                 new ProcessingBitmapTask(cameraImagePath, true).execute();
             else {
                 String picturePath = Utils.getRealPathFromIntentData(getContext(), data.getData());
@@ -162,7 +162,7 @@ public class TemplateFragment extends Fragment {
         }
 
         if (requestCode == VIDEO_REQUEST_CODE && resultCode == RESULT_OK) {
-            if (new File(cameraVideoPath).exists())
+            if (new File(cameraVideoPath).exists() || data == null)
                 createVideoPreview(cameraVideoPath, true);
             else {
                 String videoPath = Utils.getRealPathFromIntentData(getContext(), data.getData());

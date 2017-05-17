@@ -57,6 +57,14 @@ public class SearchFileAdapter extends RecyclerView.Adapter<SearchFileAdapter.Fi
             viewHolder.fileIcon.setImageResource(R.drawable.file_icon);
 
         viewHolder.separator.setVisibility(i == files.size() - 1 ? View.GONE : View.VISIBLE);
+
+        if (file.nodeType.equals("cm:content"))
+            viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    parentFragment.new OpenFileTask(file).execute();
+                }
+            });
     }
 
     @Override

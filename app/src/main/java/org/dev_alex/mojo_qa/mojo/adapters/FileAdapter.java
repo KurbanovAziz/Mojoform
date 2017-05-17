@@ -152,6 +152,15 @@ public class FileAdapter extends RecyclerView.Adapter<FileAdapter.FileViewHolder
                 return true;
             }
         });
+
+
+        if (file.nodeType.equals("cm:content"))
+            viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    parentFragment.new OpenFileTask(file).execute();
+                }
+            });
     }
 
     @Override
