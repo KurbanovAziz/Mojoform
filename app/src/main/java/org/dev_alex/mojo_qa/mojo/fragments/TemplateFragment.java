@@ -85,6 +85,9 @@ import okhttp3.Response;
 import static android.app.Activity.RESULT_OK;
 
 public class TemplateFragment extends Fragment {
+    private final String NODE_FOR_TASKS = "229ed0ec-3592-4788-87f0-6b0616599166";
+    private final String NODE_FOR_FILES = "4899bb8e-0b0b-4889-82d6-eb16fcd6b90f";
+
     private final String MEDIA_PATH_JSON_ARRAY = "media_paths";
     private final String SIGNATURE_PREVIEW_JSON_ARRAY = "sign_state";
     private SimpleDateFormat isoDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ", Locale.getDefault());
@@ -1659,7 +1662,6 @@ public class TemplateFragment extends Fragment {
         protected Integer doInBackground(Void... params) {
             try {
                 int sentCt = 0;
-                String nodeId = "28e95811-cabb-49b2-b927-8d321327267c";
 
                 successfullySentMediaCt = 0;
                 for (JSONObject jsonObject : mediaObjects)
@@ -1670,7 +1672,7 @@ public class TemplateFragment extends Fragment {
                                 String mediaPath = jsonObject.getJSONArray(MEDIA_PATH_JSON_ARRAY).getString(i);
                                 try {
                                     File mediaFile = new File(mediaPath);
-                                    Response response = RequestService.createSendFileRequest("/api/fs/upload/binary/" + nodeId, mediaFile);
+                                    Response response = RequestService.createSendFileRequest("/api/fs/upload/binary/" + NODE_FOR_FILES, mediaFile);
 
                                     if (response.code() == 200) {
                                         String mediaId = new JSONObject(response.body().string()).getJSONObject("entry").getString("id");
@@ -1706,7 +1708,7 @@ public class TemplateFragment extends Fragment {
                         Bitmap bitmap = BitmapFactory.decodeByteArray(decodedByte, 0, decodedByte.length);
                         if (bitmap != null) {
                             File mediaFile = BitmapService.saveBitmapToFile(getContext(), bitmap);
-                            Response response = RequestService.createSendFileRequest("/api/fs/upload/binary/" + nodeId, mediaFile);
+                            Response response = RequestService.createSendFileRequest("/api/fs/upload/binary/" + NODE_FOR_FILES, mediaFile);
                             if (response.code() == 200) {
                                 mediaFile.delete();
                                 String mediaId = new JSONObject(response.body().string()).getJSONObject("entry").getString("id");
@@ -1784,8 +1786,8 @@ public class TemplateFragment extends Fragment {
         @Override
         protected Integer doInBackground(Void... params) {
             try {
-                String nodeId = "28e95811-cabb-49b2-b927-8d321327267c";
-                Response response = RequestService.createPostRequest("/api/fs-mojo/create/" + nodeId + "/document", resultJson.toString());
+
+                Response response = RequestService.createPostRequest("/api/fs-mojo/create/" + NODE_FOR_TASKS + "/document", resultJson.toString());
                 String responseBody = response.body().string();
                 if (response.code() == 201 || response.code() == 200 || response.code() == 409) {
                     JSONObject jsonObject = new JSONObject();
@@ -1983,11 +1985,12 @@ public class TemplateFragment extends Fragment {
                     break;
 
                 case "photo":
-                    if ((!value.has("values") || value.has("values") && value.getJSONArray("values").length() == 0)
+                    if ((!value.has(MEDIA_PATH_JSON_ARRAY) || value.has(MEDIA_PATH_JSON_ARRAY) && value.getJSONArray(MEDIA_PATH_JSON_ARRAY).length() == 0)
                             && !(value.has("is_required") && !value.getBoolean("is_required"))) {
                         totalResult = false;
                         setBlockMarkedAsRequired(value.getString("id"));
-                    }
+                    } else
+                        photoObjects.add(value);
                     break;
 
                 case "text":
