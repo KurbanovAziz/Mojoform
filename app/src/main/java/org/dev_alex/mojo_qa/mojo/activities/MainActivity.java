@@ -1,11 +1,15 @@
 package org.dev_alex.mojo_qa.mojo.activities;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.mikepenz.materialdrawer.Drawer;
@@ -18,8 +22,14 @@ import org.dev_alex.mojo_qa.mojo.custom_views.CustomDrawerItem;
 import org.dev_alex.mojo_qa.mojo.fragments.DocumentsFragment;
 import org.dev_alex.mojo_qa.mojo.fragments.TasksFragment;
 import org.dev_alex.mojo_qa.mojo.fragments.TemplateFragment;
+import org.dev_alex.mojo_qa.mojo.models.User;
 import org.dev_alex.mojo_qa.mojo.services.AlarmService;
+import org.dev_alex.mojo_qa.mojo.services.RequestService;
 import org.dev_alex.mojo_qa.mojo.services.TokenService;
+
+import java.util.Locale;
+
+import okhttp3.Response;
 
 public class MainActivity extends AppCompatActivity {
     public Drawer drawer;
@@ -91,5 +101,47 @@ public class MainActivity extends AppCompatActivity {
                     drawer.openDrawer();
             }
         });
+
+        if (Data.currentUser.has_avatar)
+            new DownloadUserAvatar((ImageView) headerView.findViewById(R.id.profile_image)).execute();
+        else {
+            headerView.findViewById(R.id.profile_image).setVisibility(View.GONE);
+
+            User user = Data.currentUser;
+            String userInitials = String.format(Locale.getDefault(), "%s%s", user.firstName.isEmpty() ? "" : user.firstName.charAt(0), user.lastName.isEmpty() ? "" : user.lastName.charAt(0));
+            ((TextView) headerView.findViewById(R.id.user_initials)).setText(userInitials);
+        }
+    }
+
+    private class DownloadUserAvatar extends AsyncTask<Void, Void, Void> {
+        private ImageView avatarImageView;
+        private Bitmap avatar;
+
+        DownloadUserAvatar(ImageView avatarImageView) {
+            this.avatarImageView = avatarImageView;
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            try {
+                Response thumbResponse = RequestService.createGetRequest("/api/user/avatar.png");
+                byte[] imageBytes = thumbResponse.body().bytes();
+                avatar = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length);
+            } catch (Exception exc) {
+                exc.printStackTrace();
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            try {
+                if (avatar != null)
+                    avatarImageView.setImageBitmap(avatar);
+            } catch (Exception exc) {
+                exc.printStackTrace();
+            }
+        }
     }
 }

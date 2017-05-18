@@ -16,6 +16,15 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
+        debug {
+            applicationVariants.all { variant ->
+                variant.outputs.each { output ->
+                    project.ext { appName = 'Mojo.apk' }
+                    def newName = project.ext.appName;
+                    output.outputFile = new File(output.outputFile.parent, newName)
+                }
+            }
+        }
     }
     dexOptions {
         javaMaxHeapSize "4G"

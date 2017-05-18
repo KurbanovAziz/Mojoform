@@ -64,9 +64,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.93"
-        tools:layout_editor_absoluteX="0dp"
-        tools:layout_editor_absoluteY="551dp" />
+        app:layout_constraintGuide_percent="0.9" />
 
 
     <View
@@ -98,10 +96,10 @@
     <Button
         android:id="@+id/new_user_btn"
         android:layout_width="0dp"
-        android:layout_height="65dp"
-        android:background="@drawable/new_user_btn"
-        android:gravity="top|center_horizontal"
-        android:paddingTop="17dp"
+        android:layout_height="45dp"
+        android:background="@drawable/green_button"
+        android:gravity="center"
+        android:paddingTop="1.5dp"
         android:text="@string/new_user"
         android:textColor="@android:color/white"
         app:layout_constraintBottom_toTopOf="@+id/bottom_guideline"

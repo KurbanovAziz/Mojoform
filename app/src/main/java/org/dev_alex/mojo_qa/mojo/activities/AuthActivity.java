@@ -103,8 +103,10 @@ public class AuthActivity extends AppCompatActivity {
                 else
                     response = RequestService.createPostRequest("/api/user/login", requestJson.toString());
 
-                if (response.code() == 202)
-                    user = new ObjectMapper().readValue(response.body().string(), User.class);
+                if (response.code() == 202) {
+                    String userJson = response.body().string();
+                    user = new ObjectMapper().readValue(userJson, User.class);
+                }
 
                 return response.code();
             } catch (Exception exc) {
