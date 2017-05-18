@@ -61,6 +61,12 @@ public class Utils {
         }
     }
 
+    public static String getFileExstation(String fileName) {
+        if (fileName.lastIndexOf(".") != -1)
+            return fileName.substring(fileName.lastIndexOf("."));
+        return "";
+    }
+
     public static JSONArray addAllItemsToJson(JSONArray toJsonArray, JSONArray fromJsonArray) {
         try {
             for (int j = 0; j < fromJsonArray.length(); j++)

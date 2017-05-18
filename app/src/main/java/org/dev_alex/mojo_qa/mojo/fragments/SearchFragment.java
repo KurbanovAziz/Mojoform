@@ -1,14 +1,17 @@
 package org.dev_alex.mojo_qa.mojo.fragments;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.FileProvider;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
@@ -36,18 +39,25 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.UUID;
 
 import okhttp3.Response;
+import okio.BufferedSink;
+import okio.Okio;
 
 public class SearchFragment extends Fragment {
+    private final int FILE_OPEN_REQUEST_CODE = 1;
+
     private View rootView;
     private RecyclerView recyclerView;
     private RelativeLayout recyclerViewBlock;
     private DownloadImagesTask downloadTask;
     private ProgressBar progressBar;
+    private ProgressDialog loopDialog;
     private SearchFilesTask searchTask = null;
 
     public BitmapCacheService bitmapCacheService;
+    private java.io.File openingFile;
 
 
     public static SearchFragment newInstance() {
@@ -71,8 +81,18 @@ public class SearchFragment extends Fragment {
         recyclerViewBlock = (RelativeLayout) rootView.findViewById(R.id.recycler_view_block);
 
         Utils.setupCloseKeyboardUI(getActivity(), rootView);
+        initDialog();
         setListeners();
         return rootView;
+    }
+
+    private void initDialog() {
+        loopDialog = new ProgressDialog(getContext(), R.style.ProgressDialogStyle);
+        loopDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        loopDialog.setMessage(getString(R.string.loading_please_wait));
+        loopDialog.setIndeterminate(true);
+        loopDialog.setCanceledOnTouchOutside(false);
+        loopDialog.setCancelable(false);
     }
 
     @Override
@@ -183,25 +203,29 @@ public class SearchFragment extends Fragment {
         @Override
         protected void onPostExecute(Integer responseCode) {
             super.onPostExecute(responseCode);
-            progressBar.setVisibility(View.GONE);
+            try {
+                progressBar.setVisibility(View.GONE);
 
-            if (responseCode == null)
-                Toast.makeText(getContext(), R.string.network_error, Toast.LENGTH_LONG).show();
-            else if (responseCode == 401) {
-                startActivity(new Intent(getContext(), AuthActivity.class));
-                getActivity().finish();
-            } else {
-                downloadTask = new DownloadImagesTask(fileIdsWithPreviews);
-                downloadTask.execute();
+                if (responseCode == null)
+                    Toast.makeText(getContext(), R.string.network_error, Toast.LENGTH_LONG).show();
+                else if (responseCode == 401) {
+                    startActivity(new Intent(getContext(), AuthActivity.class));
+                    getActivity().finish();
+                } else {
+                    downloadTask = new DownloadImagesTask(fileIdsWithPreviews);
+                    downloadTask.execute();
 
-                if (files.isEmpty()) {
-                    rootView.findViewById(R.id.empty_block).setVisibility(View.VISIBLE);
-                    recyclerViewBlock.setVisibility(View.GONE);
-                } else
-                    recyclerViewBlock.setVisibility(View.VISIBLE);
+                    if (files.isEmpty()) {
+                        rootView.findViewById(R.id.empty_block).setVisibility(View.VISIBLE);
+                        recyclerViewBlock.setVisibility(View.GONE);
+                    } else
+                        recyclerViewBlock.setVisibility(View.VISIBLE);
 
 
-                recyclerView.setAdapter(new SearchFileAdapter(SearchFragment.this, files));
+                    recyclerView.setAdapter(new SearchFileAdapter(SearchFragment.this, files));
+                }
+            } catch (Exception exc) {
+                exc.printStackTrace();
             }
         }
     }
@@ -248,5 +272,78 @@ public class SearchFragment extends Fragment {
                 recyclerView.getAdapter().notifyDataSetChanged();
         }
 
+    }
+
+    public class OpenFileTask extends AsyncTask<Void, Void, Integer> {
+        private File file;
+        private java.io.File resultFile;
+
+        public OpenFileTask(File file) {
+            this.file = file;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            loopDialog.show();
+            String resultFileName = UUID.randomUUID().toString() + "." + Utils.getFileExstation(file.name);
+            resultFile = new java.io.File(getContext().getCacheDir(), resultFileName);
+        }
+
+        @Override
+        protected Integer doInBackground(Void... params) {
+            try {
+                String url = "/api/fs/content/" + file.id;
+                Response response = RequestService.createGetRequest(url);
+
+                if (response.code() == 200) {
+                    BufferedSink sink = Okio.buffer(Okio.sink(resultFile));
+                    sink.writeAll(response.body().source());
+                    sink.close();
+                }
+                response.body().close();
+
+                return response.code();
+            } catch (Exception exc) {
+                exc.printStackTrace();
+                return null;
+            }
+        }
+
+        @Override
+        protected void onPostExecute(Integer responseCode) {
+            super.onPostExecute(responseCode);
+            try {
+                if (loopDialog != null && loopDialog.isShowing())
+                    loopDialog.dismiss();
+
+                if (responseCode == null)
+                    Toast.makeText(getContext(), R.string.network_error, Toast.LENGTH_LONG).show();
+                else if (responseCode == 401) {
+                    startActivity(new Intent(getContext(), AuthActivity.class));
+                    getActivity().finish();
+                } else if (responseCode == 200) {
+                    try {
+                        Intent viewIntent = new Intent(Intent.ACTION_VIEW);
+                        Uri fileUri = FileProvider.getUriForFile(getContext(), getContext().getApplicationContext().getPackageName() + ".provider", resultFile);
+                        viewIntent.setDataAndType(fileUri, Utils.getMimeType(resultFile.getAbsolutePath()));
+                        viewIntent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                        openingFile = resultFile;
+                        startActivityForResult(viewIntent, FILE_OPEN_REQUEST_CODE);
+                    } catch (Exception exc) {
+                        exc.printStackTrace();
+                        Toast.makeText(getContext(), "Нет приложения, которое может открыть этот файл", Toast.LENGTH_LONG).show();
+                        try {
+                            resultFile.delete();
+                        } catch (Exception exc1) {
+                            exc1.printStackTrace();
+                        }
+                    }
+                } else
+                    Toast.makeText(getContext(), R.string.unknown_error, Toast.LENGTH_LONG).show();
+            } catch (Exception exc) {
+                exc.printStackTrace();
+            }
+        }
     }
 }
