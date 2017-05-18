@@ -203,25 +203,29 @@ public class SearchFragment extends Fragment {
         @Override
         protected void onPostExecute(Integer responseCode) {
             super.onPostExecute(responseCode);
-            progressBar.setVisibility(View.GONE);
+            try {
+                progressBar.setVisibility(View.GONE);
 
-            if (responseCode == null)
-                Toast.makeText(getContext(), R.string.network_error, Toast.LENGTH_LONG).show();
-            else if (responseCode == 401) {
-                startActivity(new Intent(getContext(), AuthActivity.class));
-                getActivity().finish();
-            } else {
-                downloadTask = new DownloadImagesTask(fileIdsWithPreviews);
-                downloadTask.execute();
+                if (responseCode == null)
+                    Toast.makeText(getContext(), R.string.network_error, Toast.LENGTH_LONG).show();
+                else if (responseCode == 401) {
+                    startActivity(new Intent(getContext(), AuthActivity.class));
+                    getActivity().finish();
+                } else {
+                    downloadTask = new DownloadImagesTask(fileIdsWithPreviews);
+                    downloadTask.execute();
 
-                if (files.isEmpty()) {
-                    rootView.findViewById(R.id.empty_block).setVisibility(View.VISIBLE);
-                    recyclerViewBlock.setVisibility(View.GONE);
-                } else
-                    recyclerViewBlock.setVisibility(View.VISIBLE);
+                    if (files.isEmpty()) {
+                        rootView.findViewById(R.id.empty_block).setVisibility(View.VISIBLE);
+                        recyclerViewBlock.setVisibility(View.GONE);
+                    } else
+                        recyclerViewBlock.setVisibility(View.VISIBLE);
 
 
-                recyclerView.setAdapter(new SearchFileAdapter(SearchFragment.this, files));
+                    recyclerView.setAdapter(new SearchFileAdapter(SearchFragment.this, files));
+                }
+            } catch (Exception exc) {
+                exc.printStackTrace();
             }
         }
     }
@@ -309,33 +313,37 @@ public class SearchFragment extends Fragment {
         @Override
         protected void onPostExecute(Integer responseCode) {
             super.onPostExecute(responseCode);
-            if (loopDialog != null && loopDialog.isShowing())
-                loopDialog.dismiss();
+            try {
+                if (loopDialog != null && loopDialog.isShowing())
+                    loopDialog.dismiss();
 
-            if (responseCode == null)
-                Toast.makeText(getContext(), R.string.network_error, Toast.LENGTH_LONG).show();
-            else if (responseCode == 401) {
-                startActivity(new Intent(getContext(), AuthActivity.class));
-                getActivity().finish();
-            } else if (responseCode == 200) {
-                try {
-                    Intent viewIntent = new Intent(Intent.ACTION_VIEW);
-                    Uri fileUri = FileProvider.getUriForFile(getContext(), getContext().getApplicationContext().getPackageName() + ".provider", resultFile);
-                    viewIntent.setDataAndType(fileUri, Utils.getMimeType(resultFile.getAbsolutePath()));
-                    viewIntent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                    openingFile = resultFile;
-                    startActivityForResult(viewIntent, FILE_OPEN_REQUEST_CODE);
-                } catch (Exception exc) {
-                    exc.printStackTrace();
-                    Toast.makeText(getContext(), "Нет приложения, которое может открыть этот файл", Toast.LENGTH_LONG).show();
+                if (responseCode == null)
+                    Toast.makeText(getContext(), R.string.network_error, Toast.LENGTH_LONG).show();
+                else if (responseCode == 401) {
+                    startActivity(new Intent(getContext(), AuthActivity.class));
+                    getActivity().finish();
+                } else if (responseCode == 200) {
                     try {
-                        resultFile.delete();
-                    } catch (Exception exc1) {
-                        exc1.printStackTrace();
+                        Intent viewIntent = new Intent(Intent.ACTION_VIEW);
+                        Uri fileUri = FileProvider.getUriForFile(getContext(), getContext().getApplicationContext().getPackageName() + ".provider", resultFile);
+                        viewIntent.setDataAndType(fileUri, Utils.getMimeType(resultFile.getAbsolutePath()));
+                        viewIntent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                        openingFile = resultFile;
+                        startActivityForResult(viewIntent, FILE_OPEN_REQUEST_CODE);
+                    } catch (Exception exc) {
+                        exc.printStackTrace();
+                        Toast.makeText(getContext(), "Нет приложения, которое может открыть этот файл", Toast.LENGTH_LONG).show();
+                        try {
+                            resultFile.delete();
+                        } catch (Exception exc1) {
+                            exc1.printStackTrace();
+                        }
                     }
-                }
-            } else
-                Toast.makeText(getContext(), R.string.unknown_error, Toast.LENGTH_LONG).show();
+                } else
+                    Toast.makeText(getContext(), R.string.unknown_error, Toast.LENGTH_LONG).show();
+            } catch (Exception exc) {
+                exc.printStackTrace();
+            }
         }
     }
 }

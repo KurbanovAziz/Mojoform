@@ -245,24 +245,28 @@ public class MoveFileFragment extends Fragment {
         @Override
         protected void onPostExecute(Integer responseCode) {
             super.onPostExecute(responseCode);
-            if (loopDialog != null && loopDialog.isShowing())
-                loopDialog.dismiss();
+            try {
+                if (loopDialog != null && loopDialog.isShowing())
+                    loopDialog.dismiss();
 
-            if (responseCode == null) {
-                Toast.makeText(getContext(), R.string.network_error, Toast.LENGTH_LONG).show();
-            } else if (responseCode == 401) {
-                startActivity(new Intent(getContext(), AuthActivity.class));
-                getActivity().finish();
-            } else {
-                if (folderId == null && !folders.isEmpty())
-                    selectedFolderId = folders.get(folders.size() - 1).id;
+                if (responseCode == null) {
+                    Toast.makeText(getContext(), R.string.network_error, Toast.LENGTH_LONG).show();
+                } else if (responseCode == 401) {
+                    startActivity(new Intent(getContext(), AuthActivity.class));
+                    getActivity().finish();
+                } else {
+                    if (folderId == null && !folders.isEmpty())
+                        selectedFolderId = folders.get(folders.size() - 1).id;
 
-                if (folderId != null) {
-                    setFolderStateDownloaded(folderId, true);
-                    setFolderStateExpanded(folderId, true);
+                    if (folderId != null) {
+                        setFolderStateDownloaded(folderId, true);
+                        setFolderStateExpanded(folderId, true);
+                    }
+
+                    drawFolders();
                 }
-
-                drawFolders();
+            } catch (Exception exc) {
+                exc.printStackTrace();
             }
         }
     }
@@ -302,27 +306,31 @@ public class MoveFileFragment extends Fragment {
         @Override
         protected void onPostExecute(Integer responseCode) {
             super.onPostExecute(responseCode);
-            if (loopDialog != null && loopDialog.isShowing())
-                loopDialog.dismiss();
+            try {
+                if (loopDialog != null && loopDialog.isShowing())
+                    loopDialog.dismiss();
 
-            if (responseCode == null)
-                Toast.makeText(getContext(), R.string.network_error, Toast.LENGTH_LONG).show();
-            else if (responseCode == 401) {
-                startActivity(new Intent(getContext(), AuthActivity.class));
-                getActivity().finish();
-            } else if (responseCode == 409)
-                Toast.makeText(getContext(), R.string.file_or_folder_already_exists, Toast.LENGTH_SHORT).show();
-            else if (responseCode == NO_ERRORS_CODE) {
-                if (movedFilesCt == 0)
-                    Toast.makeText(getContext(), R.string.move_error, Toast.LENGTH_SHORT).show();
-                else if (movedFilesCt == fileList.size())
-                    Toast.makeText(getContext(), R.string.moved_successfully, Toast.LENGTH_SHORT).show();
-                else
-                    Toast.makeText(getContext(), R.string.not_all_files_or_folders_were_moved_due_to_conflicts, Toast.LENGTH_SHORT).show();
+                if (responseCode == null)
+                    Toast.makeText(getContext(), R.string.network_error, Toast.LENGTH_LONG).show();
+                else if (responseCode == 401) {
+                    startActivity(new Intent(getContext(), AuthActivity.class));
+                    getActivity().finish();
+                } else if (responseCode == 409)
+                    Toast.makeText(getContext(), R.string.file_or_folder_already_exists, Toast.LENGTH_SHORT).show();
+                else if (responseCode == NO_ERRORS_CODE) {
+                    if (movedFilesCt == 0)
+                        Toast.makeText(getContext(), R.string.move_error, Toast.LENGTH_SHORT).show();
+                    else if (movedFilesCt == fileList.size())
+                        Toast.makeText(getContext(), R.string.moved_successfully, Toast.LENGTH_SHORT).show();
+                    else
+                        Toast.makeText(getContext(), R.string.not_all_files_or_folders_were_moved_due_to_conflicts, Toast.LENGTH_SHORT).show();
 
-                close();
-            } else
-                Toast.makeText(getContext(), R.string.unknown_error, Toast.LENGTH_SHORT).show();
+                    close();
+                } else
+                    Toast.makeText(getContext(), R.string.unknown_error, Toast.LENGTH_SHORT).show();
+            } catch (Exception exc) {
+                exc.printStackTrace();
+            }
         }
     }
 

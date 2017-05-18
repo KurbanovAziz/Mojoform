@@ -667,21 +667,25 @@ public class DocumentsFragment extends Fragment {
         @Override
         protected void onPostExecute(Integer responseCode) {
             super.onPostExecute(responseCode);
-            if (loopDialog != null && loopDialog.isShowing())
-                loopDialog.dismiss();
+            try {
+                if (loopDialog != null && loopDialog.isShowing())
+                    loopDialog.dismiss();
 
-            if (responseCode == null)
-                Toast.makeText(getContext(), R.string.network_error, Toast.LENGTH_LONG).show();
-            else if (responseCode == 401) {
-                startActivity(new Intent(getContext(), AuthActivity.class));
-                getActivity().finish();
-            } else if (responseCode == 409)
-                Toast.makeText(getContext(), R.string.file_or_folder_already_exists, Toast.LENGTH_SHORT).show();
-            else {
-                foldersStack.get(foldersStack.size() - 1).folders.add(folder);
-                setAdapters(foldersStack.get(foldersStack.size() - 1).files, foldersStack.get(foldersStack.size() - 1).folders, false);
-                dialog.dismiss();
-                Toast.makeText(getContext(), R.string.folder_successfully_created, Toast.LENGTH_SHORT).show();
+                if (responseCode == null)
+                    Toast.makeText(getContext(), R.string.network_error, Toast.LENGTH_LONG).show();
+                else if (responseCode == 401) {
+                    startActivity(new Intent(getContext(), AuthActivity.class));
+                    getActivity().finish();
+                } else if (responseCode == 409)
+                    Toast.makeText(getContext(), R.string.file_or_folder_already_exists, Toast.LENGTH_SHORT).show();
+                else {
+                    foldersStack.get(foldersStack.size() - 1).folders.add(folder);
+                    setAdapters(foldersStack.get(foldersStack.size() - 1).files, foldersStack.get(foldersStack.size() - 1).folders, false);
+                    dialog.dismiss();
+                    Toast.makeText(getContext(), R.string.folder_successfully_created, Toast.LENGTH_SHORT).show();
+                }
+            } catch (Exception exc) {
+                exc.printStackTrace();
             }
         }
     }
@@ -722,32 +726,36 @@ public class DocumentsFragment extends Fragment {
         @Override
         protected void onPostExecute(Integer responseCode) {
             super.onPostExecute(responseCode);
-            if (loopDialog != null && loopDialog.isShowing())
-                loopDialog.dismiss();
+            try {
+                if (loopDialog != null && loopDialog.isShowing())
+                    loopDialog.dismiss();
 
-            if (responseCode == null)
-                Toast.makeText(getContext(), R.string.network_error, Toast.LENGTH_LONG).show();
-            else if (responseCode == 401) {
-                startActivity(new Intent(getContext(), AuthActivity.class));
-                getActivity().finish();
-            } else if (responseCode == 409)
-                Toast.makeText(getContext(), R.string.file_or_folder_already_exists, Toast.LENGTH_SHORT).show();
-            else {
-                if (file.isFolder) {
-                    for (File folder : foldersStack.get(foldersStack.size() - 1).folders)
-                        if (folder.id.equals(file.id))
-                            folder.name = newName;
-                    folderAdapter.notifyDataSetChanged();
-                } else {
-                    for (File searchFile : foldersStack.get(foldersStack.size() - 1).files)
-                        if (searchFile.id.equals(file.id))
-                            searchFile.name = newName;
-                    fileAdapter.notifyDataSetChanged();
+                if (responseCode == null)
+                    Toast.makeText(getContext(), R.string.network_error, Toast.LENGTH_LONG).show();
+                else if (responseCode == 401) {
+                    startActivity(new Intent(getContext(), AuthActivity.class));
+                    getActivity().finish();
+                } else if (responseCode == 409)
+                    Toast.makeText(getContext(), R.string.file_or_folder_already_exists, Toast.LENGTH_SHORT).show();
+                else {
+                    if (file.isFolder) {
+                        for (File folder : foldersStack.get(foldersStack.size() - 1).folders)
+                            if (folder.id.equals(file.id))
+                                folder.name = newName;
+                        folderAdapter.notifyDataSetChanged();
+                    } else {
+                        for (File searchFile : foldersStack.get(foldersStack.size() - 1).files)
+                            if (searchFile.id.equals(file.id))
+                                searchFile.name = newName;
+                        fileAdapter.notifyDataSetChanged();
+                    }
+
+                    dialog.dismiss();
+                    Toast.makeText(getContext(), file.isFolder ? getString(R.string.folder_successfully_renamed)
+                            : getString(R.string.file_successfully_renamed), Toast.LENGTH_SHORT).show();
                 }
-
-                dialog.dismiss();
-                Toast.makeText(getContext(), file.isFolder ? getString(R.string.folder_successfully_renamed)
-                        : getString(R.string.file_successfully_renamed), Toast.LENGTH_SHORT).show();
+            } catch (Exception exc) {
+                exc.printStackTrace();
             }
         }
     }
@@ -791,42 +799,45 @@ public class DocumentsFragment extends Fragment {
         @Override
         protected void onPostExecute(Integer responseCode) {
             super.onPostExecute(responseCode);
-            if (loopDialog != null && loopDialog.isShowing())
-                loopDialog.dismiss();
+            try {
+                if (loopDialog != null && loopDialog.isShowing())
+                    loopDialog.dismiss();
 
-            if (responseCode == null)
-                Toast.makeText(getContext(), R.string.network_error, Toast.LENGTH_LONG).show();
-            else if (responseCode == 401) {
-                startActivity(new Intent(getContext(), AuthActivity.class));
-                getActivity().finish();
-            } else if (responseCode == NO_ERRORS_CODE) {
-                if (deletedFiles.isEmpty())
-                    Toast.makeText(getContext(), R.string.not_deleted, Toast.LENGTH_SHORT).show();
-                else if (deletedFiles.size() == files.size())
-                    Toast.makeText(getContext(), R.string.removed_successfully, Toast.LENGTH_SHORT).show();
-                else
-                    Toast.makeText(getContext(), R.string.not_all_files_or_folders_were_deleted, Toast.LENGTH_SHORT).show();
+                if (responseCode == null)
+                    Toast.makeText(getContext(), R.string.network_error, Toast.LENGTH_LONG).show();
+                else if (responseCode == 401) {
+                    startActivity(new Intent(getContext(), AuthActivity.class));
+                    getActivity().finish();
+                } else if (responseCode == NO_ERRORS_CODE) {
+                    if (deletedFiles.isEmpty())
+                        Toast.makeText(getContext(), R.string.not_deleted, Toast.LENGTH_SHORT).show();
+                    else if (deletedFiles.size() == files.size())
+                        Toast.makeText(getContext(), R.string.removed_successfully, Toast.LENGTH_SHORT).show();
+                    else
+                        Toast.makeText(getContext(), R.string.not_all_files_or_folders_were_deleted, Toast.LENGTH_SHORT).show();
 
-                for (File file : deletedFiles)
-                    if (file.isFolder) {
-                        for (int i = 0; i < foldersStack.get(foldersStack.size() - 1).folders.size(); i++)
-                            if (foldersStack.get(foldersStack.size() - 1).folders.get(i).id.equals(file.id)) {
-                                foldersStack.get(foldersStack.size() - 1).folders.remove(i);
-                                break;
-                            }
-                    } else {
-                        for (int i = 0; i < foldersStack.get(foldersStack.size() - 1).files.size(); i++)
-                            if (foldersStack.get(foldersStack.size() - 1).files.get(i).id.equals(file.id)) {
-                                foldersStack.get(foldersStack.size() - 1).files.remove(i);
-                                break;
-                            }
-                    }
+                    for (File file : deletedFiles)
+                        if (file.isFolder) {
+                            for (int i = 0; i < foldersStack.get(foldersStack.size() - 1).folders.size(); i++)
+                                if (foldersStack.get(foldersStack.size() - 1).folders.get(i).id.equals(file.id)) {
+                                    foldersStack.get(foldersStack.size() - 1).folders.remove(i);
+                                    break;
+                                }
+                        } else {
+                            for (int i = 0; i < foldersStack.get(foldersStack.size() - 1).files.size(); i++)
+                                if (foldersStack.get(foldersStack.size() - 1).files.get(i).id.equals(file.id)) {
+                                    foldersStack.get(foldersStack.size() - 1).files.remove(i);
+                                    break;
+                                }
+                        }
 
-                setAdapters(foldersStack.get(foldersStack.size() - 1).files, foldersStack.get(foldersStack.size() - 1).folders, false);
+                    setAdapters(foldersStack.get(foldersStack.size() - 1).files, foldersStack.get(foldersStack.size() - 1).folders, false);
 
-            } else
-                Toast.makeText(getContext(), R.string.unknown_error, Toast.LENGTH_SHORT).show();
-
+                } else
+                    Toast.makeText(getContext(), R.string.unknown_error, Toast.LENGTH_SHORT).show();
+            } catch (Exception exc) {
+                exc.printStackTrace();
+            }
         }
     }
 
@@ -908,22 +919,26 @@ public class DocumentsFragment extends Fragment {
         @Override
         protected void onPostExecute(Integer responseCode) {
             super.onPostExecute(responseCode);
-            if (loopDialog != null && loopDialog.isShowing())
-                loopDialog.dismiss();
+            try {
+                if (loopDialog != null && loopDialog.isShowing())
+                    loopDialog.dismiss();
 
-            if (responseCode == null)
-                Toast.makeText(getContext(), R.string.network_error, Toast.LENGTH_LONG).show();
-            else if (responseCode == 401) {
-                startActivity(new Intent(getContext(), AuthActivity.class));
-                getActivity().finish();
-            } else {
-                downloadTask = new DownloadImagesTask(fileIdsWithPreviews);
-                downloadTask.execute();
+                if (responseCode == null)
+                    Toast.makeText(getContext(), R.string.network_error, Toast.LENGTH_LONG).show();
+                else if (responseCode == 401) {
+                    startActivity(new Intent(getContext(), AuthActivity.class));
+                    getActivity().finish();
+                } else {
+                    downloadTask = new DownloadImagesTask(fileIdsWithPreviews);
+                    downloadTask.execute();
 
-                foldersStack.add(new FileSystemStackEntry(folders, files, fileName == null ? "" : fileName, fileId));
+                    foldersStack.add(new FileSystemStackEntry(folders, files, fileName == null ? "" : fileName, fileId));
 
-                setAdapters(files, folders, false);
-                updateHeader();
+                    setAdapters(files, folders, false);
+                    updateHeader();
+                }
+            } catch (Exception exc) {
+                exc.printStackTrace();
             }
         }
     }
@@ -967,34 +982,39 @@ public class DocumentsFragment extends Fragment {
         @Override
         protected void onPostExecute(Integer responseCode) {
             super.onPostExecute(responseCode);
-            if (loopDialog != null && loopDialog.isShowing())
-                loopDialog.dismiss();
+            try {
+                if (loopDialog != null && loopDialog.isShowing())
+                    loopDialog.dismiss();
 
-            if (responseCode == null)
-                Toast.makeText(getContext(), R.string.network_error, Toast.LENGTH_LONG).show();
-            else if (responseCode == 401) {
-                startActivity(new Intent(getContext(), AuthActivity.class));
-                getActivity().finish();
-            } else if (responseCode == 200) {
-                try {
-                    Intent viewIntent = new Intent(Intent.ACTION_VIEW);
-                    Uri fileUri = FileProvider.getUriForFile(getContext(), getContext().getApplicationContext().getPackageName() + ".provider", resultFile);
-                    viewIntent.setDataAndType(fileUri, Utils.getMimeType(resultFile.getAbsolutePath()));
-                    viewIntent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                    openingFile = resultFile;
-                    startActivityForResult(viewIntent, FILE_OPEN_REQUEST_CODE);
-                } catch (Exception exc) {
-                    exc.printStackTrace();
-                    Toast.makeText(getContext(), "Нет приложения, которое может открыть этот файл", Toast.LENGTH_LONG).show();
+                if (responseCode == null)
+                    Toast.makeText(getContext(), R.string.network_error, Toast.LENGTH_LONG).show();
+                else if (responseCode == 401) {
+                    startActivity(new Intent(getContext(), AuthActivity.class));
+                    getActivity().finish();
+                } else if (responseCode == 200) {
                     try {
-                        resultFile.delete();
-                    } catch (Exception exc1) {
-                        exc1.printStackTrace();
+                        Intent viewIntent = new Intent(Intent.ACTION_VIEW);
+                        Uri fileUri = FileProvider.getUriForFile(getContext(), getContext().getApplicationContext().getPackageName() + ".provider", resultFile);
+                        viewIntent.setDataAndType(fileUri, Utils.getMimeType(resultFile.getAbsolutePath()));
+                        viewIntent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                        openingFile = resultFile;
+                        startActivityForResult(viewIntent, FILE_OPEN_REQUEST_CODE);
+                    } catch (Exception exc) {
+                        exc.printStackTrace();
+                        Toast.makeText(getContext(), "Нет приложения, которое может открыть этот файл", Toast.LENGTH_LONG).show();
+                        try {
+                            resultFile.delete();
+                        } catch (Exception exc1) {
+                            exc1.printStackTrace();
+                        }
                     }
-                }
-            } else
-                Toast.makeText(getContext(), R.string.unknown_error, Toast.LENGTH_LONG).show();
+                } else
+                    Toast.makeText(getContext(), R.string.unknown_error, Toast.LENGTH_LONG).show();
+            } catch (Exception exc) {
+                exc.printStackTrace();
+            }
         }
+
     }
 
     private class DownloadImagesTask extends AsyncTask<Void, Void, Void> {

@@ -321,16 +321,20 @@ public class AlarmService extends Service {
         @Override
         protected void onPostExecute(Boolean result) {
             super.onPostExecute(result);
-            int notificationsCt = 0;
-            if (result) {
-                for (Task task : tasks) {
-                    if (!checkIfTaskScheduled(task.id))
-                        scheduleTask(task);
-                    if (task.dueDate.getTime() - new Date().getTime() < 60 * 60 * 1000)
-                        if (task.assignee.toLowerCase().equals(TokenService.getUsername().toLowerCase()))
-                            notificationsCt++;
+            try {
+                int notificationsCt = 0;
+                if (result) {
+                    for (Task task : tasks) {
+                        if (!checkIfTaskScheduled(task.id))
+                            scheduleTask(task);
+                        if (task.dueDate.getTime() - new Date().getTime() < 60 * 60 * 1000)
+                            if (task.assignee.toLowerCase().equals(TokenService.getUsername().toLowerCase()))
+                                notificationsCt++;
+                    }
+                    setNotificationsCt(notificationsCt);
                 }
-                setNotificationsCt(notificationsCt);
+            } catch (Exception exc) {
+                exc.printStackTrace();
             }
         }
     }
@@ -375,17 +379,21 @@ public class AlarmService extends Service {
         @Override
         protected void onPostExecute(Boolean result) {
             super.onPostExecute(result);
-            Log.d("mojo-alarm-log", "CheckIfTaskFinishedTask " + result);
+            try {
+                Log.d("mojo-alarm-log", "CheckIfTaskFinishedTask " + result);
 
-            if (result) {
-                if (task.suspended != null && !task.suspended && task.assignee.toLowerCase().equals(TokenService.getUsername().toLowerCase())) {
-                    if (message.startsWith("overdue")) {
-                        Log.d("mojo-test-log", "currentDate " + new Date().getTime() + " dueDate " + task.dueDate.getTime());
-                        int hoursCt = (int) Math.abs((new Date().getTime() - task.dueDate.getTime()) / (60 * 60 * 1000));
-                        message = String.format(Locale.getDefault(), "Просрочено %d час%s(ов)", hoursCt, hoursCt == 1 ? "" : "a");
+                if (result) {
+                    if (task.suspended != null && !task.suspended && task.assignee.toLowerCase().equals(TokenService.getUsername().toLowerCase())) {
+                        if (message.startsWith("overdue")) {
+                            Log.d("mojo-test-log", "currentDate " + new Date().getTime() + " dueDate " + task.dueDate.getTime());
+                            int hoursCt = (int) Math.abs((new Date().getTime() - task.dueDate.getTime()) / (60 * 60 * 1000));
+                            message = String.format(Locale.getDefault(), "Просрочено %d час%s(ов)", hoursCt, hoursCt == 1 ? "" : "a");
+                        }
+                        showNotification(taskName, message, taskId, templateId);
                     }
-                    showNotification(taskName, message, taskId, templateId);
                 }
+            } catch (Exception exc) {
+                exc.printStackTrace();
             }
         }
     }

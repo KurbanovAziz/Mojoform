@@ -116,38 +116,42 @@ public class AuthActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(Integer responseCode) {
             super.onPostExecute(responseCode);
-            if (loopDialog != null && loopDialog.isShowing())
-                loopDialog.dismiss();
+            try {
+                if (loopDialog != null && loopDialog.isShowing())
+                    loopDialog.dismiss();
 
-            if (loginWithinToken) {
-                if (responseCode == 202) {
-                    Data.currentUser = user;
-                    TokenService.updateToken(user.token, user.userName);
-                    Data.taskAuthLogin = user.userName;
-                    Intent intent = new Intent(AuthActivity.this, MainActivity.class);
-                    intent.putExtras(getIntent());
-                    startActivity(intent);
-                    finish();
+                if (loginWithinToken) {
+                    if (responseCode == 202) {
+                        Data.currentUser = user;
+                        TokenService.updateToken(user.token, user.userName);
+                        Data.taskAuthLogin = user.userName;
+                        Intent intent = new Intent(AuthActivity.this, MainActivity.class);
+                        intent.putExtras(getIntent());
+                        startActivity(intent);
+                        finish();
+                    } else {
+                        TokenService.deleteToken();
+                        replaceWithLoginFragment();
+                    }
                 } else {
-                    TokenService.deleteToken();
-                    replaceWithLoginFragment();
+                    if (responseCode == null)
+                        Toast.makeText(AuthActivity.this, R.string.network_error, Toast.LENGTH_LONG).show();
+                    else if (responseCode == 401)
+                        Toast.makeText(AuthActivity.this, R.string.invalid_username_or_password, Toast.LENGTH_LONG).show();
+                    else if (responseCode == 202) {
+                        Data.currentUser = user;
+                        Data.taskAuthLogin = user.userName;
+                        LoginHistoryService.addUser(user);
+                        TokenService.updateToken(user.token, user.userName);
+                        Intent intent = new Intent(AuthActivity.this, MainActivity.class);
+                        intent.putExtras(getIntent());
+                        startActivity(intent);
+                        finish();
+                    } else
+                        Toast.makeText(AuthActivity.this, getString(R.string.unknown_error) + "  code: " + responseCode, Toast.LENGTH_LONG).show();
                 }
-            } else {
-                if (responseCode == null)
-                    Toast.makeText(AuthActivity.this, R.string.network_error, Toast.LENGTH_LONG).show();
-                else if (responseCode == 401)
-                    Toast.makeText(AuthActivity.this, R.string.invalid_username_or_password, Toast.LENGTH_LONG).show();
-                else if (responseCode == 202) {
-                    Data.currentUser = user;
-                    Data.taskAuthLogin = user.userName;
-                    LoginHistoryService.addUser(user);
-                    TokenService.updateToken(user.token, user.userName);
-                    Intent intent = new Intent(AuthActivity.this, MainActivity.class);
-                    intent.putExtras(getIntent());
-                    startActivity(intent);
-                    finish();
-                } else
-                    Toast.makeText(AuthActivity.this, getString(R.string.unknown_error) + "  code: " + responseCode, Toast.LENGTH_LONG).show();
+            } catch (Exception exc) {
+                exc.printStackTrace();
             }
         }
     }

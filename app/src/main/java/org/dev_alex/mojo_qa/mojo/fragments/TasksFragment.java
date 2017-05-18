@@ -372,19 +372,23 @@ public class TasksFragment extends Fragment {
         @Override
         protected void onPostExecute(Integer responseCode) {
             super.onPostExecute(responseCode);
-            if (loopDialog != null && loopDialog.isShowing())
-                loopDialog.dismiss();
+            try {
+                if (loopDialog != null && loopDialog.isShowing())
+                    loopDialog.dismiss();
 
-            if (responseCode == null)
-                Toast.makeText(getContext(), R.string.network_error, Toast.LENGTH_LONG).show();
-            else if (responseCode == 401) {
-                Toast.makeText(getContext(), R.string.tasks_are_temporary_unavailable, Toast.LENGTH_LONG).show();
-            } else if (responseCode == 200) {
-                updateDecorators();
-                ((RadioButton) rootView.findViewById(R.id.busy)).setChecked(true);
-                recyclerView.setAdapter(new TaskAdapter(TasksFragment.this, busyTasks));
-            } else
-                Toast.makeText(getContext(), R.string.unknown_error, Toast.LENGTH_LONG).show();
+                if (responseCode == null)
+                    Toast.makeText(getContext(), R.string.network_error, Toast.LENGTH_LONG).show();
+                else if (responseCode == 401) {
+                    Toast.makeText(getContext(), R.string.tasks_are_temporary_unavailable, Toast.LENGTH_LONG).show();
+                } else if (responseCode == 200) {
+                    updateDecorators();
+                    ((RadioButton) rootView.findViewById(R.id.busy)).setChecked(true);
+                    recyclerView.setAdapter(new TaskAdapter(TasksFragment.this, busyTasks));
+                } else
+                    Toast.makeText(getContext(), R.string.unknown_error, Toast.LENGTH_LONG).show();
+            } catch (Exception exc) {
+                exc.printStackTrace();
+            }
         }
     }
 }

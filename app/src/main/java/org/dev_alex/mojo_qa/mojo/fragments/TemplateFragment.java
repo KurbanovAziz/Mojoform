@@ -1604,20 +1604,24 @@ public class TemplateFragment extends Fragment {
         @Override
         protected void onPostExecute(Integer responseCode) {
             super.onPostExecute(responseCode);
-            if (loopDialog != null && loopDialog.isShowing())
-                loopDialog.dismiss();
+            try {
+                if (loopDialog != null && loopDialog.isShowing())
+                    loopDialog.dismiss();
 
-            if (responseCode == null) {
-                Toast.makeText(getContext(), R.string.network_error, Toast.LENGTH_LONG).show();
-                getActivity().getSupportFragmentManager().popBackStack();
-            } else if (responseCode == 401) {
-                startActivity(new Intent(getContext(), AuthActivity.class));
-                getActivity().finish();
-            } else if (responseCode == 200) {
-                renderTemplate();
-            } else {
-                Toast.makeText(getContext(), R.string.unknown_error, Toast.LENGTH_LONG).show();
-                getActivity().getSupportFragmentManager().popBackStack();
+                if (responseCode == null) {
+                    Toast.makeText(getContext(), R.string.network_error, Toast.LENGTH_LONG).show();
+                    getActivity().getSupportFragmentManager().popBackStack();
+                } else if (responseCode == 401) {
+                    startActivity(new Intent(getContext(), AuthActivity.class));
+                    getActivity().finish();
+                } else if (responseCode == 200) {
+                    renderTemplate();
+                } else {
+                    Toast.makeText(getContext(), R.string.unknown_error, Toast.LENGTH_LONG).show();
+                    getActivity().getSupportFragmentManager().popBackStack();
+                }
+            } catch (Exception exc) {
+                exc.printStackTrace();
             }
         }
     }
@@ -1734,14 +1738,17 @@ public class TemplateFragment extends Fragment {
         @Override
         protected void onPostExecute(Integer result) {
             super.onPostExecute(result);
-            if (successfullySentMediaCt < totalSize) {
-                saveTemplateState();
-                if (progressDialog != null && progressDialog.isShowing())
-                    progressDialog.dismiss();
-                Toast.makeText(getContext(), R.string.error_not_all_images_were_sent, Toast.LENGTH_SHORT).show();
-            } else
-                new CompleteTemplateTask().execute();
-
+            try {
+                if (successfullySentMediaCt < totalSize) {
+                    saveTemplateState();
+                    if (progressDialog != null && progressDialog.isShowing())
+                        progressDialog.dismiss();
+                    Toast.makeText(getContext(), R.string.error_not_all_images_were_sent, Toast.LENGTH_SHORT).show();
+                } else
+                    new CompleteTemplateTask().execute();
+            } catch (Exception exc) {
+                exc.printStackTrace();
+            }
         }
     }
 
@@ -1807,27 +1814,30 @@ public class TemplateFragment extends Fragment {
         @Override
         protected void onPostExecute(Integer responseCode) {
             super.onPostExecute(responseCode);
-            if (progressDialog != null && progressDialog.isShowing())
-                progressDialog.dismiss();
+            try {
+                if (progressDialog != null && progressDialog.isShowing())
+                    progressDialog.dismiss();
 
-            saveTemplateState();
+                saveTemplateState();
 
-            if (responseCode == null)
-                Toast.makeText(getContext(), R.string.network_error, Toast.LENGTH_LONG).show();
-            else if (responseCode == 401) {
-                startActivity(new Intent(getContext(), AuthActivity.class));
-                getActivity().finish();
-            } else if (responseCode == 200) {
-                SharedPreferences mSettings;
-                mSettings = App.getContext().getSharedPreferences("templates", Context.MODE_PRIVATE);
-                SharedPreferences.Editor editor = mSettings.edit();
-                editor.putString(templateId + Data.currentUser.userName, "");
-                editor.apply();
-                ((TasksFragment) getActivity().getSupportFragmentManager().findFragmentByTag("tasks")).needUpdate = true;
-                getActivity().getSupportFragmentManager().popBackStack();
-            } else
-                Toast.makeText(getContext(), R.string.unknown_error, Toast.LENGTH_LONG).show();
-
+                if (responseCode == null)
+                    Toast.makeText(getContext(), R.string.network_error, Toast.LENGTH_LONG).show();
+                else if (responseCode == 401) {
+                    startActivity(new Intent(getContext(), AuthActivity.class));
+                    getActivity().finish();
+                } else if (responseCode == 200) {
+                    SharedPreferences mSettings;
+                    mSettings = App.getContext().getSharedPreferences("templates", Context.MODE_PRIVATE);
+                    SharedPreferences.Editor editor = mSettings.edit();
+                    editor.putString(templateId + Data.currentUser.userName, "");
+                    editor.apply();
+                    ((TasksFragment) getActivity().getSupportFragmentManager().findFragmentByTag("tasks")).needUpdate = true;
+                    getActivity().getSupportFragmentManager().popBackStack();
+                } else
+                    Toast.makeText(getContext(), R.string.unknown_error, Toast.LENGTH_LONG).show();
+            } catch (Exception exc) {
+                exc.printStackTrace();
+            }
         }
     }
 
