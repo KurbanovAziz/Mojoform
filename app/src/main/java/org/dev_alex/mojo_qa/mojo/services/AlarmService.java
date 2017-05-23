@@ -1,10 +1,12 @@
 package org.dev_alex.mojo_qa.mojo.services;
 
+import android.app.ActivityManager;
 import android.app.AlarmManager;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -26,6 +28,7 @@ import org.dev_alex.mojo_qa.mojo.App;
 import org.dev_alex.mojo_qa.mojo.Data;
 import org.dev_alex.mojo_qa.mojo.R;
 import org.dev_alex.mojo_qa.mojo.activities.AuthActivity;
+import org.dev_alex.mojo_qa.mojo.activities.MainActivity;
 import org.dev_alex.mojo_qa.mojo.models.Task;
 import org.dev_alex.mojo_qa.mojo.models.Variable;
 import org.json.JSONArray;
@@ -35,6 +38,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 import java.util.Random;
 
@@ -173,6 +177,13 @@ public class AlarmService extends Service {
 
     private void showNotification(String taskName, String message, String taskId, String templateId) {
         Log.d("mojo-alarm-log", "showNotification " + message);
+        try {
+            if (Data.currentTaskId != null && Data.currentTaskId.equals(taskId) && isForeground(MainActivity.class.getPackage().getName()))
+                return;
+        } catch (Exception exc) {
+            exc.printStackTrace();
+        }
+
         if (taskName.isEmpty())
             taskName = "NoName";
 
@@ -396,5 +407,12 @@ public class AlarmService extends Service {
                 exc.printStackTrace();
             }
         }
+    }
+
+    public boolean isForeground(String myPackage) {
+        ActivityManager manager = (ActivityManager) getSystemService(ACTIVITY_SERVICE);
+        List<ActivityManager.RunningTaskInfo> runningTaskInfo = manager.getRunningTasks(1);
+        ComponentName componentInfo = runningTaskInfo.get(0).topActivity;
+        return componentInfo.getPackageName().equals(myPackage);
     }
 }

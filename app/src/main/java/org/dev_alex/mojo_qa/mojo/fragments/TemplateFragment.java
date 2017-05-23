@@ -225,6 +225,19 @@ public class TemplateFragment extends Fragment {
         }
     }
 
+    @Override
+    public void onPause() {
+        super.onPause();
+        saveTemplateState();
+        Data.currentTaskId = "";
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        Data.currentTaskId = taskId;
+    }
+
     private void setupHeader() {
         ((TextView) getActivity().findViewById(R.id.title)).setText(getString(R.string.tasks));
         getActivity().findViewById(R.id.grid_btn).setVisibility(View.GONE);
@@ -411,6 +424,7 @@ public class TemplateFragment extends Fragment {
                 }
             }
         } catch (Exception exc) {
+            exc.printStackTrace();
             Toast.makeText(getContext(), "Некорректный шаблон", Toast.LENGTH_SHORT).show();
             getActivity().getSupportFragmentManager().popBackStack();
             exc.printStackTrace();
@@ -675,10 +689,10 @@ public class TemplateFragment extends Fragment {
             ((TextView) seekBarContainer.getChildAt(0)).setText("Нет текста");
 
         if (value.has("measure"))
-            ((TextView) ((LinearLayout) ((LinearLayout) seekBarContainer.getChildAt(4)).getChildAt(1)).getChildAt(1)).setText(value.getString("measure"));
+            ((TextView) ((LinearLayout) ((LinearLayout) seekBarContainer.getChildAt(3)).getChildAt(1)).getChildAt(1)).setText(value.getString("measure"));
 
         final SeekBar seekBar = ((SeekBar) seekBarContainer.getChildAt(1));
-        final EditText changeValue = (EditText) ((LinearLayout) ((LinearLayout) seekBarContainer.getChildAt(4)).getChildAt(1)).getChildAt(0);
+        final EditText changeValue = (EditText) ((LinearLayout) ((LinearLayout) seekBarContainer.getChildAt(3)).getChildAt(1)).getChildAt(0);
 
         final float minValue = (float) value.getDouble("min_value");
         final float maxValue = (float) value.getDouble("max_value");
@@ -699,7 +713,6 @@ public class TemplateFragment extends Fragment {
 
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                ((TextView) seekBarContainer.getChildAt(3)).setText(formatFloat((progress / digitsOffset) + minValue));
                 if (trackByUser)
                     changeValue.setText(formatFloat((progress / digitsOffset) + minValue));
             }
@@ -1925,9 +1938,11 @@ public class TemplateFragment extends Fragment {
                     JSONObject pageJson = pagesJson.getJSONObject(i).getJSONObject("page");
                     if (pageJson.has("items")) {
                         Pair<Boolean, ArrayList<JSONObject>> result = checkIfContainerIsFilled(pageJson.getJSONArray("items"), 0);
-                        if (!result.first)
+                        if (!result.first) {
                             totalResult = false;
-                        else
+                            ((LinearLayout) rootView.findViewById(R.id.page_container)).getChildAt(i).setBackgroundColor(Color.parseColor("#F2C7C6"));
+                            ((LinearLayout) rootView.findViewById(R.id.page_container)).getChildAt(i).setAlpha(1);
+                        } else
                             photoObjects.addAll(result.second);
                     }
                 }

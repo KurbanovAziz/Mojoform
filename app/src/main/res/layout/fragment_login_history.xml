@@ -96,7 +96,7 @@
     <Button
         android:id="@+id/new_user_btn"
         android:layout_width="0dp"
-        android:layout_height="45dp"
+        android:layout_height="40dp"
         android:background="@drawable/green_button"
         android:gravity="center"
         android:paddingTop="1.5dp"

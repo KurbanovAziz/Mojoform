@@ -4,17 +4,20 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginLeft="10dp"
-    android:layout_marginRight="10dp"
+    android:paddingLeft="10dp"
+    android:paddingRight="10dp"
     android:background="@drawable/white_rounded_rectangle"
     android:orientation="vertical"
     android:paddingBottom="15dp"
     android:paddingTop="15dp">
 
     <TextView
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal" />
+        android:layout_gravity="center_horizontal"
+        android:textSize="14sp"
+        android:gravity="center"
+        android:textAlignment="center" />
 
     <SeekBar
         android:id="@+id/seekBar"
@@ -45,14 +48,6 @@
             android:layout_alignParentRight="true"
             android:text="100" />
     </RelativeLayout>
-
-    <TextView
-        android:layout_width="75dp"
-        android:layout_height="45dp"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginTop="15dp"
-        android:background="@drawable/seekbar_block_text_background"
-        android:gravity="center" />
 
     <LinearLayout
         android:layout_width="match_parent"

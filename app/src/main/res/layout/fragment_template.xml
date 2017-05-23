@@ -20,19 +20,26 @@
                 android:layout_marginRight="8dp"
                 android:layout_marginTop="7dp">
 
-                <TextView
-                    android:id="@+id/template_name"
+                <HorizontalScrollView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentLeft="true"
                     android:layout_centerVertical="true"
-                    android:layout_marginRight="5dp"
                     android:layout_toLeftOf="@+id/page_name"
-                    android:ellipsize="end"
-                    android:maxLines="1"
-                    android:text=""
-                    android:textColor="#ff4c3d5f"
-                    android:textSize="17sp" />
+                    android:paddingLeft="5dp"
+                    android:paddingRight="5dp">
+
+                    <TextView
+                        android:id="@+id/template_name"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:ellipsize="end"
+                        android:maxLines="1"
+                        android:text=""
+                        android:textColor="#ff4c3d5f"
+                        android:textSize="17sp" />
+                </HorizontalScrollView>
+
 
                 <TextView
                     android:id="@+id/page_name"
@@ -65,7 +72,7 @@
             <LinearLayout
                 android:id="@+id/buttons_block"
                 android:layout_width="match_parent"
-                android:layout_height="80dp"
+                android:layout_height="69.5dp"
                 android:layout_below="@id/root_container"
                 android:baselineAligned="false"
                 android:orientation="horizontal"
@@ -94,14 +101,14 @@
 
                 <FrameLayout
                     android:layout_width="0dp"
-                    android:layout_height="72dp"
+                    android:layout_height="59dp"
                     android:layout_marginTop="12dp"
                     android:layout_weight="1">
 
                     <View
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:background="@drawable/blue_btn_with_shadow" />
+                        android:background="@drawable/purple_btn_with_shadow" />
 
                     <TextView
                         android:id="@+id/hold_task_btn"
@@ -110,16 +117,16 @@
                         android:layout_marginLeft="8dp"
                         android:layout_marginRight="8dp"
                         android:gravity="center"
-                        android:paddingBottom="16.5dp"
+                        android:paddingBottom="14dp"
                         android:text="@string/hold"
                         android:textColor="@android:color/white"
-                        android:textSize="17sp" />
+                        android:textSize="15.5sp" />
                 </FrameLayout>
 
                 <FrameLayout
-                    android:layout_width="0dp"
                     android:id="@+id/finish_btn_container"
-                    android:layout_height="72dp"
+                    android:layout_width="0dp"
+                    android:layout_height="59dp"
                     android:layout_marginTop="12dp"
                     android:layout_weight="1">
 
@@ -135,10 +142,10 @@
                         android:layout_marginLeft="8dp"
                         android:layout_marginRight="8dp"
                         android:gravity="center"
-                        android:paddingBottom="16.5dp"
+                        android:paddingBottom="14dp"
                         android:text="@string/finish"
                         android:textColor="@android:color/white"
-                        android:textSize="17sp" />
+                        android:textSize="15.5sp" />
                 </FrameLayout>
 
                 <Space
@@ -183,5 +190,8 @@
     <FrameLayout
         android:id="@+id/select_btn_popup"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true" />
 </RelativeLayout>

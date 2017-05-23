@@ -6,6 +6,7 @@ public class Data {
     public static User currentUser;
     public static String taskAuthLogin;
     public static String taskAuthPass = "p234235dfgdeg";
+    public static String currentTaskId = "";
 
 
     public static String tt = "{\n" +

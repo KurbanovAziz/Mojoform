@@ -10,7 +10,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
-        android:layout_marginLeft="5dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
         android:text="Заголовок ввода"
         android:textColor="#ff4c3d5f"
         android:textSize="16sp" />
@@ -23,7 +24,7 @@
 
     <TextView
         android:layout_width="140dp"
-        android:layout_height="52dp"
+        android:layout_height="50dp"
         android:layout_gravity="center_horizontal"
         android:background="@drawable/green_btn_with_shadow"
         android:gravity="center"
