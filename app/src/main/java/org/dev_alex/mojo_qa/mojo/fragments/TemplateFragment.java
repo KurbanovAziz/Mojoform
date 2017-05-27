@@ -85,7 +85,7 @@ import okhttp3.Response;
 import static android.app.Activity.RESULT_OK;
 
 public class TemplateFragment extends Fragment {
-    private final String NODE_FOR_TASKS = "229ed0ec-3592-4788-87f0-6b0616599166";
+    private static String NODE_FOR_TASKS = "229ed0ec-3592-4788-87f0-6b0616599166";
     private final String NODE_FOR_FILES = "4899bb8e-0b0b-4889-82d6-eb16fcd6b90f";
 
     private final String MEDIA_PATH_JSON_ARRAY = "media_paths";
@@ -96,6 +96,7 @@ public class TemplateFragment extends Fragment {
     private final int AUDIO_REQUEST_CODE = 12;
     private final int DOCUMENT_REQUEST_CODE = 13;
     private final int IMAGE_SHOW_REQUEST_CODE = 110;
+    private final int SCAN_CODE_REQUEST_CODE = 120;
 
     private View rootView;
     private ProgressDialog loopDialog;
@@ -104,6 +105,7 @@ public class TemplateFragment extends Fragment {
     private ArrayList<Page> pages;
     private int currentPagePos;
     private JSONObject template;
+    private EditText scanTo;
 
     private Pair<LinearLayout, JSONObject> currentMediaBlock;
     private String cameraImagePath;
@@ -112,10 +114,15 @@ public class TemplateFragment extends Fragment {
     private ProgressDialog progressDialog;
 
 
-    public static TemplateFragment newInstance(String templateId, String taskId) {
+    public static TemplateFragment newInstance(String templateId, String taskId, String nodeForTasks) {
         Bundle args = new Bundle();
         args.putString("template_id", templateId);
         args.putString("task_id", taskId);
+        if (nodeForTasks != null && !nodeForTasks.isEmpty())
+            args.putString("task_node_id", nodeForTasks);
+        else
+            args.putString("task_node_id", NODE_FOR_TASKS);
+
 
         TemplateFragment fragment = new TemplateFragment();
         fragment.setArguments(args);
@@ -130,13 +137,14 @@ public class TemplateFragment extends Fragment {
             ((MainActivity) getActivity()).drawer.getDrawerLayout().setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
             templateId = getArguments().getString("template_id");
             taskId = getArguments().getString("task_id");
+            NODE_FOR_TASKS = getArguments().getString("task_node_id");
 
             initDialog();
             setupHeader();
             Utils.setupCloseKeyboardUI(getActivity(), rootView);
             setListeners();
 
-            new GetTemplateTask(templateId).execute();
+            new GetTemplateTask().execute();
         }
         return rootView;
     }
@@ -222,6 +230,14 @@ public class TemplateFragment extends Fragment {
                 Toast.makeText(getContext(), "что-то пошло не так", Toast.LENGTH_SHORT).show();
             else
                 createAudioPreview(audioPath, true);
+        }
+
+        if (requestCode == SCAN_CODE_REQUEST_CODE) {
+            if (resultCode == RESULT_OK) {
+                String contents = data.getStringExtra("SCAN_RESULT");
+                if (scanTo != null)
+                    scanTo.setText(contents);
+            }
         }
     }
 
@@ -365,7 +381,7 @@ public class TemplateFragment extends Fragment {
             mSettings = App.getContext().getSharedPreferences("templates", Context.MODE_PRIVATE);
             SharedPreferences.Editor editor = mSettings.edit();
 
-            editor.putString(templateId + Data.currentUser.userName, template.toString());
+            editor.putString(taskId + Data.currentUser.userName, template.toString());
             editor.apply();
         } catch (Exception exc) {
             exc.printStackTrace();
@@ -456,16 +472,17 @@ public class TemplateFragment extends Fragment {
                     break;
 
                 case "lineedit":
-                    LinearLayout editTextSingleLineContainer = (LinearLayout) getActivity().getLayoutInflater().inflate(R.layout.lineedit, container, false);
+                    final LinearLayout editTextSingleLineContainer = (LinearLayout) getActivity().getLayoutInflater().inflate(R.layout.lineedit, container, false);
+                    ((ViewGroup) editTextSingleLineContainer.getChildAt(0)).getChildAt(1).setVisibility((value.has("is_required") && !value.getBoolean("is_required")) ? View.GONE : View.VISIBLE);
 
                     if (value.has("caption"))
-                        ((TextView) editTextSingleLineContainer.getChildAt(0)).setText(value.getString("caption"));
+                        ((TextView) ((ViewGroup) editTextSingleLineContainer.getChildAt(0)).getChildAt(0)).setText(value.getString("caption"));
                     else
-                        ((TextView) editTextSingleLineContainer.getChildAt(0)).setText("Нет текста");
+                        ((TextView) ((ViewGroup) editTextSingleLineContainer.getChildAt(0)).getChildAt(0)).setText("Нет текста");
 
                     if (value.has("value"))
-                        ((EditText) editTextSingleLineContainer.getChildAt(1)).setText(value.getString("value"));
-                    ((EditText) editTextSingleLineContainer.getChildAt(1)).addTextChangedListener(new TextWatcher() {
+                        ((EditText) ((ViewGroup) editTextSingleLineContainer.getChildAt(1)).getChildAt(0)).setText(value.getString("value"));
+                    ((EditText) ((ViewGroup) editTextSingleLineContainer.getChildAt(1)).getChildAt(0)).addTextChangedListener(new TextWatcher() {
                         @Override
                         public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 
@@ -488,20 +505,35 @@ public class TemplateFragment extends Fragment {
                         }
                     });
 
+                    ((ViewGroup) editTextSingleLineContainer.getChildAt(1)).getChildAt(1).setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            scanQrCode(((EditText) ((ViewGroup) editTextSingleLineContainer.getChildAt(1)).getChildAt(0)));
+                        }
+                    });
+
+                    ((ViewGroup) editTextSingleLineContainer.getChildAt(1)).getChildAt(2).setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            scanBarCode(((EditText) ((ViewGroup) editTextSingleLineContainer.getChildAt(1)).getChildAt(0)));
+                        }
+                    });
+
                     container.addView(boxInContainerWithId(editTextSingleLineContainer, value.getString("id")));
                     break;
 
                 case "textarea":
-                    LinearLayout editTextMultiLineContainer = (LinearLayout) getActivity().getLayoutInflater().inflate(R.layout.textarea, container, false);
+                    final LinearLayout editTextMultiLineContainer = (LinearLayout) getActivity().getLayoutInflater().inflate(R.layout.textarea, container, false);
+                    ((ViewGroup) editTextMultiLineContainer.getChildAt(0)).getChildAt(1).setVisibility((value.has("is_required") && !value.getBoolean("is_required")) ? View.GONE : View.VISIBLE);
 
                     if (value.has("caption"))
-                        ((TextView) editTextMultiLineContainer.getChildAt(0)).setText(value.getString("caption"));
+                        ((TextView) ((ViewGroup) editTextMultiLineContainer.getChildAt(0)).getChildAt(0)).setText(value.getString("caption"));
                     else
-                        ((TextView) editTextMultiLineContainer.getChildAt(0)).setText("Нет текста");
+                        ((TextView) ((ViewGroup) editTextMultiLineContainer.getChildAt(0)).getChildAt(0)).setText("Нет текста");
 
                     if (value.has("value"))
-                        ((EditText) editTextMultiLineContainer.getChildAt(1)).setText(value.getString("value"));
-                    ((EditText) editTextMultiLineContainer.getChildAt(1)).addTextChangedListener(new TextWatcher() {
+                        ((EditText) ((ViewGroup) editTextMultiLineContainer.getChildAt(1)).getChildAt(0)).setText(value.getString("value"));
+                    ((EditText) ((ViewGroup) editTextMultiLineContainer.getChildAt(1)).getChildAt(0)).addTextChangedListener(new TextWatcher() {
                         @Override
                         public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 
@@ -521,6 +553,20 @@ public class TemplateFragment extends Fragment {
                                     value.put("value", s.toString().trim());
                             } catch (Exception ignored) {
                             }
+                        }
+                    });
+
+                    ((ViewGroup) editTextMultiLineContainer.getChildAt(1)).getChildAt(1).setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            scanQrCode(((EditText) ((ViewGroup) editTextMultiLineContainer.getChildAt(1)).getChildAt(0)));
+                        }
+                    });
+
+                    ((ViewGroup) editTextMultiLineContainer.getChildAt(1)).getChildAt(2).setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            scanBarCode(((EditText) ((ViewGroup) editTextMultiLineContainer.getChildAt(1)).getChildAt(0)));
                         }
                     });
 
@@ -530,10 +576,12 @@ public class TemplateFragment extends Fragment {
                 case "checkbox":
                     LinearLayout checkBoxContainer = (LinearLayout) getActivity().getLayoutInflater().inflate(R.layout.checkbox, container, false);
 
+                    checkBoxContainer.getChildAt(2).setVisibility((value.has("is_required") && !value.getBoolean("is_required")) ? View.GONE : View.VISIBLE);
+
                     if (value.has("caption"))
-                        ((TextView) checkBoxContainer.getChildAt(1)).setText(value.getString("caption"));
+                        ((TextView) ((FrameLayout) checkBoxContainer.getChildAt(1)).getChildAt(0)).setText(value.getString("caption"));
                     else
-                        ((TextView) checkBoxContainer.getChildAt(1)).setText("Нет текста");
+                        ((TextView) ((FrameLayout) checkBoxContainer.getChildAt(1)).getChildAt(0)).setText("Нет текста");
 
                     ((CheckBox) checkBoxContainer.getChildAt(0)).setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                         @Override
@@ -619,6 +667,34 @@ public class TemplateFragment extends Fragment {
         }
     }
 
+    private void scanQrCode(EditText scanTo) {
+        try {
+            this.scanTo = scanTo;
+            Intent intent = new Intent("com.google.zxing.client.android.SCAN");
+            intent.putExtra("SCAN_MODE", "QR_CODE_MODE"); // "PRODUCT_MODE for bar codes
+            startActivityForResult(intent, SCAN_CODE_REQUEST_CODE);
+
+        } catch (Exception e) {
+            Uri marketUri = Uri.parse("market://details?id=com.google.zxing.client.android");
+            Intent marketIntent = new Intent(Intent.ACTION_VIEW, marketUri);
+            startActivity(marketIntent);
+        }
+    }
+
+    private void scanBarCode(EditText scanTo) {
+        try {
+            this.scanTo = scanTo;
+            Intent intent = new Intent("com.google.zxing.client.android.SCAN");
+            intent.putExtra("SCAN_MODE", "PRODUCT_MODE");
+            startActivityForResult(intent, SCAN_CODE_REQUEST_CODE);
+
+        } catch (Exception e) {
+            Uri marketUri = Uri.parse("market://details?id=com.google.zxing.client.android");
+            Intent marketIntent = new Intent(Intent.ACTION_VIEW, marketUri);
+            startActivity(marketIntent);
+        }
+    }
+
     private void createCategory(JSONObject value, LinearLayout container, int offset) throws Exception {
         int color;
         switch (offset) {
@@ -683,10 +759,12 @@ public class TemplateFragment extends Fragment {
 
     private void createSeekBar(final JSONObject value, LinearLayout container) throws Exception {
         final LinearLayout seekBarContainer = (LinearLayout) getActivity().getLayoutInflater().inflate(R.layout.slider, container, false);
+
+        ((ViewGroup) seekBarContainer.getChildAt(0)).getChildAt(1).setVisibility(View.VISIBLE);
         if (value.has("caption"))
-            ((TextView) seekBarContainer.getChildAt(0)).setText(value.getString("caption"));
+            ((TextView) ((ViewGroup) seekBarContainer.getChildAt(0)).getChildAt(0)).setText(value.getString("caption"));
         else
-            ((TextView) seekBarContainer.getChildAt(0)).setText("Нет текста");
+            ((TextView) ((ViewGroup) seekBarContainer.getChildAt(0)).getChildAt(0)).setText("Нет текста");
 
         if (value.has("measure"))
             ((TextView) ((LinearLayout) ((LinearLayout) seekBarContainer.getChildAt(3)).getChildAt(1)).getChildAt(1)).setText(value.getString("measure"));
@@ -748,11 +826,11 @@ public class TemplateFragment extends Fragment {
                 if (!s.toString().isEmpty()) {
                     result = s.toString();
                     float floatValue = Float.parseFloat(s.toString());
-                    if (floatValue < minValue)
+                   /* if (floatValue < minValue)
                         result = formatFloat(minValue);
                     else if (floatValue > maxValue)
-                        result = formatFloat(maxValue);
-                    else if (!result.endsWith(".") && !formatFloat(floatValue).equals(result))
+                        result = formatFloat(maxValue);*/
+                    if (!result.endsWith(".") && !formatFloat(floatValue).equals(result))
                         result = formatFloat(floatValue);
 
                     if (!s.toString().equals(result)) {
@@ -789,10 +867,11 @@ public class TemplateFragment extends Fragment {
         final LinearLayout signatureContainer = (LinearLayout) getActivity().getLayoutInflater().inflate(R.layout.signature_layout, container, false);
         final SignaturePad signaturePad = (SignaturePad) signatureContainer.getChildAt(1);
 
+        ((ViewGroup) signatureContainer.getChildAt(0)).getChildAt(1).setVisibility((value.has("is_required") && !value.getBoolean("is_required")) ? View.GONE : View.VISIBLE);
         if (value.has("caption"))
-            ((TextView) signatureContainer.getChildAt(0)).setText(value.getString("caption"));
+            ((TextView) ((ViewGroup) signatureContainer.getChildAt(0)).getChildAt(0)).setText(value.getString("caption"));
         else
-            ((TextView) signatureContainer.getChildAt(0)).setText("Нет текста");
+            ((TextView) ((ViewGroup) signatureContainer.getChildAt(0)).getChildAt(0)).setText("Нет текста");
 
         signatureContainer.getChildAt(2).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -841,6 +920,10 @@ public class TemplateFragment extends Fragment {
 
     private void createMediaBlock(final JSONObject value, LinearLayout container) throws Exception {
         final LinearLayout mediaLayout = (LinearLayout) getActivity().getLayoutInflater().inflate(R.layout.media_layout, container, false);
+
+
+        ((ViewGroup) ((ViewGroup) mediaLayout.getChildAt(0)).getChildAt(0)).getChildAt(2)
+                .setVisibility((value.has("is_required") && !value.getBoolean("is_required")) ? View.GONE : View.VISIBLE);
 
         if (value.has("caption"))
             ((TextView) ((ViewGroup) ((ViewGroup) mediaLayout.getChildAt(0)).getChildAt(0)).getChildAt(1)).setText(value.getString("caption"));
@@ -967,10 +1050,12 @@ public class TemplateFragment extends Fragment {
         TextView showPopupSelectListBtn = (TextView) selectBtnLayout.getChildAt(2);
         final LinearLayout optionalContainer = (LinearLayout) selectBtnLayout.getChildAt(3);
 
+        ((ViewGroup) selectBtnLayout.getChildAt(0)).getChildAt(1).setVisibility(View.VISIBLE);
+
         if (value.has("caption"))
-            ((TextView) selectBtnLayout.getChildAt(0)).setText(value.getString("caption"));
+            ((TextView) ((ViewGroup) selectBtnLayout.getChildAt(0)).getChildAt(0)).setText(value.getString("caption"));
         else
-            ((TextView) selectBtnLayout.getChildAt(0)).setText("Нет заголовка");
+            ((TextView) ((ViewGroup) selectBtnLayout.getChildAt(0)).getChildAt(0)).setText("Нет текста");
 
         if (value.has("options")) {
             int maxAnswersCt = 1;
@@ -1580,12 +1665,6 @@ public class TemplateFragment extends Fragment {
     }
 
     private class GetTemplateTask extends AsyncTask<Void, Void, Integer> {
-        private String templateId;
-
-        GetTemplateTask(String templateId) {
-            this.templateId = templateId;
-        }
-
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
@@ -1597,7 +1676,7 @@ public class TemplateFragment extends Fragment {
             try {
                 SharedPreferences mSettings;
                 mSettings = App.getContext().getSharedPreferences("templates", Context.MODE_PRIVATE);
-                String templateJson = mSettings.getString(templateId + Data.currentUser.userName, "");
+                String templateJson = mSettings.getString(taskId + Data.currentUser.userName, "");
                 if (!templateJson.equals("")) {
                     template = new JSONObject(templateJson);
                     return HttpURLConnection.HTTP_OK;
@@ -1814,7 +1893,7 @@ public class TemplateFragment extends Fragment {
                     jsonObject.put("action", "complete");
                     jsonObject.put("variables", new JSONArray());
 
-                    response = RequestService.createPostRequestWithCustomUrl("https://activiti.dev-alex.org/activiti-rest/service/runtime/tasks/" + taskId, jsonObject.toString());
+                    response = RequestService.createPostRequestWithCustomUrl(getString(R.string.tasks_host) + "/runtime/tasks/" + taskId, jsonObject.toString());
                     int responseCode = response.code();
                     Log.d("mojo-log", "task complete response code: " + responseCode);
                 }
@@ -1844,7 +1923,7 @@ public class TemplateFragment extends Fragment {
                     SharedPreferences mSettings;
                     mSettings = App.getContext().getSharedPreferences("templates", Context.MODE_PRIVATE);
                     SharedPreferences.Editor editor = mSettings.edit();
-                    editor.putString(templateId + Data.currentUser.userName, "");
+                    editor.putString(taskId + Data.currentUser.userName, "");
                     editor.apply();
                     ((TasksFragment) getActivity().getSupportFragmentManager().findFragmentByTag("tasks")).needUpdate = true;
                     getActivity().getSupportFragmentManager().popBackStack();
@@ -1985,8 +2064,7 @@ public class TemplateFragment extends Fragment {
                     break;
 
                 case "question":
-                    if ((!value.has("values") || value.has("values") && value.getJSONArray("values").length() == 0)
-                            && !(value.has("is_required") && !value.getBoolean("is_required"))) {
+                    if (!value.has("values") || value.has("values") && value.getJSONArray("values").length() == 0) {
                         totalResult = false;
                         setBlockMarkedAsRequired(value.getString("id"));
                     }
@@ -2052,7 +2130,7 @@ public class TemplateFragment extends Fragment {
                     break;
 
                 case "slider":
-                    if (!value.has("value") && !(value.has("is_required") && !value.getBoolean("is_required"))) {
+                    if (!value.has("value")) {
                         totalResult = false;
                         setBlockMarkedAsRequired(value.getString("id"));
                     }

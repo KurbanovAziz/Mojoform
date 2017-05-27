@@ -7,11 +7,27 @@
     android:paddingLeft="10dp"
     android:paddingRight="10dp">
 
-    <TextView
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textColor="@color/accent"
-        android:textSize="17sp" />
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_weight="1"
+            android:text=""
+            android:textColor="#ff4c3d5f"
+            android:textSize="16sp" />
+
+        <ImageView
+            android:layout_width="15dp"
+            android:layout_height="15dp"
+            android:layout_gravity="center_vertical"
+            android:adjustViewBounds="true"
+            android:src="@drawable/red_star" />
+    </LinearLayout>
 
     <com.github.gcacace.signaturepad.views.SignaturePad
         android:id="@+id/signature_pad"
@@ -21,13 +37,34 @@
         android:background="@android:color/white"
         app:penColor="@android:color/black" />
 
-    <Button
-        android:layout_width="130dp"
-        android:layout_height="40dp"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginBottom="7dp"
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
-        android:background="@drawable/blue_button"
-        android:text="@string/clear"
-        android:textColor="@android:color/white" />
+        android:orientation="horizontal">
+
+        <android.support.v4.widget.Space
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.55" />
+
+        <Button
+            android:id="@+id/button"
+            android:layout_width="0dp"
+            android:layout_height="54dp"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginBottom="7dp"
+            android:layout_weight="1"
+            android:background="@drawable/clear_btn"
+            android:paddingBottom="12dp"
+            android:text="@string/clear"
+            android:textAllCaps="false"
+            android:textColor="#979797"
+            android:textSize="16sp" />
+
+        <android.support.v4.widget.Space
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.55" />
+    </LinearLayout>
 </LinearLayout>

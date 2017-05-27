@@ -49,10 +49,11 @@ public class MainActivity extends AppCompatActivity {
         if (getIntent().hasExtra(AlarmService.TEMPLATE_ID)) {
             String templateId = getIntent().getStringExtra(AlarmService.TEMPLATE_ID);
             String taskId = getIntent().getStringExtra(AlarmService.TASK_ID);
+            String nodeForTasks = getIntent().getStringExtra(AlarmService.NODE_FOR_TASKS);
 
             if (templateId != null && !templateId.isEmpty() && taskId != null && !taskId.isEmpty())
                 getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.container, TemplateFragment.newInstance(templateId, taskId)).addToBackStack(null).commit();
+                        .replace(R.id.container, TemplateFragment.newInstance(templateId, taskId, nodeForTasks)).addToBackStack(null).commit();
         }
     }
 

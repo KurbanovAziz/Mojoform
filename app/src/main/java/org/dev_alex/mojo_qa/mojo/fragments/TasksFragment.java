@@ -9,6 +9,7 @@ import android.support.annotation.IdRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -24,6 +25,8 @@ import android.widget.Toast;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.prolificinteractive.materialcalendarview.CalendarDay;
+import com.prolificinteractive.materialcalendarview.DayViewDecorator;
+import com.prolificinteractive.materialcalendarview.DayViewFacade;
 import com.prolificinteractive.materialcalendarview.MaterialCalendarView;
 import com.prolificinteractive.materialcalendarview.OnDateSelectedListener;
 import com.prolificinteractive.materialcalendarview.OnMonthChangedListener;
@@ -229,6 +232,13 @@ public class TasksFragment extends Fragment {
         rootView.findViewById(R.id.calendar_control_panel).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if (!expandableLayout.isExpanded())
+                    new Handler().postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            new UpdateCurrentMonthDecorators().execute();
+                        }
+                    }, 700);
                 expandableLayout.toggle();
             }
         });
@@ -241,7 +251,6 @@ public class TasksFragment extends Fragment {
                 updateDate(true);
             }
         });
-
     }
 
     private void updateDate(boolean needUpdate) {
@@ -270,9 +279,9 @@ public class TasksFragment extends Fragment {
             new GetTasksTask().execute();
     }
 
-    private void updateDecorators() {
+    private void updateDecorators(ArrayList<Task> monthTasks) {
         MaterialCalendarView calendarView = (MaterialCalendarView) rootView.findViewById(R.id.calendarView);
-        for (Task task : busyTasks)
+        for (Task task : monthTasks)
             if (task.dueDate.after(new Date())) {
                 if (!daysWithActualTasks.contains(CalendarDay.from(task.dueDate)))
                     daysWithActualTasks.add(CalendarDay.from(task.dueDate));
@@ -285,6 +294,20 @@ public class TasksFragment extends Fragment {
         EventDecorator actualTasksDecorator = new EventDecorator(Color.parseColor("#ff26c373"), daysWithActualTasks);
         EventDecorator overdueTasksDecorator = new EventDecorator(Color.RED, daysWithOverdueTasks);
         calendarView.addDecorators(actualTasksDecorator, overdueTasksDecorator);
+
+        calendarView.addDecorator(new DayViewDecorator() {
+            @Override
+            public boolean shouldDecorate(CalendarDay day) {
+                Calendar currentCalendar = Calendar.getInstance();
+                currentCalendar.setTime(new Date());
+                return day.getCalendar().get(Calendar.DAY_OF_YEAR) == currentCalendar.get(Calendar.DAY_OF_YEAR);
+            }
+
+            @Override
+            public void decorate(DayViewFacade view) {
+                view.setBackgroundDrawable(ContextCompat.getDrawable(getContext(), R.drawable.image_ring));
+            }
+        });
     }
 
     private void initDialog() {
@@ -296,9 +319,9 @@ public class TasksFragment extends Fragment {
         loopDialog.setCancelable(false);
     }
 
-    public void showFillTemplateWindow(String templateId, String taskId) {
+    public void showFillTemplateWindow(String templateId, String taskId, String taskNodeId) {
         getActivity().getSupportFragmentManager().beginTransaction()
-                .replace(R.id.container, TemplateFragment.newInstance(templateId, taskId)).addToBackStack(null).commit();
+                .replace(R.id.container, TemplateFragment.newInstance(templateId, taskId, taskNodeId)).addToBackStack(null).commit();
     }
 
     private class GetTasksTask extends AsyncTask<Void, Void, Integer> {
@@ -339,10 +362,10 @@ public class TasksFragment extends Fragment {
 
                 for (int i = 0; i < 2; i++) {
                     if (i == 0)
-                        url = "https://activiti.dev-alex.org/activiti-rest/service//history/" +
+                        url = getString(R.string.tasks_host) + "/history/" +
                                 "historic-task-instances?finished=TRUE&taskAssignee=" + Data.currentUser.userName + "&includeProcessVariables=TRUE" + dateParams + sortParams;
                     else
-                        url = "https://activiti.dev-alex.org/activiti-rest/service/runtime/tasks?assignee="
+                        url = getString(R.string.tasks_host) + "/runtime/tasks?assignee="
                                 + Data.currentUser.userName + "&includeProcessVariables=TRUE" + dateParams + sortParams;
 
                     OkHttpClient client = new OkHttpClient();
@@ -381,11 +404,63 @@ public class TasksFragment extends Fragment {
                 else if (responseCode == 401) {
                     Toast.makeText(getContext(), R.string.tasks_are_temporary_unavailable, Toast.LENGTH_LONG).show();
                 } else if (responseCode == 200) {
-                    updateDecorators();
+                    if (!withDay)
+                        updateDecorators(busyTasks);
                     ((RadioButton) rootView.findViewById(R.id.busy)).setChecked(true);
                     recyclerView.setAdapter(new TaskAdapter(TasksFragment.this, busyTasks));
                 } else
                     Toast.makeText(getContext(), R.string.unknown_error, Toast.LENGTH_LONG).show();
+            } catch (Exception exc) {
+                exc.printStackTrace();
+            }
+        }
+    }
+
+    private class UpdateCurrentMonthDecorators extends AsyncTask<Void, Void, Integer> {
+        private ArrayList<Task> monthTasks;
+
+        protected Integer doInBackground(Void... params) {
+            try {
+                monthTasks = new ArrayList<>();
+                String url;
+
+                SimpleDateFormat isoDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ", Locale.getDefault());
+                String dateParams;
+                Calendar monthCalendar = Calendar.getInstance();
+                monthCalendar.setTime(currentDate.getTime());
+                monthCalendar.set(Calendar.DAY_OF_MONTH, 1);
+                dateParams = "&dueAfter=" + isoDateFormat.format(monthCalendar.getTime());
+
+                monthCalendar.add(Calendar.MONTH, 1);
+                dateParams += "&dueBefore=" + isoDateFormat.format(monthCalendar.getTime());
+                String sortParams = "&sort=dueDate&order=desc&size=100";
+
+                url = getString(R.string.tasks_host) + "/runtime/tasks?assignee="
+                        + Data.currentUser.userName + "&includeProcessVariables=TRUE" + dateParams + sortParams;
+
+                OkHttpClient client = new OkHttpClient();
+                Request request = new Request.Builder().header("Authorization", Credentials.basic(Data.taskAuthLogin, Data.taskAuthPass))
+                        .url(url).build();
+
+                Response response = client.newCall(request).execute();
+
+                if (response.code() == 200) {
+                    JSONArray tasksJson = new JSONObject(response.body().string()).getJSONArray("data");
+                    monthTasks = new ObjectMapper().readValue(tasksJson.toString(), new TypeReference<ArrayList<Task>>() {
+                    });
+                }
+                return null;
+            } catch (Exception exc) {
+                exc.printStackTrace();
+                return null;
+            }
+        }
+
+        @Override
+        protected void onPostExecute(Integer responseCode) {
+            super.onPostExecute(responseCode);
+            try {
+                updateDecorators(monthTasks);
             } catch (Exception exc) {
                 exc.printStackTrace();
             }

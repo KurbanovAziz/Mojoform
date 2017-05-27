@@ -60,6 +60,7 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
     public void onBindViewHolder(TaskViewHolder viewHolder, int i) {
         final Task task = tasks.get(i);
         String templateId = null;
+        String nodeForTasksId = null;
         viewHolder.taskActiveCircle.setVisibility((task.suspended == null || task.suspended) ? View.INVISIBLE : View.VISIBLE);
         if (task.suspended != null && !task.suspended) {
             ((GradientDrawable) viewHolder.taskActiveCircle.getBackground()).setColor(task.dueDate.after(new Date()) ? Color.GREEN : Color.RED);
@@ -83,20 +84,25 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
                         viewHolder.taskTitle.setText(variable.value);
                     if (variable.name.equals("TemplateId"))
                         templateId = variable.value;
+                    if (variable.name.equals("DocumentFolderUUID"))
+                        nodeForTasksId = variable.value;
                 }
         }
 
         if (templateId != null) {
             final String finalTemplateId = templateId;
+            final String finalNodeForTasksId = nodeForTasksId;
+
             if (task.suspended == null || task.suspended)
                 viewHolder.itemView.setOnClickListener(null);
-            else
+            else {
                 viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        parentFragment.showFillTemplateWindow(finalTemplateId, task.id);
+                        parentFragment.showFillTemplateWindow(finalTemplateId, task.id, finalNodeForTasksId);
                     }
                 });
+            }
         }
     }
 

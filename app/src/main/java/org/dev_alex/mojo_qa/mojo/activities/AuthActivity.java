@@ -124,6 +124,10 @@ public class AuthActivity extends AppCompatActivity {
 
                 if (loginWithinToken) {
                     if (responseCode == 202) {
+                        if (user == null) {
+                            Toast.makeText(AuthActivity.this, getString(R.string.unknown_error), Toast.LENGTH_LONG).show();
+                            return;
+                        }
                         Data.currentUser = user;
                         TokenService.updateToken(user.token, user.userName);
                         Data.taskAuthLogin = user.userName;
@@ -141,6 +145,10 @@ public class AuthActivity extends AppCompatActivity {
                     else if (responseCode == 401)
                         Toast.makeText(AuthActivity.this, R.string.invalid_username_or_password, Toast.LENGTH_LONG).show();
                     else if (responseCode == 202) {
+                        if (user == null) {
+                            Toast.makeText(AuthActivity.this, getString(R.string.unknown_error), Toast.LENGTH_LONG).show();
+                            return;
+                        }
                         Data.currentUser = user;
                         Data.taskAuthLogin = user.userName;
                         LoginHistoryService.addUser(user);

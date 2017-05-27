@@ -91,10 +91,10 @@ public class FileAdapter extends RecyclerView.Adapter<FileAdapter.FileViewHolder
                 viewHolder.card.setBackgroundResource(R.drawable.file_card_grid_background);
 
             FrameLayout.LayoutParams imageLayoutParams = (FrameLayout.LayoutParams) viewHolder.filePreview.getLayoutParams();
-            if (parentFragment.bitmapCacheService.hasPreviewInMemCache(file.id)) {
+            if (parentFragment.bitmapCacheService.hasThumbnailInMemCache(file.id)) {
                 imageLayoutParams.height = ViewGroup.LayoutParams.MATCH_PARENT;
 
-                Bitmap bitmap = parentFragment.bitmapCacheService.getPreviewFromMemCache(file.id);
+                Bitmap bitmap = parentFragment.bitmapCacheService.getThumbnailFromMemCache(file.id);
                 viewHolder.filePreview.setImageBitmap(bitmap);
             } else {
                 viewHolder.filePreview.setImageResource(R.drawable.no_image);

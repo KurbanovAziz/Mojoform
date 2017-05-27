@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@drawable/main_activity_background">
 
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@drawable/main_activity_background">
+        android:layout_above="@+id/buttons_block">
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -69,109 +70,6 @@
                 android:layout_marginRight="8dp"
                 android:layout_marginTop="12dp" />
 
-            <LinearLayout
-                android:id="@+id/buttons_block"
-                android:layout_width="match_parent"
-                android:layout_height="69.5dp"
-                android:layout_below="@id/root_container"
-                android:baselineAligned="false"
-                android:orientation="horizontal"
-                android:visibility="gone">
-
-                <FrameLayout
-                    android:id="@+id/left_arrow"
-                    android:layout_width="30dp"
-                    android:layout_height="match_parent"
-                    android:layout_gravity="center_vertical">
-
-                    <ImageView
-                        android:layout_width="22dp"
-                        android:layout_height="22dp"
-                        android:layout_gravity="right|center_vertical"
-                        android:adjustViewBounds="true"
-                        android:src="@drawable/left_arrow" />
-                </FrameLayout>
-
-                <Space
-                    android:id="@+id/left_space"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="0.5"
-                    android:visibility="gone" />
-
-                <FrameLayout
-                    android:layout_width="0dp"
-                    android:layout_height="59dp"
-                    android:layout_marginTop="12dp"
-                    android:layout_weight="1">
-
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:background="@drawable/purple_btn_with_shadow" />
-
-                    <TextView
-                        android:id="@+id/hold_task_btn"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_marginLeft="8dp"
-                        android:layout_marginRight="8dp"
-                        android:gravity="center"
-                        android:paddingBottom="14dp"
-                        android:text="@string/hold"
-                        android:textColor="@android:color/white"
-                        android:textSize="15.5sp" />
-                </FrameLayout>
-
-                <FrameLayout
-                    android:id="@+id/finish_btn_container"
-                    android:layout_width="0dp"
-                    android:layout_height="59dp"
-                    android:layout_marginTop="12dp"
-                    android:layout_weight="1">
-
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:background="@drawable/green_btn_with_shadow" />
-
-                    <TextView
-                        android:id="@+id/finish_btn"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_marginLeft="8dp"
-                        android:layout_marginRight="8dp"
-                        android:gravity="center"
-                        android:paddingBottom="14dp"
-                        android:text="@string/finish"
-                        android:textColor="@android:color/white"
-                        android:textSize="15.5sp" />
-                </FrameLayout>
-
-                <Space
-                    android:id="@+id/right_space"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="0.5"
-                    android:visibility="gone" />
-
-                <FrameLayout
-                    android:id="@+id/right_arrow"
-                    android:layout_width="30dp"
-                    android:layout_height="match_parent">
-
-                    <ImageView
-                        android:layout_width="22dp"
-                        android:layout_height="22dp"
-                        android:layout_gravity="left|center_vertical"
-                        android:adjustViewBounds="true"
-                        android:rotation="180"
-                        android:src="@drawable/left_arrow" />
-                </FrameLayout>
-
-
-            </LinearLayout>
-
             <FrameLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -182,10 +80,109 @@
                     layout="@layout/page_selector_window"
                     android:visibility="gone" />
             </FrameLayout>
-
         </RelativeLayout>
-
     </ScrollView>
+
+    <LinearLayout
+        android:id="@+id/buttons_block"
+        android:layout_width="match_parent"
+        android:layout_height="69.5dp"
+        android:layout_alignParentBottom="true"
+        android:baselineAligned="false"
+        android:orientation="horizontal"
+        android:visibility="gone">
+
+        <FrameLayout
+            android:id="@+id/left_arrow"
+            android:layout_width="30dp"
+            android:layout_height="match_parent"
+            android:layout_gravity="center_vertical">
+
+            <ImageView
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:layout_gravity="right|center_vertical"
+                android:adjustViewBounds="true"
+                android:src="@drawable/left_arrow" />
+        </FrameLayout>
+
+        <Space
+            android:id="@+id/left_space"
+            android:layout_width="0dp"
+            android:layout_height="54dp"
+            android:layout_weight="0.5"
+            android:visibility="gone" />
+
+        <FrameLayout
+            android:layout_width="0dp"
+            android:layout_height="54dp"
+            android:layout_marginTop="12dp"
+            android:layout_weight="1">
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/purple_btn_with_shadow" />
+
+            <TextView
+                android:id="@+id/hold_task_btn"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="8dp"
+                android:layout_marginRight="8dp"
+                android:gravity="center"
+                android:paddingBottom="13dp"
+                android:text="@string/hold"
+                android:textColor="@android:color/white"
+                android:textSize="15.5sp" />
+        </FrameLayout>
+
+        <FrameLayout
+            android:id="@+id/finish_btn_container"
+            android:layout_width="0dp"
+            android:layout_height="54dp"
+            android:layout_marginTop="12dp"
+            android:layout_weight="1">
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="54dp"
+                android:background="@drawable/green_btn_with_shadow" />
+
+            <TextView
+                android:id="@+id/finish_btn"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="8dp"
+                android:layout_marginRight="8dp"
+                android:gravity="center"
+                android:paddingBottom="13dp"
+                android:text="@string/finish"
+                android:textColor="@android:color/white"
+                android:textSize="15.5sp" />
+        </FrameLayout>
+
+        <Space
+            android:id="@+id/right_space"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.5"
+            android:visibility="gone" />
+
+        <FrameLayout
+            android:id="@+id/right_arrow"
+            android:layout_width="30dp"
+            android:layout_height="match_parent">
+
+            <ImageView
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:layout_gravity="left|center_vertical"
+                android:adjustViewBounds="true"
+                android:rotation="180"
+                android:src="@drawable/left_arrow" />
+        </FrameLayout>
+    </LinearLayout>
 
     <FrameLayout
         android:id="@+id/select_btn_popup"

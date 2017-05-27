@@ -1,22 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="wrap_content"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
-    android:paddingLeft="10dp">
+    android:paddingLeft="10dp"
+    android:paddingRight="10dp">
 
-    <CheckBox xmlns:android="http://schemas.android.com/apk/res/android"
-        android:layout_width="match_parent"
+    <CheckBox
+        android:id="@+id/checkBox"
+        android:layout_width="50dp"
         android:layout_height="50dp"
-        android:layout_gravity="center_vertical"
         android:button="@drawable/custom_check_box" />
 
-    <TextView
-        android:layout_width="match_parent"
+    <FrameLayout
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginRight="5dp"
+        android:layout_marginTop="9dp"
+        android:layout_weight="1">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="qwe" />
+    </FrameLayout>
+
+    <ImageView
+        android:layout_width="15dp"
+        android:layout_height="15dp"
         android:layout_gravity="center_vertical"
-        android:layout_marginLeft="10dp"
-        android:ellipsize="end"
-        android:maxLines="2" />
+        android:adjustViewBounds="true"
+        android:src="@drawable/red_star" />
 </LinearLayout>

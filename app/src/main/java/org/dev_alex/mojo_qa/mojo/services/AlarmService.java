@@ -52,6 +52,7 @@ public class AlarmService extends Service {
     public final static String NOTIFICATIONS_CT = "notifications_count";
 
     public final static String TASK_ID = "task_id";
+    public final static String NODE_FOR_TASKS = "task_node_id";
     public final static String TASK_NAME = "task_name";
     public final static String TEMPLATE_ID = "template_id";
     public final static String MESSAGE = "message";
@@ -69,8 +70,9 @@ public class AlarmService extends Service {
             String taskId = intent.getStringExtra(TASK_ID);
             String taskName = intent.getStringExtra(TASK_NAME);
             String templateId = intent.getStringExtra(TEMPLATE_ID);
+            String nodeForTasksID = intent.getStringExtra(NODE_FOR_TASKS);
             String message = intent.getStringExtra(MESSAGE);
-            new CheckIfTaskFinishedTask(taskId, taskName, templateId, message).execute();
+            new CheckIfTaskFinishedTask(taskId, taskName, templateId, message, nodeForTasksID).execute();
         } else {
             Log.d("mojo-alarm-log", "onStartCommand update tasks" + new Date().toString());
             if (TokenService.isTokenExists()) {
@@ -115,6 +117,7 @@ public class AlarmService extends Service {
             intent.putExtra(TASK_ID, task.id);
             intent.putExtra(TASK_NAME, getTaskName(task));
             intent.putExtra(TEMPLATE_ID, getTaskTemplateId(task));
+            intent.putExtra(NODE_FOR_TASKS, getTaskNodeId(task));
             intent.putExtra(MESSAGE, "Через час.");
             createAlarmTask(random, intent, task.dueDate.getTime() - 60 * 60 * 1000);
         }
@@ -124,6 +127,7 @@ public class AlarmService extends Service {
             intent.putExtra(TASK_ID, task.id);
             intent.putExtra(TASK_NAME, getTaskName(task));
             intent.putExtra(TEMPLATE_ID, getTaskTemplateId(task));
+            intent.putExtra(NODE_FOR_TASKS, getTaskNodeId(task));
             intent.putExtra(MESSAGE, "Через 15 минут.");
             createAlarmTask(random, intent, task.dueDate.getTime() - 15 * 60 * 1000);
         }
@@ -133,6 +137,7 @@ public class AlarmService extends Service {
             intent.putExtra(TASK_ID, task.id);
             intent.putExtra(TASK_NAME, getTaskName(task));
             intent.putExtra(TEMPLATE_ID, getTaskTemplateId(task));
+            intent.putExtra(NODE_FOR_TASKS, getTaskNodeId(task));
             intent.putExtra(MESSAGE, "Сейчас.");
             createAlarmTask(random, intent, task.dueDate.getTime());
         }
@@ -147,6 +152,7 @@ public class AlarmService extends Service {
                 intent.putExtra(TASK_ID, task.id);
                 intent.putExtra(TASK_NAME, getTaskName(task));
                 intent.putExtra(TEMPLATE_ID, getTaskTemplateId(task));
+                intent.putExtra(NODE_FOR_TASKS, getTaskNodeId(task));
                 intent.putExtra(MESSAGE, "overdue");
                 createAlarmTask(random, intent, overDueTime, 60 * 60 * 1000);
                 overdueAlarmSent = true;
@@ -175,7 +181,7 @@ public class AlarmService extends Service {
         am.setInexactRepeating(AlarmManager.RTC_WAKEUP, triggerAt, interval, pi);
     }
 
-    private void showNotification(String taskName, String message, String taskId, String templateId) {
+    private void showNotification(String taskName, String message, String taskId, String templateId, String nodeForTasksId) {
         Log.d("mojo-alarm-log", "showNotification " + message);
         try {
             if (Data.currentTaskId != null && Data.currentTaskId.equals(taskId) && isForeground(MainActivity.class.getPackage().getName()))
@@ -192,6 +198,7 @@ public class AlarmService extends Service {
         Intent notificationIntent = new Intent(context, AuthActivity.class);
         notificationIntent.putExtra(TASK_ID, taskId);
         notificationIntent.putExtra(TEMPLATE_ID, templateId);
+        notificationIntent.putExtra(NODE_FOR_TASKS, nodeForTasksId);
         notificationIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         PendingIntent contentIntent = PendingIntent.getActivity(context, (int) new Date().getTime(), notificationIntent, PendingIntent.FLAG_CANCEL_CURRENT);
 
@@ -266,6 +273,19 @@ public class AlarmService extends Service {
         }
     }
 
+    private String getTaskNodeId(Task task) {
+        if (task.processInstanceId == null) {
+            return task.name;
+        } else {
+            if (task.variables != null)
+                for (Variable variable : task.variables) {
+                    if (variable.name.equals("DocumentFolderUUID"))
+                        return (variable.value);
+                }
+            return "";
+        }
+    }
+
     private String getTaskTemplateId(Task task) {
         for (Variable variable : task.variables) {
             if (variable.name.equals("TemplateId"))
@@ -307,11 +327,11 @@ public class AlarmService extends Service {
                 dateParams += "&dueBefore=" + isoDateFormat.format(monthCalendar.getTime());
                 String sortParams = "&sort=dueDate&order=desc&size=100";
 
-                String url = "https://activiti.dev-alex.org/activiti-rest/service/runtime/tasks?assignee="
-                        + Data.currentUser.userName + "&includeProcessVariables=TRUE" + dateParams + sortParams;
+                String url = getString(R.string.tasks_host) + "/runtime/tasks?assignee="
+                        + userName + "&includeProcessVariables=TRUE" + dateParams + sortParams;
 
                 OkHttpClient client = new OkHttpClient();
-                Request request = new Request.Builder().header("Authorization", Credentials.basic(Data.taskAuthLogin, Data.taskAuthPass))
+                Request request = new Request.Builder().header("Authorization", Credentials.basic(userName, Data.taskAuthPass))
                         .url(url).build();
 
                 Response response = client.newCall(request).execute();
@@ -354,23 +374,25 @@ public class AlarmService extends Service {
         private Task task;
         private String taskId;
         private String taskName;
+        private String nodeForTasksId;
         private String templateId;
         private String message;
 
-        CheckIfTaskFinishedTask(String taskId, String taskName, String templateId, String message) {
+        CheckIfTaskFinishedTask(String taskId, String taskName, String templateId, String message, String nodeForTasksId) {
             this.taskId = taskId;
             this.taskName = taskName;
             this.templateId = templateId;
             this.message = message;
+            this.nodeForTasksId = nodeForTasksId;
         }
 
         @Override
         protected Boolean doInBackground(Void... params) {
             try {
-                String url = "https://activiti.dev-alex.org/activiti-rest/service/runtime/tasks/" + taskId;
+                String url = getString(R.string.tasks_host) + "/runtime/tasks/" + taskId;
 
                 OkHttpClient client = new OkHttpClient();
-                Request request = new Request.Builder().header("Authorization", Credentials.basic(Data.taskAuthLogin, Data.taskAuthPass))
+                Request request = new Request.Builder().header("Authorization", Credentials.basic(TokenService.getUsername(), Data.taskAuthPass))
                         .url(url).build();
 
                 Response response = client.newCall(request).execute();
@@ -400,7 +422,7 @@ public class AlarmService extends Service {
                             int hoursCt = (int) Math.abs((new Date().getTime() - task.dueDate.getTime()) / (60 * 60 * 1000));
                             message = String.format(Locale.getDefault(), "Просрочено %d час%s(ов)", hoursCt, hoursCt == 1 ? "" : "a");
                         }
-                        showNotification(taskName, message, taskId, templateId);
+                        showNotification(taskName, message, taskId, templateId, nodeForTasksId);
                     }
                 }
             } catch (Exception exc) {
