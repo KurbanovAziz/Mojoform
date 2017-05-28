@@ -376,10 +376,15 @@ public class TasksFragment extends Fragment {
 
                     if (response.code() == 200) {
                         JSONArray tasksJson = new JSONObject(response.body().string()).getJSONArray("data");
-                        if (i == 0)
+                        if (i == 0) {
                             finishedTasks = new ObjectMapper().readValue(tasksJson.toString(), new TypeReference<ArrayList<Task>>() {
                             });
-                        else
+                            ArrayList<Task> resultTasks = new ArrayList<>();
+                            for (Task task : finishedTasks)
+                                if (task.deleteReason == null)
+                                    resultTasks.add(task);
+                            finishedTasks = resultTasks;
+                        } else
                             busyTasks = new ObjectMapper().readValue(tasksJson.toString(), new TypeReference<ArrayList<Task>>() {
                             });
                     }

@@ -873,7 +873,7 @@ public class TemplateFragment extends Fragment {
         else
             ((TextView) ((ViewGroup) signatureContainer.getChildAt(0)).getChildAt(0)).setText("Нет текста");
 
-        signatureContainer.getChildAt(2).setOnClickListener(new View.OnClickListener() {
+        ((ViewGroup) signatureContainer.getChildAt(2)).getChildAt(1).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 signaturePad.clear();
