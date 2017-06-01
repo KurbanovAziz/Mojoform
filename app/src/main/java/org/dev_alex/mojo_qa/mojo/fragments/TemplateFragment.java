@@ -102,6 +102,7 @@ public class TemplateFragment extends Fragment {
     private ProgressDialog loopDialog;
     private String templateId;
     private String taskId;
+    private long dueDate;
     private ArrayList<Page> pages;
     private int currentPagePos;
     private JSONObject template;
@@ -114,9 +115,10 @@ public class TemplateFragment extends Fragment {
     private ProgressDialog progressDialog;
 
 
-    public static TemplateFragment newInstance(String templateId, String taskId, String nodeForTasks) {
+    public static TemplateFragment newInstance(String templateId, String taskId, String nodeForTasks, long dueDate) {
         Bundle args = new Bundle();
         args.putString("template_id", templateId);
+        args.putLong("due_date", dueDate);
         args.putString("task_id", taskId);
         if (nodeForTasks != null && !nodeForTasks.isEmpty())
             args.putString("task_node_id", nodeForTasks);
@@ -137,6 +139,7 @@ public class TemplateFragment extends Fragment {
             ((MainActivity) getActivity()).drawer.getDrawerLayout().setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
             templateId = getArguments().getString("template_id");
             taskId = getArguments().getString("task_id");
+            dueDate = getArguments().getLong("due_date");
             NODE_FOR_TASKS = getArguments().getString("task_node_id");
 
             initDialog();
@@ -145,6 +148,7 @@ public class TemplateFragment extends Fragment {
             setListeners();
 
             new GetTemplateTask().execute();
+
         }
         return rootView;
     }
@@ -153,7 +157,7 @@ public class TemplateFragment extends Fragment {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == PHOTO_REQUEST_CODE && resultCode == RESULT_OK) {
-            if (data == null || new File(cameraImagePath).exists())
+            if (new File(cameraImagePath).exists() || data == null)
                 new ProcessingBitmapTask(cameraImagePath, true).execute();
             else {
                 String picturePath = Utils.getRealPathFromIntentData(getContext(), data.getData());
@@ -638,6 +642,7 @@ public class TemplateFragment extends Fragment {
                         String html = "<html><head></head><body> " + value.getString("html") + " </body></html>";
                         html = html.replace(getString(R.string.host), "");
                         html = html.replace("/api", getString(R.string.host) + "/api");
+                        html = Utils.formatHtmlImagesSize(html);
 
                         richEdit.getSettings().setJavaScriptEnabled(true);
                         String cookieString = "auth_token=" + TokenService.getToken();
@@ -658,7 +663,6 @@ public class TemplateFragment extends Fragment {
                 default:
                     Log.d("jeka", fields.get(i));
             }
-
 
             Space space = new Space(getContext());
             space.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, (int) TypedValue.applyDimension(
@@ -1687,6 +1691,8 @@ public class TemplateFragment extends Fragment {
                     if (response.code() == 200) {
                         String responseStr = response.body().string();
                         template = new JSONObject(responseStr);
+                        template.put("StartTime", isoDateFormat.format(new Date()));
+                        template.put("DueTime", isoDateFormat.format(new Date(dueDate)));
                     }
                     return response.code();
                 }
@@ -1865,15 +1871,12 @@ public class TemplateFragment extends Fragment {
                 else
                     resultJson.put("StartTime", isoDateFormat.format(new Date()));
 
-                if (resultJson.has("DueTime"))
+                if (template.has("DueTime"))
                     resultJson.put("DueTime", template.getString("DueTime"));
                 else
                     resultJson.put("DueTime", isoDateFormat.format(new Date()));
 
-                if (resultJson.has("CompleteTime"))
-                    resultJson.put("CompleteTime", template.getString("CompleteTime"));
-                else
-                    resultJson.put("CompleteTime", isoDateFormat.format(new Date()));
+                resultJson.put("CompleteTime", isoDateFormat.format(new Date()));
 
                 Log.d("mojo-log", "result template: " + resultJson.toString());
 
@@ -1885,7 +1888,6 @@ public class TemplateFragment extends Fragment {
         @Override
         protected Integer doInBackground(Void... params) {
             try {
-
                 Response response = RequestService.createPostRequest("/api/fs-mojo/create/" + NODE_FOR_TASKS + "/document", resultJson.toString());
                 String responseBody = response.body().string();
                 if (response.code() == 201 || response.code() == 200 || response.code() == 409) {

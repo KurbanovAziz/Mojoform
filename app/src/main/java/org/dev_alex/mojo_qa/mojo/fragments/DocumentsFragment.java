@@ -955,7 +955,7 @@ public class DocumentsFragment extends Fragment {
         protected void onPreExecute() {
             super.onPreExecute();
             loopDialog.show();
-            String resultFileName = UUID.randomUUID().toString() + "." + Utils.getFileExstation(file.name);
+            String resultFileName = UUID.randomUUID().toString() + "." + Utils.getFileExtension(file.name);
             resultFile = new java.io.File(getContext().getCacheDir(), resultFileName);
         }
 

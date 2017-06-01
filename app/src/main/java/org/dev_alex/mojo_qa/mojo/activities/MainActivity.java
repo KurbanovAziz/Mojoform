@@ -27,6 +27,7 @@ import org.dev_alex.mojo_qa.mojo.services.AlarmService;
 import org.dev_alex.mojo_qa.mojo.services.RequestService;
 import org.dev_alex.mojo_qa.mojo.services.TokenService;
 
+import java.util.Date;
 import java.util.Locale;
 
 import okhttp3.Response;
@@ -50,10 +51,11 @@ public class MainActivity extends AppCompatActivity {
             String templateId = getIntent().getStringExtra(AlarmService.TEMPLATE_ID);
             String taskId = getIntent().getStringExtra(AlarmService.TASK_ID);
             String nodeForTasks = getIntent().getStringExtra(AlarmService.NODE_FOR_TASKS);
+            long dueDate = getIntent().getLongExtra(AlarmService.DUE_DATE, new Date().getTime());
 
             if (templateId != null && !templateId.isEmpty() && taskId != null && !taskId.isEmpty())
                 getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.container, TemplateFragment.newInstance(templateId, taskId, nodeForTasks)).addToBackStack(null).commit();
+                        .replace(R.id.container, TemplateFragment.newInstance(templateId, taskId, nodeForTasks, dueDate)).addToBackStack(null).commit();
         }
     }
 

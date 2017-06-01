@@ -319,9 +319,9 @@ public class TasksFragment extends Fragment {
         loopDialog.setCancelable(false);
     }
 
-    public void showFillTemplateWindow(String templateId, String taskId, String taskNodeId) {
+    public void showFillTemplateWindow(String templateId, String taskId, String taskNodeId, long dueDate) {
         getActivity().getSupportFragmentManager().beginTransaction()
-                .replace(R.id.container, TemplateFragment.newInstance(templateId, taskId, taskNodeId)).addToBackStack(null).commit();
+                .replace(R.id.container, TemplateFragment.newInstance(templateId, taskId, taskNodeId, dueDate)).addToBackStack(null).commit();
     }
 
     private class GetTasksTask extends AsyncTask<Void, Void, Integer> {

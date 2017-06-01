@@ -56,6 +56,7 @@ public class AlarmService extends Service {
     public final static String TASK_NAME = "task_name";
     public final static String TEMPLATE_ID = "template_id";
     public final static String MESSAGE = "message";
+    public final static String DUE_DATE = "due_date";
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -181,7 +182,7 @@ public class AlarmService extends Service {
         am.setInexactRepeating(AlarmManager.RTC_WAKEUP, triggerAt, interval, pi);
     }
 
-    private void showNotification(String taskName, String message, String taskId, String templateId, String nodeForTasksId) {
+    private void showNotification(String taskName, String message, String taskId, String templateId, String nodeForTasksId, long dueDate) {
         Log.d("mojo-alarm-log", "showNotification " + message);
         try {
             if (Data.currentTaskId != null && Data.currentTaskId.equals(taskId) && isForeground(MainActivity.class.getPackage().getName()))
@@ -199,6 +200,7 @@ public class AlarmService extends Service {
         notificationIntent.putExtra(TASK_ID, taskId);
         notificationIntent.putExtra(TEMPLATE_ID, templateId);
         notificationIntent.putExtra(NODE_FOR_TASKS, nodeForTasksId);
+        notificationIntent.putExtra(DUE_DATE, dueDate);
         notificationIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         PendingIntent contentIntent = PendingIntent.getActivity(context, (int) new Date().getTime(), notificationIntent, PendingIntent.FLAG_CANCEL_CURRENT);
 
@@ -422,7 +424,7 @@ public class AlarmService extends Service {
                             int hoursCt = (int) Math.abs((new Date().getTime() - task.dueDate.getTime()) / (60 * 60 * 1000));
                             message = String.format(Locale.getDefault(), "Просрочено %d час%s(ов)", hoursCt, hoursCt == 1 ? "" : "a");
                         }
-                        showNotification(taskName, message, taskId, templateId, nodeForTasksId);
+                        showNotification(taskName, message, taskId, templateId, nodeForTasksId, task.dueDate != null ? task.dueDate.getTime() : new Date().getTime());
                     }
                 }
             } catch (Exception exc) {

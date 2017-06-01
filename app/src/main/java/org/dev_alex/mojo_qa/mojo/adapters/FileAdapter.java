@@ -111,11 +111,24 @@ public class FileAdapter extends RecyclerView.Adapter<FileAdapter.FileViewHolder
                 viewHolder.card.setBackgroundResource(R.drawable.task_card_background);
         }
 
-        if (parentFragment.bitmapCacheService.hasThumbnailInMemCache(file.id)) {
-            Bitmap bitmap = parentFragment.bitmapCacheService.getThumbnailFromMemCache(file.id);
-            viewHolder.fileIcon.setImageBitmap(bitmap);
-        } else
-            viewHolder.fileIcon.setImageResource(R.drawable.file_icon);
+        String mimeType = file.nodeType;
+        switch (mimeType) {
+            case "cm:content":
+                viewHolder.fileIcon.setImageResource(R.drawable.icon_mojo_file);
+                break;
+            case "mojo:template":
+                viewHolder.fileIcon.setImageResource(R.drawable.icon_template);
+                break;
+            case "mojo:document":
+                viewHolder.fileIcon.setImageResource(R.drawable.icon_filled_doc);
+                break;
+            case "mojo:analytic":
+                viewHolder.fileIcon.setImageResource(R.drawable.icon_analytics);
+                break;
+            default:
+                viewHolder.fileIcon.setImageResource(R.drawable.icon_mojo_file);
+                break;
+        }
 
         viewHolder.selectedTick.setVisibility(selectionModeEnabled && selectedIds.contains(file.id) ? View.VISIBLE : View.GONE);
 

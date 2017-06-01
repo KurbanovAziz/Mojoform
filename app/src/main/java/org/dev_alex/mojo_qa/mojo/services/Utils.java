@@ -17,6 +17,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.webkit.MimeTypeMap;
 import android.widget.EditText;
 
+import org.dev_alex.mojo_qa.mojo.App;
 import org.json.JSONArray;
 
 import java.io.File;
@@ -61,7 +62,7 @@ public class Utils {
         }
     }
 
-    public static String getFileExstation(String fileName) {
+    public static String getFileExtension(String fileName) {
         if (fileName.lastIndexOf(".") != -1)
             return fileName.substring(fileName.lastIndexOf("."));
         return "";
@@ -136,6 +137,37 @@ public class Utils {
         }
         in.close();
         out.close();
+    }
+
+    public static String formatHtmlImagesSize(String html) {
+        String imgTag = "<img";
+        String videoTag = "<iframe";
+
+        html = formatHtmlBlockSize(html, imgTag);
+        html = formatHtmlBlockSize(html, videoTag);
+        return html;
+    }
+
+    private static String formatHtmlBlockSize(String html, String tag) {
+        int index = 0;
+        String widthStr = "width=\"";
+        String heightStr = "height=\"";
+
+        while ((index = html.indexOf(tag, index)) != -1) {
+            try {
+                int heightI = html.indexOf(heightStr, index);
+                int widthI = html.indexOf(widthStr, index);
+                if (heightI != -1 && widthI != -1) {
+                    html = html.substring(0, widthI + widthStr.length()) + "100%" + html.substring(html.indexOf("\"", widthI + widthStr.length() + 1));
+                    heightI = html.indexOf(heightStr, index);
+                    html = html.substring(0, heightI + heightStr.length()) + "auto" + html.substring(html.indexOf("\"", heightI + heightStr.length() + 1));
+                }
+                index++;
+            } catch (Exception exc) {
+                index++;
+            }
+        }
+        return html;
     }
 
     public static boolean isImage(String path) {
