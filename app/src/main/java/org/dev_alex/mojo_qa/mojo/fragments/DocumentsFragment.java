@@ -893,7 +893,9 @@ public class DocumentsFragment extends Fragment {
                     for (int i = 0; i < tasksEntriesJson.length(); i++)
                         if (fileId == null) {
                             JSONObject organization = tasksEntriesJson.getJSONObject(i).getJSONObject("entry");
-                            allFiles.add(convertOrganizationToFolder(organization));
+                            File fileOrg = convertOrganizationToFolder(organization);
+                            if (fileOrg != null)
+                                allFiles.add(fileOrg);
                         } else
                             allFiles.add(mapper.readValue(tasksEntriesJson.getJSONObject(i).getJSONObject("entry").toString(), File.class));
 

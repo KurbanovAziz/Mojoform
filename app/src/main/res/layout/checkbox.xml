@@ -13,23 +13,9 @@
         android:layout_height="50dp"
         android:button="@drawable/custom_check_box" />
 
-    <FrameLayout
-        android:layout_width="0dp"
+    <TextView
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginRight="5dp"
-        android:layout_marginTop="9dp"
-        android:layout_weight="1">
+        android:text="qwe" />
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="qwe" />
-    </FrameLayout>
-
-    <ImageView
-        android:layout_width="15dp"
-        android:layout_height="15dp"
-        android:layout_gravity="center_vertical"
-        android:adjustViewBounds="true"
-        android:src="@drawable/red_star" />
 </LinearLayout>

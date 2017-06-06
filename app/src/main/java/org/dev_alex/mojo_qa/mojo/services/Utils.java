@@ -17,7 +17,6 @@ import android.view.inputmethod.InputMethodManager;
 import android.webkit.MimeTypeMap;
 import android.widget.EditText;
 
-import org.dev_alex.mojo_qa.mojo.App;
 import org.json.JSONArray;
 
 import java.io.File;
@@ -64,7 +63,7 @@ public class Utils {
 
     public static String getFileExtension(String fileName) {
         if (fileName.lastIndexOf(".") != -1)
-            return fileName.substring(fileName.lastIndexOf("."));
+            return fileName.substring(fileName.lastIndexOf(".") + 1);
         return "";
     }
 
@@ -152,15 +151,23 @@ public class Utils {
         int index = 0;
         String widthStr = "width=\"";
         String heightStr = "height=\"";
+        String endOfTag = "/>";
 
         while ((index = html.indexOf(tag, index)) != -1) {
             try {
+                int endTagI = html.indexOf(endOfTag);
                 int heightI = html.indexOf(heightStr, index);
                 int widthI = html.indexOf(widthStr, index);
-                if (heightI != -1 && widthI != -1) {
-                    html = html.substring(0, widthI + widthStr.length()) + "100%" + html.substring(html.indexOf("\"", widthI + widthStr.length() + 1));
-                    heightI = html.indexOf(heightStr, index);
-                    html = html.substring(0, heightI + heightStr.length()) + "auto" + html.substring(html.indexOf("\"", heightI + heightStr.length() + 1));
+
+
+                if (endTagI != -1) {
+                    if (heightI != -1 && widthI != -1) {
+                        html = html.substring(0, widthI + widthStr.length()) + "100%" + html.substring(html.indexOf("\"", widthI + widthStr.length() + 1));
+                        heightI = html.indexOf(heightStr, index);
+                        html = html.substring(0, heightI + heightStr.length()) + "auto" + html.substring(html.indexOf("\"", heightI + heightStr.length() + 1));
+                    } else {
+                        html = html.substring(0, endTagI) + String.valueOf(" width=\"100%\" height=\"auto\" ") + html.substring(endTagI);
+                    }
                 }
                 index++;
             } catch (Exception exc) {

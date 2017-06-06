@@ -11,6 +11,7 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.mikepenz.materialdrawer.Drawer;
 import com.mikepenz.materialdrawer.DrawerBuilder;
@@ -45,6 +46,9 @@ public class MainActivity extends AppCompatActivity {
             getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
 
         initDrawer();
+        if (drawer == null)
+            return;
+
         drawer.setSelection(1, false);
         getSupportFragmentManager().beginTransaction().replace(R.id.container, TasksFragment.newInstance(), "tasks").commit();
         if (getIntent().hasExtra(AlarmService.TEMPLATE_ID)) {
@@ -63,6 +67,11 @@ public class MainActivity extends AppCompatActivity {
         View headerView = getLayoutInflater().inflate(R.layout.drawer_header, null);
         if (Data.currentUser != null) {
             ((TextView) headerView.findViewById(R.id.user_name)).setText(Data.currentUser.firstName + " " + Data.currentUser.lastName);
+        } else {
+            startActivity(new Intent(this, AuthActivity.class));
+            Toast.makeText(this, "Ошибка авторизации", Toast.LENGTH_SHORT).show();
+            finish();
+            return;
         }
 
         drawer = new DrawerBuilder()

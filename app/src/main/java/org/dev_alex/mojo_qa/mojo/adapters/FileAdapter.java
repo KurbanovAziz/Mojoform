@@ -1,6 +1,7 @@
 package org.dev_alex.mojo_qa.mojo.adapters;
 
 
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.support.v7.widget.RecyclerView;
 import android.util.TypedValue;
@@ -14,6 +15,7 @@ import android.widget.TextView;
 import org.dev_alex.mojo_qa.mojo.R;
 import org.dev_alex.mojo_qa.mojo.fragments.DocumentsFragment;
 import org.dev_alex.mojo_qa.mojo.models.File;
+import org.dev_alex.mojo_qa.mojo.services.Utils;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -114,7 +116,17 @@ public class FileAdapter extends RecyclerView.Adapter<FileAdapter.FileViewHolder
         String mimeType = file.nodeType;
         switch (mimeType) {
             case "cm:content":
-                viewHolder.fileIcon.setImageResource(R.drawable.icon_mojo_file);
+                String fileExt = Utils.getFileExtension(file.name);
+                if (!fileExt.isEmpty()) {
+                    Resources resources = parentFragment.getResources();
+                    final int resourceId = resources.getIdentifier("_" + fileExt, "drawable",
+                            parentFragment.getContext().getPackageName());
+                    if (resourceId != 0)
+                        viewHolder.fileIcon.setImageResource(resourceId);
+                    else
+                        viewHolder.fileIcon.setImageResource(R.drawable.icon_mojo_file);
+                } else
+                    viewHolder.fileIcon.setImageResource(R.drawable.icon_mojo_file);
                 break;
             case "mojo:template":
                 viewHolder.fileIcon.setImageResource(R.drawable.icon_template);
@@ -146,13 +158,22 @@ public class FileAdapter extends RecyclerView.Adapter<FileAdapter.FileViewHolder
                     parentFragment.checkIfSelectionModeFinished();
                 }
             });
-        } else
+        } else {
             viewHolder.moreBtn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     parentFragment.showPopUpWindow(file);
                 }
             });
+
+            if (file.nodeType.equals("cm:content"))
+                viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        parentFragment.new OpenFileTask(file).execute();
+                    }
+                });
+        }
 
         viewHolder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
@@ -165,15 +186,6 @@ public class FileAdapter extends RecyclerView.Adapter<FileAdapter.FileViewHolder
                 return true;
             }
         });
-
-
-        if (file.nodeType.equals("cm:content"))
-            viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    parentFragment.new OpenFileTask(file).execute();
-                }
-            });
     }
 
     @Override

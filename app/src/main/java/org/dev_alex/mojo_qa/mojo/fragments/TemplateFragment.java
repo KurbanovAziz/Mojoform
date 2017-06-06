@@ -160,19 +160,27 @@ public class TemplateFragment extends Fragment {
             if (new File(cameraImagePath).exists() || data == null)
                 new ProcessingBitmapTask(cameraImagePath, true).execute();
             else {
-                String picturePath = Utils.getRealPathFromIntentData(getContext(), data.getData());
-                if (picturePath == null) {
-                    Toast.makeText(getContext(), "что-то пошло не так", Toast.LENGTH_SHORT).show();
-                    return;
-                }
+                try {
+                    String picturePath = Utils.getRealPathFromIntentData(getContext(), data.getData());
+                    if (picturePath == null) {
+                        Toast.makeText(getContext(), "что-то пошло не так", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
 
-                String expansion = picturePath.substring(picturePath.lastIndexOf('.') + 1);
-                if (!expansion.equals("jpg") && !expansion.equals("png") && !expansion.equals("jpeg") && !expansion.equals("bmp")) {
-                    Toast.makeText(getContext(), "Пожалуйста, выберите файл в формет jpg, png или bmp", Toast.LENGTH_SHORT).show();
-                    return;
+                    String expansion = picturePath.substring(picturePath.lastIndexOf('.') + 1);
+                    if (!expansion.equals("jpg") && !expansion.equals("png") && !expansion.equals("jpeg") && !expansion.equals("bmp")) {
+                        Toast.makeText(getContext(), "Пожалуйста, выберите файл в формет jpg, png или bmp", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                    new ProcessingBitmapTask(picturePath, true).execute();
+                } catch (Exception exc) {
+                    exc.printStackTrace();
+                    try {
+                        new ProcessingBitmapTask(cameraImagePath, true).execute();
+                    } catch (Exception exc1) {
+                        Toast.makeText(getContext(), "Не удалось прикрепить изображение", Toast.LENGTH_SHORT).show();
+                    }
                 }
-                new ProcessingBitmapTask(picturePath, true).execute();
-
             }
         }
 
@@ -580,12 +588,10 @@ public class TemplateFragment extends Fragment {
                 case "checkbox":
                     LinearLayout checkBoxContainer = (LinearLayout) getActivity().getLayoutInflater().inflate(R.layout.checkbox, container, false);
 
-                    checkBoxContainer.getChildAt(2).setVisibility((value.has("is_required") && !value.getBoolean("is_required")) ? View.GONE : View.VISIBLE);
-
                     if (value.has("caption"))
-                        ((TextView) ((FrameLayout) checkBoxContainer.getChildAt(1)).getChildAt(0)).setText(value.getString("caption"));
+                        ((TextView) checkBoxContainer.getChildAt(1)).setText(value.getString("caption"));
                     else
-                        ((TextView) ((FrameLayout) checkBoxContainer.getChildAt(1)).getChildAt(0)).setText("Нет текста");
+                        ((TextView) checkBoxContainer.getChildAt(1)).setText("Нет текста");
 
                     ((CheckBox) checkBoxContainer.getChildAt(0)).setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                         @Override
@@ -764,11 +770,10 @@ public class TemplateFragment extends Fragment {
     private void createSeekBar(final JSONObject value, LinearLayout container) throws Exception {
         final LinearLayout seekBarContainer = (LinearLayout) getActivity().getLayoutInflater().inflate(R.layout.slider, container, false);
 
-        ((ViewGroup) seekBarContainer.getChildAt(0)).getChildAt(1).setVisibility(View.VISIBLE);
         if (value.has("caption"))
-            ((TextView) ((ViewGroup) seekBarContainer.getChildAt(0)).getChildAt(0)).setText(value.getString("caption"));
+            ((TextView) seekBarContainer.getChildAt(0)).setText(value.getString("caption"));
         else
-            ((TextView) ((ViewGroup) seekBarContainer.getChildAt(0)).getChildAt(0)).setText("Нет текста");
+            ((TextView) seekBarContainer.getChildAt(0)).setText("Нет текста");
 
         if (value.has("measure"))
             ((TextView) ((LinearLayout) ((LinearLayout) seekBarContainer.getChildAt(3)).getChildAt(1)).getChildAt(1)).setText(value.getString("measure"));
@@ -828,7 +833,10 @@ public class TemplateFragment extends Fragment {
             public void afterTextChanged(Editable s) {
                 String result;
                 if (!s.toString().isEmpty()) {
-                    result = s.toString();
+                    result = s.toString().trim();
+                    if (result.equals("-"))
+                        return;
+
                     float floatValue = Float.parseFloat(s.toString());
                    /* if (floatValue < minValue)
                         result = formatFloat(minValue);
@@ -1276,7 +1284,7 @@ public class TemplateFragment extends Fragment {
                 if (buttonJson.has("color"))
                     bgShape.setColor(Color.parseColor(buttonJson.getString("color")));
                 else
-                    bgShape.setColor(Color.parseColor("#FF0000"));
+                    bgShape.setColor(Color.parseColor("#c99fe3"));
             } else {
                 bgShape.setColor(Color.WHITE);
                 ((TextView) ((FrameLayout) checkButton.getParent()).getChildAt(2)).setTextColor(Color.parseColor("#4c3e60"));
