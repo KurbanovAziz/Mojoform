@@ -25,6 +25,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 
 public class Utils {
 
@@ -65,6 +67,12 @@ public class Utils {
         if (fileName.lastIndexOf(".") != -1)
             return fileName.substring(fileName.lastIndexOf(".") + 1);
         return "";
+    }
+
+    public static float trimFloatAfterPointValue(float value, int afterPointCt) {
+        BigDecimal bd = new BigDecimal(value);
+        BigDecimal res = bd.setScale(afterPointCt, RoundingMode.HALF_UP);
+        return res.floatValue();
     }
 
     public static JSONArray addAllItemsToJson(JSONArray toJsonArray, JSONArray fromJsonArray) {

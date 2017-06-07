@@ -784,24 +784,38 @@ public class TemplateFragment extends Fragment {
         final float minValue = (float) value.getDouble("min_value");
         final float maxValue = (float) value.getDouble("max_value");
         float step = (float) value.getDouble("step");
-        String minValueStr = String.valueOf(minValue), maxValueStr = String.valueOf(maxValue);
+        String minValueStr = String.valueOf(minValue), maxValueStr = String.valueOf(maxValue), stepValueStr = String.valueOf(step);
 
-        final int digitsAfterPoint = Math.max((minValueStr.contains(".")) ? 0 : minValueStr.substring(minValueStr.indexOf("." + 1)).length(),
-                (maxValueStr.contains(".")) ? 0 : maxValueStr.substring(maxValueStr.indexOf("." + 1)).length());
+        int digitsAfterPoint = Math.max((!minValueStr.contains(".")) ? 0 : minValueStr.substring(minValueStr.indexOf(".") + 1).length(),
+                (!maxValueStr.contains(".")) ? 0 : maxValueStr.substring(maxValueStr.indexOf(".") + 1).length());
+        digitsAfterPoint = Math.max(digitsAfterPoint,
+                (!stepValueStr.contains(".")) ? 0 : stepValueStr.substring(stepValueStr.indexOf(".") + 1).length());
+        final int finalDigitsAfterPoint = digitsAfterPoint;
+
         final int digitsOffset = (int) Math.pow(10, digitsAfterPoint);
 
         ((TextView) ((RelativeLayout) seekBarContainer.getChildAt(2)).getChildAt(0)).setText(formatFloat(minValue));
-
         ((TextView) ((RelativeLayout) seekBarContainer.getChildAt(2)).getChildAt(1)).setText(formatFloat(maxValue));
-        seekBar.setMax((int) ((maxValue - minValue) * digitsOffset));
-        seekBar.incrementProgressBy((int) (step * digitsOffset));
+
+        final int increment = (int) (step * digitsOffset);
+        final int max = (int) (((maxValue - minValue) * digitsOffset) / increment);
+
+        seekBar.setMax(max);
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             boolean trackByUser = false;
 
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                if (trackByUser)
-                    changeValue.setText(formatFloat((progress / digitsOffset) + minValue));
+                if (trackByUser) {
+                    float currentValue = ((float) progress / digitsOffset) * increment + minValue;
+                    if (progress == max)
+                        currentValue = maxValue;
+
+                    currentValue = Utils.trimFloatAfterPointValue(currentValue, finalDigitsAfterPoint);
+                    Log.d("jekaaa", progress + " floatValue = " + currentValue);
+
+                    changeValue.setText(formatFloat(currentValue));
+                }
             }
 
             @Override
@@ -820,6 +834,7 @@ public class TemplateFragment extends Fragment {
         else
             changeValue.setKeyListener(DigitsKeyListener.getInstance("0123456789."));
 
+        final int finalDigitsAfterPoint1 = digitsAfterPoint;
         changeValue.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -849,10 +864,11 @@ public class TemplateFragment extends Fragment {
                         changeValue.setText(result);
                     }
                     if (!s.toString().isEmpty())
-                        seekBar.setProgress(Math.round(Float.parseFloat(result) - minValue) * digitsOffset);
+                        seekBar.setProgress((int) (((Float.parseFloat(result) - minValue) * digitsOffset) / increment));
 
-                    float seekBarProgress = seekBar.getProgress() / digitsOffset + minValue;
-                    if (Float.compare(seekBarProgress, Float.parseFloat(result)) != 0)
+
+                    float currentFloatValue = Float.parseFloat(result);
+                    if (currentFloatValue < minValue || currentFloatValue > maxValue)
                         changeValue.setTextColor(Color.RED);
                     else
                         changeValue.setTextColor(Color.BLACK);
