@@ -25,6 +25,7 @@ public class FolderAdapter extends RecyclerView.Adapter<FolderAdapter.FolderView
     static class FolderViewHolder extends RecyclerView.ViewHolder {
         TextView folderName;
         ImageView moreBtn;
+        ImageView folderIcon;
         ImageView selectedTick;
         View card;
 
@@ -32,6 +33,7 @@ public class FolderAdapter extends RecyclerView.Adapter<FolderAdapter.FolderView
             super(itemView);
             folderName = (TextView) itemView.findViewById(R.id.folder_name);
             moreBtn = (ImageView) itemView.findViewById(R.id.more_btn);
+            folderIcon = (ImageView) itemView.findViewById(R.id.folder_icon_image);
             card = itemView.findViewById(R.id.card);
             selectedTick = (ImageView) itemView.findViewById(R.id.selected_tick);
         }
@@ -128,6 +130,9 @@ public class FolderAdapter extends RecyclerView.Adapter<FolderAdapter.FolderView
                     return true;
                 }
             });
+
+        viewHolder.folderIcon.setImageResource(folder.nodeType.equals("cm:org") ?
+                R.drawable.organization_icon : R.drawable.folder_icon);
     }
 
     @Override
