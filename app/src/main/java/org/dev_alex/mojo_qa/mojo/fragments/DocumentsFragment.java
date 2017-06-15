@@ -257,7 +257,7 @@ public class DocumentsFragment extends Fragment {
                 getActivity().findViewById(R.id.back_btn).setVisibility(View.VISIBLE);
 
             } else {
-                ((TextView) getActivity().findViewById(R.id.title)).setText(getString(R.string.documents));
+                ((TextView) getActivity().findViewById(R.id.title)).setText(R.string.organizations);
                 getActivity().findViewById(R.id.sandwich_btn).setVisibility(View.VISIBLE);
                 getActivity().findViewById(R.id.back_btn).setVisibility(View.GONE);
             }
@@ -440,8 +440,17 @@ public class DocumentsFragment extends Fragment {
         ((MaxHeightRecycleView) filesRecyclerView).setMaxHeightEnabled(true);
         LinearLayout.LayoutParams folderParams = (LinearLayout.LayoutParams) folderRecyclerView.getLayoutParams();
         folderParams.height = ViewGroup.LayoutParams.WRAP_CONTENT;
+
         LinearLayout.LayoutParams filesParams = (LinearLayout.LayoutParams) filesRecyclerView.getLayoutParams();
         filesParams.height = ViewGroup.LayoutParams.WRAP_CONTENT;
+        double minSizeK = 0;
+        if (folders != null && !folders.isEmpty()) {
+            minSizeK = 1.0 - ((double) folders.size() / 10.0) - 0.18;
+            if (minSizeK < 0)
+                minSizeK = 0;
+        }
+        filesRecyclerView.setMinimumHeight((int) (getResources().getDisplayMetrics().heightPixels * minSizeK));
+
 
         if (files == null || files.isEmpty()) {
             rootView.findViewById(R.id.files_block).setVisibility(View.GONE);

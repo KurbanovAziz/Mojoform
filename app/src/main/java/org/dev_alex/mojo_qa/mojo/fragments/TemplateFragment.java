@@ -1900,6 +1900,8 @@ public class TemplateFragment extends Fragment {
                 else
                     resultJson.put("DueTime", isoDateFormat.format(new Date()));
 
+                resultJson.put("initiator", "admin");
+                resultJson.put("site_id", "gzp");
                 resultJson.put("CompleteTime", isoDateFormat.format(new Date()));
 
                 Log.d("mojo-log", "result template: " + resultJson.toString());

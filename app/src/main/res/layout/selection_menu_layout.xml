@@ -52,8 +52,8 @@
         android:layout_width="50dp"
         android:layout_height="match_parent"
         android:adjustViewBounds="true"
-        android:paddingBottom="22dp"
-        android:paddingTop="22dp"
+        android:paddingBottom="23dp"
+        android:paddingTop="23dp"
         android:src="@drawable/ic_delete" />
 
     <ImageView
