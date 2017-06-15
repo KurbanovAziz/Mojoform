@@ -128,6 +128,8 @@ public class FolderAdapter extends RecyclerView.Adapter<FolderAdapter.FolderView
                     return true;
                 }
             });
+
+        viewHolder.moreBtn.setVisibility(folder.nodeType.equals("cm:org") ? View.INVISIBLE : View.VISIBLE);
     }
 
     @Override
