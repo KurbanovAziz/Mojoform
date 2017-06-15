@@ -22,7 +22,7 @@
                 android:background="#95699e"
                 android:gravity="center_vertical"
                 android:paddingLeft="25dp"
-                android:text="@string/folders"
+                android:text="@string/organizations"
                 android:textColor="@android:color/white"
                 android:textSize="17sp" />
 

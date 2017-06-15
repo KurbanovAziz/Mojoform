@@ -61,6 +61,9 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
         final Task task = tasks.get(i);
         String templateId = null;
         String nodeForTasksId = null;
+        String siteId = null;
+        String initiator = null;
+
         viewHolder.taskActiveCircle.setVisibility((task.suspended == null || task.suspended) ? View.INVISIBLE : View.VISIBLE);
         if (task.suspended != null && !task.suspended) {
             ((GradientDrawable) viewHolder.taskActiveCircle.getBackground()).setColor(task.dueDate.after(new Date()) ? Color.GREEN : Color.RED);
@@ -86,6 +89,10 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
                         templateId = variable.value;
                     if (variable.name.equals("DocumentFolderUUID"))
                         nodeForTasksId = variable.value;
+                    if (variable.name.equals("DocumentSiteId"))
+                        siteId = variable.value;
+                    if (variable.name.equals("initiator"))
+                        initiator = variable.value;
                 }
         }
 
@@ -96,10 +103,18 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
             if (task.suspended == null || task.suspended)
                 viewHolder.itemView.setOnClickListener(null);
             else {
+                if (initiator == null || initiator.isEmpty())
+                    initiator = "admin";
+                if (siteId == null || siteId.isEmpty())
+                    initiator = "gzip";
+
+                final String finalInitiator = initiator;
+                final String finalSiteId = siteId;
                 viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        parentFragment.showFillTemplateWindow(finalTemplateId, task.id, finalNodeForTasksId, task.dueDate.getTime());
+                        parentFragment.showFillTemplateWindow(finalTemplateId,
+                                task.id, finalNodeForTasksId, task.dueDate.getTime(), finalInitiator, finalSiteId);
                     }
                 });
             }

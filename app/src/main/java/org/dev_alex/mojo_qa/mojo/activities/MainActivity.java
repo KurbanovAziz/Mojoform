@@ -53,13 +53,16 @@ public class MainActivity extends AppCompatActivity {
         getSupportFragmentManager().beginTransaction().replace(R.id.container, TasksFragment.newInstance(), "tasks").commit();
         if (getIntent().hasExtra(AlarmService.TEMPLATE_ID)) {
             String templateId = getIntent().getStringExtra(AlarmService.TEMPLATE_ID);
+            String siteId = getIntent().getStringExtra(AlarmService.SITE_ID);
+            String initiator = getIntent().getStringExtra(AlarmService.INITIATOR);
             String taskId = getIntent().getStringExtra(AlarmService.TASK_ID);
             String nodeForTasks = getIntent().getStringExtra(AlarmService.NODE_FOR_TASKS);
             long dueDate = getIntent().getLongExtra(AlarmService.DUE_DATE, new Date().getTime());
 
             if (templateId != null && !templateId.isEmpty() && taskId != null && !taskId.isEmpty())
                 getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.container, TemplateFragment.newInstance(templateId, taskId, nodeForTasks, dueDate)).addToBackStack(null).commit();
+                        .replace(R.id.container, TemplateFragment.newInstance(
+                                templateId, taskId, nodeForTasks, dueDate, siteId, initiator)).addToBackStack(null).commit();
         }
     }
 

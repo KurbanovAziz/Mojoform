@@ -257,7 +257,7 @@ public class DocumentsFragment extends Fragment {
                 getActivity().findViewById(R.id.back_btn).setVisibility(View.VISIBLE);
 
             } else {
-                ((TextView) getActivity().findViewById(R.id.title)).setText(R.string.organizations);
+                ((TextView) getActivity().findViewById(R.id.title)).setText(R.string.documents);
                 getActivity().findViewById(R.id.sandwich_btn).setVisibility(View.VISIBLE);
                 getActivity().findViewById(R.id.back_btn).setVisibility(View.GONE);
             }
@@ -451,6 +451,8 @@ public class DocumentsFragment extends Fragment {
         }
         filesRecyclerView.setMinimumHeight((int) (getResources().getDisplayMetrics().heightPixels * minSizeK));
 
+        ((TextView) rootView.findViewById(R.id.folders_block)).setText(
+                (foldersStack != null && foldersStack.size() > 1) ? R.string.folders : R.string.organizations);
 
         if (files == null || files.isEmpty()) {
             rootView.findViewById(R.id.files_block).setVisibility(View.GONE);

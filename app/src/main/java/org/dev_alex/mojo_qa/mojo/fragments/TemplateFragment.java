@@ -98,11 +98,16 @@ public class TemplateFragment extends Fragment {
     private final int IMAGE_SHOW_REQUEST_CODE = 110;
     private final int SCAN_CODE_REQUEST_CODE = 120;
 
-    private View rootView;
-    private ProgressDialog loopDialog;
+
     private String templateId;
     private String taskId;
+    private String siteId;
+    private String initiator;
     private long dueDate;
+
+    private View rootView;
+    private ProgressDialog loopDialog;
+
     private ArrayList<Page> pages;
     private int currentPagePos;
     private JSONObject template;
@@ -115,11 +120,14 @@ public class TemplateFragment extends Fragment {
     private ProgressDialog progressDialog;
 
 
-    public static TemplateFragment newInstance(String templateId, String taskId, String nodeForTasks, long dueDate) {
+    public static TemplateFragment newInstance(String templateId, String taskId, String nodeForTasks,
+                                               long dueDate, String siteId, String initiator) {
         Bundle args = new Bundle();
         args.putString("template_id", templateId);
         args.putLong("due_date", dueDate);
         args.putString("task_id", taskId);
+        args.putString("initiator", initiator);
+        args.putString("site_id", siteId);
         if (nodeForTasks != null && !nodeForTasks.isEmpty())
             args.putString("task_node_id", nodeForTasks);
         else
@@ -140,6 +148,8 @@ public class TemplateFragment extends Fragment {
             templateId = getArguments().getString("template_id");
             taskId = getArguments().getString("task_id");
             dueDate = getArguments().getLong("due_date");
+            siteId = getArguments().getString("site_id");
+            initiator = getArguments().getString("initiator");
             NODE_FOR_TASKS = getArguments().getString("task_node_id");
 
             initDialog();

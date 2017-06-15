@@ -319,9 +319,11 @@ public class TasksFragment extends Fragment {
         loopDialog.setCancelable(false);
     }
 
-    public void showFillTemplateWindow(String templateId, String taskId, String taskNodeId, long dueDate) {
+    public void showFillTemplateWindow(String templateId, String taskId, String taskNodeId,
+                                       long dueDate, String initiator, String siteId) {
         getActivity().getSupportFragmentManager().beginTransaction()
-                .replace(R.id.container, TemplateFragment.newInstance(templateId, taskId, taskNodeId, dueDate)).addToBackStack(null).commit();
+                .replace(R.id.container, TemplateFragment.newInstance
+                        (templateId, taskId, taskNodeId, dueDate, siteId, initiator)).addToBackStack(null).commit();
     }
 
     private class GetTasksTask extends AsyncTask<Void, Void, Integer> {
