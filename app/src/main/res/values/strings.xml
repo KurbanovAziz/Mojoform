@@ -6,7 +6,7 @@
 
     <string name="host">https://mojo-qa.dev-alex.org</string>
     <string name="tasks_host">https://activiti.dev-alex.org/activiti-rest/service</string>
-    <string name="app_name">Mojo</string>
+    <string name="app_name">Mojoform</string>
     <string name="username">имя пользователя</string>
     <string name="password">пароль</string>
     <string name="not_all_fields_filled">Заполнены не все поля</string>

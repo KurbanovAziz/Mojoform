@@ -1829,11 +1829,13 @@ public class TemplateFragment extends Fragment {
                                             values.put(mediaId);
                                             jsonObject.put("values", values);
                                         }
-                                    }
+                                    } else
+                                        Toast.makeText(getContext(), "Сбой при отправке " + response.code(), Toast.LENGTH_LONG).show();
 
                                     Log.d("mojo-log", String.valueOf(response.code()));
                                 } catch (Exception exc) {
                                     exc.printStackTrace();
+                                    Toast.makeText(getContext(), "Эксепшн при отправке" + exc.getMessage(), Toast.LENGTH_LONG).show();
                                 }
                                 publishProgress(sentCt++);
                             }
@@ -1910,8 +1912,8 @@ public class TemplateFragment extends Fragment {
                 else
                     resultJson.put("DueTime", isoDateFormat.format(new Date()));
 
-                resultJson.put("initiator", "admin");
-                resultJson.put("site_id", "gzp");
+                resultJson.put("initiator", initiator);
+                resultJson.put("site_id", siteId);
                 resultJson.put("CompleteTime", isoDateFormat.format(new Date()));
 
                 Log.d("mojo-log", "result template: " + resultJson.toString());
