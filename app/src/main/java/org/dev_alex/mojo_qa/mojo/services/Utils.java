@@ -10,6 +10,7 @@ import android.os.Build;
 import android.os.Environment;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -203,11 +204,17 @@ public class Utils {
     }
 
     public static String getRealPathFromIntentData(Context context, Uri selectedFile) {
+        if ("file".equalsIgnoreCase(selectedFile.getScheme())) {
+            return selectedFile.getPath();
+        }
+
         String[] filePathColumn = {MediaStore.MediaColumns.DATA, MediaStore.Files.FileColumns.DATA};
         Cursor cursor = context.getContentResolver().query(selectedFile, filePathColumn, null, null, null);
 
-        if (cursor == null)
+        if (cursor == null) {
+            Log.e("UTILS", "can't get real path " + selectedFile);
             return null;
+        }
 
         cursor.moveToFirst();
         int columnIndex = cursor.getColumnIndex(filePathColumn[0]);

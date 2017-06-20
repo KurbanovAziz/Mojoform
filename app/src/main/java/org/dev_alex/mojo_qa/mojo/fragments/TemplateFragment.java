@@ -251,7 +251,7 @@ public class TemplateFragment extends Fragment {
         if (requestCode == AUDIO_REQUEST_CODE && resultCode == RESULT_OK) {
             String audioPath = Utils.getRealPathFromIntentData(getContext(), data.getData());
             if (audioPath == null)
-                Toast.makeText(getContext(), "что-то пошло не так", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), "что-то пошло не так " + data.getDataString(), Toast.LENGTH_SHORT).show();
             else
                 createAudioPreview(audioPath, true);
         }
@@ -1020,6 +1020,7 @@ public class TemplateFragment extends Fragment {
                         Intent intent = new Intent(MediaStore.Audio.Media.RECORD_SOUND_ACTION);
                         startActivityForResult(intent, AUDIO_REQUEST_CODE);
                     } catch (Exception exc) {
+                        exc.printStackTrace();
                         Toast.makeText(getContext(), "У вас нет приложения для записи аудио", Toast.LENGTH_SHORT).show();
                     }
                 } else
@@ -1607,6 +1608,7 @@ public class TemplateFragment extends Fragment {
             audioContainer.addView(audioLayout);
 
         } catch (Exception exc) {
+            exc.printStackTrace();
             Toast.makeText(getContext(), "Ошибка при добавлении аудио: " + exc.getLocalizedMessage(), Toast.LENGTH_LONG).show();
         }
 
