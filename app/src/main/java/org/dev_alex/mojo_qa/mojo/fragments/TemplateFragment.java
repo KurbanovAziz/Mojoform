@@ -1065,8 +1065,8 @@ public class TemplateFragment extends Fragment {
         if (value.has(MEDIA_PATH_JSON_ARRAY)) {
             currentMediaBlock = new Pair<>(mediaLayout, value);
             for (int j = 0; j < value.getJSONArray(MEDIA_PATH_JSON_ARRAY).length(); j++) {
-                String mediaPath = value.getJSONArray(MEDIA_PATH_JSON_ARRAY).getString(j);
-                String mimeType = Utils.getMimeType(mediaPath);
+                String mediaPath = value.getJSONArray(MEDIA_PATH_JSON_ARRAY).getJSONObject(j).getString("path");
+                String mimeType = value.getJSONArray(MEDIA_PATH_JSON_ARRAY).getJSONObject(j).getString("mime");
                 if (mimeType.startsWith("image"))
                     new ProcessingBitmapTask(mediaPath, false).execute();
                 else if (mimeType.startsWith("audio"))
@@ -1460,8 +1460,8 @@ public class TemplateFragment extends Fragment {
                     Intent showPhotoIntent = new Intent(getContext(), ImageViewActivity.class);
                     JSONArray imageSrc = new JSONArray();
                     for (int i = 0; i < currentValue.getJSONArray(MEDIA_PATH_JSON_ARRAY).length(); i++)
-                        if (Utils.isImage(currentValue.getJSONArray(MEDIA_PATH_JSON_ARRAY).getString(i)))
-                            imageSrc.put(currentValue.getJSONArray(MEDIA_PATH_JSON_ARRAY).getString(i));
+                        if (Utils.isImage(currentValue.getJSONArray(MEDIA_PATH_JSON_ARRAY).getJSONObject(i).getString("path")))
+                            imageSrc.put(currentValue.getJSONArray(MEDIA_PATH_JSON_ARRAY).getJSONObject(i).getString("path"));
 
                     showPhotoIntent.putExtra("images", imageSrc.toString());
                     startActivityForResult(showPhotoIntent, IMAGE_SHOW_REQUEST_CODE);
