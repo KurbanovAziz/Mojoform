@@ -26,15 +26,16 @@
                 android:layout_marginTop="4dp"
                 android:adjustViewBounds="true"
                 android:src="@drawable/avatar_shadow" />
-
-            <!--<de.hdodenhof.circleimageview.CircleImageView
+            
+            <de.hdodenhof.circleimageview.CircleImageView
                 android:id="@+id/profile_image"
                 android:layout_width="60dp"
                 android:layout_height="60dp"
                 android:layout_alignParentTop="true"
                 android:layout_centerHorizontal="true"
                 android:layout_marginTop="4dp"
-                android:src="@drawable/test_avatar" />-->
+                android:src="@drawable/test_avatar"
+                android:visibility="gone" />
 
             <TextView
                 android:id="@+id/user_initials"

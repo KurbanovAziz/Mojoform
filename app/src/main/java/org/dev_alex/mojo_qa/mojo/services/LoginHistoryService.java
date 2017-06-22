@@ -2,6 +2,9 @@ package org.dev_alex.mojo_qa.mojo.services;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.util.Base64;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -55,6 +58,36 @@ public class LoginHistoryService {
         } catch (Exception ignored) {
         }
     }
+
+    public static void addAvatar(String username, Bitmap bitmap) {
+        try {
+            SharedPreferences mSettings;
+            mSettings = App.getContext().getSharedPreferences(LOGIN_PREFERENCES, Context.MODE_PRIVATE);
+            SharedPreferences.Editor editor = mSettings.edit();
+
+            editor.putString(username, BitmapService.getBitmapBytesEncodedBase64(bitmap));
+            editor.apply();
+        } catch (Exception ignored) {
+        }
+    }
+
+    public static Bitmap getAvatar(String username) {
+        Bitmap avatar = null;
+        try {
+            SharedPreferences mSettings;
+            mSettings = App.getContext().getSharedPreferences(LOGIN_PREFERENCES, Context.MODE_PRIVATE);
+
+            String imageEncoded = mSettings.getString(username, "");
+            if (imageEncoded.isEmpty())
+                return null;
+
+            byte[] decodedByte = Base64.decode(imageEncoded, 0);
+            avatar = BitmapFactory.decodeByteArray(decodedByte, 0, decodedByte.length);
+        } catch (Exception ignored) {
+        }
+        return avatar;
+    }
+
 
     public static boolean lastLoginUsersExists() {
         return (getLastLoggedUsers() != null);

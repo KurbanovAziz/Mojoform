@@ -25,6 +25,7 @@ import org.dev_alex.mojo_qa.mojo.fragments.TasksFragment;
 import org.dev_alex.mojo_qa.mojo.fragments.TemplateFragment;
 import org.dev_alex.mojo_qa.mojo.models.User;
 import org.dev_alex.mojo_qa.mojo.services.AlarmService;
+import org.dev_alex.mojo_qa.mojo.services.LoginHistoryService;
 import org.dev_alex.mojo_qa.mojo.services.RequestService;
 import org.dev_alex.mojo_qa.mojo.services.TokenService;
 
@@ -152,8 +153,10 @@ public class MainActivity extends AppCompatActivity {
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
             try {
-                if (avatar != null)
+                if (avatar != null) {
                     avatarImageView.setImageBitmap(avatar);
+                    LoginHistoryService.addAvatar(Data.currentUser.userName, avatar);
+                }
             } catch (Exception exc) {
                 exc.printStackTrace();
             }

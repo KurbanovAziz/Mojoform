@@ -10,6 +10,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
+import android.graphics.Rect;
 import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.LayerDrawable;
 import android.media.ThumbnailUtils;
@@ -28,6 +29,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.Space;
 import android.support.v7.widget.PopupMenu;
 import android.text.Editable;
+import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.text.method.DigitsKeyListener;
 import android.util.Base64;
@@ -36,6 +38,7 @@ import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.CookieManager;
@@ -83,10 +86,11 @@ import java.util.Locale;
 import okhttp3.Response;
 
 import static android.app.Activity.RESULT_OK;
+import static org.dev_alex.mojo_qa.mojo.services.Utils.setupCloseKeyboardUI;
 
 public class TemplateFragment extends Fragment {
     private static String NODE_FOR_TASKS = "229ed0ec-3592-4788-87f0-6b0616599166";
-    private final String NODE_FOR_FILES = "4899bb8e-0b0b-4889-82d6-eb16fcd6b90f";
+    private String NODE_FOR_FILES = "4899bb8e-0b0b-4889-82d6-eb16fcd6b90f";
 
     private final String MEDIA_PATH_JSON_ARRAY = "media_paths";
     private final String SIGNATURE_PREVIEW_JSON_ARRAY = "sign_state";
@@ -151,10 +155,13 @@ public class TemplateFragment extends Fragment {
             siteId = getArguments().getString("site_id");
             initiator = getArguments().getString("initiator");
             NODE_FOR_TASKS = getArguments().getString("task_node_id");
+            NODE_FOR_FILES = getArguments().getString("task_node_id");
 
+            rootView.findViewById(R.id.page_selector_block).getLayoutParams().width =
+                    (int) (getResources().getDisplayMetrics().widthPixels * (2.0 / 5.0));
             initDialog();
             setupHeader();
-            Utils.setupCloseKeyboardUI(getActivity(), rootView);
+            setupCloseKeyboardUI(getActivity(), rootView);
             setListeners();
 
             new GetTemplateTask().execute();
@@ -430,12 +437,17 @@ public class TemplateFragment extends Fragment {
                         fillContainer(rootContainer, pageJson.getJSONArray("items"), 0);
 
                     final Page page = new Page(pageJson.getString("caption"), pageJson.getString("id"), rootContainer);
-                    Utils.setupCloseKeyboardUI(getActivity(), rootContainer);
+                    setupCloseKeyboardUI(getActivity(), rootContainer);
                     pages.add(page);
 
                     LinearLayout pageContainer = (LinearLayout) rootView.findViewById(R.id.page_container);
                     TextView cardPage = (TextView) getActivity().getLayoutInflater().inflate(R.layout.card_page, pageContainer, false);
                     cardPage.setText(page.name);
+                    cardPage.setMaxLines(1);
+                    cardPage.setFocusable(true);
+                    cardPage.setClickable(true);
+                    cardPage.setEllipsize(TextUtils.TruncateAt.END);
+
                     pageContainer.addView(cardPage);
                     cardPage.setOnClickListener(new View.OnClickListener() {
                         @Override
@@ -445,6 +457,7 @@ public class TemplateFragment extends Fragment {
                         }
                     });
                 }
+
                 if (!pages.isEmpty()) {
                     setPage(pages.get(0));
 
@@ -460,12 +473,35 @@ public class TemplateFragment extends Fragment {
 
                     rootView.findViewById(R.id.buttons_block).setVisibility(View.VISIBLE);
                 }
+                setupClosePagePopupUI(rootView);
             }
         } catch (Exception exc) {
             exc.printStackTrace();
             Toast.makeText(getContext(), "Некорректный шаблон", Toast.LENGTH_SHORT).show();
             getActivity().getSupportFragmentManager().popBackStack();
             exc.printStackTrace();
+        }
+    }
+
+    public void setupClosePagePopupUI(final View view) {
+        if (view.getId() != R.id.page_select_layout)
+            view.setOnTouchListener(new View.OnTouchListener() {
+                public boolean onTouch(View v, MotionEvent event) {
+                    final Rect viewRect = new Rect();
+                    rootView.findViewById(R.id.page_selector_block).getGlobalVisibleRect(viewRect);
+                    if (!viewRect.contains((int) event.getRawX(), (int) event.getRawY())) {
+                        rootView.findViewById(R.id.page_select_layout).setVisibility(View.GONE);
+                    }
+                    return false;
+                }
+            });
+
+        if (view instanceof ViewGroup) {
+            if (view.getId() != R.id.page_select_layout)
+                for (int i = 0; i < ((ViewGroup) view).getChildCount(); i++) {
+                    View innerView = ((ViewGroup) view).getChildAt(i);
+                    setupClosePagePopupUI(innerView);
+                }
         }
     }
 
@@ -928,7 +964,7 @@ public class TemplateFragment extends Fragment {
             public void onSigned() {
                 try {
                     Bitmap bitmap = signaturePad.getSignatureBitmap();
-                    value.put("sign_state", BitmapService.getBitmapBytesEncodedBase64(bitmap));
+                    value.put(SIGNATURE_PREVIEW_JSON_ARRAY, BitmapService.getBitmapBytesEncodedBase64(bitmap));
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
