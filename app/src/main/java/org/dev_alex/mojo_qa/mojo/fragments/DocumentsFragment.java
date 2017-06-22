@@ -98,8 +98,8 @@ public class DocumentsFragment extends Fragment {
         selectModeEnabled = true;
         fileAdapter.startSelectionMode();
         folderAdapter.startSelectionMode();
-        filesRecyclerView.setBackgroundResource(R.drawable.selection_mode_background);
-        folderRecyclerView.setBackgroundResource(R.drawable.selection_mode_background);
+        //filesRecyclerView.setBackgroundResource(R.drawable.selection_mode_background);
+        //folderRecyclerView.setBackgroundResource(R.drawable.selection_mode_background);
         selectionMenu.setVisibility(View.VISIBLE);
         updateSelectionMenuData();
 

@@ -1,6 +1,8 @@
 package org.dev_alex.mojo_qa.mojo.activities;
 
+import android.app.NotificationManager;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -42,6 +44,18 @@ public class AuthActivity extends AppCompatActivity {
             }, 3000);
         else
             new LoginTask(TokenService.getToken()).execute();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        try {
+            NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+            mNotificationManager.cancel(123321);
+        }
+        catch (Exception exc){
+            exc.printStackTrace();
+        }
     }
 
     private void initDialog() {

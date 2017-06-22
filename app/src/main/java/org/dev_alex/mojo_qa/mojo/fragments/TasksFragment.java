@@ -277,6 +277,9 @@ public class TasksFragment extends Fragment {
         ((TextView) rootView.findViewById(R.id.calendar_date)).setText(date);
         if (needUpdate)
             new GetTasksTask().execute();
+
+        rootView.findViewById(R.id.calendar_reset_btn).setVisibility(
+                (withDay || currentDate.get(Calendar.MONTH) != Calendar.getInstance().get(Calendar.MONTH)) ? View.VISIBLE : View.GONE);
     }
 
     private void updateDecorators(ArrayList<Task> monthTasks) {

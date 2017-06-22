@@ -8,7 +8,6 @@ public class Data {
     public static String taskAuthPass = "p234235dfgdeg";
     public static String currentTaskId = "";
 
-
     public static String tt = "{\n" +
             "  \"collapsed\": false,\n" +
             "  \"id\": \"ba7fcbfb-dd54-4828-8567-823144603ec6\",\n" +

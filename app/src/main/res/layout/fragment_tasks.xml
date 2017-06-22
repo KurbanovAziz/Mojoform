@@ -58,6 +58,7 @@
             android:layout_alignParentRight="true"
             android:layout_gravity="center_vertical"
             android:layout_marginRight="20dp"
+            android:visibility="gone"
             android:adjustViewBounds="true"
             android:paddingBottom="15dp"
             android:paddingTop="15dp"

@@ -1,5 +1,7 @@
 package org.dev_alex.mojo_qa.mojo.activities;
 
+import android.app.NotificationManager;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -160,6 +162,18 @@ public class MainActivity extends AppCompatActivity {
             } catch (Exception exc) {
                 exc.printStackTrace();
             }
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        try {
+            NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+            mNotificationManager.cancel(123321);
+        }
+        catch (Exception exc){
+            exc.printStackTrace();
         }
     }
 }
