@@ -43,7 +43,7 @@ public class RequestService {
         return client.newCall(request).execute();
     }
 
-    public static Response createSendFileRequest(String path, File file) throws Exception {
+    public static Response createSendFileRequest(String path, MediaType mimeType, File file) throws Exception {
         Log.d("mojo-log", "send file to server. file exists: " + String.valueOf(file.exists()));
         Log.d("mojo-log", "send file to server. file about " + file.toString());
 
@@ -51,7 +51,7 @@ public class RequestService {
         String url = App.getContext().getString(R.string.host) + path;
         RequestBody requestBody = new MultipartBody.Builder()
                 .setType(MultipartBody.FORM)
-                .addFormDataPart("file", file.getName(), RequestBody.create(MEDIA_TYPE, file))
+                .addFormDataPart("file", file.getName(), RequestBody.create(mimeType, file))
                 .build();
         Request.Builder requestBuilder = new Request.Builder().url(url).post(requestBody);
         Request request = requestBuilder.build();
