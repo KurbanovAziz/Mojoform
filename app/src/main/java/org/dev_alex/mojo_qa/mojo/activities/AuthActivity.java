@@ -52,8 +52,7 @@ public class AuthActivity extends AppCompatActivity {
         try {
             NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
             mNotificationManager.cancel(123321);
-        }
-        catch (Exception exc){
+        } catch (Exception exc) {
             exc.printStackTrace();
         }
     }
@@ -117,7 +116,7 @@ public class AuthActivity extends AppCompatActivity {
                 else
                     response = RequestService.createPostRequest("/api/user/login", requestJson.toString());
 
-                if (response.code() == 202) {
+                if (response.code() == 202 || response.code() == 200) {
                     String userJson = response.body().string();
                     user = new ObjectMapper().readValue(userJson, User.class);
                 }

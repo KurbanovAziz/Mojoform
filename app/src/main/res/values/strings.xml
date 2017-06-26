@@ -4,11 +4,12 @@
     <string name="next">Следующий</string>
     <string name="calendar">Календарь</string>
 
-    <string name="tasks_host">https://tasks.mojo.mojoform.com/activiti-rest/service</string>
-    <string name="host">https://mojo.mojoform.com</string>
-<!--
+    <!--
+        <string name="tasks_host">https://tasks.mojo.mojoform.com/activiti-rest/service</string>
+        <string name="host">https://mojo.mojoform.com</ng>
+    -->
     <string name="host">https://mojo-qa.dev-alex.org</string>
-    <string name="tasks_host">https://activiti.dev-alex.org/activiti-rest/service</string>-->
+    <string name="tasks_host">https://activiti.dev-alex.org/activiti-rest/service</string>
 
     <string name="app_name">Mojoform</string>
     <string name="username">имя пользователя</string>
