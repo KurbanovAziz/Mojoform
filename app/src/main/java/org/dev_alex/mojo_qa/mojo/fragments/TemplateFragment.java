@@ -695,7 +695,7 @@ public class TemplateFragment extends Fragment {
                         String html = "<html><head></head><body> " + value.getString("html") + " </body></html>";
                         html = html.replace(getString(R.string.host), "");
                         html = html.replace("/api", getString(R.string.host) + "/api");
-                        html = Utils.formatHtmlImagesSize(html);
+                        html = Utils.formatHtmlContentSize(html);
 
                         richEdit.getSettings().setJavaScriptEnabled(true);
                         String cookieString = "auth_token=" + TokenService.getToken();
@@ -881,7 +881,6 @@ public class TemplateFragment extends Fragment {
         else
             changeValue.setKeyListener(DigitsKeyListener.getInstance("0123456789."));
 
-        final int finalDigitsAfterPoint1 = digitsAfterPoint;
         changeValue.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -921,7 +920,7 @@ public class TemplateFragment extends Fragment {
                         changeValue.setTextColor(Color.BLACK);
 
                     try {
-                        value.put("value", Float.parseFloat(result));
+                        value.put("value", String.format(Locale.US, "%." + finalDigitsAfterPoint + "f", Float.parseFloat(result)));
                     } catch (Exception ignored) {
                     }
                 }

@@ -124,9 +124,9 @@ public class FileAdapter extends RecyclerView.Adapter<FileAdapter.FileViewHolder
                     if (resourceId != 0)
                         viewHolder.fileIcon.setImageResource(resourceId);
                     else
-                        viewHolder.fileIcon.setImageResource(R.drawable.icon_mojo_file);
+                        viewHolder.fileIcon.setImageResource(R.drawable.unknown);
                 } else
-                    viewHolder.fileIcon.setImageResource(R.drawable.icon_mojo_file);
+                    viewHolder.fileIcon.setImageResource(R.drawable.unknown);
                 break;
             case "mojo:template":
                 viewHolder.fileIcon.setImageResource(R.drawable.icon_template);

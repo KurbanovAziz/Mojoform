@@ -147,12 +147,14 @@ public class Utils {
         out.close();
     }
 
-    public static String formatHtmlImagesSize(String html) {
+    public static String formatHtmlContentSize(String html) {
         String imgTag = "<img";
         String videoTag = "<iframe";
+        String video2Tag = "<video";
 
         html = formatHtmlBlockSize(html, imgTag);
         html = formatHtmlBlockSize(html, videoTag);
+        html = formatHtmlBlockSize(html, video2Tag);
         return html;
     }
 
@@ -161,20 +163,24 @@ public class Utils {
         String widthStr = "width=\"";
         String heightStr = "height=\"";
         String endOfTag = "/>";
+        String closeTag = "</" + tag.substring(1);
 
         while ((index = html.indexOf(tag, index)) != -1) {
             try {
                 int endTagI = html.indexOf(endOfTag);
+                int closeTagI = html.indexOf(closeTag);
                 int heightI = html.indexOf(heightStr, index);
                 int widthI = html.indexOf(widthStr, index);
 
 
-                if (endTagI != -1) {
+                if (endTagI != -1 || closeTagI != -1) {
                     if (heightI != -1 && widthI != -1) {
                         html = html.substring(0, widthI + widthStr.length()) + "100%" + html.substring(html.indexOf("\"", widthI + widthStr.length() + 1));
                         heightI = html.indexOf(heightStr, index);
                         html = html.substring(0, heightI + heightStr.length()) + "auto" + html.substring(html.indexOf("\"", heightI + heightStr.length() + 1));
                     } else {
+                        if (endTagI == -1)
+                            endTagI = closeTagI;
                         html = html.substring(0, endTagI) + String.valueOf(" width=\"100%\" height=\"auto\" ") + html.substring(endTagI);
                     }
                 }

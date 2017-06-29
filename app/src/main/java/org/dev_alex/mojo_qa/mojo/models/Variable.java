@@ -5,4 +5,5 @@ public class Variable {
     public String type;
     public String value;
     public String scope;
+    public String valueUrl;
 }
