@@ -693,13 +693,13 @@ public class TemplateFragment extends Fragment {
                         String encoding = "utf-8";
 
                         String html = "<html><head></head><body> " + value.getString("html") + " </body></html>";
-                        html = html.replace(getString(R.string.host), "");
-                        html = html.replace("/api", getString(R.string.host) + "/api");
+                        html = html.replace(App.getHost(), "");
+                        html = html.replace("/api", App.getHost() + "/api");
                         html = Utils.formatHtmlContentSize(html);
 
                         richEdit.getSettings().setJavaScriptEnabled(true);
                         String cookieString = "auth_token=" + TokenService.getToken();
-                        CookieManager.getInstance().setCookie(getString(R.string.host) + "/", cookieString);
+                        CookieManager.getInstance().setCookie(App.getHost() + "/", cookieString);
                         CookieManager.getInstance().setAcceptCookie(true);
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
                             CookieManager.getInstance().setAcceptThirdPartyCookies(richEdit, true);
@@ -1988,7 +1988,7 @@ public class TemplateFragment extends Fragment {
                     jsonObject.put("action", "complete");
                     jsonObject.put("variables", new JSONArray());
 
-                    response = RequestService.createPostRequestWithCustomUrl(getString(R.string.tasks_host) + "/runtime/tasks/" + taskId, jsonObject.toString());
+                    response = RequestService.createPostRequestWithCustomUrl(App.getTask_host() + "/runtime/tasks/" + taskId, jsonObject.toString());
                     int responseCode = response.code();
                     Log.d("mojo-log", "task complete response code: " + responseCode);
                 }

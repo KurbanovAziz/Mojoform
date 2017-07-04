@@ -33,6 +33,7 @@ import com.prolificinteractive.materialcalendarview.OnMonthChangedListener;
 
 import net.cachapa.expandablelayout.ExpandableLayout;
 
+import org.dev_alex.mojo_qa.mojo.App;
 import org.dev_alex.mojo_qa.mojo.Data;
 import org.dev_alex.mojo_qa.mojo.EventDecorator;
 import org.dev_alex.mojo_qa.mojo.R;
@@ -367,10 +368,10 @@ public class TasksFragment extends Fragment {
 
                 for (int i = 0; i < 2; i++) {
                     if (i == 0)
-                        url = getString(R.string.tasks_host) + "/history/" +
+                        url = App.getTask_host() + "/history/" +
                                 "historic-task-instances?finished=TRUE&taskAssignee=" + Data.currentUser.userName + "&includeProcessVariables=TRUE" + dateParams + sortParams;
                     else
-                        url = getString(R.string.tasks_host) + "/runtime/tasks?assignee="
+                        url = App.getTask_host() + "/runtime/tasks?assignee="
                                 + Data.currentUser.userName + "&includeProcessVariables=TRUE" + dateParams + sortParams;
 
                     OkHttpClient client = new OkHttpClient();
@@ -445,7 +446,7 @@ public class TasksFragment extends Fragment {
                 dateParams += "&dueBefore=" + isoDateFormat.format(monthCalendar.getTime());
                 String sortParams = "&sort=dueDate&order=desc&size=100";
 
-                url = getString(R.string.tasks_host) + "/runtime/tasks?assignee="
+                url = App.getTask_host() + "/runtime/tasks?assignee="
                         + Data.currentUser.userName + "&includeProcessVariables=TRUE" + dateParams + sortParams;
 
                 OkHttpClient client = new OkHttpClient();

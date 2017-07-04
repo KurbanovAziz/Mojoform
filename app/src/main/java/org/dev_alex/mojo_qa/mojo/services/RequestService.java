@@ -4,7 +4,6 @@ import android.util.Log;
 
 import org.dev_alex.mojo_qa.mojo.App;
 import org.dev_alex.mojo_qa.mojo.Data;
-import org.dev_alex.mojo_qa.mojo.R;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -27,7 +26,7 @@ public class RequestService {
 
 
     public static Response createPostRequest(String path, String jsonStr) throws Exception {
-        String url = App.getContext().getString(R.string.host) + path;
+        String url = App.getHost() + path;
         return createPostRequestWithCustomUrl(url, jsonStr);
     }
 
@@ -48,7 +47,7 @@ public class RequestService {
         Log.d("mojo-log", "send file to server. file about " + file.toString());
 
         OkHttpClient client = createOkHttpClient();
-        String url = App.getContext().getString(R.string.host) + path;
+        String url = App.getHost() + path;
         RequestBody requestBody = new MultipartBody.Builder()
                 .setType(MultipartBody.FORM)
                 .addFormDataPart("file", file.getName(), RequestBody.create(mimeType, file))
@@ -61,7 +60,7 @@ public class RequestService {
 
     public static Response createCustomTypeRequest(String path, String method, String jsonStr) throws Exception {
         OkHttpClient client = createOkHttpClient();
-        String url = App.getContext().getString(R.string.host) + path;
+        String url = App.getHost() + path;
         RequestBody body = RequestBody.create(JSON, jsonStr);
         Request.Builder requestBuilder = new Request.Builder().url(url).method(method, body);
         return client.newCall(requestBuilder.build()).execute();
@@ -69,7 +68,7 @@ public class RequestService {
 
     public static Response createGetRequest(String path) throws Exception {
         OkHttpClient client = createOkHttpClient();
-        String url = App.getContext().getString(R.string.host) + path;
+        String url = App.getHost() + path;
         Request.Builder requestBuilder = new Request.Builder().url(url);
         return client.newCall(requestBuilder.build()).execute();
     }
@@ -96,7 +95,7 @@ public class RequestService {
     }
 
     private static Cookie createNonPersistentCookie() {
-        String domain = App.getContext().getString(R.string.host);
+        String domain = App.getHost();
         domain = domain.replace("https://", "");
         domain = domain.replace("http://", "");
         return new Cookie.Builder()

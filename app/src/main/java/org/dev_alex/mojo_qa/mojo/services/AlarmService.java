@@ -355,7 +355,7 @@ public class AlarmService extends Service {
                 dateParams += "&dueBefore=" + isoDateFormat.format(monthCalendar.getTime());
                 String sortParams = "&sort=dueDate&order=desc&size=100";
 
-                String url = getString(R.string.tasks_host) + "/runtime/tasks?assignee="
+                String url = App.getTask_host() + "/runtime/tasks?assignee="
                         + userName + "&includeProcessVariables=TRUE" + dateParams + sortParams;
 
                 OkHttpClient client = new OkHttpClient();
@@ -422,7 +422,7 @@ public class AlarmService extends Service {
         @Override
         protected Boolean doInBackground(Void... params) {
             try {
-                String url = getString(R.string.tasks_host) + "/runtime/tasks/" + taskId;
+                String url = App.getTask_host() + "/runtime/tasks/" + taskId;
 
                 OkHttpClient client = new OkHttpClient();
                 Request request = new Request.Builder().header("Authorization", Credentials.basic(TokenService.getUsername(), Data.taskAuthPass))
