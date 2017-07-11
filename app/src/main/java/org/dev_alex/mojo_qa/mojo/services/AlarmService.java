@@ -41,6 +41,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Random;
+import java.util.TimeZone;
 
 import okhttp3.Credentials;
 import okhttp3.OkHttpClient;
@@ -347,6 +348,7 @@ public class AlarmService extends Service {
             try {
                 String userName = TokenService.getUsername();
                 SimpleDateFormat isoDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ", Locale.getDefault());
+                isoDateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
                 String dateParams;
 
                 Calendar monthCalendar = Calendar.getInstance();

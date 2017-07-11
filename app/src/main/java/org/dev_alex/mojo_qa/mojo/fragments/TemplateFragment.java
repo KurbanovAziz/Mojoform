@@ -82,6 +82,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.Locale;
+import java.util.TimeZone;
 
 import okhttp3.MediaType;
 import okhttp3.Response;
@@ -147,6 +148,8 @@ public class TemplateFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        isoDateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+
         if (rootView == null) {
             rootView = inflater.inflate(R.layout.fragment_template, container, false);
             ((MainActivity) getActivity()).drawer.getDrawerLayout().setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);

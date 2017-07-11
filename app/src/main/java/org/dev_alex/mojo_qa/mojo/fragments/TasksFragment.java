@@ -50,6 +50,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.Locale;
+import java.util.TimeZone;
 
 import okhttp3.Credentials;
 import okhttp3.OkHttpClient;
@@ -347,6 +348,9 @@ public class TasksFragment extends Fragment {
                 String url;
 
                 SimpleDateFormat isoDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ", Locale.getDefault());
+                isoDateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+
+
                 String dateParams;
                 if (withDay) {
                     Calendar dayCalendar = Calendar.getInstance();
@@ -436,6 +440,9 @@ public class TasksFragment extends Fragment {
                 String url;
 
                 SimpleDateFormat isoDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ", Locale.getDefault());
+                isoDateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+
+
                 String dateParams;
                 Calendar monthCalendar = Calendar.getInstance();
                 monthCalendar.setTime(currentDate.getTime());
