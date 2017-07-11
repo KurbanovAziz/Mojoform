@@ -4,7 +4,6 @@
     <string name="next">Следующий</string>
     <string name="calendar">Календарь</string>
 
-    <string name="app_name">Mojoform</string>
     <string name="username">имя пользователя</string>
     <string name="password">пароль</string>
     <string name="not_all_fields_filled">Заполнены не все поля</string>

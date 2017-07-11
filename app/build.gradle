@@ -44,10 +44,18 @@ android {
     productFlavors {
         release_flavor {
             applicationId 'org.dev_alex.mojo_qa.mojo.release'
+            resValue "string", "app_name", "Mojoform"
+            manifestPlaceholders = [
+                    appIcon: "@mipmap/ic_launcher"
+            ]
         }
         debug_flavor {
             minSdkVersion 15
             applicationId 'org.dev_alex.mojo_qa.mojo.debug'
+            resValue "string", "app_name", "Mojo"
+            manifestPlaceholders = [
+                    appIcon: "@drawable/test"
+            ]
         }
     }
 }

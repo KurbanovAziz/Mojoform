@@ -1185,6 +1185,17 @@ public class TemplateFragment extends Fragment {
                                 JSONObject optional = optionals.getJSONObject(i).getJSONObject("optional");
                                 if (optional.has("keys") && optional.getJSONArray("keys").length() > 0 && value.has("values")
                                         && Utils.containsAllValues(value.getJSONArray("values"), optional.getJSONArray("keys"))) {
+
+                                    if (optional.has("caption")) {
+                                        TextView caption = new TextView(getContext());
+                                        caption.setText(optional.getString("caption"));
+                                        caption.setTextColor(ContextCompat.getColor(getContext(), R.color.accent));
+                                        caption.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
+                                        optionalContainer.addView(caption);
+                                        int paddings = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 10, getResources().getDisplayMetrics());
+                                        caption.setPadding(paddings, paddings, paddings, paddings / 3);
+                                    }
+
                                     fillContainer(optionalContainer, optional.getJSONArray("items"), offset + 1);
                                 }
                             }

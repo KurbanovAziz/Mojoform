@@ -154,6 +154,9 @@ public class AlarmService extends Service {
             if (new Date().after(new Date(overDueTime)))
                 overDueTime += 60 * 60 * 1000;
             else {
+                if (overDueTime > new Date().getTime() + 3 * 60 * 60 * 1000)
+                    break;
+
                 Intent intent = new Intent(getApplicationContext(), AlarmService.class);
                 intent.putExtra(TASK_ID, task.id);
                 intent.putExtra(TASK_NAME, getTaskName(task));
