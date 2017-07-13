@@ -26,18 +26,18 @@ public class App extends Application {
 
         switch (BuildConfig.FLAVOR) {
             case "release_flavor":
-                host = "https://mojo-qa.dev-alex.org";
-                task_host = "https://activiti.dev-alex.org/activiti-rest/service";
-                break;
-
-            case "debug_flavor":
                 host = "https://mojo.mojoform.com";
                 task_host = "https://tasks.mojo.mojoform.com/activiti-rest/service";
                 break;
 
-            default:
+            case "debug_flavor":
                 host = "https://mojo-qa.dev-alex.org";
                 task_host = "https://activiti.dev-alex.org/activiti-rest/service";
+                break;
+
+            default:
+                host = "https://mojo.mojoform.com";
+                task_host = "https://tasks.mojo.mojoform.com/activiti-rest/service";
                 break;
         }
     }

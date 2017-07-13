@@ -49,6 +49,7 @@ android {
                     appIcon: "@mipmap/ic_launcher"
             ]
         }
+        
         debug_flavor {
             minSdkVersion 15
             applicationId 'org.dev_alex.mojo_qa.mojo.debug'
