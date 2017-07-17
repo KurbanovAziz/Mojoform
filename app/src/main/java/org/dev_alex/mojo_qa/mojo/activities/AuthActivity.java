@@ -153,6 +153,8 @@ public class AuthActivity extends AppCompatActivity {
                         replaceWithLoginFragment();
                     }
                 } else {
+                    getSharedPreferences("templates", Context.MODE_PRIVATE).edit().clear().apply();
+
                     if (responseCode == null)
                         Toast.makeText(AuthActivity.this, R.string.network_error, Toast.LENGTH_LONG).show();
                     else if (responseCode == 401)

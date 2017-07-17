@@ -161,14 +161,16 @@ public class Utils {
     private static String formatHtmlBlockSize(String html, String tag) {
         int index = 0;
         String widthStr = "width=\"";
+        String widthStr2 = "width:";
         String heightStr = "height=\"";
+        String heightStr2 = "height:";
         String endOfTag = "/>";
         String closeTag = "</" + tag.substring(1);
 
         while ((index = html.indexOf(tag, index)) != -1) {
             try {
-                int endTagI = html.indexOf(endOfTag);
-                int closeTagI = html.indexOf(closeTag);
+                int endTagI = html.indexOf(endOfTag, index + 1);
+                int closeTagI = html.indexOf(closeTag, index + 1);
                 int heightI = html.indexOf(heightStr, index);
                 int widthI = html.indexOf(widthStr, index);
 
@@ -182,6 +184,33 @@ public class Utils {
                         if (endTagI == -1)
                             endTagI = closeTagI;
                         html = html.substring(0, endTagI) + String.valueOf(" width=\"100%\" height=\"auto\" ") + html.substring(endTagI);
+                    }
+                }
+                index++;
+            } catch (Exception exc) {
+                index++;
+            }
+        }
+
+        index = 0;
+        while ((index = html.indexOf(tag, index)) != -1) {
+            try {
+                int endTagI = html.indexOf(endOfTag, index + 1);
+                int closeTagI = html.indexOf(closeTag, index + 1);
+                int heightI = html.indexOf(heightStr2, index);
+                int widthI = html.indexOf(widthStr2, index);
+
+
+                if (endTagI != -1 || closeTagI != -1) {
+                    if (heightI != -1 && widthI != -1) {
+                        html = html.substring(0, widthI + widthStr2.length()) + "100%" + html.substring(html.indexOf("px", widthI + widthStr2.length() + 1));
+                        heightI = html.indexOf(heightStr2, index);
+                        html = html.substring(0, heightI + heightStr2.length()) + "auto" + html.substring(html.indexOf("px", heightI + heightStr2.length() + 1));
+                        html = html.replace("px", "");
+                    } else {
+                        if (endTagI == -1)
+                            endTagI = closeTagI;
+                        html = html.substring(0, endTagI) + String.valueOf(" width:100%; height:auto; ") + html.substring(endTagI);
                     }
                 }
                 index++;
