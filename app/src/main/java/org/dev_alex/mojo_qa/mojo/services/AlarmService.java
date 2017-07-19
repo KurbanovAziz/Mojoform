@@ -155,9 +155,6 @@ public class AlarmService extends Service {
             if (new Date().after(new Date(overDueTime)))
                 overDueTime += 60 * 60 * 1000;
             else {
-                if (overDueTime > new Date().getTime() + 3 * 60 * 60 * 1000)
-                    break;
-
                 Intent intent = new Intent(getApplicationContext(), AlarmService.class);
                 intent.putExtra(TASK_ID, task.id);
                 intent.putExtra(TASK_NAME, getTaskName(task));
@@ -459,9 +456,14 @@ public class AlarmService extends Service {
                             Log.d("mojo-test-log", "currentDate " + new Date().getTime() + " dueDate " + task.dueDate.getTime());
                             int hoursCt = (int) Math.abs((new Date().getTime() - task.dueDate.getTime()) / (60 * 60 * 1000));
                             message = String.format(Locale.getDefault(), "Просрочено %d час%s(ов)", hoursCt, hoursCt == 1 ? "" : "a");
+
+                            if (hoursCt < 4)
+                                showNotification(taskName, message, taskId, templateId, nodeForTasksId,
+                                        task.dueDate != null ? task.dueDate.getTime() : new Date().getTime(), initiator, siteId);
+                        } else {
+                            showNotification(taskName, message, taskId, templateId, nodeForTasksId,
+                                    task.dueDate != null ? task.dueDate.getTime() : new Date().getTime(), initiator, siteId);
                         }
-                        showNotification(taskName, message, taskId, templateId, nodeForTasksId,
-                                task.dueDate != null ? task.dueDate.getTime() : new Date().getTime(), initiator, siteId);
                     }
                 }
             } catch (Exception exc) {

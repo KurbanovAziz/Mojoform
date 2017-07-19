@@ -141,9 +141,9 @@ public class AuthActivity extends AppCompatActivity {
                             Toast.makeText(AuthActivity.this, getString(R.string.unknown_error), Toast.LENGTH_LONG).show();
                             return;
                         }
-                        Data.currentUser = user;
+                        Data.currentUser = new User(user);
                         TokenService.updateToken(user.token, user.userName);
-                        Data.taskAuthLogin = user.userName;
+                        Data.taskAuthLogin = Data.currentUser.userName;
                         Intent intent = new Intent(AuthActivity.this, MainActivity.class);
                         intent.putExtras(getIntent());
                         startActivity(intent);
@@ -164,10 +164,10 @@ public class AuthActivity extends AppCompatActivity {
                             Toast.makeText(AuthActivity.this, getString(R.string.unknown_error), Toast.LENGTH_LONG).show();
                             return;
                         }
-                        Data.currentUser = user;
-                        Data.taskAuthLogin = user.userName;
+                        Data.currentUser = new User(user);
+                        Data.taskAuthLogin = Data.currentUser.userName;
                         LoginHistoryService.addUser(user);
-                        TokenService.updateToken(user.token, user.userName);
+                        TokenService.updateToken(Data.currentUser.token, Data.currentUser.userName);
                         Intent intent = new Intent(AuthActivity.this, MainActivity.class);
                         intent.putExtras(getIntent());
                         startActivity(intent);
