@@ -13,13 +13,11 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.mikepenz.materialdrawer.Drawer;
 import com.mikepenz.materialdrawer.DrawerBuilder;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 
-import org.dev_alex.mojo_qa.mojo.Data;
 import org.dev_alex.mojo_qa.mojo.R;
 import org.dev_alex.mojo_qa.mojo.custom_views.CustomDrawerItem;
 import org.dev_alex.mojo_qa.mojo.fragments.DocumentsFragment;
@@ -71,14 +69,9 @@ public class MainActivity extends AppCompatActivity {
 
     private void initDrawer() {
         View headerView = getLayoutInflater().inflate(R.layout.drawer_header, null);
-        if (Data.currentUser != null) {
-            ((TextView) headerView.findViewById(R.id.user_name)).setText(Data.currentUser.firstName + " " + Data.currentUser.lastName);
-        } else {
-            startActivity(new Intent(this, AuthActivity.class));
-            Toast.makeText(this, "Ошибка которой быть не должно", Toast.LENGTH_SHORT).show();
-            finish();
-            return;
-        }
+        User currentUser = LoginHistoryService.getCurrentUser();
+        ((TextView) headerView.findViewById(R.id.user_name)).setText(currentUser.firstName + " " + currentUser.lastName);
+
 
         drawer = new DrawerBuilder()
                 .withActivity(this)
@@ -120,13 +113,13 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        if (Data.currentUser.has_avatar)
+        if (currentUser.has_avatar)
             new DownloadUserAvatar((ImageView) headerView.findViewById(R.id.profile_image)).execute();
         else {
             headerView.findViewById(R.id.profile_image).setVisibility(View.GONE);
 
-            User user = Data.currentUser;
-            String userInitials = String.format(Locale.getDefault(), "%s%s", user.firstName.isEmpty() ? "" : user.firstName.charAt(0), user.lastName.isEmpty() ? "" : user.lastName.charAt(0));
+            String userInitials = String.format(Locale.getDefault(), "%s%s", currentUser.firstName.isEmpty() ?
+                    "" : currentUser.firstName.charAt(0), currentUser.lastName.isEmpty() ? "" : currentUser.lastName.charAt(0));
             ((TextView) headerView.findViewById(R.id.user_initials)).setText(userInitials);
         }
     }
@@ -157,7 +150,7 @@ public class MainActivity extends AppCompatActivity {
             try {
                 if (avatar != null) {
                     avatarImageView.setImageBitmap(avatar);
-                    LoginHistoryService.addAvatar(Data.currentUser.userName, avatar);
+                    LoginHistoryService.addAvatar(LoginHistoryService.getCurrentUser().userName, avatar);
                 }
             } catch (Exception exc) {
                 exc.printStackTrace();
@@ -171,8 +164,7 @@ public class MainActivity extends AppCompatActivity {
         try {
             NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
             mNotificationManager.cancel(123321);
-        }
-        catch (Exception exc){
+        } catch (Exception exc) {
             exc.printStackTrace();
         }
     }

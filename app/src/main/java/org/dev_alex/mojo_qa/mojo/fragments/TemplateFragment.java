@@ -68,6 +68,7 @@ import org.dev_alex.mojo_qa.mojo.activities.ImageViewActivity;
 import org.dev_alex.mojo_qa.mojo.activities.MainActivity;
 import org.dev_alex.mojo_qa.mojo.models.Page;
 import org.dev_alex.mojo_qa.mojo.services.BitmapService;
+import org.dev_alex.mojo_qa.mojo.services.LoginHistoryService;
 import org.dev_alex.mojo_qa.mojo.services.RequestService;
 import org.dev_alex.mojo_qa.mojo.services.TokenService;
 import org.dev_alex.mojo_qa.mojo.services.Utils;
@@ -414,7 +415,7 @@ public class TemplateFragment extends Fragment {
             mSettings = App.getContext().getSharedPreferences("templates", Context.MODE_PRIVATE);
             SharedPreferences.Editor editor = mSettings.edit();
 
-            editor.putString(taskId + Data.currentUser.userName, template.toString());
+            editor.putString(taskId + LoginHistoryService.getCurrentUser().userName, template.toString());
             editor.apply();
         } catch (Exception exc) {
             exc.printStackTrace();
@@ -1768,7 +1769,7 @@ public class TemplateFragment extends Fragment {
             try {
                 SharedPreferences mSettings;
                 mSettings = App.getContext().getSharedPreferences("templates", Context.MODE_PRIVATE);
-                String templateJson = mSettings.getString(taskId + Data.currentUser.userName, "");
+                String templateJson = mSettings.getString(taskId + LoginHistoryService.getCurrentUser().userName, "");
                 if (!templateJson.equals("")) {
                     template = new JSONObject(templateJson);
                     return HttpURLConnection.HTTP_OK;
@@ -1969,7 +1970,7 @@ public class TemplateFragment extends Fragment {
 
                 resultJson.put("template_id", templateId);
                 resultJson.put("name", template.getString("name"));
-                resultJson.put("executor", Data.currentUser.userName);
+                resultJson.put("executor", LoginHistoryService.getCurrentUser().userName);
                 if (template.has("StartTime"))
                     resultJson.put("StartTime", template.getString("StartTime"));
                 else
@@ -2031,7 +2032,7 @@ public class TemplateFragment extends Fragment {
                     SharedPreferences mSettings;
                     mSettings = App.getContext().getSharedPreferences("templates", Context.MODE_PRIVATE);
                     SharedPreferences.Editor editor = mSettings.edit();
-                    editor.putString(taskId + Data.currentUser.userName, "");
+                    editor.putString(taskId + LoginHistoryService.getCurrentUser().userName, "");
                     editor.apply();
                     ((TasksFragment) getActivity().getSupportFragmentManager().findFragmentByTag("tasks")).needUpdate = true;
                     getActivity().getSupportFragmentManager().popBackStack();

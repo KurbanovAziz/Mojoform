@@ -18,6 +18,7 @@ import java.util.ArrayList;
 public class LoginHistoryService {
     private final static String LOGIN_PREFERENCES = "user_history";
     private final static String USERS = "users";
+    private final static String CURRENT_USER = "current_user";
 
     public static ArrayList<User> getLastLoggedUsers() {
         try {
@@ -88,6 +89,33 @@ public class LoginHistoryService {
         return avatar;
     }
 
+    public static User getCurrentUser() {
+        try {
+            SharedPreferences mSettings;
+            mSettings = App.getContext().getSharedPreferences(LOGIN_PREFERENCES, Context.MODE_PRIVATE);
+
+            String userJson = mSettings.getString(CURRENT_USER, "");
+            if (userJson.isEmpty())
+                return new User();
+            else
+                return new ObjectMapper().readValue(userJson, User.class);
+
+        } catch (Exception exc) {
+            return new User();
+        }
+    }
+
+    public static void setCurrentUser(User user) {
+        try {
+            SharedPreferences mSettings;
+            mSettings = App.getContext().getSharedPreferences(LOGIN_PREFERENCES, Context.MODE_PRIVATE);
+            SharedPreferences.Editor editor = mSettings.edit();
+
+            editor.putString(CURRENT_USER, new ObjectMapper().writeValueAsString(user));
+            editor.apply();
+        } catch (Exception ignored) {
+        }
+    }
 
     public static boolean lastLoginUsersExists() {
         return (getLastLoggedUsers() != null);

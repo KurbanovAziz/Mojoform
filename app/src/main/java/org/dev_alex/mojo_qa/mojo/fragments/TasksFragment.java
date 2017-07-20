@@ -39,6 +39,8 @@ import org.dev_alex.mojo_qa.mojo.EventDecorator;
 import org.dev_alex.mojo_qa.mojo.R;
 import org.dev_alex.mojo_qa.mojo.adapters.TaskAdapter;
 import org.dev_alex.mojo_qa.mojo.models.Task;
+import org.dev_alex.mojo_qa.mojo.models.User;
+import org.dev_alex.mojo_qa.mojo.services.LoginHistoryService;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -370,13 +372,14 @@ public class TasksFragment extends Fragment {
                 }
                 String sortParams = "&sort=dueDate&order=desc&size=100";
 
+                User currentUser = LoginHistoryService.getCurrentUser();
                 for (int i = 0; i < 2; i++) {
                     if (i == 0)
                         url = App.getTask_host() + "/history/" +
-                                "historic-task-instances?finished=TRUE&taskAssignee=" + Data.currentUser.userName + "&includeProcessVariables=TRUE" + dateParams + sortParams;
+                                "historic-task-instances?finished=TRUE&taskAssignee=" + currentUser.userName + "&includeProcessVariables=TRUE" + dateParams + sortParams;
                     else
                         url = App.getTask_host() + "/runtime/tasks?assignee="
-                                + Data.currentUser.userName + "&includeProcessVariables=TRUE" + dateParams + sortParams;
+                                + currentUser.userName + "&includeProcessVariables=TRUE" + dateParams + sortParams;
 
                     OkHttpClient client = new OkHttpClient();
                     Request request = new Request.Builder().header("Authorization", Credentials.basic(Data.taskAuthLogin, Data.taskAuthPass))
@@ -454,7 +457,7 @@ public class TasksFragment extends Fragment {
                 String sortParams = "&sort=dueDate&order=desc&size=100";
 
                 url = App.getTask_host() + "/runtime/tasks?assignee="
-                        + Data.currentUser.userName + "&includeProcessVariables=TRUE" + dateParams + sortParams;
+                        + LoginHistoryService.getCurrentUser().userName + "&includeProcessVariables=TRUE" + dateParams + sortParams;
 
                 OkHttpClient client = new OkHttpClient();
                 Request request = new Request.Builder().header("Authorization", Credentials.basic(Data.taskAuthLogin, Data.taskAuthPass))
