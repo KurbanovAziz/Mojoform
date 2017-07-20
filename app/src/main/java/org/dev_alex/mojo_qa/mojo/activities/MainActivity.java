@@ -75,7 +75,7 @@ public class MainActivity extends AppCompatActivity {
             ((TextView) headerView.findViewById(R.id.user_name)).setText(Data.currentUser.firstName + " " + Data.currentUser.lastName);
         } else {
             startActivity(new Intent(this, AuthActivity.class));
-            Toast.makeText(this, "Ошибка авторизации", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Ошибка которой быть не должно", Toast.LENGTH_SHORT).show();
             finish();
             return;
         }
