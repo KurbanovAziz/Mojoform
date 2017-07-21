@@ -178,32 +178,39 @@ public class TemplateFragment extends Fragment {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == PHOTO_REQUEST_CODE && resultCode == RESULT_OK) {
-            if (new File(cameraImagePath).exists() || data == null)
-                new ProcessingBitmapTask(cameraImagePath, true).execute();
-            else {
-                try {
-                    String picturePath = Utils.getRealPathFromIntentData(getContext(), data.getData());
-                    if (picturePath == null) {
-                        Toast.makeText(getContext(), "что-то пошло не так", Toast.LENGTH_SHORT).show();
-                        return;
-                    }
 
-                    String expansion = picturePath.substring(picturePath.lastIndexOf('.') + 1);
-                    if (!expansion.equals("jpg") && !expansion.equals("png") && !expansion.equals("jpeg") && !expansion.equals("bmp")) {
-                        Toast.makeText(getContext(), "Пожалуйста, выберите файл в формет jpg, png или bmp", Toast.LENGTH_SHORT).show();
-                        return;
-                    }
-                    new ProcessingBitmapTask(picturePath, true).execute();
-                } catch (Exception exc) {
-                    exc.printStackTrace();
+        try {
+            if (requestCode == PHOTO_REQUEST_CODE && resultCode == RESULT_OK) {
+                if (new File(cameraImagePath).exists() || data == null)
+                    new ProcessingBitmapTask(cameraImagePath, true).execute();
+                else {
                     try {
-                        new ProcessingBitmapTask(cameraImagePath, true).execute();
-                    } catch (Exception exc1) {
-                        Toast.makeText(getContext(), "Не удалось прикрепить изображение", Toast.LENGTH_SHORT).show();
+                        String picturePath = Utils.getRealPathFromIntentData(getContext(), data.getData());
+                        if (picturePath == null) {
+                            Toast.makeText(getContext(), "что-то пошло не так", Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+
+                        String expansion = picturePath.substring(picturePath.lastIndexOf('.') + 1);
+                        if (!expansion.equals("jpg") && !expansion.equals("png") && !expansion.equals("jpeg") && !expansion.equals("bmp")) {
+                            Toast.makeText(getContext(), "Пожалуйста, выберите файл в формет jpg, png или bmp", Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+                        new ProcessingBitmapTask(picturePath, true).execute();
+                    } catch (Exception exc) {
+                        exc.printStackTrace();
+                        try {
+                            new ProcessingBitmapTask(cameraImagePath, true).execute();
+                        } catch (Exception exc1) {
+                            Toast.makeText(getContext(), "Не удалось прикрепить изображение", Toast.LENGTH_SHORT).show();
+                        }
                     }
                 }
             }
+        } catch (Exception exc) {
+            exc.printStackTrace();
+            String error = "camera_path = " + (cameraImagePath == null ? "null" : cameraImagePath);
+            Toast.makeText(getContext(), error, Toast.LENGTH_LONG).show();
         }
 
         if (requestCode == VIDEO_REQUEST_CODE && resultCode == RESULT_OK) {
