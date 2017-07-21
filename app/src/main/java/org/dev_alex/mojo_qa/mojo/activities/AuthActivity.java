@@ -23,6 +23,8 @@ import org.dev_alex.mojo_qa.mojo.services.RequestService;
 import org.dev_alex.mojo_qa.mojo.services.TokenService;
 import org.json.JSONObject;
 
+import java.io.File;
+
 import okhttp3.Response;
 
 public class AuthActivity extends AppCompatActivity {
@@ -154,6 +156,7 @@ public class AuthActivity extends AppCompatActivity {
                     }
                 } else {
                     getSharedPreferences("templates", Context.MODE_PRIVATE).edit().clear().apply();
+                    trimCache(AuthActivity.this);
 
                     if (responseCode == null)
                         Toast.makeText(AuthActivity.this, R.string.network_error, Toast.LENGTH_LONG).show();
@@ -179,5 +182,36 @@ public class AuthActivity extends AppCompatActivity {
                 exc.printStackTrace();
             }
         }
+    }
+
+    public static void trimCache(Context context) {
+        try {
+            File dir = context.getCacheDir();
+            if (dir != null && dir.isDirectory()) {
+                deleteDir(dir);
+            }
+
+            dir = context.getExternalCacheDir();
+            if (dir != null && dir.isDirectory()) {
+                deleteDir(dir);
+            }
+        } catch (Exception e) {
+            // TODO: handle exception
+        }
+    }
+
+    public static boolean deleteDir(File dir) {
+        if (dir != null && dir.isDirectory()) {
+            String[] children = dir.list();
+            for (int i = 0; i < children.length; i++) {
+                boolean success = deleteDir(new File(dir, children[i]));
+                if (!success) {
+                    return false;
+                }
+            }
+        }
+
+        // The directory is now empty so delete it
+        return dir.delete();
     }
 }
