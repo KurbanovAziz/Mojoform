@@ -85,6 +85,8 @@ import java.util.Iterator;
 import java.util.Locale;
 import java.util.TimeZone;
 
+import icepick.Icepick;
+import icepick.State;
 import okhttp3.MediaType;
 import okhttp3.Response;
 
@@ -105,24 +107,29 @@ public class TemplateFragment extends Fragment {
     private final int IMAGE_SHOW_REQUEST_CODE = 110;
     private final int SCAN_CODE_REQUEST_CODE = 120;
 
-
-    private String templateId;
-    private String taskId;
-    private String siteId;
-    private String initiator;
-    private long dueDate;
+    public String templateId;
+    public String taskId;
+    public String siteId;
+    public String initiator;
+    public long dueDate;
 
     private View rootView;
     private ProgressDialog loopDialog;
 
-    private ArrayList<Page> pages;
-    private int currentPagePos;
-    private JSONObject template;
-    private EditText scanTo;
+    public ArrayList<Page> pages;
+    @State
+    public int currentPagePos;
 
-    private Pair<LinearLayout, JSONObject> currentMediaBlock;
-    private String cameraImagePath;
-    private String cameraVideoPath;
+    public JSONObject template;
+
+    public EditText scanTo;
+
+    public Pair<LinearLayout, JSONObject> currentMediaBlock;
+
+    @State
+    public String cameraImagePath;
+    @State
+    public String cameraVideoPath;
 
     private ProgressDialog progressDialog;
 
@@ -164,14 +171,18 @@ public class TemplateFragment extends Fragment {
 
             rootView.findViewById(R.id.page_selector_block).getLayoutParams().width =
                     (int) (getResources().getDisplayMetrics().widthPixels * (2.0 / 5.0));
+
             initDialog();
             setupHeader();
             setupCloseKeyboardUI(getActivity(), rootView);
             setListeners();
 
             new GetTemplateTask().execute();
+        } else
+            initDialog();
 
-        }
+        if (savedInstanceState != null)
+            Icepick.restoreInstanceState(this, savedInstanceState);
         return rootView;
     }
 
@@ -2421,5 +2432,11 @@ public class TemplateFragment extends Fragment {
             }
         }
         return containerValues;
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        Icepick.saveInstanceState(this, outState);
     }
 }

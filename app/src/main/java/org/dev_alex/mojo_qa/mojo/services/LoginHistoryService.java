@@ -113,7 +113,8 @@ public class LoginHistoryService {
 
             editor.putString(CURRENT_USER, new ObjectMapper().writeValueAsString(user));
             editor.apply();
-        } catch (Exception ignored) {
+        } catch (Exception exc) {
+            exc.printStackTrace();
         }
     }
 

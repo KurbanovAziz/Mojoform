@@ -138,7 +138,7 @@ public class AuthActivity extends AppCompatActivity {
                     loopDialog.dismiss();
 
                 if (loginWithinToken) {
-                    if (responseCode == 202) {
+                    if (responseCode == 202 || responseCode == 200) {
                         if (user == null) {
                             Toast.makeText(AuthActivity.this, getString(R.string.unknown_error), Toast.LENGTH_LONG).show();
                             return;
@@ -162,7 +162,7 @@ public class AuthActivity extends AppCompatActivity {
                         Toast.makeText(AuthActivity.this, R.string.network_error, Toast.LENGTH_LONG).show();
                     else if (responseCode == 401)
                         Toast.makeText(AuthActivity.this, R.string.invalid_username_or_password, Toast.LENGTH_LONG).show();
-                    else if (responseCode == 202) {
+                    else if (responseCode == 202 || responseCode == 200) {
                         if (user == null) {
                             Toast.makeText(AuthActivity.this, getString(R.string.unknown_error), Toast.LENGTH_LONG).show();
                             return;
