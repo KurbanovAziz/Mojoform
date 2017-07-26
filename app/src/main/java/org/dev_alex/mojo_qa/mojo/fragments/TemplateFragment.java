@@ -1828,9 +1828,21 @@ public class TemplateFragment extends Fragment {
                     Toast.makeText(getContext(), R.string.unknown_error, Toast.LENGTH_LONG).show();
                     getActivity().getSupportFragmentManager().popBackStack();
                 }
+
+                printLog("mojo-template", template.toString());
             } catch (Exception exc) {
                 exc.printStackTrace();
             }
+        }
+    }
+
+    private void printLog(String TAG, String message) {
+        int maxLogSize = 1000;
+        for (int i = 0; i <= message.length() / maxLogSize; i++) {
+            int start = i * maxLogSize;
+            int end = (i + 1) * maxLogSize;
+            end = end > message.length() ? message.length() : end;
+            Log.v(TAG, message.substring(start, end));
         }
     }
 

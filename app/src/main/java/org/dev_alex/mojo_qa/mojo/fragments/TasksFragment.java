@@ -373,13 +373,15 @@ public class TasksFragment extends Fragment {
                 String sortParams = "&sort=dueDate&order=desc&size=100";
 
                 User currentUser = LoginHistoryService.getCurrentUser();
-                for (int i = 0; i < 2; i++) {
+                for (int i = 0; i < 3; i++) {
                     if (i == 0)
                         url = App.getTask_host() + "/history/" +
                                 "historic-task-instances?finished=TRUE&taskAssignee=" + currentUser.userName + "&includeProcessVariables=TRUE" + dateParams + sortParams;
-                    else
+                    else if (i == 1)
                         url = App.getTask_host() + "/runtime/tasks?assignee="
                                 + currentUser.userName + "&includeProcessVariables=TRUE" + dateParams + sortParams;
+                    else
+                        url = App.getTask_host() + "/runtime/tasks?sort=createTime&order=desc&size=100&assignee=" + currentUser.userName + "&includeProcessVariables=TRUE&withoutDueDate=TRUE";
 
                     OkHttpClient client = new OkHttpClient();
                     Request request = new Request.Builder().header("Authorization", Credentials.basic(Data.taskAuthLogin, Data.taskAuthPass))
@@ -397,9 +399,19 @@ public class TasksFragment extends Fragment {
                                 if (task.deleteReason == null)
                                     resultTasks.add(task);
                             finishedTasks = resultTasks;
-                        } else
-                            busyTasks = new ObjectMapper().readValue(tasksJson.toString(), new TypeReference<ArrayList<Task>>() {
-                            });
+                        } else {
+                            if (i == 1)
+                                busyTasks = new ObjectMapper().readValue(tasksJson.toString(), new TypeReference<ArrayList<Task>>() {
+                                });
+                            else {
+                                ArrayList<Task> taskWithoutDate = new ObjectMapper().readValue(tasksJson.toString(), new TypeReference<ArrayList<Task>>() {
+                                });
+                                if (busyTasks == null)
+                                    busyTasks = new ArrayList<>();
+                                busyTasks.addAll(taskWithoutDate);
+                                Log.d("mojo-tasks", "tasks without date = " + taskWithoutDate.size());
+                            }
+                        }
                     }
                 }
 
