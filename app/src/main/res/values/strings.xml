@@ -74,4 +74,5 @@
     <string name="nothing_found">Ничего не найдено</string>
     <string name="tasks_are_temporary_unavailable">Задачи временно недоступны</string>
     <string name="organizations">Организации</string>
+    <string name="permanent">Постоянные</string>
 </resources>

@@ -48,8 +48,6 @@ import java.text.DateFormatSymbols;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
@@ -66,6 +64,7 @@ public class TasksFragment extends Fragment {
 
     private ArrayList<Task> finishedTasks;
     private ArrayList<Task> busyTasks;
+    private ArrayList<Task> permanentTasks;
     private Calendar currentDate;
     private boolean withDay = false;
 
@@ -146,26 +145,8 @@ public class TasksFragment extends Fragment {
                         recyclerView.setAdapter(new TaskAdapter(TasksFragment.this, busyTasks));
                         break;
 
-                    case R.id.all:
-                        ArrayList<Task> allTasks = new ArrayList<>(busyTasks);
-                        allTasks.addAll(finishedTasks);
-
-                        Collections.sort(allTasks, new Comparator<Task>() {
-                            @Override
-                            public int compare(Task task1, Task task2) {
-                                if (task1.dueDate == null)
-                                    return 1;
-                                if (task2.dueDate == null)
-                                    return -1;
-
-                                if (task1.dueDate.getTime() == task2.dueDate.getTime())
-                                    return 0;
-
-                                return (task1.dueDate.after(task2.dueDate)) ? -1 : 1;
-                            }
-                        });
-
-                        recyclerView.setAdapter(new TaskAdapter(TasksFragment.this, allTasks));
+                    case R.id.permanent:
+                        recyclerView.setAdapter(new TaskAdapter(TasksFragment.this, permanentTasks));
                         break;
                 }
             }
@@ -347,6 +328,7 @@ public class TasksFragment extends Fragment {
                 Response response = null;
                 finishedTasks = new ArrayList<>();
                 busyTasks = new ArrayList<>();
+                permanentTasks = new ArrayList<>();
                 String url;
 
                 SimpleDateFormat isoDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ", Locale.getDefault());
@@ -374,13 +356,13 @@ public class TasksFragment extends Fragment {
 
                 User currentUser = LoginHistoryService.getCurrentUser();
                 for (int i = 0; i < 3; i++) {
-                    if (i == 0)
+                    if (i == 0) {
                         url = App.getTask_host() + "/history/" +
                                 "historic-task-instances?finished=TRUE&taskAssignee=" + currentUser.userName + "&includeProcessVariables=TRUE" + dateParams + sortParams;
-                    else if (i == 1)
+                    } else if (i == 1) {
                         url = App.getTask_host() + "/runtime/tasks?assignee="
                                 + currentUser.userName + "&includeProcessVariables=TRUE" + dateParams + sortParams;
-                    else
+                    } else
                         url = App.getTask_host() + "/runtime/tasks?sort=createTime&order=desc&size=100&assignee=" + currentUser.userName + "&includeProcessVariables=TRUE&withoutDueDate=TRUE";
 
                     OkHttpClient client = new OkHttpClient();
@@ -388,6 +370,7 @@ public class TasksFragment extends Fragment {
                             .url(url).build();
 
                     response = client.newCall(request).execute();
+                    Log.d("mojo-response", "url = " + url);
 
                     if (response.code() == 200) {
                         JSONArray tasksJson = new JSONObject(response.body().string()).getJSONArray("data");
@@ -404,12 +387,9 @@ public class TasksFragment extends Fragment {
                                 busyTasks = new ObjectMapper().readValue(tasksJson.toString(), new TypeReference<ArrayList<Task>>() {
                                 });
                             else {
-                                ArrayList<Task> taskWithoutDate = new ObjectMapper().readValue(tasksJson.toString(), new TypeReference<ArrayList<Task>>() {
+                                permanentTasks = new ObjectMapper().readValue(tasksJson.toString(), new TypeReference<ArrayList<Task>>() {
                                 });
-                                if (busyTasks == null)
-                                    busyTasks = new ArrayList<>();
-                                busyTasks.addAll(taskWithoutDate);
-                                Log.d("mojo-tasks", "tasks without date = " + taskWithoutDate.size());
+                                Log.d("mojo-tasks", "tasks without date = " + permanentTasks.size());
                             }
                         }
                     }

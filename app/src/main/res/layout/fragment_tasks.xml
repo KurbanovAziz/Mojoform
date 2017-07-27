@@ -113,14 +113,14 @@
             android:textColor="@color/toggle_button_text_color" />
 
         <RadioButton
-            android:id="@+id/all"
+            android:id="@+id/permanent"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:background="@drawable/task_switch_button_background"
             android:button="@null"
             android:gravity="center"
-            android:text="@string/all"
+            android:text="@string/permanent"
             android:textColor="@color/toggle_button_text_color" />
     </RadioGroup>
 
