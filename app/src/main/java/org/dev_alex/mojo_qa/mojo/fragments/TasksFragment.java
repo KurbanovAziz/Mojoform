@@ -374,6 +374,9 @@ public class TasksFragment extends Fragment {
 
                     if (response.code() == 200) {
                         JSONArray tasksJson = new JSONObject(response.body().string()).getJSONArray("data");
+                        Log.d("mojo-response", "tasks size = " + tasksJson.length());
+                        Log.d("mojo-response", "tasks = " + tasksJson.toString());
+
                         if (i == 0) {
                             finishedTasks = new ObjectMapper().readValue(tasksJson.toString(), new TypeReference<ArrayList<Task>>() {
                             });
@@ -382,6 +385,7 @@ public class TasksFragment extends Fragment {
                                 if (task.deleteReason == null)
                                     resultTasks.add(task);
                             finishedTasks = resultTasks;
+                            Log.d("mojo-response", "finished tasks size = " + finishedTasks.size());
                         } else {
                             if (i == 1)
                                 busyTasks = new ObjectMapper().readValue(tasksJson.toString(), new TypeReference<ArrayList<Task>>() {
