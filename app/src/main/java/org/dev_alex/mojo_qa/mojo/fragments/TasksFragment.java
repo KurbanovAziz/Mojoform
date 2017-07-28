@@ -363,7 +363,7 @@ public class TasksFragment extends Fragment {
                         url = App.getTask_host() + "/runtime/tasks?assignee="
                                 + currentUser.userName + "&includeProcessVariables=TRUE" + dateParams + sortParams;
                     } else
-                        url = App.getTask_host() + "/runtime/tasks?sort=createTime&order=desc&size=100&assignee=" + currentUser.userName + "&includeProcessVariables=TRUE&withoutDueDate=TRUE";
+                        url = App.getTask_host() + "/runtime/tasks?sort=createTime&order=desc&size=170&includeProcessVariables=TRUE&withoutDueDate=TRUE";
 
                     OkHttpClient client = new OkHttpClient();
                     Request request = new Request.Builder().header("Authorization", Credentials.basic(Data.taskAuthLogin, Data.taskAuthPass))

@@ -65,12 +65,20 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
         String initiator = null;
 
         viewHolder.taskActiveCircle.setVisibility((task.suspended == null || task.suspended) ? View.INVISIBLE : View.VISIBLE);
-        if (task.suspended != null && !task.suspended) {
-            ((GradientDrawable) viewHolder.taskActiveCircle.getBackground()).setColor(task.dueDate.after(new Date()) ? Color.GREEN : Color.RED);
-        }
+        if (task.dueDate == null) {
+            viewHolder.taskActiveCircle.setVisibility(View.INVISIBLE);
+            viewHolder.taskDate.setVisibility(View.INVISIBLE);
+        } else {
+            viewHolder.taskActiveCircle.setVisibility(View.VISIBLE);
+            viewHolder.taskDate.setVisibility(View.VISIBLE);
 
-        SimpleDateFormat sdf = new SimpleDateFormat("dd MMMM yyyy | HH.mm", Locale.getDefault());
-        viewHolder.taskDate.setText(sdf.format(task.dueDate));
+            if (task.suspended != null && !task.suspended) {
+                ((GradientDrawable) viewHolder.taskActiveCircle.getBackground()).setColor(task.dueDate.after(new Date()) ? Color.GREEN : Color.RED);
+            }
+
+            SimpleDateFormat sdf = new SimpleDateFormat("dd MMMM yyyy | HH.mm", Locale.getDefault());
+            viewHolder.taskDate.setText(sdf.format(task.dueDate));
+        }
 
         if (task.processInstanceId == null) {
             viewHolder.taskIcon.setImageResource(R.drawable.profile_icon);
