@@ -121,8 +121,9 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
                 viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
+                        Long dueDate = task.dueDate == null ? null : task.dueDate.getTime();
                         parentFragment.showFillTemplateWindow(finalTemplateId,
-                                task.id, finalNodeForTasksId, task.dueDate.getTime(), finalInitiator, finalSiteId);
+                                task.id, finalNodeForTasksId, dueDate, finalInitiator, finalSiteId);
                     }
                 });
             }

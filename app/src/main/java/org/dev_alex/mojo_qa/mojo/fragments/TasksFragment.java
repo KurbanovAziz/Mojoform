@@ -454,7 +454,7 @@ public class TasksFragment extends Fragment {
     }
 
     public void showFillTemplateWindow(String templateId, String taskId, String taskNodeId,
-                                       long dueDate, String initiator, String siteId) {
+                                       Long dueDate, String initiator, String siteId) {
         getActivity().getSupportFragmentManager().beginTransaction()
                 .replace(R.id.container, TemplateFragment.newInstance
                         (templateId, taskId, taskNodeId, dueDate, siteId, initiator)).addToBackStack(null).commit();

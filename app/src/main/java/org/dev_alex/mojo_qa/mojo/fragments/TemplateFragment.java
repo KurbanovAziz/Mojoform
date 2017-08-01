@@ -111,7 +111,7 @@ public class TemplateFragment extends Fragment {
     public String taskId;
     public String siteId;
     public String initiator;
-    public long dueDate;
+    public Long dueDate;
 
     private View rootView;
     private ProgressDialog loopDialog;
@@ -135,10 +135,11 @@ public class TemplateFragment extends Fragment {
 
 
     public static TemplateFragment newInstance(String templateId, String taskId, String nodeForTasks,
-                                               long dueDate, String siteId, String initiator) {
+                                               Long dueDate, String siteId, String initiator) {
         Bundle args = new Bundle();
         args.putString("template_id", templateId);
-        args.putLong("due_date", dueDate);
+        if (dueDate != null)
+            args.putLong("due_date", dueDate);
         args.putString("task_id", taskId);
         args.putString("initiator", initiator);
         args.putString("site_id", siteId);
@@ -163,7 +164,10 @@ public class TemplateFragment extends Fragment {
             ((MainActivity) getActivity()).drawer.getDrawerLayout().setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
             templateId = getArguments().getString("template_id");
             taskId = getArguments().getString("task_id");
-            dueDate = getArguments().getLong("due_date");
+            if (getArguments().containsKey("due_date"))
+                dueDate = getArguments().getLong("due_date");
+            else
+                dueDate = null;
             siteId = getArguments().getString("site_id");
             initiator = getArguments().getString("initiator");
             NODE_FOR_TASKS = getArguments().getString("task_node_id");
@@ -1799,7 +1803,8 @@ public class TemplateFragment extends Fragment {
                         String responseStr = response.body().string();
                         template = new JSONObject(responseStr);
                         template.put("StartTime", isoDateFormat.format(new Date()));
-                        template.put("DueTime", isoDateFormat.format(new Date(dueDate)));
+                        if (dueDate != null)
+                            template.put("DueTime", isoDateFormat.format(new Date(dueDate)));
                     }
                     return response.code();
                 }
