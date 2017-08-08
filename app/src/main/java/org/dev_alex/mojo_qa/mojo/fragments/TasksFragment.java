@@ -1,6 +1,7 @@
 package org.dev_alex.mojo_qa.mojo.fragments;
 
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -13,10 +14,14 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
@@ -40,6 +45,7 @@ import org.dev_alex.mojo_qa.mojo.R;
 import org.dev_alex.mojo_qa.mojo.adapters.TaskAdapter;
 import org.dev_alex.mojo_qa.mojo.models.Task;
 import org.dev_alex.mojo_qa.mojo.models.User;
+import org.dev_alex.mojo_qa.mojo.models.Variable;
 import org.dev_alex.mojo_qa.mojo.services.LoginHistoryService;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -58,6 +64,8 @@ import okhttp3.Request;
 import okhttp3.Response;
 
 public class TasksFragment extends Fragment {
+    private enum CurrentAdapterType {FINISHED, BUSY, PERMANENT}
+
     private View rootView;
     private ProgressDialog loopDialog;
     private RecyclerView recyclerView;
@@ -70,6 +78,10 @@ public class TasksFragment extends Fragment {
 
     private ArrayList<CalendarDay> daysWithOverdueTasks = new ArrayList<>();
     private ArrayList<CalendarDay> daysWithActualTasks = new ArrayList<>();
+
+    private String searchText = null;
+    private TextWatcher searchListener;
+    private CurrentAdapterType currentAdapterType = null;
 
     public boolean needUpdate = false;
 
@@ -126,10 +138,136 @@ public class TasksFragment extends Fragment {
         ((TextView) getActivity().findViewById(R.id.title)).setText(getString(R.string.tasks));
         getActivity().findViewById(R.id.grid_btn).setVisibility(View.GONE);
         getActivity().findViewById(R.id.back_btn).setVisibility(View.GONE);
-        getActivity().findViewById(R.id.search_btn).setVisibility(View.GONE);
         getActivity().findViewById(R.id.group_by_btn).setVisibility(View.GONE);
 
         getActivity().findViewById(R.id.sandwich_btn).setVisibility(View.VISIBLE);
+        getActivity().findViewById(R.id.search_btn).setVisibility(View.VISIBLE);
+
+    }
+
+    private void stopSearch() {
+        searchText = null;
+        getActivity().findViewById(R.id.main_menu_buttons_block).setVisibility(View.VISIBLE);
+        getActivity().findViewById(R.id.main_menu_search_block).setVisibility(View.GONE);
+
+        if (searchListener != null)
+            ((EditText) getActivity().findViewById(R.id.search_text)).removeTextChangedListener(searchListener);
+
+        resetSearch();
+    }
+
+    private void startSearch() {
+        searchText = "";
+        getActivity().findViewById(R.id.main_menu_buttons_block).setVisibility(View.GONE);
+        getActivity().findViewById(R.id.main_menu_search_block).setVisibility(View.VISIBLE);
+
+        getActivity().findViewById(R.id.search_back_btn).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                stopSearch();
+            }
+        });
+
+        getActivity().findViewById(R.id.search_reset).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                ((EditText) getActivity().findViewById(R.id.search_text)).setText("");
+            }
+        });
+
+        searchListener = new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                searchText = editable.toString();
+                applySearch();
+            }
+        };
+        ((EditText) getActivity().findViewById(R.id.search_text)).addTextChangedListener(searchListener);
+        getActivity().findViewById(R.id.search_text).requestFocus();
+        getActivity().findViewById(R.id.search_text).requestFocusFromTouch();
+        InputMethodManager inputMethodManager = (InputMethodManager) getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+        inputMethodManager.showSoftInput(getActivity().findViewById(R.id.search_text), InputMethodManager.SHOW_IMPLICIT);
+    }
+
+    private void applySearch() {
+        ArrayList<Task> currentTaskList;
+        switch (currentAdapterType) {
+            case BUSY:
+                currentTaskList = busyTasks;
+                break;
+
+            case FINISHED:
+                currentTaskList = finishedTasks;
+                break;
+
+            case PERMANENT:
+                currentTaskList = permanentTasks;
+                break;
+
+            default:
+                currentTaskList = busyTasks;
+                break;
+        }
+
+        ArrayList<Task> searchResult = new ArrayList<>();
+        for (Task task : currentTaskList) {
+            if (task.processInstanceId == null) {
+                if (task.name.toLowerCase().contains(searchText.toLowerCase()))
+                    searchResult.add(task);
+            } else {
+                if (task.variables != null)
+                    for (Variable variable : task.variables) {
+                        if (variable.name.equals("TemplateName")) {
+                            if (variable.value.toLowerCase().contains(searchText.toLowerCase()))
+                                searchResult.add(task);
+                            break;
+                        }
+                    }
+            }
+        }
+        recyclerView.setAdapter(new TaskAdapter(this, searchResult));
+    }
+
+    private void resetSearch() {
+        ArrayList<Task> currentTaskList;
+        switch (currentAdapterType) {
+            case BUSY:
+                currentTaskList = busyTasks;
+                break;
+
+            case FINISHED:
+                currentTaskList = finishedTasks;
+                break;
+
+            case PERMANENT:
+                currentTaskList = permanentTasks;
+                break;
+
+            default:
+                currentTaskList = busyTasks;
+                break;
+        }
+        recyclerView.setAdapter(new TaskAdapter(this, currentTaskList));
+    }
+
+    private void updateTaskAdapter(TaskAdapter taskAdapter, CurrentAdapterType type) {
+        currentAdapterType = type;
+        recyclerView.setAdapter(taskAdapter);
+
+        if (searchText == null || searchText.isEmpty())
+            resetSearch();
+        if (searchText != null && !searchText.isEmpty())
+            applySearch();
     }
 
     private void setListeners() {
@@ -138,15 +276,15 @@ public class TasksFragment extends Fragment {
             public void onCheckedChanged(RadioGroup group, @IdRes int checkedId) {
                 switch (checkedId) {
                     case R.id.ended:
-                        recyclerView.setAdapter(new TaskAdapter(TasksFragment.this, finishedTasks));
+                        updateTaskAdapter(new TaskAdapter(TasksFragment.this, finishedTasks), CurrentAdapterType.FINISHED);
                         break;
 
                     case R.id.busy:
-                        recyclerView.setAdapter(new TaskAdapter(TasksFragment.this, busyTasks));
+                        updateTaskAdapter(new TaskAdapter(TasksFragment.this, busyTasks), CurrentAdapterType.BUSY);
                         break;
 
                     case R.id.permanent:
-                        recyclerView.setAdapter(new TaskAdapter(TasksFragment.this, permanentTasks));
+                        updateTaskAdapter(new TaskAdapter(TasksFragment.this, permanentTasks), CurrentAdapterType.PERMANENT);
                         break;
                 }
             }
@@ -236,6 +374,14 @@ public class TasksFragment extends Fragment {
                 updateDate(true);
             }
         });
+
+
+        getActivity().findViewById(R.id.search_btn).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startSearch();
+            }
+        });
     }
 
     private void updateDate(boolean needUpdate) {
@@ -308,7 +454,7 @@ public class TasksFragment extends Fragment {
     }
 
     public void showFillTemplateWindow(String templateId, String taskId, String taskNodeId,
-                                       long dueDate, String initiator, String siteId) {
+                                       Long dueDate, String initiator, String siteId) {
         getActivity().getSupportFragmentManager().beginTransaction()
                 .replace(R.id.container, TemplateFragment.newInstance
                         (templateId, taskId, taskNodeId, dueDate, siteId, initiator)).addToBackStack(null).commit();
@@ -363,7 +509,8 @@ public class TasksFragment extends Fragment {
                         url = App.getTask_host() + "/runtime/tasks?assignee="
                                 + currentUser.userName + "&includeProcessVariables=TRUE" + dateParams + sortParams;
                     } else
-                        url = App.getTask_host() + "/runtime/tasks?sort=createTime&order=desc&size=100&assignee=" + currentUser.userName + "&includeProcessVariables=TRUE&withoutDueDate=TRUE";
+                        url = App.getTask_host() + "/runtime/tasks?sort=createTime&order=desc&size=170&assignee="
+                                + currentUser.userName + "&includeProcessVariables=TRUE&withoutDueDate=true";
 
                     OkHttpClient client = new OkHttpClient();
                     Request request = new Request.Builder().header("Authorization", Credentials.basic(Data.taskAuthLogin, Data.taskAuthPass))
@@ -374,6 +521,9 @@ public class TasksFragment extends Fragment {
 
                     if (response.code() == 200) {
                         JSONArray tasksJson = new JSONObject(response.body().string()).getJSONArray("data");
+                        Log.d("mojo-response", "tasks size = " + tasksJson.length());
+                        Log.d("mojo-response", "tasks = " + tasksJson.toString());
+
                         if (i == 0) {
                             finishedTasks = new ObjectMapper().readValue(tasksJson.toString(), new TypeReference<ArrayList<Task>>() {
                             });
@@ -382,6 +532,7 @@ public class TasksFragment extends Fragment {
                                 if (task.deleteReason == null)
                                     resultTasks.add(task);
                             finishedTasks = resultTasks;
+                            Log.d("mojo-response", "finished tasks size = " + finishedTasks.size());
                         } else {
                             if (i == 1)
                                 busyTasks = new ObjectMapper().readValue(tasksJson.toString(), new TypeReference<ArrayList<Task>>() {
@@ -417,7 +568,7 @@ public class TasksFragment extends Fragment {
                     if (!withDay)
                         updateDecorators(busyTasks);
                     ((RadioButton) rootView.findViewById(R.id.busy)).setChecked(true);
-                    recyclerView.setAdapter(new TaskAdapter(TasksFragment.this, busyTasks));
+                    updateTaskAdapter(new TaskAdapter(TasksFragment.this, busyTasks), CurrentAdapterType.BUSY);
                 } else
                     Toast.makeText(getContext(), R.string.unknown_error, Toast.LENGTH_LONG).show();
             } catch (Exception exc) {
