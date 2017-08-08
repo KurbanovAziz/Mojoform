@@ -117,6 +117,9 @@ public class TemplateFragment extends Fragment {
     private ProgressDialog loopDialog;
 
     public ArrayList<Page> pages;
+    private ArrayList<String> requiredElementTags;
+    private ArrayList<String> requiredCategoriesTags;
+
     @State
     public int currentPagePos;
 
@@ -159,6 +162,9 @@ public class TemplateFragment extends Fragment {
         isoDateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
 
         if (rootView == null) {
+            requiredElementTags = new ArrayList<>();
+            requiredCategoriesTags = new ArrayList<>();
+
             rootView = inflater.inflate(R.layout.fragment_template, container, false);
             ((MainActivity) getActivity()).drawer.getDrawerLayout().setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
             templateId = getArguments().getString("template_id");
@@ -382,22 +388,44 @@ public class TemplateFragment extends Fragment {
     }
 
     private void setPage(Page page) {
-        FrameLayout rootContainer = (FrameLayout) rootView.findViewById(R.id.root_container);
-        rootContainer.removeAllViewsInLayout();
-        rootContainer.addView(page.layout);
+        try {
+            FrameLayout rootTemplateContainer = (FrameLayout) rootView.findViewById(R.id.root_container);
+            rootTemplateContainer.removeAllViewsInLayout();
 
-        ((TextView) rootView.findViewById(R.id.page_name)).setText(page.name);
-        currentPagePos = pages.indexOf(page);
-        for (int i = 0; i < ((LinearLayout) rootView.findViewById(R.id.page_container)).getChildCount(); i++)
-            if (currentPagePos == i) {
-                ((LinearLayout) rootView.findViewById(R.id.page_container)).getChildAt(i).setBackgroundColor(Color.parseColor("#ff322452"));
-                ((LinearLayout) rootView.findViewById(R.id.page_container)).getChildAt(i).setAlpha(1);
-            } else {
-                ((LinearLayout) rootView.findViewById(R.id.page_container)).getChildAt(i).setBackgroundColor(Color.TRANSPARENT);
-                ((LinearLayout) rootView.findViewById(R.id.page_container)).getChildAt(i).setAlpha(0.83f);
-            }
+            LinearLayout rootPageContainer = new LinearLayout(getContext());
+            rootPageContainer.setOrientation(LinearLayout.VERTICAL);
+            LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+            rootPageContainer.setLayoutParams(layoutParams);
 
-        updateArrows();
+            int pageI = pages.indexOf(page);
+            JSONArray pagesJson = template.getJSONArray("items");
+            JSONObject pageJson = pagesJson.getJSONObject(pageI).getJSONObject("page");
+
+            if (pageJson.has("items"))
+                fillContainer(rootPageContainer, pageJson.getJSONArray("items"), 0);
+
+            rootTemplateContainer.addView(rootPageContainer);
+            setupCloseKeyboardUI(getActivity(), rootPageContainer);
+            for (String requiredElementTag : requiredElementTags)
+                setBlockMarkedAsRequired(requiredElementTag);
+            for (String requiredCategoryTag : requiredCategoriesTags)
+                setCategoryMarkedAsRequired(requiredCategoryTag);
+
+            ((TextView) rootView.findViewById(R.id.page_name)).setText(page.name);
+            currentPagePos = pages.indexOf(page);
+            for (int i = 0; i < ((LinearLayout) rootView.findViewById(R.id.page_container)).getChildCount(); i++)
+                if (currentPagePos == i) {
+                    ((LinearLayout) rootView.findViewById(R.id.page_container)).getChildAt(i).setBackgroundColor(Color.parseColor("#ff322452"));
+                    ((LinearLayout) rootView.findViewById(R.id.page_container)).getChildAt(i).setAlpha(1);
+                } else {
+                    ((LinearLayout) rootView.findViewById(R.id.page_container)).getChildAt(i).setBackgroundColor(Color.TRANSPARENT);
+                    ((LinearLayout) rootView.findViewById(R.id.page_container)).getChildAt(i).setAlpha(0.83f);
+                }
+
+            updateArrows();
+        } catch (Exception exc) {
+            exc.printStackTrace();
+        }
     }
 
     private void updateArrows() {
@@ -450,17 +478,9 @@ public class TemplateFragment extends Fragment {
 
                 JSONArray pagesJson = template.getJSONArray("items");
                 for (int i = 0; i < pagesJson.length(); i++) {
-                    LinearLayout rootContainer = new LinearLayout(getContext());
-                    rootContainer.setOrientation(LinearLayout.VERTICAL);
-                    LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-                    rootContainer.setLayoutParams(layoutParams);
-
                     JSONObject pageJson = pagesJson.getJSONObject(i).getJSONObject("page");
-                    if (pageJson.has("items"))
-                        fillContainer(rootContainer, pageJson.getJSONArray("items"), 0);
 
-                    final Page page = new Page(pageJson.getString("caption"), pageJson.getString("id"), rootContainer);
-                    setupCloseKeyboardUI(getActivity(), rootContainer);
+                    final Page page = new Page(pageJson.getString("caption"), pageJson.getString("id"));
                     pages.add(page);
 
                     LinearLayout pageContainer = (LinearLayout) rootView.findViewById(R.id.page_container);
@@ -1432,17 +1452,17 @@ public class TemplateFragment extends Fragment {
     }
 
     private void setBlockMarkedAsRequired(String tag) {
-        ViewGroup container = null;
-        for (Page page : pages) {
-            container = (ViewGroup) page.layout.findViewWithTag(tag);
-            if (container != null)
-                break;
-        }
+        requiredElementTags.add(tag);
+
+        ViewGroup container = (ViewGroup) rootView.findViewById(R.id.root_container).findViewWithTag(tag);
+
         if (container != null)
             container.setBackgroundColor(Color.parseColor("#FEDADA"));
     }
 
     private void setCategoryMarkedAsRequired(String tag) {
+        requiredCategoriesTags.add(tag);
+
         ViewGroup categoryHeader = getCategoryByTag(tag + "_head");
         ViewGroup categoryContainer = getCategoryByTag(tag + "_cont");
 
@@ -1454,6 +1474,7 @@ public class TemplateFragment extends Fragment {
     }
 
     private void resetCategoryColor(String tag, int offset) {
+        requiredCategoriesTags.remove(tag);
         ViewGroup categoryHeader = getCategoryByTag(tag + "_head");
         ViewGroup categoryContainer = getCategoryByTag(tag + "_cont");
 
@@ -1488,22 +1509,14 @@ public class TemplateFragment extends Fragment {
     }
 
     private ViewGroup getCategoryByTag(String tag) {
-        ViewGroup container = null;
-        for (Page page : pages) {
-            container = (ViewGroup) page.layout.findViewWithTag(tag);
-            if (container != null)
-                return container;
-        }
-        return null;
+        return (ViewGroup) rootView.findViewById(R.id.root_container).findViewWithTag(tag);
+
     }
 
     private void resetRequiredBlock(String tag) {
-        ViewGroup container = null;
-        for (Page page : pages) {
-            container = (ViewGroup) page.layout.findViewWithTag(tag);
-            if (container != null)
-                break;
-        }
+        requiredElementTags.remove(tag);
+
+        ViewGroup container = (ViewGroup) rootView.findViewById(R.id.root_container).findViewWithTag(tag);
         if (container != null)
             container.setBackgroundColor(Color.TRANSPARENT);
     }

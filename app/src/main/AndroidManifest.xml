@@ -25,7 +25,6 @@
         <activity
             android:name=".activities.AuthActivity"
             android:configChanges="orientation|keyboardHidden|keyboard"
-            android:process=":first"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar.FullScreen">
             <intent-filter>
@@ -39,7 +38,6 @@
             android:name=".activities.MainActivity"
             android:configChanges="orientation|keyboardHidden|keyboard"
             android:largeHeap="true"
-            android:process=":first"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.ActionBar.Transparent"
             android:windowSoftInputMode="adjustPan" />
