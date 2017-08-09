@@ -2046,9 +2046,19 @@ public class TemplateFragment extends Fragment {
                 Response response = RequestService.createPostRequest("/api/fs-mojo/create/" + NODE_FOR_TASKS + "/document", resultJson.toString());
                 String responseBody = response.body().string();
                 if (response.code() == 201 || response.code() == 200 || response.code() == 409) {
+                    String resId = new JSONObject(responseBody).getJSONObject("entry").getString("id");
+
                     JSONObject jsonObject = new JSONObject();
+                    JSONArray variables = new JSONArray();
+
+                    JSONObject completeVar = new JSONObject();
+                    completeVar.put("name", "result_doc");
+                    completeVar.put("value", resId);
+                    completeVar.put("type", "string");
+                    variables.put(completeVar);
+
                     jsonObject.put("action", "complete");
-                    jsonObject.put("variables", new JSONArray());
+                    jsonObject.put("variables", variables);
 
                     response = RequestService.createPostRequestWithCustomUrl(App.getTask_host() + "/runtime/tasks/" + taskId, jsonObject.toString());
                     int responseCode = response.code();
