@@ -133,9 +133,10 @@ public class TemplateFragment extends Fragment {
     public String cameraImagePath;
     @State
     public String cameraVideoPath;
+    @State
+    public boolean isTaskFinished;
 
     private ProgressDialog progressDialog;
-
 
     public static TemplateFragment newInstance(String templateId, String taskId, String nodeForTasks,
                                                Long dueDate, String siteId, String initiator) {
@@ -146,11 +147,27 @@ public class TemplateFragment extends Fragment {
         args.putString("task_id", taskId);
         args.putString("initiator", initiator);
         args.putString("site_id", siteId);
+        args.putBoolean("is_finished", false);
+
         if (nodeForTasks != null && !nodeForTasks.isEmpty())
             args.putString("task_node_id", nodeForTasks);
         else
             args.putString("task_node_id", NODE_FOR_TASKS);
 
+
+        TemplateFragment fragment = new TemplateFragment();
+        fragment.setArguments(args);
+        return fragment;
+    }
+
+    public static TemplateFragment newInstance(String docId) {
+        Bundle args = new Bundle();
+        args.putString("template_id", docId);
+        args.putString("task_id", "");
+        args.putString("initiator", "");
+        args.putString("site_id", "");
+        args.putBoolean("is_finished", true);
+        args.putString("task_node_id", "");
 
         TemplateFragment fragment = new TemplateFragment();
         fragment.setArguments(args);
@@ -178,6 +195,7 @@ public class TemplateFragment extends Fragment {
             initiator = getArguments().getString("initiator");
             NODE_FOR_TASKS = getArguments().getString("task_node_id");
             NODE_FOR_FILES = getArguments().getString("task_node_id");
+            isTaskFinished = getArguments().getBoolean("is_finished");
 
             rootView.findViewById(R.id.page_selector_block).getLayoutParams().width =
                     (int) (getResources().getDisplayMetrics().widthPixels * (2.0 / 5.0));
@@ -442,9 +460,11 @@ public class TemplateFragment extends Fragment {
                 rootView.findViewById(R.id.right_space).setVisibility(View.GONE);
                 rootView.findViewById(R.id.finish_btn_container).setVisibility(View.VISIBLE);
             } else {
-                rootView.findViewById(R.id.left_space).setVisibility(View.VISIBLE);
-                rootView.findViewById(R.id.right_space).setVisibility(View.VISIBLE);
-                rootView.findViewById(R.id.finish_btn_container).setVisibility(View.GONE);
+                if (!isTaskFinished) {
+                    rootView.findViewById(R.id.left_space).setVisibility(View.VISIBLE);
+                    rootView.findViewById(R.id.right_space).setVisibility(View.VISIBLE);
+                    rootView.findViewById(R.id.finish_btn_container).setVisibility(View.GONE);
+                }
             }
         } else {
             rootView.findViewById(R.id.left_space).setVisibility(View.GONE);
@@ -459,6 +479,9 @@ public class TemplateFragment extends Fragment {
 
     private void saveTemplateState() {
         try {
+            if (isTaskFinished)
+                return;
+
             if (!template.has("StartTime"))
                 template.put("StartTime", isoDateFormat.format(new Date()));
             SharedPreferences mSettings;
@@ -518,6 +541,26 @@ public class TemplateFragment extends Fragment {
                         }
                     });
 
+                    if (isTaskFinished) {
+                        rootView.findViewById(R.id.main_buttons_block).setVisibility(View.GONE);
+                        rootView.findViewById(R.id.finished_buttons_block).setVisibility(View.VISIBLE);
+
+                        rootView.findViewById(R.id.close_btn_container).setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                getActivity().getSupportFragmentManager().popBackStack();
+                            }
+                        });
+                        rootView.findViewById(R.id.download_pdf_btn_container).setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                Toast.makeText(getContext(), "потом скачаем", Toast.LENGTH_LONG).show();
+                            }
+                        });
+                    } else {
+                        rootView.findViewById(R.id.main_buttons_block).setVisibility(View.VISIBLE);
+                        rootView.findViewById(R.id.finished_buttons_block).setVisibility(View.GONE);
+                    }
                     rootView.findViewById(R.id.buttons_block).setVisibility(View.VISIBLE);
                 }
                 setupClosePagePopupUI(rootView);
@@ -624,6 +667,9 @@ public class TemplateFragment extends Fragment {
                         }
                     });
 
+                    if (isTaskFinished)
+                        ((ViewGroup) editTextSingleLineContainer.getChildAt(1)).getChildAt(0).setEnabled(false);
+
                     container.addView(boxInContainerWithId(editTextSingleLineContainer, value.getString("id")));
                     break;
 
@@ -675,6 +721,9 @@ public class TemplateFragment extends Fragment {
                         }
                     });
 
+                    if (isTaskFinished)
+                        (((ViewGroup) editTextMultiLineContainer.getChildAt(1)).getChildAt(0)).setEnabled(false);
+
                     container.addView(boxInContainerWithId(editTextMultiLineContainer, value.getString("id")));
                     break;
 
@@ -686,16 +735,17 @@ public class TemplateFragment extends Fragment {
                     else
                         ((TextView) checkBoxContainer.getChildAt(1)).setText("Нет текста");
 
-                    ((CheckBox) checkBoxContainer.getChildAt(0)).setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-                        @Override
-                        public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                            try {
-                                value.put("value", isChecked);
-                            } catch (JSONException e) {
-                                e.printStackTrace();
+                    if (!isTaskFinished)
+                        ((CheckBox) checkBoxContainer.getChildAt(0)).setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                            @Override
+                            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                                try {
+                                    value.put("value", isChecked);
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
                             }
-                        }
-                    });
+                        });
 
                     if (value.has("value"))
                         ((CheckBox) checkBoxContainer.getChildAt(0)).setChecked(value.getBoolean("value"));
@@ -981,6 +1031,11 @@ public class TemplateFragment extends Fragment {
             seekBar.setProgress(0);
             changeValue.setText(formatFloat((seekBar.getProgress() / digitsOffset) + minValue));
         }
+
+        if (isTaskFinished) {
+            seekBar.setEnabled(false);
+            changeValue.setEnabled(false);
+        }
     }
 
     private void createSignature(final JSONObject value, LinearLayout container) throws Exception {
@@ -1036,6 +1091,9 @@ public class TemplateFragment extends Fragment {
             if (bitmap != null)
                 signaturePad.setSignatureBitmap(bitmap);
         }
+
+        if (isTaskFinished)
+            signaturePad.setEnabled(false);
     }
 
     private void createMediaBlock(final JSONObject value, LinearLayout container) throws Exception {
@@ -1057,88 +1115,92 @@ public class TemplateFragment extends Fragment {
             }
         });
 
-        buttonsContainer.getChildAt(0).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (checkExternalPermissions()) {
-                    try {
-                        currentMediaBlock = new Pair<>(mediaLayout, value);
-                        Pair<Intent, File> intentFilePair = BitmapService.getPickImageIntent(getContext());
-                        cameraImagePath = intentFilePair.second.getAbsolutePath();
-                        startActivityForResult(intentFilePair.first, PHOTO_REQUEST_CODE);
-                    } catch (Exception exc) {
-                        Toast.makeText(getContext(), "У вас нет камеры", Toast.LENGTH_SHORT).show();
-                    }
-                } else
-                    requestExternalPermissions();
-            }
-        });
+        if (isTaskFinished) {
 
-        buttonsContainer.getChildAt(1).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (checkExternalPermissions()) {
-                    try {
-                        currentMediaBlock = new Pair<>(mediaLayout, value);
-                        Pair<Intent, File> intentFilePair = BitmapService.getPickVideoIntent(getContext());
-                        cameraVideoPath = intentFilePair.second.getAbsolutePath();
-                        startActivityForResult(intentFilePair.first, VIDEO_REQUEST_CODE);
-                    } catch (Exception exc) {
-                        Toast.makeText(getContext(), "У вас нет камеры", Toast.LENGTH_SHORT).show();
-                    }
-                } else
-                    requestExternalPermissions();
-            }
-        });
+        } else {
+            buttonsContainer.getChildAt(0).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (checkExternalPermissions()) {
+                        try {
+                            currentMediaBlock = new Pair<>(mediaLayout, value);
+                            Pair<Intent, File> intentFilePair = BitmapService.getPickImageIntent(getContext());
+                            cameraImagePath = intentFilePair.second.getAbsolutePath();
+                            startActivityForResult(intentFilePair.first, PHOTO_REQUEST_CODE);
+                        } catch (Exception exc) {
+                            Toast.makeText(getContext(), "У вас нет камеры", Toast.LENGTH_SHORT).show();
+                        }
+                    } else
+                        requestExternalPermissions();
+                }
+            });
 
-        buttonsContainer.getChildAt(2).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (checkAudioPermissions()) {
-                    try {
-                        currentMediaBlock = new Pair<>(mediaLayout, value);
-                        Intent intent = new Intent(MediaStore.Audio.Media.RECORD_SOUND_ACTION);
-                        startActivityForResult(intent, AUDIO_REQUEST_CODE);
-                    } catch (Exception exc) {
-                        exc.printStackTrace();
-                        Toast.makeText(getContext(), "У вас нет приложения для записи аудио", Toast.LENGTH_SHORT).show();
-                    }
-                } else
-                    requestAudioPermissions();
-            }
-        });
+            buttonsContainer.getChildAt(1).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (checkExternalPermissions()) {
+                        try {
+                            currentMediaBlock = new Pair<>(mediaLayout, value);
+                            Pair<Intent, File> intentFilePair = BitmapService.getPickVideoIntent(getContext());
+                            cameraVideoPath = intentFilePair.second.getAbsolutePath();
+                            startActivityForResult(intentFilePair.first, VIDEO_REQUEST_CODE);
+                        } catch (Exception exc) {
+                            Toast.makeText(getContext(), "У вас нет камеры", Toast.LENGTH_SHORT).show();
+                        }
+                    } else
+                        requestExternalPermissions();
+                }
+            });
 
-        buttonsContainer.getChildAt(3).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (checkExternalPermissions()) {
-                    try {
-                        currentMediaBlock = new Pair<>(mediaLayout, value);
+            buttonsContainer.getChildAt(2).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (checkAudioPermissions()) {
+                        try {
+                            currentMediaBlock = new Pair<>(mediaLayout, value);
+                            Intent intent = new Intent(MediaStore.Audio.Media.RECORD_SOUND_ACTION);
+                            startActivityForResult(intent, AUDIO_REQUEST_CODE);
+                        } catch (Exception exc) {
+                            exc.printStackTrace();
+                            Toast.makeText(getContext(), "У вас нет приложения для записи аудио", Toast.LENGTH_SHORT).show();
+                        }
+                    } else
+                        requestAudioPermissions();
+                }
+            });
 
-                        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-                        intent.setType("*/*");
-                        intent.addCategory(Intent.CATEGORY_OPENABLE);
+            buttonsContainer.getChildAt(3).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (checkExternalPermissions()) {
+                        try {
+                            currentMediaBlock = new Pair<>(mediaLayout, value);
 
-                        Intent sIntent = new Intent("com.sec.android.app.myfiles.PICK_DATA");
-                        sIntent.addCategory(Intent.CATEGORY_DEFAULT);
+                            Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+                            intent.setType("*/*");
+                            intent.addCategory(Intent.CATEGORY_OPENABLE);
 
-                        Intent chooserIntent;
-                        if (getActivity().getPackageManager().resolveActivity(sIntent, 0) != null) {
-                            // it is device with samsung file manager
-                            chooserIntent = Intent.createChooser(sIntent, "Выбрать файл");
-                            chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, new Intent[]{intent});
-                        } else
-                            chooserIntent = Intent.createChooser(intent, "Выбрать файл");
+                            Intent sIntent = new Intent("com.sec.android.app.myfiles.PICK_DATA");
+                            sIntent.addCategory(Intent.CATEGORY_DEFAULT);
 
-                        startActivityForResult(chooserIntent, DOCUMENT_REQUEST_CODE);
+                            Intent chooserIntent;
+                            if (getActivity().getPackageManager().resolveActivity(sIntent, 0) != null) {
+                                // it is device with samsung file manager
+                                chooserIntent = Intent.createChooser(sIntent, "Выбрать файл");
+                                chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, new Intent[]{intent});
+                            } else
+                                chooserIntent = Intent.createChooser(intent, "Выбрать файл");
 
-                    } catch (Exception exc) {
-                        Toast.makeText(getContext(), "У вас нет файлового менеджера, чтобы выбрать файл", Toast.LENGTH_SHORT).show();
-                    }
-                } else
-                    requestExternalPermissions();
-            }
-        });
+                            startActivityForResult(chooserIntent, DOCUMENT_REQUEST_CODE);
+
+                        } catch (Exception exc) {
+                            Toast.makeText(getContext(), "У вас нет файлового менеджера, чтобы выбрать файл", Toast.LENGTH_SHORT).show();
+                        }
+                    } else
+                        requestExternalPermissions();
+                }
+            });
+        }
 
         container.addView(boxInContainerWithId(mediaLayout, value.getString("id")));
 
@@ -1282,7 +1344,8 @@ public class TemplateFragment extends Fragment {
                 selectBtn.setTag(option.getString("id"));
                 selectBtn.setChecked(value.has("values") && Utils.containsValue(value.getJSONArray("values"), option.getString("id")));
                 styleSelectBtn(selectBtn, selectBtn.isChecked(), option);
-                selectBtn.setOnCheckedChangeListener(checkButtonListener);
+                if (!isTaskFinished)
+                    selectBtn.setOnCheckedChangeListener(checkButtonListener);
             }
 
             optionalContainer.removeAllViewsInLayout();
@@ -1303,19 +1366,20 @@ public class TemplateFragment extends Fragment {
         if (isList) {
             applySelectResultsInListView(value, selectBtnContainer);
 
-            showPopupSelectListBtn.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    try {
-                        ((ViewGroup) rootView.findViewById(R.id.select_btn_popup)).removeAllViewsInLayout();
-                        ((ViewGroup) rootView.findViewById(R.id.select_btn_popup)).addView(listSelectBtnLayout);
-                        JSONArray valueBackups = value.has("values") ? value.getJSONArray("values") : new JSONArray();
-                        value.put("values_backup", valueBackups);
-                    } catch (Exception exc) {
-                        exc.printStackTrace();
+            if (!isTaskFinished)
+                showPopupSelectListBtn.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        try {
+                            ((ViewGroup) rootView.findViewById(R.id.select_btn_popup)).removeAllViewsInLayout();
+                            ((ViewGroup) rootView.findViewById(R.id.select_btn_popup)).addView(listSelectBtnLayout);
+                            JSONArray valueBackups = value.has("values") ? value.getJSONArray("values") : new JSONArray();
+                            value.put("values_backup", valueBackups);
+                        } catch (Exception exc) {
+                            exc.printStackTrace();
+                        }
                     }
-                }
-            });
+                });
             if (value.has("caption"))
                 ((TextView) listSelectBtnLayout.findViewById(R.id.select_layout_caption)).setText(value.getString("caption"));
             else
@@ -1792,6 +1856,129 @@ public class TemplateFragment extends Fragment {
         popupMenu.show();
     }
 
+    private void printLog(String TAG, String message) {
+        int maxLogSize = 1000;
+        for (int i = 0; i <= message.length() / maxLogSize; i++) {
+            int start = i * maxLogSize;
+            int end = (i + 1) * maxLogSize;
+            end = end > message.length() ? message.length() : end;
+            Log.v(TAG, message.substring(start, end));
+        }
+    }
+
+    private JSONObject transformFinishedTemplate(JSONObject finishedTemplate) {
+        try {
+            JSONArray values = finishedTemplate.getJSONArray("values");
+            JSONObject template = finishedTemplate.getJSONObject("template");
+
+            for (int i = 0; i < values.length(); i++) {
+                JSONObject value = values.getJSONObject(i);
+                String elemType = value.getString("type");
+                String elemId = value.getString("id");
+                String elemValue = value.getString("value");
+
+
+                if (elemType == null || elemId == null || elemValue == null)
+                    continue;
+                JSONObject item = findTemplateElementById(template, elemId);
+                if (item == null)
+                    continue;
+
+                switch (elemType) {
+                    case "question":
+                        if (item.has("values"))
+                            item.getJSONArray("values").put(elemValue);
+                        else {
+                            JSONArray valuesArray = new JSONArray();
+                            valuesArray.put(elemValue);
+                            item.put("values", valuesArray);
+                        }
+                        break;
+
+                    case "text":
+                    case "slider":
+                        item.put("value", elemValue);
+                        break;
+
+                    case "checkbox":
+                        boolean boolValue = Boolean.parseBoolean(elemValue);
+                        item.put("value", boolValue);
+                        break;
+                }
+            }
+
+            return template;
+        } catch (JSONException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    private JSONObject findTemplateElementById(JSONObject template, String id) {
+        try {
+            JSONArray pages = template.getJSONArray("items");
+            for (int i = 0; i < pages.length(); i++) {
+                JSONArray items = pages.getJSONObject(i).getJSONObject("page").getJSONArray("items");
+                JSONObject foundedElement = findJsonElementById(items, id);
+                if (foundedElement != null)
+                    return foundedElement;
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    private JSONObject findJsonElementById(JSONArray items, String id) {
+        try {
+            for (int i = 0; i < items.length(); i++) {
+                JSONObject item = items.getJSONObject(i);
+
+                String elementName = null;
+                Iterator<String> iterator = item.keys();
+                if (iterator.hasNext())
+                    elementName = iterator.next();
+
+                if (elementName == null)
+                    continue;
+
+                JSONObject foundedItem;
+                switch (elementName) {
+                    case "category":
+                        foundedItem = findJsonElementById(item.getJSONObject(elementName).getJSONArray("items"), id);
+                        if (foundedItem != null)
+                            return foundedItem;
+                        break;
+
+                    case "question":
+                        JSONObject question = item.getJSONObject(elementName);
+                        if (question.has("id") && question.getString("id").equals(id))
+                            return question;
+                        else if (question.has("optionals")) {
+                            JSONArray optionals = question.getJSONArray("optionals");
+                            for (int j = 0; j < optionals.length(); j++) {
+                                foundedItem = findJsonElementById(optionals.getJSONObject(i).getJSONObject("optional").getJSONArray("items"), id);
+                                if (foundedItem != null)
+                                    return foundedItem;
+                            }
+                        }
+                        break;
+
+                    default:
+                        if (item.getJSONObject(elementName).has("id") && item.getJSONObject(elementName).getString("id").equals(id))
+                            return item.getJSONObject(elementName);
+                        break;
+                }
+            }
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return null;
+
+    }
+
+
     private class GetTemplateTask extends AsyncTask<Void, Void, Integer> {
         @Override
         protected void onPreExecute() {
@@ -1802,24 +1989,34 @@ public class TemplateFragment extends Fragment {
         @Override
         protected Integer doInBackground(Void... params) {
             try {
-                SharedPreferences mSettings;
-                mSettings = App.getContext().getSharedPreferences("templates", Context.MODE_PRIVATE);
-                String templateJson = mSettings.getString(taskId + LoginHistoryService.getCurrentUser().userName, "");
-                if (!templateJson.equals("")) {
-                    template = new JSONObject(templateJson);
-                    return HttpURLConnection.HTTP_OK;
-                } else {
-                    String url = "/api/fs-mojo/get/template/" + templateId;
+                if (isTaskFinished) {
+                    String url = "/api/fs-mojo/get/document/" + templateId;
                     Response response = RequestService.createGetRequest(url);
-
                     if (response.code() == 200) {
                         String responseStr = response.body().string();
-                        template = new JSONObject(responseStr);
-                        template.put("StartTime", isoDateFormat.format(new Date()));
-                        if (dueDate != null)
-                            template.put("DueTime", isoDateFormat.format(new Date(dueDate)));
+                        template = transformFinishedTemplate(new JSONObject(responseStr));
                     }
                     return response.code();
+                } else {
+                    SharedPreferences mSettings;
+                    mSettings = App.getContext().getSharedPreferences("templates", Context.MODE_PRIVATE);
+                    String templateJson = mSettings.getString(taskId + LoginHistoryService.getCurrentUser().userName, "");
+                    if (!templateJson.equals("")) {
+                        template = new JSONObject(templateJson);
+                        return HttpURLConnection.HTTP_OK;
+                    } else {
+                        String url = "/api/fs-mojo/get/template/" + templateId;
+                        Response response = RequestService.createGetRequest(url);
+
+                        if (response.code() == 200) {
+                            String responseStr = response.body().string();
+                            template = new JSONObject(responseStr);
+                            template.put("StartTime", isoDateFormat.format(new Date()));
+                            if (dueDate != null)
+                                template.put("DueTime", isoDateFormat.format(new Date(dueDate)));
+                        }
+                        return response.code();
+                    }
                 }
             } catch (Exception exc) {
                 exc.printStackTrace();
@@ -1851,16 +2048,6 @@ public class TemplateFragment extends Fragment {
             } catch (Exception exc) {
                 exc.printStackTrace();
             }
-        }
-    }
-
-    private void printLog(String TAG, String message) {
-        int maxLogSize = 1000;
-        for (int i = 0; i <= message.length() / maxLogSize; i++) {
-            int start = i * maxLogSize;
-            int end = (i + 1) * maxLogSize;
-            end = end > message.length() ? message.length() : end;
-            Log.v(TAG, message.substring(start, end));
         }
     }
 
@@ -2201,7 +2388,8 @@ public class TemplateFragment extends Fragment {
         return new Pair<>(false, null);
     }
 
-    private Pair<Boolean, ArrayList<JSONObject>> checkIfContainerIsFilled(JSONArray dataJson, int offset) throws Exception {
+    private Pair<Boolean, ArrayList<JSONObject>> checkIfContainerIsFilled(JSONArray dataJson,
+                                                                          int offset) throws Exception {
         boolean totalResult = true;
         ArrayList<JSONObject> photoObjects = new ArrayList<>();
 

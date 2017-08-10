@@ -75,4 +75,6 @@
     <string name="tasks_are_temporary_unavailable">Задачи временно недоступны</string>
     <string name="organizations">Организации</string>
     <string name="permanent">Постоянные</string>
+    <string name="close">Закрыть</string>
+    <string name="save_as_pdf">Сохранить pdf</string>
 </resources>

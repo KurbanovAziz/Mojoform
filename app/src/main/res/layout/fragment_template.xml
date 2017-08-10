@@ -91,7 +91,8 @@
         android:layout_alignParentBottom="true"
         android:baselineAligned="false"
         android:orientation="horizontal"
-        android:visibility="gone">
+        android:visibility="visible">
+
 
         <FrameLayout
             android:id="@+id/left_arrow"
@@ -114,54 +115,122 @@
             android:layout_weight="0.5"
             android:visibility="gone" />
 
-        <FrameLayout
+        <LinearLayout
+            android:id="@+id/main_buttons_block"
             android:layout_width="0dp"
-            android:layout_height="54dp"
-            android:layout_marginTop="12dp"
-            android:layout_weight="1">
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:baselineAligned="false"
+            android:orientation="horizontal"
+            android:visibility="visible">
 
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="@drawable/purple_btn_with_shadow" />
-
-            <TextView
-                android:id="@+id/hold_task_btn"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_marginLeft="8dp"
-                android:layout_marginRight="8dp"
-                android:gravity="center"
-                android:paddingBottom="13dp"
-                android:text="@string/hold"
-                android:textColor="@android:color/white"
-                android:textSize="15.5sp" />
-        </FrameLayout>
-
-        <FrameLayout
-            android:id="@+id/finish_btn_container"
-            android:layout_width="0dp"
-            android:layout_height="54dp"
-            android:layout_marginTop="12dp"
-            android:layout_weight="1">
-
-            <View
-                android:layout_width="match_parent"
+            <FrameLayout
+                android:layout_width="0dp"
                 android:layout_height="54dp"
-                android:background="@drawable/green_btn_with_shadow" />
+                android:layout_marginTop="12dp"
+                android:layout_weight="1">
 
-            <TextView
-                android:id="@+id/finish_btn"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_marginLeft="8dp"
-                android:layout_marginRight="8dp"
-                android:gravity="center"
-                android:paddingBottom="13dp"
-                android:text="@string/finish"
-                android:textColor="@android:color/white"
-                android:textSize="15.5sp" />
-        </FrameLayout>
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@drawable/purple_btn_with_shadow" />
+
+                <TextView
+                    android:id="@+id/hold_task_btn"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginLeft="8dp"
+                    android:layout_marginRight="8dp"
+                    android:gravity="center"
+                    android:paddingBottom="13dp"
+                    android:text="@string/hold"
+                    android:textColor="@android:color/white"
+                    android:textSize="15.5sp" />
+            </FrameLayout>
+
+            <FrameLayout
+                android:id="@+id/finish_btn_container"
+                android:layout_width="0dp"
+                android:layout_height="54dp"
+                android:layout_marginTop="12dp"
+                android:layout_weight="1">
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="54dp"
+                    android:background="@drawable/green_btn_with_shadow" />
+
+                <TextView
+                    android:id="@+id/finish_btn"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginLeft="8dp"
+                    android:layout_marginRight="8dp"
+                    android:gravity="center"
+                    android:paddingBottom="13dp"
+                    android:text="@string/finish"
+                    android:textColor="@android:color/white"
+                    android:textSize="15.5sp" />
+            </FrameLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/finished_buttons_block"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:baselineAligned="false"
+            android:orientation="horizontal"
+            android:visibility="gone">
+
+            <FrameLayout
+                android:id="@+id/download_pdf_btn_container"
+                android:layout_width="0dp"
+                android:layout_height="54dp"
+                android:layout_marginTop="12dp"
+                android:layout_weight="1">
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@drawable/purple_btn_with_shadow" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginLeft="8dp"
+                    android:layout_marginRight="8dp"
+                    android:gravity="center"
+                    android:paddingBottom="13dp"
+                    android:text="@string/save_as_pdf"
+                    android:textColor="@android:color/white"
+                    android:textSize="15.5sp" />
+            </FrameLayout>
+
+            <FrameLayout
+                android:id="@+id/close_btn_container"
+                android:layout_width="0dp"
+                android:layout_height="54dp"
+                android:layout_marginTop="12dp"
+                android:layout_weight="1">
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="54dp"
+                    android:background="@drawable/green_btn_with_shadow" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginLeft="8dp"
+                    android:layout_marginRight="8dp"
+                    android:gravity="center"
+                    android:paddingBottom="13dp"
+                    android:text="@string/close"
+                    android:textColor="@android:color/white"
+                    android:textSize="15.5sp" />
+            </FrameLayout>
+        </LinearLayout>
 
         <Space
             android:id="@+id/right_space"
@@ -189,7 +258,7 @@
         android:id="@+id/select_btn_popup"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_alignParentTop="true"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true" />
+        android:layout_alignParentStart="true" />
 </RelativeLayout>

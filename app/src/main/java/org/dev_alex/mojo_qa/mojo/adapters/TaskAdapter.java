@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.dev_alex.mojo_qa.mojo.R;
 import org.dev_alex.mojo_qa.mojo.fragments.TasksFragment;
@@ -63,18 +64,23 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
         String nodeForTasksId = null;
         String siteId = null;
         String initiator = null;
+        String resultDocId = null;
 
         viewHolder.taskActiveCircle.setVisibility((task.suspended == null || task.suspended) ? View.INVISIBLE : View.VISIBLE);
         if (task.dueDate == null) {
             viewHolder.taskActiveCircle.setVisibility(View.INVISIBLE);
             viewHolder.taskDate.setVisibility(View.INVISIBLE);
         } else {
-            viewHolder.taskActiveCircle.setVisibility(View.VISIBLE);
-            viewHolder.taskDate.setVisibility(View.VISIBLE);
+            if (task.suspended == null || task.suspended)
+                viewHolder.taskActiveCircle.setVisibility(View.INVISIBLE);
+            else
+                viewHolder.taskActiveCircle.setVisibility(View.VISIBLE);
 
+            viewHolder.taskDate.setVisibility(View.VISIBLE);
             if (task.suspended != null && !task.suspended) {
                 ((GradientDrawable) viewHolder.taskActiveCircle.getBackground()).setColor(task.dueDate.after(new Date()) ? Color.GREEN : Color.RED);
             }
+
 
             SimpleDateFormat sdf = new SimpleDateFormat("dd MMMM yyyy | HH.mm", Locale.getDefault());
             viewHolder.taskDate.setText(sdf.format(task.dueDate));
@@ -101,16 +107,28 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
                         siteId = variable.value;
                     if (variable.name.equals("initiator"))
                         initiator = variable.value;
+                    if (variable.name.equals("result_doc"))
+                        resultDocId = variable.value;
                 }
         }
 
         if (templateId != null) {
             final String finalTemplateId = templateId;
             final String finalNodeForTasksId = nodeForTasksId;
+            final String finalResultDocId = resultDocId;
 
-            if (task.suspended == null || task.suspended)
-                viewHolder.itemView.setOnClickListener(null);
-            else {
+            if (task.suspended == null || task.suspended) {
+                viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        if (finalResultDocId == null)
+                            Toast.makeText(context, "Не удалось открыть документ", Toast.LENGTH_LONG).show();
+                        else
+                            parentFragment.showFilledDocById(finalResultDocId);
+
+                    }
+                });
+            } else {
                 if (initiator == null || initiator.isEmpty())
                     initiator = "admin";
                 if (siteId == null || siteId.isEmpty())

@@ -460,6 +460,11 @@ public class TasksFragment extends Fragment {
                         (templateId, taskId, taskNodeId, dueDate, siteId, initiator)).addToBackStack(null).commit();
     }
 
+    public void showFilledDocById(String nodeId) {
+        getActivity().getSupportFragmentManager().beginTransaction()
+                .replace(R.id.container, TemplateFragment.newInstance(nodeId)).addToBackStack(null).commit();
+    }
+
     private class GetTasksTask extends AsyncTask<Void, Void, Integer> {
 
         @Override
@@ -503,8 +508,8 @@ public class TasksFragment extends Fragment {
                 User currentUser = LoginHistoryService.getCurrentUser();
                 for (int i = 0; i < 3; i++) {
                     if (i == 0) {
-                        url = App.getTask_host() + "/history/" +
-                                "historic-task-instances?finished=TRUE&taskAssignee=" + currentUser.userName + "&includeProcessVariables=TRUE" + dateParams + sortParams;
+                        url = App.getTask_host() + "/history/historic-task-instances?size=1000&finished=TRUE&" +
+                                "includeProcessVariables=TRUE&taskAssignee=" + currentUser.userName + "&start=0" + dateParams + sortParams;
                     } else if (i == 1) {
                         url = App.getTask_host() + "/runtime/tasks?assignee="
                                 + currentUser.userName + "&includeProcessVariables=TRUE" + dateParams + sortParams;
