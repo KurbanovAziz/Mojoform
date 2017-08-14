@@ -572,8 +572,24 @@ public class TasksFragment extends Fragment {
                 } else if (responseCode == 200) {
                     if (!withDay)
                         updateDecorators(busyTasks);
-                    ((RadioButton) rootView.findViewById(R.id.busy)).setChecked(true);
-                    updateTaskAdapter(new TaskAdapter(TasksFragment.this, busyTasks), CurrentAdapterType.BUSY);
+
+                    if (currentAdapterType == null)
+                        currentAdapterType = CurrentAdapterType.BUSY;
+                    switch (currentAdapterType) {
+                        case BUSY:
+                            ((RadioButton) rootView.findViewById(R.id.busy)).setChecked(true);
+                            updateTaskAdapter(new TaskAdapter(TasksFragment.this, busyTasks), CurrentAdapterType.BUSY);
+                            break;
+                        case FINISHED:
+                            ((RadioButton) rootView.findViewById(R.id.ended)).setChecked(true);
+                            updateTaskAdapter(new TaskAdapter(TasksFragment.this, finishedTasks), CurrentAdapterType.FINISHED);
+                            break;
+                        case PERMANENT:
+                            ((RadioButton) rootView.findViewById(R.id.permanent)).setChecked(true);
+                            updateTaskAdapter(new TaskAdapter(TasksFragment.this, permanentTasks), CurrentAdapterType.PERMANENT);
+                            break;
+                    }
+
                 } else
                     Toast.makeText(getContext(), R.string.unknown_error, Toast.LENGTH_LONG).show();
             } catch (Exception exc) {

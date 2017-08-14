@@ -630,45 +630,48 @@ public class TemplateFragment extends Fragment {
 
                     if (value.has("value"))
                         ((EditText) ((ViewGroup) editTextSingleLineContainer.getChildAt(1)).getChildAt(0)).setText(value.getString("value"));
-                    ((EditText) ((ViewGroup) editTextSingleLineContainer.getChildAt(1)).getChildAt(0)).addTextChangedListener(new TextWatcher() {
-                        @Override
-                        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 
-                        }
-
-                        @Override
-                        public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-                        }
-
-                        @Override
-                        public void afterTextChanged(Editable s) {
-                            try {
-                                if (s.toString().trim().isEmpty())
-                                    value.remove("value");
-                                else
-                                    value.put("value", s.toString().trim());
-                            } catch (Exception ignored) {
-                            }
-                        }
-                    });
-
-                    ((ViewGroup) editTextSingleLineContainer.getChildAt(1)).getChildAt(1).setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            scanQrCode(((EditText) ((ViewGroup) editTextSingleLineContainer.getChildAt(1)).getChildAt(0)));
-                        }
-                    });
-
-                    ((ViewGroup) editTextSingleLineContainer.getChildAt(1)).getChildAt(2).setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            scanBarCode(((EditText) ((ViewGroup) editTextSingleLineContainer.getChildAt(1)).getChildAt(0)));
-                        }
-                    });
 
                     if (isTaskFinished)
                         ((ViewGroup) editTextSingleLineContainer.getChildAt(1)).getChildAt(0).setEnabled(false);
+                    else {
+                        ((EditText) ((ViewGroup) editTextSingleLineContainer.getChildAt(1)).getChildAt(0)).addTextChangedListener(new TextWatcher() {
+                            @Override
+                            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+                            }
+
+                            @Override
+                            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+                            }
+
+                            @Override
+                            public void afterTextChanged(Editable s) {
+                                try {
+                                    if (s.toString().trim().isEmpty())
+                                        value.remove("value");
+                                    else
+                                        value.put("value", s.toString().trim());
+                                } catch (Exception ignored) {
+                                }
+                            }
+                        });
+
+                        ((ViewGroup) editTextSingleLineContainer.getChildAt(1)).getChildAt(1).setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                scanQrCode(((EditText) ((ViewGroup) editTextSingleLineContainer.getChildAt(1)).getChildAt(0)));
+                            }
+                        });
+
+                        ((ViewGroup) editTextSingleLineContainer.getChildAt(1)).getChildAt(2).setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                scanBarCode(((EditText) ((ViewGroup) editTextSingleLineContainer.getChildAt(1)).getChildAt(0)));
+                            }
+                        });
+                    }
 
                     container.addView(boxInContainerWithId(editTextSingleLineContainer, value.getString("id")));
                     break;
@@ -684,45 +687,47 @@ public class TemplateFragment extends Fragment {
 
                     if (value.has("value"))
                         ((EditText) ((ViewGroup) editTextMultiLineContainer.getChildAt(1)).getChildAt(0)).setText(value.getString("value"));
-                    ((EditText) ((ViewGroup) editTextMultiLineContainer.getChildAt(1)).getChildAt(0)).addTextChangedListener(new TextWatcher() {
-                        @Override
-                        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-                        }
-
-                        @Override
-                        public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-                        }
-
-                        @Override
-                        public void afterTextChanged(Editable s) {
-                            try {
-                                if (s.toString().trim().isEmpty())
-                                    value.remove("value");
-                                else
-                                    value.put("value", s.toString().trim());
-                            } catch (Exception ignored) {
-                            }
-                        }
-                    });
-
-                    ((ViewGroup) editTextMultiLineContainer.getChildAt(1)).getChildAt(1).setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            scanQrCode(((EditText) ((ViewGroup) editTextMultiLineContainer.getChildAt(1)).getChildAt(0)));
-                        }
-                    });
-
-                    ((ViewGroup) editTextMultiLineContainer.getChildAt(1)).getChildAt(2).setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            scanBarCode(((EditText) ((ViewGroup) editTextMultiLineContainer.getChildAt(1)).getChildAt(0)));
-                        }
-                    });
 
                     if (isTaskFinished)
                         (((ViewGroup) editTextMultiLineContainer.getChildAt(1)).getChildAt(0)).setEnabled(false);
+                    else {
+                        ((EditText) ((ViewGroup) editTextMultiLineContainer.getChildAt(1)).getChildAt(0)).addTextChangedListener(new TextWatcher() {
+                            @Override
+                            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+                            }
+
+                            @Override
+                            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+                            }
+
+                            @Override
+                            public void afterTextChanged(Editable s) {
+                                try {
+                                    if (s.toString().trim().isEmpty())
+                                        value.remove("value");
+                                    else
+                                        value.put("value", s.toString().trim());
+                                } catch (Exception ignored) {
+                                }
+                            }
+                        });
+
+                        ((ViewGroup) editTextMultiLineContainer.getChildAt(1)).getChildAt(1).setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                scanQrCode(((EditText) ((ViewGroup) editTextMultiLineContainer.getChildAt(1)).getChildAt(0)));
+                            }
+                        });
+
+                        ((ViewGroup) editTextMultiLineContainer.getChildAt(1)).getChildAt(2).setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                scanBarCode(((EditText) ((ViewGroup) editTextMultiLineContainer.getChildAt(1)).getChildAt(0)));
+                            }
+                        });
+                    }
 
                     container.addView(boxInContainerWithId(editTextMultiLineContainer, value.getString("id")));
                     break;
@@ -746,6 +751,8 @@ public class TemplateFragment extends Fragment {
                                 }
                             }
                         });
+                    else
+                        checkBoxContainer.getChildAt(0).setEnabled(false);
 
                     if (value.has("value"))
                         ((CheckBox) checkBoxContainer.getChildAt(0)).setChecked(value.getBoolean("value"));
@@ -927,7 +934,8 @@ public class TemplateFragment extends Fragment {
         final float minValue = (float) value.getDouble("min_value");
         final float maxValue = (float) value.getDouble("max_value");
         float step = (float) value.getDouble("step");
-        String minValueStr = String.valueOf(minValue), maxValueStr = String.valueOf(maxValue), stepValueStr = String.valueOf(step);
+        String minValueStr = formatFloat(minValue), maxValueStr = formatFloat(maxValue), stepValueStr = formatFloat(step);
+
 
         int digitsAfterPoint = Math.max((!minValueStr.contains(".")) ? 0 : minValueStr.substring(minValueStr.indexOf(".") + 1).length(),
                 (!maxValueStr.contains(".")) ? 0 : maxValueStr.substring(maxValueStr.indexOf(".") + 1).length());
@@ -1897,6 +1905,7 @@ public class TemplateFragment extends Fragment {
 
                     case "text":
                     case "slider":
+                    case "float":
                         item.put("value", elemValue);
                         break;
 
