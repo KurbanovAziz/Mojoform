@@ -1,7 +1,6 @@
 package org.dev_alex.mojo_qa.mojo.adapters;
 
 
-import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
 import android.support.v7.widget.RecyclerView;
@@ -24,7 +23,6 @@ import java.util.Locale;
 
 
 public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder> {
-    private Context context;
     private ArrayList<Task> tasks;
     private TasksFragment parentFragment;
 
@@ -107,8 +105,12 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
                         siteId = variable.value;
                     if (variable.name.equals("initiator"))
                         initiator = variable.value;
-                    if (variable.name.equals("result_doc"))
-                        resultDocId = variable.value;
+                    if (variable.name.equals("result_doc")) {
+                        if (variable.scope.equals("local") && !variable.value.equals("empty"))
+                            resultDocId = variable.value;
+                        else if (variable.scope.equals("global") && resultDocId == null)
+                            resultDocId = variable.value;
+                    }
                 }
         }
 
@@ -122,7 +124,7 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
                     @Override
                     public void onClick(View v) {
                         if (finalResultDocId == null)
-                            Toast.makeText(context, "Не удалось открыть документ", Toast.LENGTH_LONG).show();
+                            Toast.makeText(parentFragment.getContext(), "Не удалось открыть документ", Toast.LENGTH_LONG).show();
                         else
                             parentFragment.showFilledDocById(finalResultDocId);
 

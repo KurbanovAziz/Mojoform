@@ -18,6 +18,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
@@ -89,6 +90,8 @@ import icepick.Icepick;
 import icepick.State;
 import okhttp3.MediaType;
 import okhttp3.Response;
+import okio.BufferedSink;
+import okio.Okio;
 
 import static android.app.Activity.RESULT_OK;
 import static org.dev_alex.mojo_qa.mojo.services.Utils.setupCloseKeyboardUI;
@@ -554,7 +557,10 @@ public class TemplateFragment extends Fragment {
                         rootView.findViewById(R.id.download_pdf_btn_container).setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
-                                Toast.makeText(getContext(), "потом скачаем", Toast.LENGTH_LONG).show();
+                                if (checkExternalPermissions())
+                                    new DownloadPdfTask(templateId).execute();
+                                else
+                                    requestExternalPermissions();
                             }
                         });
                     } else {
@@ -1100,8 +1106,10 @@ public class TemplateFragment extends Fragment {
                 signaturePad.setSignatureBitmap(bitmap);
         }
 
-        if (isTaskFinished)
+        if (isTaskFinished) {
             signaturePad.setEnabled(false);
+            ((ViewGroup) signatureContainer.getChildAt(2)).getChildAt(1).setVisibility(View.GONE);
+        }
     }
 
     private void createMediaBlock(final JSONObject value, LinearLayout container) throws Exception {
@@ -1116,16 +1124,37 @@ public class TemplateFragment extends Fragment {
 
         final ExpandableLayout expandableLayout = (ExpandableLayout) ((LinearLayout) mediaLayout.getChildAt(0)).getChildAt(1);
         LinearLayout buttonsContainer = (LinearLayout) expandableLayout.getChildAt(0);
-        ((LinearLayout) mediaLayout.getChildAt(0)).getChildAt(0).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                expandableLayout.toggle();
-            }
-        });
 
         if (isTaskFinished) {
+            expandableLayout.collapse();
+
+            if (value.has("media_ids")) {
+                ViewGroup mediaContainer = (ViewGroup) ((ViewGroup) mediaLayout.getChildAt(1)).getChildAt(0);
+                mediaContainer.removeAllViewsInLayout();
+                final JSONArray mediaIds = value.getJSONArray("media_ids");
+
+                for (int i = 0; i < mediaIds.length(); i++) {
+                    final String mediaId = mediaIds.getString(i);
+                    LinearLayout mediaFrame = (LinearLayout) ((HorizontalScrollView) currentMediaBlock.first.getChildAt(1)).getChildAt(0);
+                    mediaFrame.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            new OpenFileTask(mediaId).execute();
+                        }
+                    });
+                    mediaContainer.addView(mediaFrame);
+                }
+            }
+
 
         } else {
+            ((LinearLayout) mediaLayout.getChildAt(0)).getChildAt(0).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    expandableLayout.toggle();
+                }
+            });
+
             buttonsContainer.getChildAt(0).setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -1889,6 +1918,8 @@ public class TemplateFragment extends Fragment {
                 if (elemType == null || elemId == null || elemValue == null)
                     continue;
                 JSONObject item = findTemplateElementById(template, elemId);
+                String elementName = getTemplateElementNameById(template, elemId);
+
                 if (item == null)
                     continue;
 
@@ -1913,6 +1944,22 @@ public class TemplateFragment extends Fragment {
                         boolean boolValue = Boolean.parseBoolean(elemValue);
                         item.put("value", boolValue);
                         break;
+
+                    case "media_id":
+                        if (elementName == null)
+                            break;
+
+                        if (elementName.equals("signature")) {
+                            downloadSignature(item, elemValue);
+                        } else {
+                            if (item.has("media_ids"))
+                                item.getJSONArray("media_ids").put(value);
+                            else {
+                                JSONArray mediaIds = new JSONArray();
+                                mediaIds.put(value);
+                                item.put("media_ids", mediaIds);
+                            }
+                        }
                 }
             }
 
@@ -1920,6 +1967,33 @@ public class TemplateFragment extends Fragment {
         } catch (JSONException e) {
             e.printStackTrace();
             return null;
+        }
+    }
+
+    private void downloadSignature(JSONObject signature, String mediaId) {
+        try {
+            if (mediaId.contains(":"))
+                mediaId = mediaId.substring(mediaId.lastIndexOf(":") + 1);
+            String url = "/api/file/get/" + mediaId;
+            Response response = RequestService.createGetRequest(url);
+            File resultFile = new File(getContext().getCacheDir(), mediaId);
+            if (!resultFile.exists()) {
+                if (response.code() == 200) {
+                    BufferedSink sink = Okio.buffer(Okio.sink(resultFile));
+                    sink.writeAll(response.body().source());
+                    sink.close();
+                }
+                response.body().close();
+            }
+
+            if (resultFile.exists()) {
+                BitmapFactory.Options options = new BitmapFactory.Options();
+                options.inPreferredConfig = Bitmap.Config.ARGB_8888;
+                Bitmap bitmap = BitmapFactory.decodeFile(resultFile.getAbsolutePath(), options);
+                signature.put(SIGNATURE_PREVIEW_JSON_ARRAY, BitmapService.getBitmapBytesEncodedBase64(bitmap));
+            }
+        } catch (Exception exc) {
+            exc.printStackTrace();
         }
     }
 
@@ -1976,6 +2050,70 @@ public class TemplateFragment extends Fragment {
                     default:
                         if (item.getJSONObject(elementName).has("id") && item.getJSONObject(elementName).getString("id").equals(id))
                             return item.getJSONObject(elementName);
+                        break;
+                }
+            }
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return null;
+
+    }
+
+    private String getTemplateElementNameById(JSONObject template, String id) {
+        try {
+            JSONArray pages = template.getJSONArray("items");
+            for (int i = 0; i < pages.length(); i++) {
+                JSONArray items = pages.getJSONObject(i).getJSONObject("page").getJSONArray("items");
+                String foundedElementName = findJsonElementNameById(items, id);
+                if (foundedElementName != null)
+                    return foundedElementName;
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    private String findJsonElementNameById(JSONArray items, String id) {
+        try {
+            for (int i = 0; i < items.length(); i++) {
+                JSONObject item = items.getJSONObject(i);
+
+                String elementName = null;
+                Iterator<String> iterator = item.keys();
+                if (iterator.hasNext())
+                    elementName = iterator.next();
+
+                if (elementName == null)
+                    continue;
+
+                String foundedItem;
+                switch (elementName) {
+                    case "category":
+                        foundedItem = findJsonElementNameById(item.getJSONObject(elementName).getJSONArray("items"), id);
+                        if (foundedItem != null)
+                            return foundedItem;
+                        break;
+
+                    case "question":
+                        JSONObject question = item.getJSONObject(elementName);
+                        if (question.has("id") && question.getString("id").equals(id))
+                            return elementName;
+                        else if (question.has("optionals")) {
+                            JSONArray optionals = question.getJSONArray("optionals");
+                            for (int j = 0; j < optionals.length(); j++) {
+                                foundedItem = findJsonElementNameById(optionals.getJSONObject(i).getJSONObject("optional").getJSONArray("items"), id);
+                                if (foundedItem != null)
+                                    return foundedItem;
+                            }
+                        }
+                        break;
+
+                    default:
+                        if (item.getJSONObject(elementName).has("id") && item.getJSONObject(elementName).getString("id").equals(id))
+                            return elementName;
                         break;
                 }
             }
@@ -2239,22 +2377,23 @@ public class TemplateFragment extends Fragment {
         @Override
         protected Integer doInBackground(Void... params) {
             try {
-                Response response = RequestService.createPostRequest("/api/fs-mojo/create/" + NODE_FOR_TASKS + "/document", resultJson.toString());
+                String url = "/api/fs-mojo/create/" + NODE_FOR_TASKS + "/document";
+                Response response = RequestService.createPostRequest(url, resultJson.toString());
                 String responseBody = response.body().string();
                 if (response.code() == 201 || response.code() == 200 || response.code() == 409) {
                     String resId = new JSONObject(responseBody).getJSONObject("entry").getString("id");
-
-                    JSONObject jsonObject = new JSONObject();
-                    JSONArray variables = new JSONArray();
 
                     JSONObject completeVar = new JSONObject();
                     completeVar.put("name", "result_doc");
                     completeVar.put("value", resId);
                     completeVar.put("type", "string");
-                    variables.put(completeVar);
+                    completeVar.put("scope", "local");
 
+                    RequestService.createCustomTypeRequest("/runtime/tasks/" + taskId + "/variables/result_doc", "PUT", completeVar.toString());
+
+                    JSONObject jsonObject = new JSONObject();
                     jsonObject.put("action", "complete");
-                    jsonObject.put("variables", variables);
+                    jsonObject.put("variables", new JSONArray());
 
                     response = RequestService.createPostRequestWithCustomUrl(App.getTask_host() + "/runtime/tasks/" + taskId, jsonObject.toString());
                     int responseCode = response.code();
@@ -2354,13 +2493,15 @@ public class TemplateFragment extends Fragment {
                 if (resCode != null) {
                     FrameLayout imageContainer = createImgFrame(photo);
                     imageContainer.setTag(cachedImgPath);
+                    if (currentMediaBlock == null || currentMediaBlock.first == null)
+                        return;
                     ((LinearLayout) ((HorizontalScrollView) currentMediaBlock.first.getChildAt(1)).getChildAt(0)).addView(imageContainer);
 
                     if (copyToChache)
                         addMediaPath(cachedImgPath, Utils.getMimeType(cachedImgPath));
 
                 } else
-                    Toast.makeText(getContext(), "При обработке фото произошла ошибка: " + errorMessage, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), "При обработке фото произошла ошибка:: " + errorMessage, Toast.LENGTH_SHORT).show();
             } catch (Exception exc) {
                 exc.printStackTrace();
                 Toast.makeText(getContext(), "При обработке фото произошла ошибка: " + exc.getMessage(), Toast.LENGTH_SHORT).show();
@@ -2368,6 +2509,156 @@ public class TemplateFragment extends Fragment {
         }
     }
 
+    private class OpenFileTask extends AsyncTask<Void, Void, Integer> {
+        private java.io.File resultFile;
+        private String mediaId;
+
+        OpenFileTask(String mediaId) {
+            if (mediaId.contains(":"))
+                mediaId = mediaId.substring(mediaId.lastIndexOf(":") + 1);
+            this.mediaId = mediaId;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            loopDialog.show();
+            resultFile = new File(getContext().getCacheDir(), mediaId);
+        }
+
+        @Override
+        protected Integer doInBackground(Void... params) {
+            try {
+                if (resultFile.exists())
+                    return 200;
+
+                String url = "/api/file/get/" + mediaId;
+                Response response = RequestService.createGetRequest(url);
+
+                if (response.code() == 200) {
+                    BufferedSink sink = Okio.buffer(Okio.sink(resultFile));
+                    sink.writeAll(response.body().source());
+                    sink.close();
+                }
+                response.body().close();
+
+                return response.code();
+            } catch (Exception exc) {
+                exc.printStackTrace();
+                return null;
+            }
+        }
+
+        @Override
+        protected void onPostExecute(Integer responseCode) {
+            super.onPostExecute(responseCode);
+            try {
+                if (loopDialog != null && loopDialog.isShowing())
+                    loopDialog.dismiss();
+
+                if (responseCode == null)
+                    Toast.makeText(getContext(), R.string.network_error, Toast.LENGTH_LONG).show();
+                else if (responseCode == 401) {
+                    startActivity(new Intent(getContext(), AuthActivity.class));
+                    getActivity().finish();
+                } else if (responseCode == 200) {
+                    try {
+                        Intent viewIntent = new Intent(Intent.ACTION_VIEW);
+                        Uri fileUri = FileProvider.getUriForFile(getContext(), getContext().getApplicationContext().getPackageName() + ".provider", resultFile);
+                        viewIntent.setDataAndType(fileUri, Utils.getMimeType(resultFile.getAbsolutePath()));
+                        viewIntent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                        startActivity(viewIntent);
+                    } catch (Exception exc) {
+                        exc.printStackTrace();
+                        Toast.makeText(getContext(), "Нет приложения, которое может открыть этот файл", Toast.LENGTH_LONG).show();
+                        try {
+                            resultFile.delete();
+                        } catch (Exception exc1) {
+                            exc1.printStackTrace();
+                        }
+                    }
+                } else
+                    Toast.makeText(getContext(), R.string.unknown_error, Toast.LENGTH_LONG).show();
+            } catch (Exception exc) {
+                exc.printStackTrace();
+            }
+        }
+    }
+
+    private class DownloadPdfTask extends AsyncTask<Void, Void, Integer> {
+        private java.io.File resultFile;
+        private String nodeId;
+
+        DownloadPdfTask(String nodeId) {
+            this.nodeId = nodeId;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            loopDialog.show();
+            File downloadsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+            resultFile = new File(downloadsDir, nodeId + ".pdf");
+        }
+
+        @Override
+        protected Integer doInBackground(Void... params) {
+            try {
+                if (resultFile.exists())
+                    return 200;
+
+                String url = "/api/fs-mojo/download/" + nodeId + "/document/pdf";
+                Response response = RequestService.createGetRequest(url);
+
+                if (response.code() == 200) {
+                    BufferedSink sink = Okio.buffer(Okio.sink(resultFile));
+                    sink.writeAll(response.body().source());
+                    sink.close();
+                }
+                response.body().close();
+
+                return response.code();
+            } catch (Exception exc) {
+                exc.printStackTrace();
+                return null;
+            }
+        }
+
+        @Override
+        protected void onPostExecute(Integer responseCode) {
+            super.onPostExecute(responseCode);
+            try {
+                if (loopDialog != null && loopDialog.isShowing())
+                    loopDialog.dismiss();
+
+                if (responseCode == null)
+                    Toast.makeText(getContext(), R.string.network_error, Toast.LENGTH_LONG).show();
+                else if (responseCode == 401) {
+                    startActivity(new Intent(getContext(), AuthActivity.class));
+                    getActivity().finish();
+                } else if (responseCode == 200) {
+                    try {
+                        Intent viewIntent = new Intent(Intent.ACTION_VIEW);
+                        Uri fileUri = FileProvider.getUriForFile(getContext(), getContext().getApplicationContext().getPackageName() + ".provider", resultFile);
+                        viewIntent.setDataAndType(fileUri, Utils.getMimeType(resultFile.getAbsolutePath()));
+                        viewIntent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                        startActivity(viewIntent);
+                    } catch (Exception exc) {
+                        exc.printStackTrace();
+                        Toast.makeText(getContext(), "Нет приложения, которое может открыть этот файл", Toast.LENGTH_LONG).show();
+                        try {
+                            resultFile.delete();
+                        } catch (Exception exc1) {
+                            exc1.printStackTrace();
+                        }
+                    }
+                } else
+                    Toast.makeText(getContext(), R.string.unknown_error, Toast.LENGTH_LONG).show();
+            } catch (Exception exc) {
+                exc.printStackTrace();
+            }
+        }
+    }
 
     private Pair<Boolean, ArrayList<JSONObject>> checkIfTemplateIsFilled(JSONObject template) {
         try {
