@@ -88,7 +88,11 @@ import java.util.TimeZone;
 
 import icepick.Icepick;
 import icepick.State;
+import okhttp3.Credentials;
 import okhttp3.MediaType;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
 import okhttp3.Response;
 import okio.BufferedSink;
 import okio.Okio;
@@ -1115,7 +1119,6 @@ public class TemplateFragment extends Fragment {
     private void createMediaBlock(final JSONObject value, LinearLayout container) throws Exception {
         final LinearLayout mediaLayout = (LinearLayout) getActivity().getLayoutInflater().inflate(R.layout.media_layout, container, false);
 
-
         ((ViewGroup) ((ViewGroup) mediaLayout.getChildAt(0)).getChildAt(0)).getChildAt(2)
                 .setVisibility((value.has("is_required") && !value.getBoolean("is_required")) ? View.GONE : View.VISIBLE);
 
@@ -1135,7 +1138,8 @@ public class TemplateFragment extends Fragment {
 
                 for (int i = 0; i < mediaIds.length(); i++) {
                     final String mediaId = mediaIds.getString(i);
-                    LinearLayout mediaFrame = (LinearLayout) ((HorizontalScrollView) currentMediaBlock.first.getChildAt(1)).getChildAt(0);
+                    View mediaFrame = LayoutInflater.from(getContext())
+                            .inflate(R.layout.small_image_with_frame_layout, mediaContainer, false);
                     mediaFrame.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
@@ -1953,10 +1957,10 @@ public class TemplateFragment extends Fragment {
                             downloadSignature(item, elemValue);
                         } else {
                             if (item.has("media_ids"))
-                                item.getJSONArray("media_ids").put(value);
+                                item.getJSONArray("media_ids").put(elemValue);
                             else {
                                 JSONArray mediaIds = new JSONArray();
-                                mediaIds.put(value);
+                                mediaIds.put(elemValue);
                                 item.put("media_ids", mediaIds);
                             }
                         }
@@ -2389,7 +2393,17 @@ public class TemplateFragment extends Fragment {
                     completeVar.put("type", "string");
                     completeVar.put("scope", "local");
 
-                    response = RequestService.createCustomTypeRequest("/runtime/tasks/" + taskId + "/variables/result_doc", "PUT", completeVar.toString());
+                    url = App.getTask_host() + "/runtime/tasks/" + taskId + "/variables/result_doc";
+                    RequestBody body = RequestBody.create(MediaType.parse("application/json"), completeVar.toString());
+                    OkHttpClient client = new OkHttpClient();
+                    Request request = new Request.Builder()
+                            .header("Authorization", Credentials.basic(Data.taskAuthLogin, Data.taskAuthPass))
+                            .url(url)
+                            .method("PUT", body)
+                            .build();
+                    response = client.newCall(request).execute();
+                    if (response.code() != 200 && response.code() != 201)
+                        return response.code();
 
                     JSONObject jsonObject = new JSONObject();
                     jsonObject.put("action", "complete");
