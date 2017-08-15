@@ -2389,7 +2389,7 @@ public class TemplateFragment extends Fragment {
                     completeVar.put("type", "string");
                     completeVar.put("scope", "local");
 
-                    RequestService.createCustomTypeRequest("/runtime/tasks/" + taskId + "/variables/result_doc", "PUT", completeVar.toString());
+                    response = RequestService.createCustomTypeRequest("/runtime/tasks/" + taskId + "/variables/result_doc", "PUT", completeVar.toString());
 
                     JSONObject jsonObject = new JSONObject();
                     jsonObject.put("action", "complete");
