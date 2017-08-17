@@ -2537,19 +2537,19 @@ public class TemplateFragment extends Fragment {
         protected void onPreExecute() {
             super.onPreExecute();
             loopDialog.show();
-            resultFile = new File(getContext().getCacheDir(), mediaId);
         }
 
         @Override
         protected Integer doInBackground(Void... params) {
             try {
-                if (resultFile.exists())
-                    return 200;
-
-                String url = "/api/file/get/" + mediaId;
+                String url = "/api/file/download/" + mediaId;
                 Response response = RequestService.createGetRequest(url);
 
                 if (response.code() == 200) {
+                    String header = response.header("Content-Disposition");
+                    String extension = header.substring(header.lastIndexOf("."), header.lastIndexOf("\""));
+                    resultFile = new File(getContext().getCacheDir(), mediaId + extension);
+
                     BufferedSink sink = Okio.buffer(Okio.sink(resultFile));
                     sink.writeAll(response.body().source());
                     sink.close();
@@ -2657,6 +2657,8 @@ public class TemplateFragment extends Fragment {
                         viewIntent.setDataAndType(fileUri, Utils.getMimeType(resultFile.getAbsolutePath()));
                         viewIntent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                         startActivity(viewIntent);
+
+                        Toast.makeText(getContext(), "Сохранено в загрузках", Toast.LENGTH_LONG).show();
                     } catch (Exception exc) {
                         exc.printStackTrace();
                         Toast.makeText(getContext(), "Нет приложения, которое может открыть этот файл", Toast.LENGTH_LONG).show();

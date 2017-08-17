@@ -23,6 +23,7 @@ import java.util.Locale;
 
 
 public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder> {
+    SimpleDateFormat sdf = new SimpleDateFormat("dd MMMM yyyy | HH.mm", Locale.getDefault());
     private ArrayList<Task> tasks;
     private TasksFragment parentFragment;
 
@@ -67,7 +68,13 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
         viewHolder.taskActiveCircle.setVisibility((task.suspended == null || task.suspended) ? View.INVISIBLE : View.VISIBLE);
         if (task.dueDate == null) {
             viewHolder.taskActiveCircle.setVisibility(View.INVISIBLE);
-            viewHolder.taskDate.setVisibility(View.INVISIBLE);
+            if (task.endTime == null)
+                viewHolder.taskDate.setVisibility(View.INVISIBLE);
+            else {
+                viewHolder.taskDate.setVisibility(View.VISIBLE);
+                viewHolder.taskDate.setText(sdf.format(task.endTime));
+
+            }
         } else {
             if (task.suspended == null || task.suspended)
                 viewHolder.taskActiveCircle.setVisibility(View.INVISIBLE);
@@ -79,8 +86,6 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
                 ((GradientDrawable) viewHolder.taskActiveCircle.getBackground()).setColor(task.dueDate.after(new Date()) ? Color.GREEN : Color.RED);
             }
 
-
-            SimpleDateFormat sdf = new SimpleDateFormat("dd MMMM yyyy | HH.mm", Locale.getDefault());
             viewHolder.taskDate.setText(sdf.format(task.dueDate));
         }
 
