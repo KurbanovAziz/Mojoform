@@ -503,20 +503,21 @@ public class TasksFragment extends Fragment {
                     monthCalendar.add(Calendar.MONTH, 1);
                     dateParams += "&dueBefore=" + isoDateFormat.format(monthCalendar.getTime());
                 }
-                String sortParams = "&sort=dueDate&order=desc&size=100";
+                String sortParams;
 
                 User currentUser = LoginHistoryService.getCurrentUser();
                 for (int i = 0; i < 3; i++) {
                     if (i == 0) {
                         url = App.getTask_host() + "/history/historic-task-instances?size=1000&finished=TRUE&" +
-                                "includeTaskLocalVariables=TRUE&includeProcessVariables=TRUE&taskAssignee=" + currentUser.userName + "&start=0" + dateParams + sortParams;
+                                "includeTaskLocalVariables=TRUE&includeProcessVariables=TRUE&taskAssignee=" + currentUser.userName + "&start=0" + dateParams + "&order=desc";
                     } else if (i == 1) {
+                        sortParams = "&sort=dueDate&order=desc&size=100";
                         url = App.getTask_host() + "/runtime/tasks?assignee="
                                 + currentUser.userName + "&includeProcessVariables=TRUE" + dateParams + sortParams;
-                    } else
+                    } else {
                         url = App.getTask_host() + "/runtime/tasks?sort=createTime&order=desc&size=170&assignee="
                                 + currentUser.userName + "&includeProcessVariables=TRUE&withoutDueDate=true";
-
+                    }
                     OkHttpClient client = new OkHttpClient();
                     Request request = new Request.Builder().header("Authorization", Credentials.basic(Data.taskAuthLogin, Data.taskAuthPass))
                             .url(url).build();
