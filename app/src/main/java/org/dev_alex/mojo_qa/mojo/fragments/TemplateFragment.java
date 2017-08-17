@@ -86,8 +86,6 @@ import java.util.Iterator;
 import java.util.Locale;
 import java.util.TimeZone;
 
-import icepick.Icepick;
-import icepick.State;
 import okhttp3.Credentials;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
@@ -127,7 +125,6 @@ public class TemplateFragment extends Fragment {
     private ArrayList<String> requiredElementTags;
     private ArrayList<String> requiredCategoriesTags;
 
-    @State
     public int currentPagePos;
 
     public JSONObject template;
@@ -136,11 +133,8 @@ public class TemplateFragment extends Fragment {
 
     public Pair<LinearLayout, JSONObject> currentMediaBlock;
 
-    @State
     public String cameraImagePath;
-    @State
     public String cameraVideoPath;
-    @State
     public boolean isTaskFinished;
 
     private ProgressDialog progressDialog;
@@ -184,9 +178,9 @@ public class TemplateFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        isoDateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
-
         if (rootView == null) {
+            isoDateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+
             requiredElementTags = new ArrayList<>();
             requiredCategoriesTags = new ArrayList<>();
 
@@ -216,8 +210,6 @@ public class TemplateFragment extends Fragment {
         } else
             initDialog();
 
-        if (savedInstanceState != null)
-            Icepick.restoreInstanceState(this, savedInstanceState);
         return rootView;
     }
 
@@ -331,7 +323,6 @@ public class TemplateFragment extends Fragment {
     @Override
     public void onPause() {
         super.onPause();
-        saveTemplateState();
         Data.currentTaskId = "";
     }
 
@@ -339,6 +330,12 @@ public class TemplateFragment extends Fragment {
     public void onResume() {
         super.onResume();
         Data.currentTaskId = taskId;
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        saveTemplateState();
     }
 
     private void setupHeader() {
@@ -2976,11 +2973,5 @@ public class TemplateFragment extends Fragment {
             }
         }
         return containerValues;
-    }
-
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        Icepick.saveInstanceState(this, outState);
     }
 }
