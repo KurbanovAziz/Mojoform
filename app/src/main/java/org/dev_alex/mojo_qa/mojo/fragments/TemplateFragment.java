@@ -2479,7 +2479,7 @@ public class TemplateFragment extends Fragment {
                 photo = BitmapService.modifyOrientation(photo, picturePath);
 
                 if (copyToChache) {
-                    options.inSampleSize = BitmapService.calculateInSampleSize(tmpOptions, 1200);
+                    options.inSampleSize = BitmapService.calculateInSampleSize(tmpOptions, 900);
                     cachedImgPath = BitmapService.saveBitmapToCache(BitmapService.modifyOrientation(BitmapFactory.decodeFile(picturePath, options), picturePath));
 
                     if (cachedImgPath == null) {
