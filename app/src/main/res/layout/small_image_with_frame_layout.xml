@@ -8,6 +8,7 @@
     android:background="@android:color/white">
 
     <ImageView
+        android:id="@+id/media_image"
         android:layout_width="52dp"
         android:layout_height="52dp"
         android:layout_gravity="center"

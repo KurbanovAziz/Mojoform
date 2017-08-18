@@ -1132,15 +1132,29 @@ public class TemplateFragment extends Fragment {
                 ViewGroup mediaContainer = (ViewGroup) ((ViewGroup) mediaLayout.getChildAt(1)).getChildAt(0);
                 mediaContainer.removeAllViewsInLayout();
                 final JSONArray mediaIds = value.getJSONArray("media_ids");
+                final JSONArray fileNames = value.getJSONArray("file_names");
+                final JSONArray fileTypes = value.getJSONArray("file_types");
 
                 for (int i = 0; i < mediaIds.length(); i++) {
                     final String mediaId = mediaIds.getString(i);
+                    final String fileName = fileNames.getString(i);
+                    final String fileType = fileTypes.getString(i);
+
                     View mediaFrame = LayoutInflater.from(getContext())
                             .inflate(R.layout.small_image_with_frame_layout, mediaContainer, false);
+                    if (fileType.contains("image"))
+                        ((ImageView) mediaFrame.findViewById(R.id.media_image)).setImageResource(R.drawable.add_photo_btn);
+                    if (fileType.contains("video"))
+                        ((ImageView) mediaFrame.findViewById(R.id.media_image)).setImageResource(R.drawable.add_video_btn);
+                    if (fileType.contains("audio"))
+                        ((ImageView) mediaFrame.findViewById(R.id.media_image)).setImageResource(R.drawable.add_audio_btn);
+                    else
+                        ((ImageView) mediaFrame.findViewById(R.id.media_image)).setImageResource(R.drawable.add_file_btn);
+
                     mediaFrame.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            new OpenFileTask(mediaId).execute();
+                            new OpenFileTask(mediaId, fileName).execute();
                         }
                     });
                     mediaContainer.addView(mediaFrame);
@@ -1953,12 +1967,22 @@ public class TemplateFragment extends Fragment {
                         if (elementName.equals("signature")) {
                             downloadSignature(item, elemValue);
                         } else {
-                            if (item.has("media_ids"))
+                            if (item.has("media_ids")) {
                                 item.getJSONArray("media_ids").put(elemValue);
-                            else {
+                                item.getJSONArray("file_names").put(value.getString("fileName"));
+                                item.getJSONArray("file_types").put(value.getString("mimeType"));
+                            } else {
                                 JSONArray mediaIds = new JSONArray();
                                 mediaIds.put(elemValue);
                                 item.put("media_ids", mediaIds);
+
+                                JSONArray fileNames = new JSONArray();
+                                fileNames.put(value.getString("fileName"));
+                                item.put("file_names", fileNames);
+
+                                JSONArray fileTypes = new JSONArray();
+                                fileTypes.put(value.getString("mimeType"));
+                                item.put("file_types", fileTypes);
                             }
                         }
                 }
@@ -2523,29 +2547,33 @@ public class TemplateFragment extends Fragment {
     private class OpenFileTask extends AsyncTask<Void, Void, Integer> {
         private java.io.File resultFile;
         private String mediaId;
+        private String fileName;
 
-        OpenFileTask(String mediaId) {
+        OpenFileTask(String mediaId, String fileName) {
             if (mediaId.contains(":"))
                 mediaId = mediaId.substring(mediaId.lastIndexOf(":") + 1);
             this.mediaId = mediaId;
+            this.fileName = fileName;
         }
 
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
             loopDialog.show();
+
+            resultFile = new File(getContext().getCacheDir(), fileName);
         }
 
         @Override
         protected Integer doInBackground(Void... params) {
             try {
+                if (resultFile.exists())
+                    return 200;
+
                 String url = "/api/file/download/" + mediaId;
                 Response response = RequestService.createGetRequest(url);
 
                 if (response.code() == 200) {
-                    String header = response.header("Content-Disposition");
-                    String extension = header.substring(header.lastIndexOf("."), header.lastIndexOf("\""));
-                    resultFile = new File(getContext().getCacheDir(), mediaId + extension);
 
                     BufferedSink sink = Okio.buffer(Okio.sink(resultFile));
                     sink.writeAll(response.body().source());
