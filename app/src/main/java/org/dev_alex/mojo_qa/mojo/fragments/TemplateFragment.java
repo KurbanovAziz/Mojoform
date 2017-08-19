@@ -1145,9 +1145,9 @@ public class TemplateFragment extends Fragment {
                             .inflate(R.layout.small_image_with_frame_layout, mediaContainer, false);
                     if (fileType.contains("image"))
                         ((ImageView) mediaFrame.findViewById(R.id.media_image)).setImageResource(R.drawable.add_photo_btn);
-                    if (fileType.contains("video"))
+                    else if (fileType.contains("video"))
                         ((ImageView) mediaFrame.findViewById(R.id.media_image)).setImageResource(R.drawable.add_video_btn);
-                    if (fileType.contains("audio"))
+                    else if (fileType.contains("audio"))
                         ((ImageView) mediaFrame.findViewById(R.id.media_image)).setImageResource(R.drawable.add_audio_btn);
                     else
                         ((ImageView) mediaFrame.findViewById(R.id.media_image)).setImageResource(R.drawable.add_file_btn);
