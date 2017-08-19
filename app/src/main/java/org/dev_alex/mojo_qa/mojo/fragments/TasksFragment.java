@@ -509,7 +509,7 @@ public class TasksFragment extends Fragment {
                 for (int i = 0; i < 3; i++) {
                     if (i == 0) {
                         url = App.getTask_host() + "/history/historic-task-instances?size=1000&finished=TRUE&" +
-                                "includeTaskLocalVariables=TRUE&includeProcessVariables=TRUE&taskAssignee=" + currentUser.userName + "&start=0" + dateParams + "&order=desc";
+                                "includeTaskLocalVariables=TRUE&includeProcessVariables=TRUE&taskAssignee=" + currentUser.userName + "&start=0" + dateParams + "&sort=endTime&order=desc";
                     } else if (i == 1) {
                         sortParams = "&sort=dueDate&order=desc&size=100";
                         url = App.getTask_host() + "/runtime/tasks?assignee="

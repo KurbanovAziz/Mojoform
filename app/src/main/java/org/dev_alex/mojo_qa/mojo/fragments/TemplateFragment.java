@@ -1924,14 +1924,22 @@ public class TemplateFragment extends Fragment {
             JSONObject template = finishedTemplate.getJSONObject("template");
 
             for (int i = 0; i < values.length(); i++) {
-                JSONObject value = values.getJSONObject(i);
-                String elemType = value.getString("type");
-                String elemId = value.getString("id");
-                String elemValue = value.getString("value");
-
-
+                JSONObject value;
+                String elemType;
+                String elemId;
+                String elemValue;
+                try {
+                    value = values.getJSONObject(i);
+                    elemType = value.getString("type");
+                    elemId = value.getString("id");
+                    elemValue = value.getString("value");
+                } catch (Exception exc) {
+                    continue;
+                }
                 if (elemType == null || elemId == null || elemValue == null)
                     continue;
+
+
                 JSONObject item = findTemplateElementById(template, elemId);
                 String elementName = getTemplateElementNameById(template, elemId);
 
