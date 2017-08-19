@@ -450,6 +450,7 @@ public class TemplateFragment extends Fragment {
 
             updateArrows();
         } catch (Exception exc) {
+            Toast.makeText(getContext(), "Ошибка при рендеринге - " + exc.getMessage(), Toast.LENGTH_LONG).show();
             exc.printStackTrace();
         }
     }
