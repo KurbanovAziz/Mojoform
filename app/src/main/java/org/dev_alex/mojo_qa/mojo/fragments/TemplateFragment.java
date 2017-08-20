@@ -86,6 +86,8 @@ import java.util.Iterator;
 import java.util.Locale;
 import java.util.TimeZone;
 
+import icepick.Icepick;
+import icepick.State;
 import okhttp3.Credentials;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
@@ -133,7 +135,9 @@ public class TemplateFragment extends Fragment {
 
     public Pair<LinearLayout, JSONObject> currentMediaBlock;
 
+    @State
     public String cameraImagePath;
+    @State
     public String cameraVideoPath;
     public boolean isTaskFinished;
 
@@ -173,6 +177,18 @@ public class TemplateFragment extends Fragment {
         TemplateFragment fragment = new TemplateFragment();
         fragment.setArguments(args);
         return fragment;
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        Icepick.restoreInstanceState(this, savedInstanceState);
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        Icepick.saveInstanceState(this, outState);
     }
 
     @Nullable

@@ -84,8 +84,10 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
                     ((GradientDrawable) viewHolder.taskActiveCircle.getBackground()).setColor(task.dueDate.after(new Date()) ? Color.GREEN : Color.RED);
                 }
                 viewHolder.taskDate.setText(sdf.format(task.dueDate));
-            } else
+            } else {
                 viewHolder.taskDate.setVisibility(View.INVISIBLE);
+                viewHolder.taskActiveCircle.setVisibility(View.INVISIBLE);
+            }
         }
 
 
