@@ -181,13 +181,14 @@ public class TemplateFragment extends Fragment {
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+        super.onCreate(null);
         Icepick.restoreInstanceState(this, savedInstanceState);
+        setRetainInstance(true);
     }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
+        super.onSaveInstanceState(null);
         Icepick.saveInstanceState(this, outState);
     }
 
