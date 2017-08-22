@@ -38,9 +38,11 @@ public class BitmapService {
 
         Intent galleryIntent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
         galleryIntent.setType("image/*");
+        galleryIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 
 
         Intent takePhotoIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        takePhotoIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         takePhotoIntent.putExtra("return-data", true);
         File cameraFile = new File(context.getExternalCacheDir(), String.valueOf(System.currentTimeMillis()) + ".jpg");
 
@@ -55,8 +57,9 @@ public class BitmapService {
             chooserIntent = Intent.createChooser(intentList.remove(intentList.size() - 1),
                     context.getString(R.string.pick_image));
             chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, intentList.toArray(new Parcelable[]{}));
-            chooserIntent.setFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
-            chooserIntent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            chooserIntent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+            chooserIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            chooserIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
         }
 
 
@@ -69,10 +72,12 @@ public class BitmapService {
         List<Intent> intentList = new ArrayList<>();
 
         Intent galleryIntent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        galleryIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         galleryIntent.setType("video/*");
 
 
         Intent takeVideoIntent = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
+        takeVideoIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         takeVideoIntent.putExtra("return-data", false);
         File cameraFile = new File(context.getExternalCacheDir(), String.valueOf(System.currentTimeMillis()) + ".mp4");
         Uri fileUri = FileProvider.getUriForFile(context, context.getApplicationContext().getPackageName() + ".provider", cameraFile);
@@ -86,8 +91,9 @@ public class BitmapService {
             chooserIntent = Intent.createChooser(intentList.remove(intentList.size() - 1),
                     context.getString(R.string.pick_image));
             chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, intentList.toArray(new Parcelable[]{}));
-            chooserIntent.setFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
-            chooserIntent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            chooserIntent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+            chooserIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            chooserIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
         }
 
 
@@ -99,6 +105,7 @@ public class BitmapService {
         for (ResolveInfo resolveInfo : resInfo) {
             String packageName = resolveInfo.activityInfo.packageName;
             Intent targetedIntent = new Intent(intent);
+            targetedIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             targetedIntent.setPackage(packageName);
             list.add(targetedIntent);
         }

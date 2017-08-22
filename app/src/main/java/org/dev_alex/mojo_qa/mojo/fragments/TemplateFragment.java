@@ -857,6 +857,9 @@ public class TemplateFragment extends Fragment {
             this.scanTo = scanTo;
             Intent intent = new Intent("com.google.zxing.client.android.SCAN");
             intent.putExtra("SCAN_MODE", "QR_CODE_MODE"); // "PRODUCT_MODE for bar codes
+            intent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
             startActivityForResult(intent, SCAN_CODE_REQUEST_CODE);
 
         } catch (Exception e) {
@@ -871,6 +874,9 @@ public class TemplateFragment extends Fragment {
             this.scanTo = scanTo;
             Intent intent = new Intent("com.google.zxing.client.android.SCAN");
             intent.putExtra("SCAN_MODE", "PRODUCT_MODE");
+            intent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
             startActivityForResult(intent, SCAN_CODE_REQUEST_CODE);
 
         } catch (Exception e) {
@@ -1229,6 +1235,9 @@ public class TemplateFragment extends Fragment {
                         try {
                             currentMediaBlock = new Pair<>(mediaLayout, value);
                             Intent intent = new Intent(MediaStore.Audio.Media.RECORD_SOUND_ACTION);
+                            intent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+                            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                             startActivityForResult(intent, AUDIO_REQUEST_CODE);
                         } catch (Exception exc) {
                             exc.printStackTrace();
@@ -1248,6 +1257,9 @@ public class TemplateFragment extends Fragment {
 
                             Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
                             intent.setType("*/*");
+                            intent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+                            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                             intent.addCategory(Intent.CATEGORY_OPENABLE);
 
                             Intent sIntent = new Intent("com.sec.android.app.myfiles.PICK_DATA");
@@ -1257,6 +1269,9 @@ public class TemplateFragment extends Fragment {
                             if (getActivity().getPackageManager().resolveActivity(sIntent, 0) != null) {
                                 // it is device with samsung file manager
                                 chooserIntent = Intent.createChooser(sIntent, "Выбрать файл");
+                                chooserIntent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+                                chooserIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                                chooserIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                                 chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, new Intent[]{intent});
                             } else
                                 chooserIntent = Intent.createChooser(intent, "Выбрать файл");

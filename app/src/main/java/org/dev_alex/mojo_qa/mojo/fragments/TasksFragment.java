@@ -97,6 +97,8 @@ public class TasksFragment extends Fragment {
         super.onCreate(savedInstanceState);
         currentDate = Calendar.getInstance();
         currentDate.setTime(new Date());
+
+        setRetainInstance(true);
     }
 
     @Nullable

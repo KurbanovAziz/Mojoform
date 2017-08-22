@@ -8,6 +8,7 @@ import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.PersistableBundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.WindowManager;
@@ -39,7 +40,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+        super.onCreate(null);
         setContentView(R.layout.activity_main);
         AlarmService.scheduleAlarm(this);
 
@@ -65,6 +66,11 @@ public class MainActivity extends AppCompatActivity {
                         .replace(R.id.container, TemplateFragment.newInstance(
                                 templateId, taskId, nodeForTasks, dueDate, siteId, initiator)).addToBackStack(null).commit();
         }
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState, PersistableBundle outPersistentState) {
+        super.onSaveInstanceState(outState, null);
     }
 
     private void initDrawer() {

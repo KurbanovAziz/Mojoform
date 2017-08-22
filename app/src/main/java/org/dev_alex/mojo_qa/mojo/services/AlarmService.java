@@ -12,6 +12,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.IBinder;
 import android.os.SystemClock;
@@ -221,9 +222,10 @@ public class AlarmService extends Service {
             notificationIcon = BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher);
 
         builder.setContentIntent(contentIntent)
-                .setSmallIcon(R.drawable.logo_small)
+                .setSmallIcon(R.drawable.logo_notification)
                 .setLargeIcon(notificationIcon)
                 .setAutoCancel(true)
+                .setLights(Color.parseColor("#632E83"), 1000, 3000)
                 .setVibrate(new long[]{1000, 1000, 1000, 1000, 1000})
                 .setContentTitle(taskName)
                 .setContentText(message);
