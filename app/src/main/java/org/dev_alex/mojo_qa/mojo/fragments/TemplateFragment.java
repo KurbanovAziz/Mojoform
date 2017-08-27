@@ -57,7 +57,13 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.afollestad.materialdialogs.DialogAction;
+import com.afollestad.materialdialogs.GravityEnum;
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.github.gcacace.signaturepad.views.SignaturePad;
+import com.mlsdev.rximagepicker.RxImageConverters;
+import com.mlsdev.rximagepicker.RxImagePicker;
+import com.mlsdev.rximagepicker.Sources;
 
 import net.cachapa.expandablelayout.ExpandableLayout;
 
@@ -83,11 +89,20 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
+import java.util.UUID;
 
 import icepick.Icepick;
 import icepick.State;
+import io.reactivex.Observable;
+import io.reactivex.ObservableSource;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.annotations.NonNull;
+import io.reactivex.functions.Consumer;
+import io.reactivex.functions.Function;
+import io.reactivex.schedulers.Schedulers;
 import okhttp3.Credentials;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
@@ -135,8 +150,6 @@ public class TemplateFragment extends Fragment {
 
     public Pair<LinearLayout, JSONObject> currentMediaBlock;
 
-    @State
-    public String cameraImagePath;
     @State
     public String cameraVideoPath;
     public boolean isTaskFinished;
@@ -234,7 +247,7 @@ public class TemplateFragment extends Fragment {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        try {
+       /* try {
             if (requestCode == PHOTO_REQUEST_CODE && resultCode == RESULT_OK) {
                 if (new File(cameraImagePath).exists() || data == null)
                     new ProcessingBitmapTask(cameraImagePath, true).execute();
@@ -266,7 +279,7 @@ public class TemplateFragment extends Fragment {
             exc.printStackTrace();
             String error = "camera_path = " + (cameraImagePath == null ? "null" : cameraImagePath);
             Toast.makeText(getContext(), error, Toast.LENGTH_LONG).show();
-        }
+        }*/
 
         if (requestCode == VIDEO_REQUEST_CODE && resultCode == RESULT_OK) {
             if (new File(cameraVideoPath).exists() || data == null)
@@ -310,7 +323,7 @@ public class TemplateFragment extends Fragment {
             else {
                 String mimeType = Utils.getMimeType(documentPath);
                 if (mimeType.startsWith("image"))
-                    new ProcessingBitmapTask(documentPath, true).execute();
+                    processImageFile(new File(documentPath), false);
                 else if (mimeType.startsWith("audio"))
                     createAudioPreview(documentPath, true);
                 else if (mimeType.startsWith("video"))
@@ -428,6 +441,63 @@ public class TemplateFragment extends Fragment {
         progressDialog.setIndeterminate(false);
         progressDialog.setCanceledOnTouchOutside(false);
         progressDialog.setCancelable(false);
+    }
+
+    private void showGalleryOrPhotoPickDialog() {
+        new MaterialDialog.Builder(getContext())
+                .title("Добавить фото")
+                .cancelable(true)
+                .content("Выберите откуда добавить фото")
+                .buttonsGravity(GravityEnum.CENTER)
+                .autoDismiss(true)
+                .positiveText("Камера")
+                .negativeText("Галерея")
+                .onPositive(new MaterialDialog.SingleButtonCallback() {
+                    @Override
+                    public void onClick(@android.support.annotation.NonNull MaterialDialog dialog, @android.support.annotation.NonNull DialogAction which) {
+                        RxImagePicker.with(getContext()).requestImage(Sources.CAMERA)
+                                .flatMap(new Function<Uri, ObservableSource<File>>() {
+                                    @Override
+                                    public ObservableSource<File> apply(@NonNull Uri uri) throws Exception {
+                                        File cacheFile = new File(getContext().getCacheDir(), UUID.randomUUID().toString() + ".png");
+                                        return RxImageConverters.uriToFile(getContext(), uri, cacheFile);
+                                    }
+                                })
+                                .subscribe(new Consumer<File>() {
+                                    @Override
+                                    public void accept(@NonNull File file) throws Exception {
+                                        processImageFile(file, false);
+                                    }
+                                });
+                    }
+                })
+                .onNegative(new MaterialDialog.SingleButtonCallback() {
+                    @Override
+                    public void onClick(@android.support.annotation.NonNull MaterialDialog dialog, @android.support.annotation.NonNull DialogAction which) {
+                        RxImagePicker.with(getContext()).requestMultipleImages()
+                                .flatMap(new Function<List<Uri>, ObservableSource<Uri>>() {
+                                    @Override
+                                    public ObservableSource<Uri> apply(@NonNull List<Uri> uris) throws Exception {
+                                        return Observable.fromIterable(uris);
+                                    }
+                                })
+                                .flatMap(new Function<Uri, ObservableSource<File>>() {
+                                    @Override
+                                    public ObservableSource<File> apply(@NonNull Uri uri) throws Exception {
+                                        File cacheFile = new File(getContext().getCacheDir(), UUID.randomUUID().toString() + ".png");
+                                        return RxImageConverters.uriToFile(getContext(), uri, cacheFile);
+                                    }
+                                })
+                                .subscribe(new Consumer<File>() {
+                                    @Override
+                                    public void accept(@NonNull File file) throws Exception {
+                                        processImageFile(file, false);
+                                    }
+                                });
+                    }
+                })
+                .build()
+                .show();
     }
 
     private void setPage(Page page) {
@@ -1199,10 +1269,12 @@ public class TemplateFragment extends Fragment {
                 public void onClick(View v) {
                     if (checkExternalPermissions()) {
                         try {
+                            showGalleryOrPhotoPickDialog();
                             currentMediaBlock = new Pair<>(mediaLayout, value);
+                            /*
                             Pair<Intent, File> intentFilePair = BitmapService.getPickImageIntent(getContext());
                             cameraImagePath = intentFilePair.second.getAbsolutePath();
-                            startActivityForResult(intentFilePair.first, PHOTO_REQUEST_CODE);
+                            startActivityForResult(intentFilePair.first, PHOTO_REQUEST_CODE);*/
                         } catch (Exception exc) {
                             Toast.makeText(getContext(), "У вас нет камеры", Toast.LENGTH_SHORT).show();
                         }
@@ -1295,7 +1367,7 @@ public class TemplateFragment extends Fragment {
                 String mediaPath = value.getJSONArray(MEDIA_PATH_JSON_ARRAY).getJSONObject(j).getString("path");
                 String mimeType = value.getJSONArray(MEDIA_PATH_JSON_ARRAY).getJSONObject(j).getString("mime");
                 if (mimeType.startsWith("image"))
-                    new ProcessingBitmapTask(mediaPath, false).execute();
+                    processImageFile(new File(mediaPath), true);
                 else if (mimeType.startsWith("audio"))
                     createAudioPreview(mediaPath, false);
                 else if (mimeType.startsWith("video"))
@@ -2513,7 +2585,7 @@ public class TemplateFragment extends Fragment {
         }
     }
 
-    private class ProcessingBitmapTask extends AsyncTask<Void, Void, Integer> {
+/*    private class ProcessingBitmapTask extends AsyncTask<Void, Void, Integer> {
         private String cachedImgPath;
         private Bitmap photo;
         private String picturePath;
@@ -2583,6 +2655,55 @@ public class TemplateFragment extends Fragment {
                 Toast.makeText(getContext(), "При обработке фото произошла ошибка: " + exc.getMessage(), Toast.LENGTH_SHORT).show();
             }
         }
+    }*/
+
+    private void processImageFile(File file, final boolean isRestore) {
+        final int imgSize = Math.round(TypedValue.applyDimension
+                (TypedValue.COMPLEX_UNIT_DIP, 93, getResources().getDisplayMetrics()));
+
+        Observable.just(file)
+                .subscribeOn(Schedulers.io())
+                .observeOn(Schedulers.io())
+                .flatMap(new Function<File, ObservableSource<Pair<Bitmap, String>>>() {
+                    @Override
+                    public ObservableSource<Pair<Bitmap, String>> apply(@NonNull File file) throws Exception {
+                        String picturePath = file.getAbsolutePath();
+
+                        final BitmapFactory.Options tmpOptions = new BitmapFactory.Options();
+                        final BitmapFactory.Options options = new BitmapFactory.Options();
+
+                        tmpOptions.inJustDecodeBounds = true;
+                        BitmapFactory.decodeFile(picturePath, tmpOptions);
+                        options.inSampleSize = BitmapService.calculateInSampleSize(tmpOptions, imgSize);
+                        options.inJustDecodeBounds = false;
+
+                        Bitmap bitmap = BitmapFactory.decodeFile(picturePath, options);
+                        bitmap = BitmapService.modifyOrientation(bitmap, picturePath);
+
+                        return Observable.just(new Pair<>(bitmap, picturePath));
+                    }
+                })
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(
+                        new Consumer<Pair<Bitmap, String>>() {
+                            @Override
+                            public void accept(@NonNull Pair<Bitmap, String> bitmapStringPair) throws Exception {
+                                FrameLayout imageContainer = createImgFrame(bitmapStringPair.first);
+                                imageContainer.setTag(bitmapStringPair.second);
+                                if (currentMediaBlock == null || currentMediaBlock.first == null)
+                                    return;
+                                ((LinearLayout) ((HorizontalScrollView) currentMediaBlock.first.getChildAt(1)).getChildAt(0)).addView(imageContainer);
+
+                                if (!isRestore)
+                                    addMediaPath(bitmapStringPair.second, Utils.getMimeType(bitmapStringPair.second));
+                            }
+                        },
+                        new Consumer<Throwable>() {
+                            @Override
+                            public void accept(@NonNull Throwable throwable) throws Exception {
+                                Toast.makeText(getContext(), "При обработке фото произошла ошибка:: " + throwable.getMessage(), Toast.LENGTH_LONG).show();
+                            }
+                        });
     }
 
     private class OpenFileTask extends AsyncTask<Void, Void, Integer> {
@@ -2893,7 +3014,6 @@ public class TemplateFragment extends Fragment {
         else
             return new Pair<>(false, null);
     }
-
 
     private JSONArray getTemplateElementValues(JSONObject template) {
         JSONArray resultValues = new JSONArray();

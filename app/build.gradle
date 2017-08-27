@@ -80,5 +80,7 @@ dependencies {
 
     compile 'frankiesardo:icepick:3.2.0'
     provided 'frankiesardo:icepick-processor:3.2.0'
+    compile 'com.mlsdev.rximagepicker:library:2.0.0'
+    compile 'com.afollestad.material-dialogs:core:0.9.4.5'
     testCompile 'junit:junit:4.12'
 }
