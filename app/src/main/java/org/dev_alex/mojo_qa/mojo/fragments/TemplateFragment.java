@@ -60,6 +60,9 @@ import android.widget.Toast;
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.GravityEnum;
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.darsh.multipleimageselect.activities.AlbumSelectActivity;
+import com.darsh.multipleimageselect.helpers.Constants;
+import com.darsh.multipleimageselect.models.Image;
 import com.github.gcacace.signaturepad.views.SignaturePad;
 import com.mlsdev.rximagepicker.RxImageConverters;
 import com.mlsdev.rximagepicker.RxImagePicker;
@@ -89,7 +92,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
 import java.util.UUID;
@@ -143,17 +145,12 @@ public class TemplateFragment extends Fragment {
     private ArrayList<String> requiredCategoriesTags;
 
     public int currentPagePos;
-
     public JSONObject template;
-
     public EditText scanTo;
-
     public Pair<LinearLayout, JSONObject> currentMediaBlock;
-
     @State
     public String cameraVideoPath;
     public boolean isTaskFinished;
-
     private ProgressDialog progressDialog;
 
     public static TemplateFragment newInstance(String templateId, String taskId, String nodeForTasks,
@@ -247,6 +244,11 @@ public class TemplateFragment extends Fragment {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
+        if (requestCode == Constants.REQUEST_CODE && resultCode == RESULT_OK && data != null) {
+            ArrayList<Image> images = data.getParcelableArrayListExtra(Constants.INTENT_EXTRA_IMAGES);
+            for (Image image : images)
+                processImageFile(new File(image.path), false);
+        }
        /* try {
             if (requestCode == PHOTO_REQUEST_CODE && resultCode == RESULT_OK) {
                 if (new File(cameraImagePath).exists() || data == null)
@@ -474,7 +476,7 @@ public class TemplateFragment extends Fragment {
                 .onNegative(new MaterialDialog.SingleButtonCallback() {
                     @Override
                     public void onClick(@android.support.annotation.NonNull MaterialDialog dialog, @android.support.annotation.NonNull DialogAction which) {
-                        RxImagePicker.with(getContext()).requestMultipleImages()
+                        /*RxImagePicker.with(getContext()).requestMultipleImages()
                                 .flatMap(new Function<List<Uri>, ObservableSource<Uri>>() {
                                     @Override
                                     public ObservableSource<Uri> apply(@NonNull List<Uri> uris) throws Exception {
@@ -493,7 +495,10 @@ public class TemplateFragment extends Fragment {
                                     public void accept(@NonNull File file) throws Exception {
                                         processImageFile(file, false);
                                     }
-                                });
+                                });*/
+                        Intent intent = new Intent(getContext(), AlbumSelectActivity.class);
+                        intent.putExtra(Constants.INTENT_EXTRA_LIMIT, 10);
+                        startActivityForResult(intent, Constants.REQUEST_CODE);
                     }
                 })
                 .build()
@@ -890,7 +895,9 @@ public class TemplateFragment extends Fragment {
                         String mime = "text/html";
                         String encoding = "utf-8";
 
-                        String html = "<html><head></head><body> " + value.getString("html") + " </body></html>";
+                        String html = value.getString("html");
+                        if (!html.contains("<html"))
+                            html = "<html><head></head><body> " + html + " </body></html>";
                         html = html.replace(App.getHost(), "");
                         html = html.replace("/api", App.getHost() + "/api");
                         html = Utils.formatHtmlContentSize(html);
@@ -2178,7 +2185,7 @@ public class TemplateFragment extends Fragment {
                         else if (question.has("optionals")) {
                             JSONArray optionals = question.getJSONArray("optionals");
                             for (int j = 0; j < optionals.length(); j++) {
-                                foundedItem = findJsonElementById(optionals.getJSONObject(i).getJSONObject("optional").getJSONArray("items"), id);
+                                foundedItem = findJsonElementById(optionals.getJSONObject(j).getJSONObject("optional").getJSONArray("items"), id);
                                 if (foundedItem != null)
                                     return foundedItem;
                             }
@@ -2242,7 +2249,7 @@ public class TemplateFragment extends Fragment {
                         else if (question.has("optionals")) {
                             JSONArray optionals = question.getJSONArray("optionals");
                             for (int j = 0; j < optionals.length(); j++) {
-                                foundedItem = findJsonElementNameById(optionals.getJSONObject(i).getJSONObject("optional").getJSONArray("items"), id);
+                                foundedItem = findJsonElementNameById(optionals.getJSONObject(j).getJSONObject("optional").getJSONArray("items"), id);
                                 if (foundedItem != null)
                                     return foundedItem;
                             }

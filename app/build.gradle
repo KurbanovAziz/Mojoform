@@ -82,5 +82,7 @@ dependencies {
     provided 'frankiesardo:icepick-processor:3.2.0'
     compile 'com.mlsdev.rximagepicker:library:2.0.0'
     compile 'com.afollestad.material-dialogs:core:0.9.4.5'
+
+    compile 'com.github.darsh2:MultipleImageSelect:v0.0.4'
     testCompile 'junit:junit:4.12'
 }

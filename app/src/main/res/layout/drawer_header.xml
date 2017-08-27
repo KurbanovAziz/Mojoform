@@ -118,15 +118,16 @@
     <FrameLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="-20dp">
+        android:layout_marginTop="-20dp"
+        android:visibility="gone">
 
         <include layout="@layout/graphics_layout" />
     </FrameLayout>
 
     <View
         android:layout_width="match_parent"
+        android:layout_marginTop="-10dp"
         android:layout_height="0.8dp"
         android:layout_marginLeft="50dp"
-        android:layout_marginTop="40dp"
         android:background="#B6A9C9" />
 </LinearLayout>

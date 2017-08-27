@@ -7,4 +7,15 @@
     <color name="drawer_background">#DFD6E2</color>
     <color name="drawer_text_color">#4C3D5F</color>
     <color name="drawer_item_selected_color">#B6A9C9</color>
+
+    <color name="multiple_image_select_primary">#57466e</color>
+    <color name="multiple_image_select_primaryDark">#4C3E60</color>
+    <color name="multiple_image_select_primaryLight">#D1C4E9</color>
+    <color name="multiple_image_select_accent">#536DFE</color>
+    <color name="multiple_image_select_primaryText">#e7e7e7</color>
+    <color name="multiple_image_select_secondaryText">#727272</color>
+    <color name="multiple_image_select_divider">#B6B6B6</color>
+    <color name="multiple_image_select_toolbarPrimaryText">#FFFFFF</color>
+    <color name="multiple_image_select_albumTextBackground">#99212121</color>
+    <color name="multiple_image_select_imageSelectBackground">#000000</color>
 </resources>
