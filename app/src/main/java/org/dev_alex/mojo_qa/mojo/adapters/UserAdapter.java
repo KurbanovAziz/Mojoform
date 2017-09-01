@@ -53,7 +53,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
     public void onBindViewHolder(UserViewHolder viewHolder, int i) {
         final User user = users.get(i);
 
-        Bitmap avatar = LoginHistoryService.getAvatar(user.userName);
+        Bitmap avatar = LoginHistoryService.getAvatar(user.username);
         if (avatar == null) {
             viewHolder.avatarImage.setVisibility(View.GONE);
             viewHolder.userInitials.setVisibility(View.VISIBLE);

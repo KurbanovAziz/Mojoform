@@ -156,7 +156,7 @@ public class MainActivity extends AppCompatActivity {
             try {
                 if (avatar != null) {
                     avatarImageView.setImageBitmap(avatar);
-                    LoginHistoryService.addAvatar(LoginHistoryService.getCurrentUser().userName, avatar);
+                    LoginHistoryService.addAvatar(LoginHistoryService.getCurrentUser().username, avatar);
                 }
             } catch (Exception exc) {
                 exc.printStackTrace();

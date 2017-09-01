@@ -144,8 +144,8 @@ public class AuthActivity extends AppCompatActivity {
                             return;
                         }
                         LoginHistoryService.setCurrentUser(user);
-                        TokenService.updateToken(user.token, user.userName);
-                        Data.taskAuthLogin = user.userName;
+                        TokenService.updateToken(user.token, user.username);
+                        Data.taskAuthLogin = user.username;
                         Intent intent = new Intent(AuthActivity.this, MainActivity.class);
                         intent.putExtras(getIntent());
                         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -169,9 +169,9 @@ public class AuthActivity extends AppCompatActivity {
                             return;
                         }
                         LoginHistoryService.setCurrentUser(user);
-                        Data.taskAuthLogin = user.userName;
+                        Data.taskAuthLogin = user.username;
                         LoginHistoryService.addUser(user);
-                        TokenService.updateToken(user.token, user.userName);
+                        TokenService.updateToken(user.token, user.username);
                         Intent intent = new Intent(AuthActivity.this, MainActivity.class);
                         intent.putExtras(getIntent());
                         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);

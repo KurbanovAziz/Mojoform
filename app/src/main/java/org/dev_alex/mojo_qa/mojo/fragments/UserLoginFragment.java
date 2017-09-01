@@ -56,7 +56,7 @@ public class UserLoginFragment extends Fragment {
                 if (password.getText().toString().trim().isEmpty())
                     Toast.makeText(getContext(), R.string.pass_is_empty, Toast.LENGTH_LONG).show();
                 else
-                    ((AuthActivity) getActivity()).new LoginTask(user.userName,
+                    ((AuthActivity) getActivity()).new LoginTask(user.username,
                             password.getText().toString()).execute();
             }
         });

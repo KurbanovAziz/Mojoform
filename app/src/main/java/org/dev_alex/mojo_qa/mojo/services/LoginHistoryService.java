@@ -50,7 +50,7 @@ public class LoginHistoryService {
                 users = new ArrayList<>();
 
             for (User tmpUser : users)
-                if (tmpUser.userName.equals(user.userName))
+                if (tmpUser.username.equals(user.username))
                     return;
 
             users.add(user);

@@ -585,7 +585,7 @@ public class TemplateFragment extends Fragment {
             mSettings = App.getContext().getSharedPreferences("templates", Context.MODE_PRIVATE);
             SharedPreferences.Editor editor = mSettings.edit();
 
-            editor.putString(taskId + LoginHistoryService.getCurrentUser().userName, template.toString());
+            editor.putString(taskId + LoginHistoryService.getCurrentUser().username, template.toString());
             editor.apply();
         } catch (Exception exc) {
             exc.printStackTrace();
@@ -2292,7 +2292,7 @@ public class TemplateFragment extends Fragment {
                 } else {
                     SharedPreferences mSettings;
                     mSettings = App.getContext().getSharedPreferences("templates", Context.MODE_PRIVATE);
-                    String templateJson = mSettings.getString(taskId + LoginHistoryService.getCurrentUser().userName, "");
+                    String templateJson = mSettings.getString(taskId + LoginHistoryService.getCurrentUser().username, "");
                     if (!templateJson.equals("")) {
                         template = new JSONObject(templateJson);
                         return HttpURLConnection.HTTP_OK;
@@ -2497,7 +2497,7 @@ public class TemplateFragment extends Fragment {
 
                 resultJson.put("template_id", templateId);
                 resultJson.put("name", template.getString("name"));
-                resultJson.put("executor", LoginHistoryService.getCurrentUser().userName);
+                resultJson.put("executor", LoginHistoryService.getCurrentUser().username);
                 if (template.has("StartTime"))
                     resultJson.put("StartTime", template.getString("StartTime"));
                 else
@@ -2580,7 +2580,7 @@ public class TemplateFragment extends Fragment {
                     SharedPreferences mSettings;
                     mSettings = App.getContext().getSharedPreferences("templates", Context.MODE_PRIVATE);
                     SharedPreferences.Editor editor = mSettings.edit();
-                    editor.putString(taskId + LoginHistoryService.getCurrentUser().userName, "");
+                    editor.putString(taskId + LoginHistoryService.getCurrentUser().username, "");
                     editor.apply();
                     ((TasksFragment) getActivity().getSupportFragmentManager().findFragmentByTag("tasks")).needUpdate = true;
                     getActivity().getSupportFragmentManager().popBackStack();
