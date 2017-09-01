@@ -9,14 +9,14 @@ public class User implements Serializable {
     public String firstName;
     public String lastName;
     public String token;
-    public String userName;
+    public String username;
     public boolean has_avatar;
 
-    public User(String firstName, String lastName, String token, String userName, boolean has_avatar) {
+    public User(String firstName, String lastName, String token, String username, boolean has_avatar) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.token = token;
-        this.userName = userName;
+        this.username = username;
         this.has_avatar = has_avatar;
     }
 
@@ -24,7 +24,7 @@ public class User implements Serializable {
         this.firstName = user.firstName;
         this.lastName = user.lastName;
         this.token = user.token;
-        this.userName = user.userName;
+        this.username = user.username;
         this.has_avatar = user.has_avatar;
     }
 
