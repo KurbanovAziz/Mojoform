@@ -402,8 +402,8 @@ public class DocumentsFragment extends Fragment {
             orgFolder.isLocked = true;
             orgFolder.isFile = false;
             orgFolder.nodeType = "cm:org";
-            orgFolder.id = orgJson.getJSONObject("site").getString("node_id");
-            orgFolder.name = orgJson.getJSONObject("site").getString("title");
+            orgFolder.id = orgJson.getString("nodeID");
+            orgFolder.name = orgJson.getString("name");
 
             return orgFolder;
         } catch (JSONException e) {
@@ -889,7 +889,7 @@ public class DocumentsFragment extends Fragment {
 
                 String url;
                 if (fileId == null) {
-                    url = "//api/user/orgs" + sortParameter;
+                    url = "/api/orgs" + sortParameter;
                     foldersStack = new ArrayList<>();
                 } else
                     url = "/api/fs/children/" + fileId + sortParameter;
@@ -898,17 +898,29 @@ public class DocumentsFragment extends Fragment {
 
                 if (response.code() == 200) {
                     ObjectMapper mapper = new ObjectMapper();
-                    JSONObject resultJson = new JSONObject(response.body().string());
-                    JSONArray tasksEntriesJson = resultJson.getJSONObject("list").getJSONArray("entries");
+                    if (fileId == null) {
+                        JSONArray tasksEntriesJson = new JSONArray(response.body().string());
 
-                    for (int i = 0; i < tasksEntriesJson.length(); i++)
-                        if (fileId == null) {
-                            JSONObject organization = tasksEntriesJson.getJSONObject(i).getJSONObject("entry");
+                        for (int i = 0; i < tasksEntriesJson.length(); i++) {
+                            JSONObject organization = tasksEntriesJson.getJSONObject(i);
                             File fileOrg = convertOrganizationToFolder(organization);
                             if (fileOrg != null)
                                 allFiles.add(fileOrg);
-                        } else
-                            allFiles.add(mapper.readValue(tasksEntriesJson.getJSONObject(i).getJSONObject("entry").toString(), File.class));
+                        }
+                    } else {
+                        JSONArray tasksEntriesJson = new JSONObject(response.body().string())
+                                .getJSONObject("list").getJSONArray("entries");
+
+                        for (int i = 0; i < tasksEntriesJson.length(); i++)
+                            if (fileId == null) {
+                                JSONObject organization = tasksEntriesJson.getJSONObject(i).getJSONObject("entry");
+                                File fileOrg = convertOrganizationToFolder(organization);
+                                if (fileOrg != null)
+                                    allFiles.add(fileOrg);
+                            } else
+                                allFiles.add(mapper.readValue(tasksEntriesJson.getJSONObject(i).getJSONObject("entry").toString(), File.class));
+
+                    }
 
                     fileIdsWithPreviews = new ArrayList<>();
                     for (File file : allFiles) {
@@ -1034,6 +1046,8 @@ public class DocumentsFragment extends Fragment {
         private ArrayList<String> fileIds;
 
         DownloadImagesTask(ArrayList<String> fileIds) {
+            if (fileIds == null)
+                fileIds = new ArrayList<>();
             this.fileIds = fileIds;
         }
 

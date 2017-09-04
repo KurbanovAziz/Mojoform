@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
@@ -917,6 +918,20 @@ public class TemplateFragment extends Fragment {
                 case "signature":
                     createSignature(value, container);
                     break;
+
+                case "indicator":
+                    Resources resources = getContext().getResources();
+
+                    ImageView indicator = new ImageView(getContext());
+                    indicator.setAdjustViewBounds(true);
+                    indicator.setImageResource(R.drawable.default_indicator);
+                    container.addView(indicator);
+
+                    LinearLayout.LayoutParams layoutParams = (LinearLayout.LayoutParams) indicator.getLayoutParams();
+                    layoutParams.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 130, resources.getDisplayMetrics());
+                    layoutParams.width = LinearLayout.LayoutParams.WRAP_CONTENT;
+                    indicator.setLayoutParams(layoutParams);
+                    indicator.requestLayout();
 
                 default:
                     Log.d("jeka", fields.get(i));
