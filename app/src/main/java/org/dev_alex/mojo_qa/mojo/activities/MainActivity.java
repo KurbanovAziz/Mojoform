@@ -141,7 +141,7 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected Void doInBackground(Void... params) {
             try {
-                Response thumbResponse = RequestService.createGetRequest("/api/user/avatar.png");
+                Response thumbResponse = RequestService.createGetRequest("/api/user/" + LoginHistoryService.getCurrentUser().username + "/avatar.png");
                 byte[] imageBytes = thumbResponse.body().bytes();
                 avatar = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length);
             } catch (Exception exc) {

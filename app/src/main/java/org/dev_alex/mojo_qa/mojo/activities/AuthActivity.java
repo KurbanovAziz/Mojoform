@@ -114,7 +114,7 @@ public class AuthActivity extends AppCompatActivity {
 
                 Response response;
                 if (loginWithinToken)
-                    response = RequestService.createGetRequest("/api/user/info");
+                    response = RequestService.createGetRequest("/api/user/");
                 else
                     response = RequestService.createPostRequest("/api/user/login", requestJson.toString());
 

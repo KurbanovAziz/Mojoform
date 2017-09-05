@@ -35,7 +35,7 @@ public class IndicatorLayout extends FrameLayout {
         if (currentValue == -11112222) {
             ((TextView) findViewById(R.id.indicator_value)).setText("Нет данных");
         } else {
-            ((TextView) findViewById(R.id.indicator_value)).setText("");
+            ((TextView) findViewById(R.id.indicator_value)).setText("Нет данных");
 
             for (IndicatorModel.Range range : indicatorModel.ranges)
                 if (currentValue >= range.from && currentValue <= range.to)

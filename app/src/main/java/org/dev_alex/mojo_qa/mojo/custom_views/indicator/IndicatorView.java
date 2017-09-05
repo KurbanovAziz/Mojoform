@@ -35,7 +35,7 @@ public class IndicatorView extends View {
     private Paint gradientPaint;
 
     private ArrayList<Paint> indicatorLinePaints;
-    private int currentIndicatorValue = 0;
+    private int currentIndicatorValue = -11112222;
 
     private Path mArc;
     private Bitmap bitmap;
@@ -153,11 +153,11 @@ public class IndicatorView extends View {
 
         canvas.drawArc(indicatorValueRect, START_ANGLE_POINT, ANGLE_ARC, false, indicatorPaint);
 
-
-        int xPos = (canvas.getWidth() / 2);
-        int yPos = (int) ((canvas.getHeight() / 2) - ((indicatorTextPaint.descent() + indicatorTextPaint.ascent()) / 2));
-        canvas.drawText(String.valueOf(currentIndicatorValue), xPos, yPos, indicatorTextPaint);
-
+        if (currentIndicatorValue != -11112222) {
+            int xPos = (canvas.getWidth() / 2);
+            int yPos = (int) ((canvas.getHeight() / 2) - ((indicatorTextPaint.descent() + indicatorTextPaint.ascent()) / 2));
+            canvas.drawText(String.valueOf(currentIndicatorValue), xPos, yPos, indicatorTextPaint);
+        }
 
         canvas.drawRect(0, 0, w, h, gradientPaint);
     }
