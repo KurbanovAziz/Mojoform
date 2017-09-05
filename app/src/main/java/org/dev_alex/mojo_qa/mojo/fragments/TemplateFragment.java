@@ -64,6 +64,8 @@ import com.afollestad.materialdialogs.MaterialDialog;
 import com.darsh.multipleimageselect.activities.AlbumSelectActivity;
 import com.darsh.multipleimageselect.helpers.Constants;
 import com.darsh.multipleimageselect.models.Image;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.gcacace.signaturepad.views.SignaturePad;
 import com.mlsdev.rximagepicker.RxImageConverters;
 import com.mlsdev.rximagepicker.RxImagePicker;
@@ -77,6 +79,8 @@ import org.dev_alex.mojo_qa.mojo.R;
 import org.dev_alex.mojo_qa.mojo.activities.AuthActivity;
 import org.dev_alex.mojo_qa.mojo.activities.ImageViewActivity;
 import org.dev_alex.mojo_qa.mojo.activities.MainActivity;
+import org.dev_alex.mojo_qa.mojo.custom_views.indicator.IndicatorLayout;
+import org.dev_alex.mojo_qa.mojo.models.IndicatorModel;
 import org.dev_alex.mojo_qa.mojo.models.Page;
 import org.dev_alex.mojo_qa.mojo.services.BitmapService;
 import org.dev_alex.mojo_qa.mojo.services.LoginHistoryService;
@@ -125,6 +129,7 @@ public class TemplateFragment extends Fragment {
     private final String MEDIA_PATH_JSON_ARRAY = "media_paths";
     private final String SIGNATURE_PREVIEW_JSON_ARRAY = "sign_state";
     private SimpleDateFormat isoDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ", Locale.getDefault());
+    private SimpleDateFormat isoDateFormatNoTimeZone = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault());
     private final int VIDEO_REQUEST_CODE = 10;
     private final int PHOTO_REQUEST_CODE = 11;
     private final int AUDIO_REQUEST_CODE = 12;
@@ -176,7 +181,7 @@ public class TemplateFragment extends Fragment {
         return fragment;
     }
 
-    public static TemplateFragment newInstance(String docId) {
+    public static TemplateFragment newInstance(String docId, long dueDate) {
         Bundle args = new Bundle();
         args.putString("template_id", docId);
         args.putString("task_id", "");
@@ -184,6 +189,8 @@ public class TemplateFragment extends Fragment {
         args.putString("site_id", "");
         args.putBoolean("is_finished", true);
         args.putString("task_node_id", "");
+
+        args.putLong("due_date", dueDate);
 
         TemplateFragment fragment = new TemplateFragment();
         fragment.setArguments(args);
@@ -920,18 +927,33 @@ public class TemplateFragment extends Fragment {
                     break;
 
                 case "indicator":
-                    Resources resources = getContext().getResources();
+                    if (!isTaskFinished) {
+                        Resources resources = getContext().getResources();
 
-                    ImageView indicator = new ImageView(getContext());
-                    indicator.setAdjustViewBounds(true);
-                    indicator.setImageResource(R.drawable.default_indicator);
-                    container.addView(indicator);
+                        ImageView indicator = new ImageView(getContext());
+                        indicator.setAdjustViewBounds(true);
+                        indicator.setImageResource(R.drawable.default_indicator);
+                        container.addView(indicator);
 
-                    LinearLayout.LayoutParams layoutParams = (LinearLayout.LayoutParams) indicator.getLayoutParams();
-                    layoutParams.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 130, resources.getDisplayMetrics());
-                    layoutParams.width = LinearLayout.LayoutParams.WRAP_CONTENT;
-                    indicator.setLayoutParams(layoutParams);
-                    indicator.requestLayout();
+                        LinearLayout.LayoutParams layoutParams = (LinearLayout.LayoutParams) indicator.getLayoutParams();
+                        layoutParams.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 130, resources.getDisplayMetrics());
+                        layoutParams.width = LinearLayout.LayoutParams.WRAP_CONTENT;
+                        indicator.setLayoutParams(layoutParams);
+                        indicator.requestLayout();
+                    } else {
+                        IndicatorModel indicatorModel = new IndicatorModel();
+
+                        if (value.has("ranges")) {
+                            ArrayList<IndicatorModel.Range> ranges = new ObjectMapper()
+                                    .readValue(value.getJSONArray("ranges").toString(), new TypeReference<ArrayList<IndicatorModel.Range>>() {
+                                    });
+                            indicatorModel.ranges = ranges;
+                        }
+
+                        IndicatorLayout indicatorLayout = new IndicatorLayout(getContext(), indicatorModel);
+                        indicatorLayout.setCurrentValue(value.getInt("value"));
+                        container.addView(indicatorLayout);
+                    }
 
                 default:
                     Log.d("jeka", fields.get(i));
@@ -2050,6 +2072,9 @@ public class TemplateFragment extends Fragment {
             JSONArray values = finishedTemplate.getJSONArray("values");
             JSONObject template = finishedTemplate.getJSONObject("template");
 
+            if (dueDate != null)
+                downloadIndicatorValue(template, dueDate);
+
             for (int i = 0; i < values.length(); i++) {
                 JSONObject value;
                 String elemType;
@@ -2286,6 +2311,88 @@ public class TemplateFragment extends Fragment {
     }
 
 
+    private void downloadIndicatorValue(JSONObject template, long dueDate) {
+        try {
+            JSONArray pages = template.getJSONArray("items");
+            for (int i = 0; i < pages.length(); i++) {
+                JSONArray items = pages.getJSONObject(i).getJSONObject("page").getJSONArray("items");
+                downloadIndicatorValueInTemplate(items, dueDate);
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void downloadIndicatorValueInTemplate(JSONArray items, long dueDate) {
+        try {
+            for (int i = 0; i < items.length(); i++) {
+                JSONObject item = items.getJSONObject(i);
+
+                String elementName = null;
+                Iterator<String> iterator = item.keys();
+                if (iterator.hasNext())
+                    elementName = iterator.next();
+
+                if (elementName == null)
+                    continue;
+
+                switch (elementName) {
+                    case "category":
+                        downloadIndicatorValueInTemplate(item.getJSONObject(elementName).getJSONArray("items"), dueDate);
+
+                        break;
+
+                    case "question":
+                        JSONObject question = item.getJSONObject(elementName);
+                        if (question.has("optionals")) {
+                            JSONArray optionals = question.getJSONArray("optionals");
+                            for (int j = 0; j < optionals.length(); j++) {
+                                downloadIndicatorValueInTemplate(optionals.getJSONObject(j).getJSONObject("optional").getJSONArray("items"), dueDate);
+                            }
+                        }
+                        break;
+
+                    case "indicator":
+                        JSONObject indicator = item.getJSONObject("indicator");
+                        try {
+                            TimeZone tz = TimeZone.getDefault();
+                            Date now = new Date();
+                            int offsetFromUtc = tz.getOffset(now.getTime());
+
+                            long timeGMT = dueDate - offsetFromUtc;
+
+
+                            String host = "https://servlet.dss.mojo.mojoform.com/services/mojo_datastore.HTTPEndpoint";
+                            String url = host + indicator.getString("datasource_url") +
+                                    "&userId=" + LoginHistoryService.getCurrentUser().username +
+                                    "&Past=" + isoDateFormatNoTimeZone.format(new Date(timeGMT)) +
+                                    "&Before=" + isoDateFormatNoTimeZone.format(new Date(timeGMT + 5 * 60 * 1000));
+
+                            OkHttpClient client = new OkHttpClient();
+                            Request.Builder requestBuilder = new Request.Builder()
+                                    .url(url)
+                                    .header("Authorization", "Basic YWRtaW46S0FESTdhc3VmandrbGVuaGtsOA==")
+                                    .header("Accept", "application/json");
+
+                            Response response = client.newCall(requestBuilder.build()).execute();
+                            String responseStr = response.body().string();
+                            JSONObject jsonObject = new JSONObject(responseStr);
+                            indicator.put("value", jsonObject.getJSONObject("timeSeries").getJSONObject("tick").getInt("value"));
+
+                        } catch (Exception exc) {
+                            exc.printStackTrace();
+                            indicator.put("value", -11112222);
+                        }
+                        break;
+                }
+            }
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+
     private class GetTemplateTask extends AsyncTask<Void, Void, Integer> {
         @Override
         protected void onPreExecute() {
@@ -2351,7 +2458,6 @@ public class TemplateFragment extends Fragment {
                     getActivity().getSupportFragmentManager().popBackStack();
                 }
 
-                printLog("mojo-template", template.toString());
             } catch (Exception exc) {
                 exc.printStackTrace();
             }

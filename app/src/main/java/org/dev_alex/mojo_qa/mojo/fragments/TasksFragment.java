@@ -462,9 +462,9 @@ public class TasksFragment extends Fragment {
                         (templateId, taskId, taskNodeId, dueDate, siteId, initiator)).addToBackStack(null).commit();
     }
 
-    public void showFilledDocById(String nodeId) {
+    public void showFilledDocById(String nodeId, long dueDate) {
         getActivity().getSupportFragmentManager().beginTransaction()
-                .replace(R.id.container, TemplateFragment.newInstance(nodeId)).addToBackStack(null).commit();
+                .replace(R.id.container, TemplateFragment.newInstance(nodeId, dueDate)).addToBackStack(null).commit();
     }
 
     private class GetTasksTask extends AsyncTask<Void, Void, Integer> {

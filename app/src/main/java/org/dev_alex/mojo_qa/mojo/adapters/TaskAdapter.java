@@ -132,8 +132,12 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
                     public void onClick(View v) {
                         if (finalResultDocId == null)
                             Toast.makeText(parentFragment.getContext(), "Не удалось открыть документ", Toast.LENGTH_LONG).show();
-                        else
-                            parentFragment.showFilledDocById(finalResultDocId);
+                        else {
+                            if (task.dueDate != null)
+                                parentFragment.showFilledDocById(finalResultDocId, task.dueDate.getTime());
+                            else
+                                parentFragment.showFilledDocById(finalResultDocId, task.endTime.getTime());
+                        }
 
                     }
                 });
