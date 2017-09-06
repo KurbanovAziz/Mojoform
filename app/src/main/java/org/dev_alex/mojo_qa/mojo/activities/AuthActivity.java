@@ -12,7 +12,6 @@ import android.widget.Toast;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import org.dev_alex.mojo_qa.mojo.Data;
 import org.dev_alex.mojo_qa.mojo.R;
 import org.dev_alex.mojo_qa.mojo.fragments.LoginFragment;
 import org.dev_alex.mojo_qa.mojo.fragments.LoginHistoryFragment;
@@ -145,7 +144,6 @@ public class AuthActivity extends AppCompatActivity {
                         }
                         LoginHistoryService.setCurrentUser(user);
                         TokenService.updateToken(user.token, user.username);
-                        Data.taskAuthLogin = user.username;
                         Intent intent = new Intent(AuthActivity.this, MainActivity.class);
                         intent.putExtras(getIntent());
                         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -169,7 +167,6 @@ public class AuthActivity extends AppCompatActivity {
                             return;
                         }
                         LoginHistoryService.setCurrentUser(user);
-                        Data.taskAuthLogin = user.username;
                         LoginHistoryService.addUser(user);
                         TokenService.updateToken(user.token, user.username);
                         Intent intent = new Intent(AuthActivity.this, MainActivity.class);

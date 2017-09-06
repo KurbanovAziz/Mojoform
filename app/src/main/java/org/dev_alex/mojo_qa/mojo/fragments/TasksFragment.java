@@ -526,7 +526,7 @@ public class TasksFragment extends Fragment {
                                 + currentUser.username + "&includeProcessVariables=TRUE&withoutDueDate=true";
                     }
                     OkHttpClient client = new OkHttpClient();
-                    Request request = new Request.Builder().header("Authorization", Credentials.basic(Data.taskAuthLogin, Data.taskAuthPass))
+                    Request request = new Request.Builder().header("Authorization", Credentials.basic(Data.getTaskAuthLogin(), Data.taskAuthPass))
                             .url(url).build();
 
                     response = client.newCall(request).execute();
@@ -632,7 +632,7 @@ public class TasksFragment extends Fragment {
                         + LoginHistoryService.getCurrentUser().username + "&includeProcessVariables=TRUE" + dateParams + sortParams;
 
                 OkHttpClient client = new OkHttpClient();
-                Request request = new Request.Builder().header("Authorization", Credentials.basic(Data.taskAuthLogin, Data.taskAuthPass))
+                Request request = new Request.Builder().header("Authorization", Credentials.basic(Data.getTaskAuthLogin(), Data.taskAuthPass))
                         .url(url).build();
 
                 Response response = client.newCall(request).execute();

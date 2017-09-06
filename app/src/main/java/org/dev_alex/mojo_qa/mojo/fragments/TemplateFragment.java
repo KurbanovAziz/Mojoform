@@ -2665,7 +2665,7 @@ public class TemplateFragment extends Fragment {
                     RequestBody body = RequestBody.create(MediaType.parse("application/json"), completeVar.toString());
                     OkHttpClient client = new OkHttpClient();
                     Request request = new Request.Builder()
-                            .header("Authorization", Credentials.basic(Data.taskAuthLogin, Data.taskAuthPass))
+                            .header("Authorization", Credentials.basic(Data.getTaskAuthLogin(), Data.taskAuthPass))
                             .url(url)
                             .method("PUT", body)
                             .build();
