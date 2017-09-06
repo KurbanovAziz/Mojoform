@@ -659,9 +659,15 @@ public class TemplateFragment extends Fragment {
                         rootView.findViewById(R.id.download_pdf_btn_container).setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
-                                if (checkExternalPermissions())
-                                    new DownloadPdfTask(templateId).execute();
-                                else
+                                if (checkExternalPermissions()) {
+                                    try {
+                                        String pdfName = template.getString("name") + "_" +
+                                                new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss", Locale.getDefault()).format(new Date());
+                                        new DownloadPdfTask(templateId, pdfName).execute();
+                                    } catch (Exception exc) {
+                                        exc.printStackTrace();
+                                    }
+                                } else
                                     requestExternalPermissions();
                             }
                         });
@@ -2917,9 +2923,11 @@ public class TemplateFragment extends Fragment {
     private class DownloadPdfTask extends AsyncTask<Void, Void, Integer> {
         private java.io.File resultFile;
         private String nodeId;
+        private String name;
 
-        DownloadPdfTask(String nodeId) {
+        DownloadPdfTask(String nodeId, String name) {
             this.nodeId = nodeId;
+            this.name = name;
         }
 
         @Override
@@ -2927,7 +2935,7 @@ public class TemplateFragment extends Fragment {
             super.onPreExecute();
             loopDialog.show();
             File downloadsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
-            resultFile = new File(downloadsDir, nodeId + ".pdf");
+            resultFile = new File(downloadsDir, name + ".pdf");
         }
 
         @Override
@@ -2969,7 +2977,7 @@ public class TemplateFragment extends Fragment {
                     try {
                         Intent viewIntent = new Intent(Intent.ACTION_VIEW);
                         Uri fileUri = FileProvider.getUriForFile(getContext(), getContext().getApplicationContext().getPackageName() + ".provider", resultFile);
-                        viewIntent.setDataAndType(fileUri, Utils.getMimeType(resultFile.getAbsolutePath()));
+                        viewIntent.setDataAndType(fileUri, "application/pdf");
                         viewIntent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                         startActivity(viewIntent);
 
