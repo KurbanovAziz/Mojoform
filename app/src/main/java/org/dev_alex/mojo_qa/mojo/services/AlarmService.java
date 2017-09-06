@@ -329,7 +329,7 @@ public class AlarmService extends Service {
         @Override
         protected Void doInBackground(Void... params) {
             try {
-                Response response = RequestService.createGetRequest("/api/user/info");
+                Response response = RequestService.createGetRequest("/api/user/");
                 Log.d("mojo-alarm-log", "KeepTokenAliveTask " + response.code());
 
             } catch (Exception exc) {
