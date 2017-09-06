@@ -10,6 +10,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.PersistableBundle;
 import android.support.v7.app.AppCompatActivity;
+import android.text.TextUtils;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.ImageView;
@@ -76,8 +77,13 @@ public class MainActivity extends AppCompatActivity {
     private void initDrawer() {
         View headerView = getLayoutInflater().inflate(R.layout.drawer_header, null);
         User currentUser = LoginHistoryService.getCurrentUser();
-        ((TextView) headerView.findViewById(R.id.user_name)).setText(currentUser.firstName + " " + currentUser.lastName);
 
+        if (TextUtils.isEmpty(currentUser.firstName) && TextUtils.isEmpty(currentUser.lastName))
+            ((TextView) headerView.findViewById(R.id.user_name)).setText(currentUser.username);
+        else
+            ((TextView) headerView.findViewById(R.id.user_name)).setText(String.format(Locale.getDefault(),
+                    "%s %s", TextUtils.isEmpty(currentUser.firstName) ? "" : currentUser.firstName,
+                    TextUtils.isEmpty(currentUser.lastName) ? "" : currentUser.lastName));
 
         drawer = new DrawerBuilder()
                 .withActivity(this)
@@ -124,8 +130,14 @@ public class MainActivity extends AppCompatActivity {
         else {
             headerView.findViewById(R.id.profile_image).setVisibility(View.GONE);
 
-            String userInitials = String.format(Locale.getDefault(), "%s%s", currentUser.firstName.isEmpty() ?
-                    "" : currentUser.firstName.charAt(0), currentUser.lastName.isEmpty() ? "" : currentUser.lastName.charAt(0));
+            String userInitials;
+            if (TextUtils.isEmpty(currentUser.firstName) && TextUtils.isEmpty(currentUser.lastName))
+                userInitials = currentUser.username;
+            else
+                userInitials = String.format(Locale.getDefault(),
+                        "%s%s", TextUtils.isEmpty(currentUser.firstName) ? "" : currentUser.firstName.charAt(0),
+                        TextUtils.isEmpty(currentUser.lastName) ? "" : currentUser.lastName.charAt(0));
+
             ((TextView) headerView.findViewById(R.id.user_initials)).setText(userInitials);
         }
     }

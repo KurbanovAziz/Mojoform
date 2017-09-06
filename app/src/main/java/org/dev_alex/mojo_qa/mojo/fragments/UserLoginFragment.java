@@ -3,6 +3,7 @@ package org.dev_alex.mojo_qa.mojo.fragments;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -38,8 +39,20 @@ public class UserLoginFragment extends Fragment {
             rootView = inflater.inflate(R.layout.fragment_user_login, container, false);
             user = (User) getArguments().getSerializable("user");
 
-            ((TextView) rootView.findViewById(R.id.user_name)).setText(user.firstName + " " + user.lastName);
-            ((TextView) rootView.findViewById(R.id.user_initials)).setText(String.format(Locale.getDefault(), "%s%s", user.firstName.isEmpty() ? "" : user.firstName.charAt(0), user.lastName.isEmpty() ? "" : user.lastName.charAt(0)));
+            if (user != null) {
+                if (TextUtils.isEmpty(user.firstName) && TextUtils.isEmpty(user.lastName)) {
+                    ((TextView) rootView.findViewById(R.id.user_name)).setText(user.username);
+                    ((TextView) rootView.findViewById(R.id.user_initials)).setText(user.username);
+                } else {
+                    ((TextView) rootView.findViewById(R.id.user_initials)).setText(String.format(Locale.getDefault(),
+                            "%s%s", TextUtils.isEmpty(user.firstName) ? "" : user.firstName.charAt(0),
+                            TextUtils.isEmpty(user.lastName) ? "" : user.lastName.charAt(0)));
+
+                    ((TextView) rootView.findViewById(R.id.user_name)).setText(String.format(Locale.getDefault(),
+                            "%s %s", TextUtils.isEmpty(user.firstName) ? "" : user.firstName,
+                            TextUtils.isEmpty(user.lastName) ? "" : user.lastName));
+                }
+            }
 
             Utils.setupCloseKeyboardUI(getActivity(), rootView);
             setListeners();
