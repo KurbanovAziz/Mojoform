@@ -494,21 +494,21 @@ public class TasksFragment extends Fragment {
                     Calendar dayCalendar = Calendar.getInstance();
                     dayCalendar.setTime(currentDate.getTime());
                     dateParams = "&dueAfter=" + isoDateFormat.format(dayCalendar.getTime());
-                    endDateParams = "&endAfter=" + isoDateFormat.format(dayCalendar.getTime());
+                    endDateParams = "&taskCompletedAfter=" + isoDateFormat.format(dayCalendar.getTime());
 
                     dayCalendar.add(Calendar.DAY_OF_MONTH, 1);
                     dateParams += "&dueBefore=" + isoDateFormat.format(dayCalendar.getTime());
-                    endDateParams += "&endBefore=" + isoDateFormat.format(dayCalendar.getTime());
+                    endDateParams += "&taskCompletedBefore=" + isoDateFormat.format(dayCalendar.getTime());
                 } else {
                     Calendar monthCalendar = Calendar.getInstance();
                     monthCalendar.setTime(currentDate.getTime());
                     monthCalendar.set(Calendar.DAY_OF_MONTH, 1);
                     dateParams = "&dueAfter=" + isoDateFormat.format(monthCalendar.getTime());
-                    endDateParams = "&endAfter=" + isoDateFormat.format(monthCalendar.getTime());
+                    endDateParams = "&taskCompletedAfter=" + isoDateFormat.format(monthCalendar.getTime());
 
                     monthCalendar.add(Calendar.MONTH, 1);
                     dateParams += "&dueBefore=" + isoDateFormat.format(monthCalendar.getTime());
-                    endDateParams += "&endBefore=" + isoDateFormat.format(monthCalendar.getTime());
+                    endDateParams += "&taskCompletedBefore=" + isoDateFormat.format(monthCalendar.getTime());
                 }
                 String sortParams;
 
