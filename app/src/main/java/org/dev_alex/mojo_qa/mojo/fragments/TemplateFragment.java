@@ -532,10 +532,16 @@ public class TemplateFragment extends Fragment {
 
             rootTemplateContainer.addView(rootPageContainer);
             setupCloseKeyboardUI(getActivity(), rootPageContainer);
-            for (String requiredElementTag : requiredElementTags)
+
+
+            for (int i = 0; i < requiredElementTags.size(); i++) {
+                String requiredElementTag = requiredElementTags.get(i);
                 setBlockMarkedAsRequired(requiredElementTag);
-            for (String requiredCategoryTag : requiredCategoriesTags)
+            }
+            for (int i = 0; i < requiredCategoriesTags.size(); i++) {
+                String requiredCategoryTag = requiredCategoriesTags.get(i);
                 setCategoryMarkedAsRequired(requiredCategoryTag);
+            }
 
             ((TextView) rootView.findViewById(R.id.page_name)).setText(page.name);
             currentPagePos = pages.indexOf(page);
@@ -1570,6 +1576,9 @@ public class TemplateFragment extends Fragment {
         }
 
         showPopupSelectListBtn.setVisibility(isList ? View.VISIBLE : View.GONE);
+        if (isTaskFinished)
+            showPopupSelectListBtn.setVisibility(View.GONE);
+
         if (isList) {
             applySelectResultsInListView(value, selectBtnContainer);
 
@@ -1727,7 +1736,8 @@ public class TemplateFragment extends Fragment {
     }
 
     private void setBlockMarkedAsRequired(String tag) {
-        requiredElementTags.add(tag);
+        if (!requiredElementTags.contains(tag))
+            requiredElementTags.add(tag);
 
         ViewGroup container = (ViewGroup) rootView.findViewById(R.id.root_container).findViewWithTag(tag);
 
@@ -1736,7 +1746,8 @@ public class TemplateFragment extends Fragment {
     }
 
     private void setCategoryMarkedAsRequired(String tag) {
-        requiredCategoriesTags.add(tag);
+        if (!requiredCategoriesTags.contains(tag))
+            requiredCategoriesTags.add(tag);
 
         ViewGroup categoryHeader = getCategoryByTag(tag + "_head");
         ViewGroup categoryContainer = getCategoryByTag(tag + "_cont");
