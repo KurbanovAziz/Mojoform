@@ -1418,6 +1418,7 @@ public class TemplateFragment extends Fragment {
 
         container.addView(boxInContainerWithId(mediaLayout, value.getString("id")));
 
+        currentMediaBlock = new Pair<>(mediaLayout, value);
         if (value.has(MEDIA_PATH_JSON_ARRAY)) {
             for (int j = 0; j < value.getJSONArray(MEDIA_PATH_JSON_ARRAY).length(); j++) {
                 String mediaPath = value.getJSONArray(MEDIA_PATH_JSON_ARRAY).getJSONObject(j).getString("path");
@@ -2854,7 +2855,7 @@ public class TemplateFragment extends Fragment {
                                 FrameLayout imageContainer = createImgFrame(bitmapStringPair.first);
                                 imageContainer.setTag(bitmapStringPair.second);
 
-                                if (toBlock != null) {
+                                if (toBlock != null && toBlock.first != null) {
                                     ((LinearLayout) ((HorizontalScrollView) toBlock.first.getChildAt(1)).getChildAt(0)).addView(imageContainer);
                                 } else {
                                     if (currentMediaBlock == null || currentMediaBlock.first == null)
