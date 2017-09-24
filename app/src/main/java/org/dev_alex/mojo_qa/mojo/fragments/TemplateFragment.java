@@ -14,6 +14,7 @@ import android.graphics.PorterDuff;
 import android.graphics.Rect;
 import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.LayerDrawable;
+import android.media.ExifInterface;
 import android.media.ThumbnailUtils;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -255,7 +256,7 @@ public class TemplateFragment extends Fragment {
         if (requestCode == Constants.REQUEST_CODE && resultCode == RESULT_OK && data != null) {
             ArrayList<Image> images = data.getParcelableArrayListExtra(Constants.INTENT_EXTRA_IMAGES);
             for (Image image : images)
-                processImageFile(new File(image.path), false);
+                processImageFile(new File(image.path), false, null);
         }
        /* try {
             if (requestCode == PHOTO_REQUEST_CODE && resultCode == RESULT_OK) {
@@ -333,7 +334,7 @@ public class TemplateFragment extends Fragment {
             else {
                 String mimeType = Utils.getMimeType(documentPath);
                 if (mimeType.startsWith("image"))
-                    processImageFile(new File(documentPath), false);
+                    processImageFile(new File(documentPath), false, null);
                 else if (mimeType.startsWith("audio"))
                     createAudioPreview(documentPath, true);
                 else if (mimeType.startsWith("video"))
@@ -476,7 +477,7 @@ public class TemplateFragment extends Fragment {
                                 .subscribe(new Consumer<File>() {
                                     @Override
                                     public void accept(@NonNull File file) throws Exception {
-                                        processImageFile(file, false);
+                                        processImageFile(file, false, null);
                                     }
                                 });
                     }
@@ -1418,12 +1419,11 @@ public class TemplateFragment extends Fragment {
         container.addView(boxInContainerWithId(mediaLayout, value.getString("id")));
 
         if (value.has(MEDIA_PATH_JSON_ARRAY)) {
-            currentMediaBlock = new Pair<>(mediaLayout, value);
             for (int j = 0; j < value.getJSONArray(MEDIA_PATH_JSON_ARRAY).length(); j++) {
                 String mediaPath = value.getJSONArray(MEDIA_PATH_JSON_ARRAY).getJSONObject(j).getString("path");
                 String mimeType = value.getJSONArray(MEDIA_PATH_JSON_ARRAY).getJSONObject(j).getString("mime");
                 if (mimeType.startsWith("image"))
-                    processImageFile(new File(mediaPath), true);
+                    processImageFile(new File(mediaPath), true, new Pair<>(mediaLayout, value));
                 else if (mimeType.startsWith("audio"))
                     createAudioPreview(mediaPath, false);
                 else if (mimeType.startsWith("video"))
@@ -2802,7 +2802,7 @@ public class TemplateFragment extends Fragment {
         }
     }*/
 
-    private void processImageFile(File file, final boolean isRestore) {
+    private void processImageFile(File file, final boolean isRestore, final Pair<LinearLayout, JSONObject> toBlock) {
         final int imgSize = Math.round(TypedValue.applyDimension
                 (TypedValue.COMPLEX_UNIT_DIP, 93, getResources().getDisplayMetrics()));
 
@@ -2813,6 +2813,24 @@ public class TemplateFragment extends Fragment {
                     @Override
                     public ObservableSource<Pair<Bitmap, String>> apply(@NonNull File file) throws Exception {
                         String picturePath = file.getAbsolutePath();
+
+                        if (!isRestore) {
+                            try {
+                                ExifInterface exif = new ExifInterface(picturePath);
+
+                                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy:MM:dd", Locale.getDefault());
+                                SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm:ss", Locale.getDefault());
+
+                                exif.setAttribute(ExifInterface.TAG_DATETIME, dateFormat.format(new Date()) + " " + timeFormat.format(new Date()));
+                                exif.setAttribute(ExifInterface.TAG_GPS_DATESTAMP, dateFormat.format(new Date()));
+                                exif.setAttribute(ExifInterface.TAG_GPS_TIMESTAMP, timeFormat.format(new Date()));
+                                exif.saveAttributes();
+
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        }
+
 
                         final BitmapFactory.Options tmpOptions = new BitmapFactory.Options();
                         final BitmapFactory.Options options = new BitmapFactory.Options();
@@ -2835,9 +2853,14 @@ public class TemplateFragment extends Fragment {
                             public void accept(@NonNull Pair<Bitmap, String> bitmapStringPair) throws Exception {
                                 FrameLayout imageContainer = createImgFrame(bitmapStringPair.first);
                                 imageContainer.setTag(bitmapStringPair.second);
-                                if (currentMediaBlock == null || currentMediaBlock.first == null)
-                                    return;
-                                ((LinearLayout) ((HorizontalScrollView) currentMediaBlock.first.getChildAt(1)).getChildAt(0)).addView(imageContainer);
+
+                                if (toBlock != null) {
+                                    ((LinearLayout) ((HorizontalScrollView) toBlock.first.getChildAt(1)).getChildAt(0)).addView(imageContainer);
+                                } else {
+                                    if (currentMediaBlock == null || currentMediaBlock.first == null)
+                                        return;
+                                    ((LinearLayout) ((HorizontalScrollView) currentMediaBlock.first.getChildAt(1)).getChildAt(0)).addView(imageContainer);
+                                }
 
                                 if (!isRestore)
                                     addMediaPath(bitmapStringPair.second, Utils.getMimeType(bitmapStringPair.second));
