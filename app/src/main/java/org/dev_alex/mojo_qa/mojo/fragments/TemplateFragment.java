@@ -21,6 +21,7 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
@@ -32,6 +33,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.Space;
 import android.support.v7.widget.PopupMenu;
 import android.text.Editable;
+import android.text.InputType;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.text.method.DigitsKeyListener;
@@ -83,6 +85,7 @@ import org.dev_alex.mojo_qa.mojo.activities.MainActivity;
 import org.dev_alex.mojo_qa.mojo.custom_views.indicator.IndicatorLayout;
 import org.dev_alex.mojo_qa.mojo.models.IndicatorModel;
 import org.dev_alex.mojo_qa.mojo.models.Page;
+import org.dev_alex.mojo_qa.mojo.models.User;
 import org.dev_alex.mojo_qa.mojo.services.BitmapService;
 import org.dev_alex.mojo_qa.mojo.services.LoginHistoryService;
 import org.dev_alex.mojo_qa.mojo.services.RequestService;
@@ -159,6 +162,7 @@ public class TemplateFragment extends Fragment {
     public String cameraVideoPath;
     public boolean isTaskFinished;
     private ProgressDialog progressDialog;
+    private Handler handler;
 
     public static TemplateFragment newInstance(String templateId, String taskId, String nodeForTasks,
                                                Long dueDate, String siteId, String initiator) {
@@ -203,6 +207,7 @@ public class TemplateFragment extends Fragment {
         super.onCreate(null);
         Icepick.restoreInstanceState(this, savedInstanceState);
         setRetainInstance(true);
+        handler = new Handler();
     }
 
     @Override
@@ -2521,6 +2526,40 @@ public class TemplateFragment extends Fragment {
             try {
                 int sentCt = 0;
 
+                Response tokenResponse = RequestService.createGetRequest("/api/user/");
+                if (tokenResponse.code() != 202 && tokenResponse.code() != 200) {
+                    handler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            new MaterialDialog.Builder(getContext())
+                                    .title("Подтвердите аккаунт")
+                                    .content("Введите пароль")
+                                    .inputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD)
+                                    .autoDismiss(false)
+                                    .input("Пароль", "", new MaterialDialog.InputCallback() {
+                                        @Override
+                                        public void onInput(@android.support.annotation.NonNull MaterialDialog dialog, CharSequence input) {
+                                            if (input.length() > 0) {
+                                                new LoginTask(LoginHistoryService.getCurrentUser().username, input.toString()).execute();
+                                                dialog.dismiss();
+                                            }
+                                        }
+                                    })
+                                    .positiveText("Готово")
+                                    .negativeText("Отмена")
+                                    .onNegative(new MaterialDialog.SingleButtonCallback() {
+                                        @Override
+                                        public void onClick(@android.support.annotation.NonNull MaterialDialog dialog, @android.support.annotation.NonNull DialogAction which) {
+                                            Toast.makeText(getContext(), "bbb", Toast.LENGTH_LONG).show();
+                                            dialog.dismiss();
+                                        }
+                                    })
+                                    .show();
+                        }
+                    });
+                    return -102;
+                }
+
                 successfullySentMediaCt = 0;
                 for (JSONObject jsonObject : mediaObjects)
                     if (jsonObject.has(MEDIA_PATH_JSON_ARRAY))
@@ -2609,14 +2648,89 @@ public class TemplateFragment extends Fragment {
         @Override
         protected void onPostExecute(Integer result) {
             super.onPostExecute(result);
+            if (progressDialog != null && progressDialog.isShowing())
+                progressDialog.dismiss();
+
+            if (result == -102)
+                return;
+
             try {
                 if (successfullySentMediaCt < totalSize) {
                     saveTemplateState();
-                    if (progressDialog != null && progressDialog.isShowing())
-                        progressDialog.dismiss();
+
                     Toast.makeText(getContext(), R.string.error_not_all_images_were_sent, Toast.LENGTH_SHORT).show();
                 } else
                     new CompleteTemplateTask().execute();
+            } catch (Exception exc) {
+                exc.printStackTrace();
+            }
+        }
+    }
+
+    public class LoginTask extends AsyncTask<Void, Void, Integer> {
+        private String username, password;
+        private User user;
+
+
+        public LoginTask(String username, String password) {
+            this.username = username;
+            this.password = password;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            loopDialog.show();
+        }
+
+        @Override
+        protected Integer doInBackground(Void... params) {
+            try {
+                JSONObject requestJson = new JSONObject();
+                requestJson.put("username", username);
+                requestJson.put("password", password);
+
+                Response response = RequestService.createPostRequest("/api/user/login", requestJson.toString());
+
+                if (response.code() == 202 || response.code() == 200) {
+                    String userJson = response.body().string();
+                    user = new ObjectMapper().readValue(userJson, User.class);
+                }
+
+                return response.code();
+            } catch (Exception exc) {
+                exc.printStackTrace();
+                return null;
+            }
+        }
+
+        @Override
+        protected void onPostExecute(Integer responseCode) {
+            super.onPostExecute(responseCode);
+            try {
+                if (loopDialog != null && loopDialog.isShowing())
+                    loopDialog.dismiss();
+
+                if (responseCode == null)
+                    Toast.makeText(getContext(), R.string.network_error, Toast.LENGTH_LONG).show();
+                else if (responseCode == 401)
+                    Toast.makeText(getContext(), R.string.invalid_username_or_password, Toast.LENGTH_LONG).show();
+                else if (responseCode == 202 || responseCode == 200) {
+                    if (user == null) {
+                        Toast.makeText(getContext(), getString(R.string.unknown_error), Toast.LENGTH_LONG).show();
+                        return;
+                    }
+                    LoginHistoryService.setCurrentUser(user);
+                    LoginHistoryService.addUser(user);
+                    TokenService.updateToken(user.token, user.username);
+
+                    Pair<Boolean, ArrayList<JSONObject>> result = checkIfTemplateIsFilled(template);
+                    if (result.first) {
+                        new SendMediaTask(result.second).execute();
+                    } else
+                        Toast.makeText(getContext(), R.string.not_all_required_fields_are_filled, Toast.LENGTH_LONG).show();
+                } else
+                    Toast.makeText(getContext(), getString(R.string.unknown_error) + "  code: " + responseCode, Toast.LENGTH_LONG).show();
             } catch (Exception exc) {
                 exc.printStackTrace();
             }
@@ -2730,78 +2844,6 @@ public class TemplateFragment extends Fragment {
             }
         }
     }
-
-/*    private class ProcessingBitmapTask extends AsyncTask<Void, Void, Integer> {
-        private String cachedImgPath;
-        private Bitmap photo;
-        private String picturePath;
-        private boolean copyToChache;
-        private String errorMessage;
-
-
-        ProcessingBitmapTask(String picturePath, boolean withCopyInChache) {
-            this.picturePath = picturePath;
-            this.copyToChache = withCopyInChache;
-        }
-
-        @Override
-        protected Integer doInBackground(Void... params) {
-            int imgSize = Math.round(TypedValue.applyDimension
-                    (TypedValue.COMPLEX_UNIT_DIP, 93, getResources().getDisplayMetrics()));
-
-            try {
-                final BitmapFactory.Options tmpOptions = new BitmapFactory.Options();
-                final BitmapFactory.Options options = new BitmapFactory.Options();
-
-                tmpOptions.inJustDecodeBounds = true;
-                BitmapFactory.decodeFile(picturePath, tmpOptions);
-                options.inSampleSize = BitmapService.calculateInSampleSize(tmpOptions, imgSize);
-                options.inJustDecodeBounds = false;
-
-                photo = BitmapFactory.decodeFile(picturePath, options);
-                photo = BitmapService.modifyOrientation(photo, picturePath);
-
-                if (copyToChache) {
-                    options.inSampleSize = BitmapService.calculateInSampleSize(tmpOptions, 900);
-                    cachedImgPath = BitmapService.saveBitmapToCache(BitmapService.modifyOrientation(BitmapFactory.decodeFile(picturePath, options), picturePath));
-
-                    if (cachedImgPath == null) {
-                        errorMessage = "Не удалось сохранить изображение";
-                        return null;
-                    }
-                } else
-                    cachedImgPath = picturePath;
-
-                return 1;
-
-            } catch (Exception exc) {
-                errorMessage = exc.getMessage();
-                return null;
-            }
-        }
-
-        @Override
-        protected void onPostExecute(Integer resCode) {
-            super.onPostExecute(resCode);
-            try {
-                if (resCode != null) {
-                    FrameLayout imageContainer = createImgFrame(photo);
-                    imageContainer.setTag(cachedImgPath);
-                    if (currentMediaBlock == null || currentMediaBlock.first == null)
-                        return;
-                    ((LinearLayout) ((HorizontalScrollView) currentMediaBlock.first.getChildAt(1)).getChildAt(0)).addView(imageContainer);
-
-                    if (copyToChache)
-                        addMediaPath(cachedImgPath, Utils.getMimeType(cachedImgPath));
-
-                } else
-                    Toast.makeText(getContext(), "При обработке фото произошла ошибка:: " + errorMessage, Toast.LENGTH_SHORT).show();
-            } catch (Exception exc) {
-                exc.printStackTrace();
-                Toast.makeText(getContext(), "При обработке фото произошла ошибка: " + exc.getMessage(), Toast.LENGTH_SHORT).show();
-            }
-        }
-    }*/
 
     private void processImageFile(File file, final boolean isRestore, final Pair<LinearLayout, JSONObject> toBlock) {
         final int imgSize = Math.round(TypedValue.applyDimension
