@@ -1,78 +1,93 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="90dp"
     android:background="@drawable/task_card_background"
-    android:orientation="horizontal"
     android:paddingRight="15dp">
 
     <LinearLayout
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="20dp"
-        android:layout_marginTop="15dp"
-        android:layout_weight="1"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:orientation="horizontal">
 
-        <FrameLayout
-            android:layout_width="wrap_content"
-            android:layout_height="25dp">
-
-            <View
-                android:id="@+id/task_active"
-                android:layout_width="5dp"
-                android:layout_height="5dp"
-                android:layout_gravity="center"
-                android:background="@drawable/green_circle" />
-        </FrameLayout>
-
-        <ImageView
-            android:id="@+id/task_icon"
-            android:layout_width="25dp"
-            android:layout_height="25dp"
-            android:layout_marginLeft="8dp"
-            android:adjustViewBounds="true"
-            android:src="@drawable/profile_icon" />
-
         <LinearLayout
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="15dp"
-            android:orientation="vertical">
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="15dp"
+            android:layout_weight="1"
+            android:orientation="horizontal">
 
-            <TextView
-                android:id="@+id/task_title"
+            <FrameLayout
                 android:layout_width="wrap_content"
-                android:layout_height="25dp"
-                android:ellipsize="end"
-                android:gravity="center_vertical"
-                android:maxLines="1"
-                android:text="Моя задача на все веремна всегда и везде"
-                android:textColor="#4c3d5f"
-                android:textSize="15sp" />
+                android:layout_height="25dp">
 
-            <TextView
-                android:id="@+id/task_date"
+                <View
+                    android:id="@+id/task_active"
+                    android:layout_width="5dp"
+                    android:layout_height="5dp"
+                    android:layout_gravity="center"
+                    android:background="@drawable/green_circle" />
+            </FrameLayout>
+
+            <ImageView
+                android:id="@+id/task_icon"
+                android:layout_width="25dp"
+                android:layout_height="25dp"
+                android:layout_marginLeft="8dp"
+                android:adjustViewBounds="true"
+                android:src="@drawable/profile_icon" />
+
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:ellipsize="end"
-                android:gravity="center_vertical"
-                android:maxLines="1"
-                android:text="16 марта 2017 | 17:00"
-                android:textColor="#4c3d5f"
-                android:textSize="14sp" />
+                android:layout_marginLeft="15dp"
+                android:orientation="vertical">
 
+                <TextView
+                    android:id="@+id/task_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="25dp"
+                    android:ellipsize="end"
+                    android:gravity="center_vertical"
+                    android:maxLines="1"
+                    android:text="Моя задача на все веремна всегда и везде"
+                    android:textColor="#4c3d5f"
+                    android:textSize="15sp" />
+
+                <TextView
+                    android:id="@+id/task_date"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:ellipsize="end"
+                    android:gravity="center_vertical"
+                    android:maxLines="1"
+                    android:text="16 марта 2017 | 17:00"
+                    android:textColor="#4c3d5f"
+                    android:textSize="14sp" />
+
+            </LinearLayout>
         </LinearLayout>
+
+        <ImageView
+            android:id="@+id/more_btn"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_gravity="center_vertical"
+            android:layout_marginTop="-5dp"
+            android:adjustViewBounds="true"
+            android:src="@drawable/more_icon"
+            android:visibility="visible" />
     </LinearLayout>
 
-
-    <ImageView
-        android:id="@+id/more_btn"
-        android:layout_width="20dp"
-        android:layout_height="20dp"
-        android:layout_gravity="center_vertical"
-        android:layout_marginTop="-5dp"
-        android:adjustViewBounds="true"
-        android:src="@drawable/more_icon"
-        android:visibility="visible" />
-</LinearLayout>
+    <TextView
+        android:id="@+id/delayed"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="right"
+        android:layout_marginTop="4dp"
+        android:text="@string/delayed"
+        android:textColor="@android:color/holo_red_dark"
+        android:textSize="14sp"
+        android:visibility="gone" />
+</FrameLayout>

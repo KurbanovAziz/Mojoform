@@ -77,4 +77,5 @@
     <string name="permanent">Постоянные</string>
     <string name="close">Закрыть</string>
     <string name="save_as_pdf">Сохранить pdf</string>
+    <string name="delayed">Отложено</string>
 </resources>

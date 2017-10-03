@@ -1,6 +1,8 @@
 package org.dev_alex.mojo_qa.mojo.adapters;
 
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
 import android.support.v7.widget.RecyclerView;
@@ -11,10 +13,12 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.dev_alex.mojo_qa.mojo.App;
 import org.dev_alex.mojo_qa.mojo.R;
 import org.dev_alex.mojo_qa.mojo.fragments.TasksFragment;
 import org.dev_alex.mojo_qa.mojo.models.Task;
 import org.dev_alex.mojo_qa.mojo.models.Variable;
+import org.dev_alex.mojo_qa.mojo.services.LoginHistoryService;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -30,6 +34,7 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
     static class TaskViewHolder extends RecyclerView.ViewHolder {
         TextView taskTitle;
         TextView taskDate;
+        TextView delayed;
         View taskActiveCircle;
         ImageView taskIcon;
         ImageView moreBtn;
@@ -38,6 +43,7 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
             super(itemView);
             taskDate = (TextView) itemView.findViewById(R.id.task_date);
             taskTitle = (TextView) itemView.findViewById(R.id.task_title);
+            delayed = (TextView) itemView.findViewById(R.id.delayed);
             taskActiveCircle = itemView.findViewById(R.id.task_active);
             taskIcon = (ImageView) itemView.findViewById(R.id.task_icon);
             moreBtn = (ImageView) itemView.findViewById(R.id.more_btn);
@@ -65,6 +71,7 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
         String initiator = null;
         String resultDocId = null;
 
+        viewHolder.delayed.setVisibility(View.GONE);
         viewHolder.taskActiveCircle.setVisibility((task.suspended == null || task.suspended) ? View.INVISIBLE : View.VISIBLE);
 
         if (task.suspended == null || task.suspended) {
@@ -157,6 +164,12 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
                                 task.id, finalNodeForTasksId, dueDate, finalInitiator, finalSiteId);
                     }
                 });
+
+                SharedPreferences mSettings;
+                mSettings = App.getContext().getSharedPreferences("templates", Context.MODE_PRIVATE);
+                String templateJson = mSettings.getString(task.id + LoginHistoryService.getCurrentUser().username, "");
+
+                viewHolder.delayed.setVisibility(templateJson.equals("") ? View.GONE : View.VISIBLE);
             }
         }
     }
