@@ -15,6 +15,7 @@ import android.widget.TextView;
 import org.dev_alex.mojo_qa.mojo.R;
 import org.dev_alex.mojo_qa.mojo.fragments.DocumentsFragment;
 import org.dev_alex.mojo_qa.mojo.models.File;
+import org.dev_alex.mojo_qa.mojo.services.LoginHistoryService;
 import org.dev_alex.mojo_qa.mojo.services.Utils;
 
 import java.text.SimpleDateFormat;
@@ -186,6 +187,10 @@ public class FileAdapter extends RecyclerView.Adapter<FileAdapter.FileViewHolder
                 return true;
             }
         });
+
+        if (LoginHistoryService.getCurrentUser().is_manager == null || !LoginHistoryService.getCurrentUser().is_manager
+                && LoginHistoryService.getCurrentUser().is_orgowner == null || !LoginHistoryService.getCurrentUser().is_orgowner)
+            viewHolder.moreBtn.setVisibility(View.INVISIBLE);
     }
 
     @Override

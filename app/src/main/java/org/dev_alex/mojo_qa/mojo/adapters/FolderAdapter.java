@@ -11,6 +11,7 @@ import android.widget.TextView;
 import org.dev_alex.mojo_qa.mojo.R;
 import org.dev_alex.mojo_qa.mojo.fragments.DocumentsFragment;
 import org.dev_alex.mojo_qa.mojo.models.File;
+import org.dev_alex.mojo_qa.mojo.services.LoginHistoryService;
 
 import java.util.ArrayList;
 
@@ -135,6 +136,10 @@ public class FolderAdapter extends RecyclerView.Adapter<FolderAdapter.FolderView
                 R.drawable.organization_icon : R.drawable.folder_icon);
 
         viewHolder.moreBtn.setVisibility(folder.nodeType.equals("cm:org") ? View.INVISIBLE : View.VISIBLE);
+
+        if (LoginHistoryService.getCurrentUser().is_manager == null || !LoginHistoryService.getCurrentUser().is_manager
+                && LoginHistoryService.getCurrentUser().is_orgowner == null || !LoginHistoryService.getCurrentUser().is_orgowner)
+            viewHolder.moreBtn.setVisibility(View.INVISIBLE);
     }
 
     @Override

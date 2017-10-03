@@ -44,6 +44,7 @@ import org.dev_alex.mojo_qa.mojo.models.File;
 import org.dev_alex.mojo_qa.mojo.models.FileSystemStackEntry;
 import org.dev_alex.mojo_qa.mojo.services.BitmapCacheService;
 import org.dev_alex.mojo_qa.mojo.services.BlurHelper;
+import org.dev_alex.mojo_qa.mojo.services.LoginHistoryService;
 import org.dev_alex.mojo_qa.mojo.services.RequestService;
 import org.dev_alex.mojo_qa.mojo.services.Utils;
 import org.json.JSONArray;
@@ -118,7 +119,10 @@ public class DocumentsFragment extends Fragment {
         folderRecyclerView.setBackgroundColor(Color.TRANSPARENT);
 
         selectionMenu.setVisibility(View.GONE);
-        rootView.findViewById(R.id.create_dir_btn).setVisibility(foldersStack.size() > 1 ? View.VISIBLE : View.GONE);
+
+        if (LoginHistoryService.getCurrentUser().is_manager != null || LoginHistoryService.getCurrentUser().is_manager
+                || LoginHistoryService.getCurrentUser().is_orgowner != null || LoginHistoryService.getCurrentUser().is_orgowner)
+            rootView.findViewById(R.id.create_dir_btn).setVisibility(foldersStack.size() > 1 ? View.VISIBLE : View.GONE);
     }
 
     public void checkIfSelectionModeFinished() {
@@ -429,7 +433,9 @@ public class DocumentsFragment extends Fragment {
     }
 
     private void setAdapters(ArrayList<File> files, ArrayList<File> folders, boolean withSelection) {
-        rootView.findViewById(R.id.create_dir_btn).setVisibility(foldersStack.size() > 1 ? View.VISIBLE : View.GONE);
+        if (LoginHistoryService.getCurrentUser().is_manager != null || LoginHistoryService.getCurrentUser().is_manager
+                || LoginHistoryService.getCurrentUser().is_orgowner != null || LoginHistoryService.getCurrentUser().is_orgowner)
+            rootView.findViewById(R.id.create_dir_btn).setVisibility(foldersStack.size() > 1 ? View.VISIBLE : View.GONE);
 
         if ((files == null || files.isEmpty()) && (folders == null || folders.isEmpty()))
             rootView.findViewById(R.id.empty_block).setVisibility(View.VISIBLE);
