@@ -475,7 +475,7 @@ public class TemplateFragment extends Fragment {
                                 .flatMap(new Function<Uri, ObservableSource<File>>() {
                                     @Override
                                     public ObservableSource<File> apply(@NonNull Uri uri) throws Exception {
-                                        File cacheFile = new File(getContext().getCacheDir(), UUID.randomUUID().toString() + ".png");
+                                        File cacheFile = new File(getContext().getCacheDir(), UUID.randomUUID().toString() + ".jpg");
                                         return RxImageConverters.uriToFile(getContext(), uri, cacheFile);
                                     }
                                 })
@@ -1331,8 +1331,8 @@ public class TemplateFragment extends Fragment {
                 public void onClick(View v) {
                     if (checkExternalPermissions()) {
                         try {
-                            showGalleryOrPhotoPickDialog();
                             currentMediaBlock = new Pair<>(mediaLayout, value);
+                            showGalleryOrPhotoPickDialog();
                             /*
                             Pair<Intent, File> intentFilePair = BitmapService.getPickImageIntent(getContext());
                             cameraImagePath = intentFilePair.second.getAbsolutePath();
@@ -2620,7 +2620,7 @@ public class TemplateFragment extends Fragment {
                         Bitmap bitmap = BitmapFactory.decodeByteArray(decodedByte, 0, decodedByte.length);
                         if (bitmap != null) {
                             File mediaFile = BitmapService.saveBitmapToFile(getContext(), bitmap);
-                            Response response = RequestService.createSendFileRequest("/api/file/upload", MediaType.parse("image/png"), mediaFile);
+                            Response response = RequestService.createSendFileRequest("/api/file/upload", MediaType.parse("image/jpg"), mediaFile);
                             if (response.code() == 200) {
                                 mediaFile.delete();
                                 String mediaId = "attach:" + new JSONObject(response.body().string()).getString("id");
@@ -2857,24 +2857,6 @@ public class TemplateFragment extends Fragment {
                     public ObservableSource<Pair<Bitmap, String>> apply(@NonNull File file) throws Exception {
                         String picturePath = file.getAbsolutePath();
 
-                        if (!isRestore) {
-                            try {
-                                ExifInterface exif = new ExifInterface(picturePath);
-
-                                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy:MM:dd", Locale.getDefault());
-                                SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm:ss", Locale.getDefault());
-
-                                exif.setAttribute(ExifInterface.TAG_DATETIME, dateFormat.format(new Date()) + " " + timeFormat.format(new Date()));
-                                exif.setAttribute(ExifInterface.TAG_GPS_DATESTAMP, dateFormat.format(new Date()));
-                                exif.setAttribute(ExifInterface.TAG_GPS_TIMESTAMP, timeFormat.format(new Date()));
-                                exif.saveAttributes();
-
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                            }
-                        }
-
-
                         final BitmapFactory.Options tmpOptions = new BitmapFactory.Options();
                         final BitmapFactory.Options options = new BitmapFactory.Options();
 
@@ -2885,6 +2867,26 @@ public class TemplateFragment extends Fragment {
 
                         Bitmap bitmap = BitmapFactory.decodeFile(picturePath, options);
                         bitmap = BitmapService.modifyOrientation(bitmap, picturePath);
+
+
+                        if (!isRestore) {
+                            try {
+                                ExifInterface exif = new ExifInterface(picturePath);
+
+                                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy:MM:dd", Locale.getDefault());
+                                SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm:ss", Locale.getDefault());
+
+                                exif.setAttribute(ExifInterface.TAG_DATETIME, dateFormat.format(new Date()) + " " + timeFormat.format(new Date()));
+                                exif.setAttribute(ExifInterface.TAG_EXPOSURE_TIME, dateFormat.format(new Date()) + " " + timeFormat.format(new Date()));
+
+                                exif.setAttribute(ExifInterface.TAG_GPS_DATESTAMP, dateFormat.format(new Date()));
+                                exif.setAttribute(ExifInterface.TAG_GPS_TIMESTAMP, timeFormat.format(new Date()));
+                                exif.saveAttributes();
+
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        }
 
                         return Observable.just(new Pair<>(bitmap, picturePath));
                     }

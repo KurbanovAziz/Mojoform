@@ -137,8 +137,9 @@ public class FolderAdapter extends RecyclerView.Adapter<FolderAdapter.FolderView
 
         viewHolder.moreBtn.setVisibility(folder.nodeType.equals("cm:org") ? View.INVISIBLE : View.VISIBLE);
 
-        if (LoginHistoryService.getCurrentUser().is_manager == null || !LoginHistoryService.getCurrentUser().is_manager
-                && LoginHistoryService.getCurrentUser().is_orgowner == null || !LoginHistoryService.getCurrentUser().is_orgowner)
+        viewHolder.moreBtn.setVisibility(View.VISIBLE);
+        if ((LoginHistoryService.getCurrentUser().is_manager == null || !LoginHistoryService.getCurrentUser().is_manager)
+                && (LoginHistoryService.getCurrentUser().is_orgowner == null || !LoginHistoryService.getCurrentUser().is_orgowner))
             viewHolder.moreBtn.setVisibility(View.INVISIBLE);
     }
 

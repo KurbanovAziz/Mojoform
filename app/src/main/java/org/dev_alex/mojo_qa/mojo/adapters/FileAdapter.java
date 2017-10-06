@@ -188,8 +188,9 @@ public class FileAdapter extends RecyclerView.Adapter<FileAdapter.FileViewHolder
             }
         });
 
-        if (LoginHistoryService.getCurrentUser().is_manager == null || !LoginHistoryService.getCurrentUser().is_manager
-                && LoginHistoryService.getCurrentUser().is_orgowner == null || !LoginHistoryService.getCurrentUser().is_orgowner)
+        viewHolder.moreBtn.setVisibility(View.VISIBLE);
+        if ((LoginHistoryService.getCurrentUser().is_manager == null || !LoginHistoryService.getCurrentUser().is_manager)
+                && (LoginHistoryService.getCurrentUser().is_orgowner == null || !LoginHistoryService.getCurrentUser().is_orgowner))
             viewHolder.moreBtn.setVisibility(View.INVISIBLE);
     }
 

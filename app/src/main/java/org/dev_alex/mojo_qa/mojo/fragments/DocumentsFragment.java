@@ -96,15 +96,18 @@ public class DocumentsFragment extends Fragment {
     }
 
     public void startSelectionMode() {
-        selectModeEnabled = true;
-        fileAdapter.startSelectionMode();
-        folderAdapter.startSelectionMode();
-        //filesRecyclerView.setBackgroundResource(R.drawable.selection_mode_background);
-        //folderRecyclerView.setBackgroundResource(R.drawable.selection_mode_background);
-        selectionMenu.setVisibility(View.VISIBLE);
-        updateSelectionMenuData();
+        if ((LoginHistoryService.getCurrentUser().is_manager != null && LoginHistoryService.getCurrentUser().is_manager)
+                || (LoginHistoryService.getCurrentUser().is_orgowner != null && LoginHistoryService.getCurrentUser().is_orgowner)) {
+            selectModeEnabled = true;
+            fileAdapter.startSelectionMode();
+            folderAdapter.startSelectionMode();
+            //filesRecyclerView.setBackgroundResource(R.drawable.selection_mode_background);
+            //folderRecyclerView.setBackgroundResource(R.drawable.selection_mode_background);
+            selectionMenu.setVisibility(View.VISIBLE);
+            updateSelectionMenuData();
 
-        rootView.findViewById(R.id.create_dir_btn).setVisibility(View.GONE);
+            rootView.findViewById(R.id.create_dir_btn).setVisibility(View.GONE);
+        }
     }
 
     public void stopSelectionMode() {
@@ -120,8 +123,8 @@ public class DocumentsFragment extends Fragment {
 
         selectionMenu.setVisibility(View.GONE);
 
-        if (LoginHistoryService.getCurrentUser().is_manager != null || LoginHistoryService.getCurrentUser().is_manager
-                || LoginHistoryService.getCurrentUser().is_orgowner != null || LoginHistoryService.getCurrentUser().is_orgowner)
+        if ((LoginHistoryService.getCurrentUser().is_manager != null && LoginHistoryService.getCurrentUser().is_manager)
+                || (LoginHistoryService.getCurrentUser().is_orgowner != null && LoginHistoryService.getCurrentUser().is_orgowner))
             rootView.findViewById(R.id.create_dir_btn).setVisibility(foldersStack.size() > 1 ? View.VISIBLE : View.GONE);
     }
 
@@ -406,7 +409,7 @@ public class DocumentsFragment extends Fragment {
             orgFolder.isLocked = true;
             orgFolder.isFile = false;
             orgFolder.nodeType = "cm:org";
-            orgFolder.id = orgJson.getString("nodeID");
+            orgFolder.id = orgJson.getString("id");
             orgFolder.name = orgJson.getString("name");
 
             return orgFolder;
@@ -433,8 +436,8 @@ public class DocumentsFragment extends Fragment {
     }
 
     private void setAdapters(ArrayList<File> files, ArrayList<File> folders, boolean withSelection) {
-        if (LoginHistoryService.getCurrentUser().is_manager != null || LoginHistoryService.getCurrentUser().is_manager
-                || LoginHistoryService.getCurrentUser().is_orgowner != null || LoginHistoryService.getCurrentUser().is_orgowner)
+        if ((LoginHistoryService.getCurrentUser().is_manager != null && LoginHistoryService.getCurrentUser().is_manager)
+                || (LoginHistoryService.getCurrentUser().is_orgowner != null && LoginHistoryService.getCurrentUser().is_orgowner))
             rootView.findViewById(R.id.create_dir_btn).setVisibility(foldersStack.size() > 1 ? View.VISIBLE : View.GONE);
 
         if ((files == null || files.isEmpty()) && (folders == null || folders.isEmpty()))
@@ -895,7 +898,7 @@ public class DocumentsFragment extends Fragment {
 
                 String url;
                 if (fileId == null) {
-                    url = "/api/orgs" + sortParameter;
+                    url = "/api/user/root" + sortParameter;
                     foldersStack = new ArrayList<>();
                 } else
                     url = "/api/fs/children/" + fileId + sortParameter;

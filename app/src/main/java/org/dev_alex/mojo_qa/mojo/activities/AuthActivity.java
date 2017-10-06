@@ -141,7 +141,6 @@ public class AuthActivity extends AppCompatActivity {
                             return;
                         }
                         LoginHistoryService.setCurrentUser(user);
-                        TokenService.updateToken(user.token, user.username);
                         Intent intent = new Intent(AuthActivity.this, MainActivity.class);
                         intent.putExtras(getIntent());
                         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);

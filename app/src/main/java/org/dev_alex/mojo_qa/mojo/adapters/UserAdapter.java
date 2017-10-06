@@ -59,9 +59,11 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
             viewHolder.avatarImage.setVisibility(View.GONE);
             viewHolder.userInitials.setVisibility(View.VISIBLE);
             if (TextUtils.isEmpty(user.firstName) && TextUtils.isEmpty(user.lastName))
-                viewHolder.userInitials.setText(user.username);
+                viewHolder.userInitials.setText(user.username.charAt(0));
             else
-                viewHolder.userInitials.setText(String.format(Locale.getDefault(), "%s%s", TextUtils.isEmpty(user.firstName) ? "" : user.firstName.charAt(0), TextUtils.isEmpty(user.lastName) ? "" : user.lastName.charAt(0)));
+                viewHolder.userInitials.setText(String.format(Locale.getDefault(), "%s%s",
+                        TextUtils.isEmpty(user.firstName) ? "" : user.firstName.charAt(0),
+                        TextUtils.isEmpty(user.lastName) ? "" : user.lastName.charAt(0)));
         } else {
             viewHolder.userInitials.setVisibility(View.GONE);
             viewHolder.avatarImage.setVisibility(View.VISIBLE);
@@ -74,7 +76,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
             viewHolder.userName.setText(String.format(Locale.getDefault(),
                     "%s %s", TextUtils.isEmpty(user.firstName) ? "" : user.firstName,
                     TextUtils.isEmpty(user.lastName) ? "" : user.lastName));
-        
+
         viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
