@@ -134,6 +134,8 @@ public class TasksFragment extends Fragment {
     public void onResume() {
         super.onResume();
         setupHeader();
+        if (recyclerView != null && recyclerView.getAdapter() != null)
+            recyclerView.getAdapter().notifyDataSetChanged();
     }
 
     private void setupHeader() {
