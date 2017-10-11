@@ -77,6 +77,7 @@ import com.mlsdev.rximagepicker.Sources;
 import net.cachapa.expandablelayout.ExpandableLayout;
 
 import org.dev_alex.mojo_qa.mojo.App;
+import org.dev_alex.mojo_qa.mojo.BuildConfig;
 import org.dev_alex.mojo_qa.mojo.Data;
 import org.dev_alex.mojo_qa.mojo.R;
 import org.dev_alex.mojo_qa.mojo.activities.AuthActivity;
@@ -2384,8 +2385,22 @@ public class TemplateFragment extends Fragment {
 
                             long timeGMT = dueDate - offsetFromUtc;
 
+                            String host;
+                            switch (BuildConfig.FLAVOR) {
+                                case "release_flavor":
+                                    host = "https://servlet.dss.mojo.mojoform.com/services";
+                                    break;
 
-                            String host = "https://servlet.dss.mojo.mojoform.com/services/mojo_datastore.HTTPEndpoint";
+                                case "debug_flavor":
+                                    host = "https://servlet.dss.dev-alex.org/services";
+                                    break;
+
+                                default:
+                                    host = "https://servlet.dss.mojo.mojoform.com/services";
+                                    break;
+                            }
+                            host += "/mojo_datastore.HTTPEndpoint";
+
                             String url = host + indicator.getString("datasource_url") +
                                     "&userId=" + LoginHistoryService.getCurrentUser().username +
                                     "&Past=" + isoDateFormatNoTimeZone.format(new Date(timeGMT)) +
