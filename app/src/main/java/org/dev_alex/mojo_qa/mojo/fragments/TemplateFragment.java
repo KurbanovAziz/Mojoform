@@ -70,6 +70,17 @@ import com.darsh.multipleimageselect.models.Image;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.gcacace.signaturepad.views.SignaturePad;
+import com.github.mikephil.charting.charts.BarChart;
+import com.github.mikephil.charting.charts.LineChart;
+import com.github.mikephil.charting.components.AxisBase;
+import com.github.mikephil.charting.components.XAxis;
+import com.github.mikephil.charting.data.BarData;
+import com.github.mikephil.charting.data.BarDataSet;
+import com.github.mikephil.charting.data.BarEntry;
+import com.github.mikephil.charting.data.Entry;
+import com.github.mikephil.charting.data.LineData;
+import com.github.mikephil.charting.data.LineDataSet;
+import com.github.mikephil.charting.formatter.IAxisValueFormatter;
 import com.mlsdev.rximagepicker.RxImageConverters;
 import com.mlsdev.rximagepicker.RxImagePicker;
 import com.mlsdev.rximagepicker.Sources;
@@ -102,6 +113,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
 import java.util.UUID;
@@ -951,27 +963,115 @@ public class TemplateFragment extends Fragment {
 
                         ImageView indicator = new ImageView(getContext());
                         indicator.setAdjustViewBounds(true);
-                        indicator.setImageResource(R.drawable.default_indicator);
+
+                        switch (value.getString("type")) {
+                            case "indicator":
+                                indicator.setImageResource(R.drawable.default_indicator);
+                                break;
+                            case "spline":
+                                indicator.setImageResource(R.drawable.default_spline);
+                                break;
+                            case "histogram":
+                                indicator.setImageResource(R.drawable.default_histogram);
+                                break;
+
+                        }
                         container.addView(indicator);
 
                         LinearLayout.LayoutParams layoutParams = (LinearLayout.LayoutParams) indicator.getLayoutParams();
-                        layoutParams.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 130, resources.getDisplayMetrics());
+                        layoutParams.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 180, resources.getDisplayMetrics());
                         layoutParams.width = LinearLayout.LayoutParams.WRAP_CONTENT;
                         indicator.setLayoutParams(layoutParams);
                         indicator.requestLayout();
                     } else {
-                        IndicatorModel indicatorModel = new IndicatorModel();
+                        String type = value.getString("type");
+                        switch (type) {
+                            case "indicator":
+                                IndicatorModel indicatorModel = new IndicatorModel();
 
-                        if (value.has("ranges")) {
-                            ArrayList<IndicatorModel.Range> ranges = new ObjectMapper()
-                                    .readValue(value.getJSONArray("ranges").toString(), new TypeReference<ArrayList<IndicatorModel.Range>>() {
-                                    });
-                            indicatorModel.ranges = ranges;
+                                if (value.has("ranges")) {
+                                    ArrayList<IndicatorModel.Range> ranges = new ObjectMapper()
+                                            .readValue(value.getJSONArray("ranges").toString(), new TypeReference<ArrayList<IndicatorModel.Range>>() {
+                                            });
+                                    indicatorModel.ranges = ranges;
+                                }
+
+                                IndicatorLayout indicatorLayout = new IndicatorLayout(getContext(), indicatorModel);
+                                indicatorLayout.setCurrentValue(value.getInt("value"));
+                                container.addView(indicatorLayout);
+                                break;
+
+                            case "spline":
+                            case "histogram":
+                                final JSONArray ticks = value.getJSONArray("tick");
+
+
+                                List<Entry> entries = new ArrayList<>();
+                                List<BarEntry> barEntries = new ArrayList<>();
+                                final List<String> xValues = new ArrayList<>();
+
+                                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+                                SimpleDateFormat xDateFormat = new SimpleDateFormat("dd-MM HH:mm", Locale.getDefault());
+
+                                for (int k = 0; k < ticks.length(); k++) {
+                                    JSONObject tick = ticks.getJSONObject(k);
+                                    Date date = sdf.parse(tick.getString("DT"));
+
+                                    entries.add(new Entry(k, (float) tick.getDouble("value")));
+                                    BarEntry barEntry = new BarEntry((float) k, (float) tick.getDouble("value"));
+                                    barEntries.add(barEntry);
+                                    xValues.add(xDateFormat.format(date));
+                                }
+
+
+                                Resources resources = getContext().getResources();
+                                int chartHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 300, resources.getDisplayMetrics());
+                                if (type.equals("spline")) {
+                                    LineChart lineChart = new LineChart(getContext());
+                                    lineChart.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, chartHeight));
+
+                                    LineDataSet dataSet = new LineDataSet(entries, "");
+                                    dataSet.setColor(Color.RED);
+                                    dataSet.setValueTextColor(Color.BLACK);
+                                    dataSet.setMode(LineDataSet.Mode.CUBIC_BEZIER);
+                                    dataSet.setLineWidth(1f);
+
+                                    LineData lineData = new LineData(dataSet);
+
+                                    lineChart.setData(lineData);
+                                    lineChart.getLegend().setEnabled(false);
+                                    lineChart.getDescription().setEnabled(false);
+                                    lineChart.setTouchEnabled(true);
+                                    lineChart.setScaleYEnabled(true);
+                                    lineChart.setScaleXEnabled(false);
+                                    setupAxis(lineChart.getXAxis(), xValues);
+
+                                    lineChart.invalidate(); // refresh
+                                    lineChart.getAxisLeft().resetAxisMinimum();
+                                    lineChart.getAxisLeft().setAxisMaximum(lineChart.getAxisLeft().getAxisMaximum() * 1.2f);
+                                    container.addView(lineChart);
+                                } else {
+                                    BarChart barChart = new BarChart(getContext());
+                                    barChart.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, chartHeight));
+                                    BarDataSet set = new BarDataSet(barEntries, "BarDataSet");
+
+                                    BarData barData = new BarData(set);
+                                    barData.setDrawValues(true);
+                                    barData.setBarWidth(0.9f);
+
+                                    barChart.setData(barData);
+                                    barChart.setFitBars(true);
+                                    barChart.getLegend().setEnabled(false);
+                                    barChart.getDescription().setEnabled(false);
+                                    barChart.setScaleYEnabled(true);
+                                    setupAxis(barChart.getXAxis(), xValues);
+
+
+                                    barChart.invalidate();
+                                    container.addView(barChart);
+                                }
+                                break;
                         }
-
-                        IndicatorLayout indicatorLayout = new IndicatorLayout(getContext(), indicatorModel);
-                        indicatorLayout.setCurrentValue(value.getInt("value"));
-                        container.addView(indicatorLayout);
                     }
 
                 default:
@@ -983,6 +1083,34 @@ public class TemplateFragment extends Fragment {
                     TypedValue.COMPLEX_UNIT_DIP, 10, getResources().getDisplayMetrics())));
             container.addView(space);
         }
+    }
+
+    private void setupAxis(XAxis xAxis, final List<String> xValues) {
+        xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
+        xAxis.setLabelRotationAngle(90);
+        xAxis.setDrawLabels(true);
+        xAxis.setEnabled(true);
+        xAxis.setSpaceMin(1);
+        xAxis.setSpaceMax(1);
+        xAxis.setTextColor(Color.BLUE);
+
+        xAxis.setValueFormatter(new IAxisValueFormatter() {
+
+            @Override
+            public String getFormattedValue(float value, AxisBase axis) {
+                String stringValue;
+                if (xValues.size() >= 0 && value >= 0 && (((int) value == value))) {
+                    if (value < xValues.size()) {
+                        stringValue = xValues.get((int) value);
+                    } else {
+                        stringValue = "";
+                    }
+                } else {
+                    stringValue = "";
+                }
+                return stringValue;
+            }
+        });
     }
 
     private void scanQrCode(EditText scanTo) {
@@ -2403,7 +2531,7 @@ public class TemplateFragment extends Fragment {
 
                             String url = host + indicator.getString("datasource_url") +
                                     "&userId=" + LoginHistoryService.getCurrentUser().username +
-                                    "&Past=" + isoDateFormatNoTimeZone.format(new Date(timeGMT)) +
+                                    "&Past=" + isoDateFormatNoTimeZone.format(new Date(timeGMT - 24 * 60 * 60 * 1000)) +
                                     "&Before=" + isoDateFormatNoTimeZone.format(new Date(timeGMT + 5 * 60 * 1000));
 
                             OkHttpClient client = new OkHttpClient();
@@ -2415,11 +2543,30 @@ public class TemplateFragment extends Fragment {
                             Response response = client.newCall(requestBuilder.build()).execute();
                             String responseStr = response.body().string();
                             JSONObject jsonObject = new JSONObject(responseStr);
-                            indicator.put("value", jsonObject.getJSONObject("timeSeries").getJSONObject("tick").getInt("value"));
+
+                            if (indicator.get("type").equals("indicator")) {
+                                try {
+                                    indicator.put("value", jsonObject.getJSONObject("timeSeries").getJSONObject("tick").getInt("value"));
+                                } catch (Exception exc) {
+                                    indicator.put("value", -11112222);
+                                }
+                            } else {
+                                JSONArray tick = new JSONArray();
+                                try {
+                                    Object obj = jsonObject.getJSONObject("timeSeries").get("tick");
+                                    if (obj instanceof JSONArray)
+                                        tick = (JSONArray) obj;
+                                    else {
+                                        tick.put(obj);
+                                    }
+                                } catch (Exception exc) {
+                                    exc.printStackTrace();
+                                }
+                                indicator.put("tick", tick);
+                            }
 
                         } catch (Exception exc) {
                             exc.printStackTrace();
-                            indicator.put("value", -11112222);
                         }
                         break;
                 }
@@ -2779,6 +2926,10 @@ public class TemplateFragment extends Fragment {
                 resultJson.put("initiator", initiator);
                 resultJson.put("site_id", siteId);
                 resultJson.put("CompleteTime", isoDateFormat.format(new Date()));
+                resultJson.put("task_id", taskId);
+
+                TimeZone timeZone = TimeZone.getDefault();
+                resultJson.put("timezone", timeZone.getID());
 
                 Log.d("mojo-log", "result template: " + resultJson.toString());
 

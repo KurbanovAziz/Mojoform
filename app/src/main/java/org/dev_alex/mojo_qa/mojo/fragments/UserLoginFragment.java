@@ -42,7 +42,7 @@ public class UserLoginFragment extends Fragment {
             if (user != null) {
                 if (TextUtils.isEmpty(user.firstName) && TextUtils.isEmpty(user.lastName)) {
                     ((TextView) rootView.findViewById(R.id.user_name)).setText(user.username);
-                    ((TextView) rootView.findViewById(R.id.user_initials)).setText(user.username.charAt(0));
+                    ((TextView) rootView.findViewById(R.id.user_initials)).setText(String.valueOf(user.username.charAt(0)));
                 } else {
                     ((TextView) rootView.findViewById(R.id.user_initials)).setText(String.format(Locale.getDefault(),
                             "%s%s", TextUtils.isEmpty(user.firstName) ? "" : user.firstName.charAt(0),

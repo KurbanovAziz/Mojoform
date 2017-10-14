@@ -59,7 +59,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
             viewHolder.avatarImage.setVisibility(View.GONE);
             viewHolder.userInitials.setVisibility(View.VISIBLE);
             if (TextUtils.isEmpty(user.firstName) && TextUtils.isEmpty(user.lastName))
-                viewHolder.userInitials.setText(user.username.charAt(0));
+                viewHolder.userInitials.setText(String.valueOf(user.username.charAt(0)));
             else
                 viewHolder.userInitials.setText(String.format(Locale.getDefault(), "%s%s",
                         TextUtils.isEmpty(user.firstName) ? "" : user.firstName.charAt(0),
