@@ -980,6 +980,7 @@ public class TemplateFragment extends Fragment {
 
                         LinearLayout.LayoutParams layoutParams = (LinearLayout.LayoutParams) indicator.getLayoutParams();
                         layoutParams.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 180, resources.getDisplayMetrics());
+                        layoutParams.gravity = Gravity.CENTER_HORIZONTAL;
                         layoutParams.width = LinearLayout.LayoutParams.WRAP_CONTENT;
                         indicator.setLayoutParams(layoutParams);
                         indicator.requestLayout();
