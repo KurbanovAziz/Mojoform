@@ -408,8 +408,10 @@ public class TemplateFragment extends Fragment {
         getActivity().findViewById(R.id.back_btn).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                getActivity().getSupportFragmentManager().popBackStack();
-                ((MainActivity) getActivity()).drawer.getDrawerLayout().setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
+                if (getActivity() != null && getActivity().getSupportFragmentManager() != null) {
+                    getActivity().getSupportFragmentManager().popBackStack();
+                    ((MainActivity) getActivity()).drawer.getDrawerLayout().setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
+                }
             }
         });
     }
@@ -2932,6 +2934,7 @@ public class TemplateFragment extends Fragment {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
+            loopDialog.show();
             try {
                 resultJson = new JSONObject();
                 JSONArray values = getTemplateElementValues(template);
@@ -3012,8 +3015,8 @@ public class TemplateFragment extends Fragment {
         protected void onPostExecute(Integer responseCode) {
             super.onPostExecute(responseCode);
             try {
-                if (progressDialog != null && progressDialog.isShowing())
-                    progressDialog.dismiss();
+                if (loopDialog != null && loopDialog.isShowing())
+                    loopDialog.dismiss();
 
                 saveTemplateState();
 
