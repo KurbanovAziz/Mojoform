@@ -78,4 +78,5 @@
     <string name="close">Закрыть</string>
     <string name="save_as_pdf">Сохранить pdf</string>
     <string name="delayed">Отложено</string>
+    <string name="no_data">Нет данных</string>
 </resources>

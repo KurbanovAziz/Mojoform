@@ -1004,8 +1004,12 @@ public class TemplateFragment extends Fragment {
 
                             case "spline":
                             case "histogram":
-                                final JSONArray ticks = value.getJSONArray("tick");
+                                Resources resources = getContext().getResources();
+                                int chartHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 300, resources.getDisplayMetrics());
+                                RelativeLayout chartContainer = new RelativeLayout(getContext());
+                                chartContainer.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, chartHeight));
 
+                                final JSONArray ticks = value.getJSONArray("tick");
 
                                 List<Entry> entries = new ArrayList<>();
                                 List<BarEntry> barEntries = new ArrayList<>();
@@ -1023,13 +1027,25 @@ public class TemplateFragment extends Fragment {
                                     barEntries.add(barEntry);
                                     xValues.add(xDateFormat.format(date));
                                 }
+                                if (entries.isEmpty()) {
+                                    entries.add(new Entry(0, 0));
+                                    barEntries.add(new BarEntry(0, 0));
+
+                                    TextView emptyText = new TextView(getContext());
+                                    emptyText.setText(R.string.no_data);
+                                    chartContainer.addView(emptyText);
+
+                                    RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams
+                                            (ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                                    layoutParams.addRule(RelativeLayout.CENTER_IN_PARENT);
+                                    emptyText.setLayoutParams(layoutParams);
+                                    emptyText.requestLayout();
+                                }
 
 
-                                Resources resources = getContext().getResources();
-                                int chartHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 300, resources.getDisplayMetrics());
                                 if (type.equals("spline")) {
                                     LineChart lineChart = new LineChart(getContext());
-                                    lineChart.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, chartHeight));
+                                    lineChart.setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT));
 
                                     LineDataSet dataSet = new LineDataSet(entries, "");
                                     dataSet.setColor(Color.RED);
@@ -1046,14 +1062,17 @@ public class TemplateFragment extends Fragment {
                                     lineChart.setScaleYEnabled(true);
                                     lineChart.setScaleXEnabled(false);
                                     setupAxis(lineChart.getXAxis(), xValues);
-
+                                    
                                     lineChart.invalidate(); // refresh
+
                                     lineChart.getAxisLeft().resetAxisMinimum();
                                     lineChart.getAxisLeft().setAxisMaximum(lineChart.getAxisLeft().getAxisMaximum() * 1.2f);
-                                    container.addView(lineChart);
+
+                                    chartContainer.addView(lineChart);
                                 } else {
                                     BarChart barChart = new BarChart(getContext());
-                                    barChart.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, chartHeight));
+                                    barChart.setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT));
+
                                     BarDataSet set = new BarDataSet(barEntries, "BarDataSet");
 
                                     BarData barData = new BarData(set);
@@ -1067,10 +1086,10 @@ public class TemplateFragment extends Fragment {
                                     barChart.setScaleYEnabled(true);
                                     setupAxis(barChart.getXAxis(), xValues);
 
-
                                     barChart.invalidate();
-                                    container.addView(barChart);
+                                    chartContainer.addView(barChart);
                                 }
+                                container.addView(chartContainer);
                                 break;
                         }
                     }
@@ -2532,8 +2551,7 @@ public class TemplateFragment extends Fragment {
 
                             String url = host + indicator.getString("datasource_url") +
                                     "&userId=" + LoginHistoryService.getCurrentUser().username +
-                                    "&Past=" + isoDateFormatNoTimeZone.format(new Date(timeGMT - 24 * 60 * 60 * 1000)) +
-                                    "&Before=" + isoDateFormatNoTimeZone.format(new Date(timeGMT + 5 * 60 * 1000));
+                                    "&documentId=" + templateId;
 
                             OkHttpClient client = new OkHttpClient();
                             Request.Builder requestBuilder = new Request.Builder()
