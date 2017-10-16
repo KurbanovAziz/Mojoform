@@ -1062,7 +1062,7 @@ public class TemplateFragment extends Fragment {
                                     lineChart.setScaleYEnabled(true);
                                     lineChart.setScaleXEnabled(false);
                                     setupAxis(lineChart.getXAxis(), xValues);
-                                    
+
                                     lineChart.invalidate(); // refresh
 
                                     lineChart.getAxisLeft().resetAxisMinimum();
@@ -1110,8 +1110,8 @@ public class TemplateFragment extends Fragment {
         xAxis.setLabelRotationAngle(90);
         xAxis.setDrawLabels(true);
         xAxis.setEnabled(true);
-        xAxis.setSpaceMin(1);
-        xAxis.setSpaceMax(1);
+        xAxis.setSpaceMin(2.0f);
+        xAxis.setSpaceMax(2.0f);
         xAxis.setTextColor(Color.BLUE);
 
         xAxis.setValueFormatter(new IAxisValueFormatter() {
@@ -2549,9 +2549,17 @@ public class TemplateFragment extends Fragment {
                             }
                             host += "/mojo_datastore.HTTPEndpoint";
 
-                            String url = host + indicator.getString("datasource_url") +
-                                    "&userId=" + LoginHistoryService.getCurrentUser().username +
-                                    "&documentId=" + templateId;
+                            String url;
+                            if (indicator.get("type").equals("indicator")) {
+                                url = host + indicator.getString("datasource_url") +
+                                        "&userId=" + LoginHistoryService.getCurrentUser().username +
+                                        "&documentId=" + templateId;
+                            } else {
+                                url = host + indicator.getString("datasource_url") +
+                                        "&userId=" + LoginHistoryService.getCurrentUser().username +
+                                        "&Past=" + isoDateFormatNoTimeZone.format(new Date(timeGMT - 24 * 60 * 60 * 1000)) +
+                                        "&Before=" + isoDateFormatNoTimeZone.format(new Date(timeGMT + 5 * 60 * 1000));
+                            }
 
                             OkHttpClient client = new OkHttpClient();
                             Request.Builder requestBuilder = new Request.Builder()
