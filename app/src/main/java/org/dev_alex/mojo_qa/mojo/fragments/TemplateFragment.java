@@ -487,9 +487,12 @@ public class TemplateFragment extends Fragment {
                     @Override
                     public void onClick(@android.support.annotation.NonNull MaterialDialog dialog, @android.support.annotation.NonNull DialogAction which) {
                         RxImagePicker.with(getContext()).requestImage(Sources.CAMERA)
+                                .subscribeOn(Schedulers.io())
+                                .observeOn(AndroidSchedulers.mainThread())
                                 .flatMap(new Function<Uri, ObservableSource<File>>() {
                                     @Override
                                     public ObservableSource<File> apply(@NonNull Uri uri) throws Exception {
+                                        Thread.sleep(200);
                                         File cacheFile = new File(getContext().getCacheDir(), UUID.randomUUID().toString() + ".jpg");
                                         return RxImageConverters.uriToFile(getContext(), uri, cacheFile);
                                     }
