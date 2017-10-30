@@ -18,6 +18,7 @@ import android.widget.TextView;
 
 import com.mikepenz.materialdrawer.Drawer;
 import com.mikepenz.materialdrawer.DrawerBuilder;
+import com.mikepenz.materialdrawer.model.DividerDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 
 import org.dev_alex.mojo_qa.mojo.R;
@@ -93,7 +94,10 @@ public class MainActivity extends AppCompatActivity {
                 .addDrawerItems(
                         new CustomDrawerItem(15, -10).withIdentifier(1).withName(R.string.tasks).withIcon(R.drawable.tasks),
                         new CustomDrawerItem(15, 0).withIdentifier(2).withName(R.string.documents).withIcon(R.drawable.documents),
-                        new CustomDrawerItem(15, 0).withIdentifier(3).withName(R.string.exit).withIcon(R.drawable.exit)
+                        new CustomDrawerItem(15, 0).withIdentifier(3).withName(R.string.exit).withIcon(R.drawable.exit),
+                        new DividerDrawerItem(),
+                        new CustomDrawerItem(15, 0).withIdentifier(4).withName(R.string.about_app).withIcon(R.drawable.question)
+
                 )
                 .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
                     @Override
@@ -111,6 +115,9 @@ public class MainActivity extends AppCompatActivity {
                                 trimCache(MainActivity.this);
                                 startActivity(new Intent(MainActivity.this, AuthActivity.class));
                                 finish();
+                                break;
+                            case 4:
+                                startActivity(new Intent(MainActivity.this, OnboardingActivity.class));
                                 break;
                         }
                         return false;

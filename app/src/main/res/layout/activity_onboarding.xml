@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context="org.dev_alex.mojo_qa.mojo.activities.OnboardingActivity">
+
+    <android.support.v4.view.ViewPager
+        android:id="@+id/view_pager"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <RadioGroup
+        android:id="@+id/page_points_toggle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="15dp"
+        android:checkedButton="@+id/page_1"
+        android:orientation="horizontal">
+
+        <RadioButton
+            android:id="@+id/page_1"
+            android:layout_width="5dp"
+            android:layout_height="5dp"
+            android:layout_marginRight="8dp"
+            android:background="@drawable/page_circle_background"
+            android:button="@null"
+            android:enabled="false"
+            android:gravity="center" />
+
+        <RadioButton
+            android:id="@+id/page_2"
+            android:layout_width="5dp"
+            android:layout_height="5dp"
+            android:layout_marginRight="8dp"
+            android:background="@drawable/page_circle_background"
+            android:button="@null"
+            android:enabled="false"
+            android:gravity="center" />
+
+        <RadioButton
+            android:id="@+id/page_3"
+            android:layout_width="5dp"
+            android:layout_height="5dp"
+            android:layout_marginRight="8dp"
+            android:background="@drawable/page_circle_background"
+            android:button="@null"
+            android:enabled="false"
+            android:gravity="center" />
+
+        <RadioButton
+            android:id="@+id/page_4"
+            android:layout_width="5dp"
+            android:layout_height="5dp"
+            android:layout_marginRight="8dp"
+            android:background="@drawable/page_circle_background"
+            android:button="@null"
+            android:enabled="false"
+            android:gravity="center" />
+    </RadioGroup>
+</RelativeLayout>

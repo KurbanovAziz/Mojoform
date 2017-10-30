@@ -33,6 +33,9 @@ public class AuthActivity extends AppCompatActivity {
         setContentView(R.layout.activity_auth);
         initDialog();
 
+        if (!OnboardingActivity.isOnboardingFinished())
+            startActivity(new Intent(this, OnboardingActivity.class));
+        
         getSupportFragmentManager().beginTransaction().replace(R.id.container, LogoFragment.newInstance()).commit();
         if (!TokenService.isTokenExists())
             new Handler().postDelayed(new Runnable() {

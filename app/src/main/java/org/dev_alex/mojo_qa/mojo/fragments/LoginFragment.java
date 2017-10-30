@@ -1,5 +1,6 @@
 package org.dev_alex.mojo_qa.mojo.fragments;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -11,6 +12,7 @@ import android.widget.Toast;
 
 import org.dev_alex.mojo_qa.mojo.R;
 import org.dev_alex.mojo_qa.mojo.activities.AuthActivity;
+import org.dev_alex.mojo_qa.mojo.activities.OnboardingActivity;
 import org.dev_alex.mojo_qa.mojo.services.Utils;
 
 public class LoginFragment extends Fragment {
@@ -47,6 +49,13 @@ public class LoginFragment extends Fragment {
                 else
                     ((AuthActivity) getActivity()).new LoginTask(login.getText().toString().trim(),
                             password.getText().toString()).execute();
+            }
+        });
+
+        rootView.findViewById(R.id.about_btn).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(getContext(), OnboardingActivity.class));
             }
         });
     }

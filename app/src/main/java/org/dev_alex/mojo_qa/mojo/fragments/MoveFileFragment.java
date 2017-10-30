@@ -219,19 +219,28 @@ public class MoveFileFragment extends Fragment {
             try {
                 String url;
                 if (folderId == null) {
-                    url = "/api/fs/childrenmy";
+                    url = "/api/user/root";
                 } else
                     url = "/api/fs/children/" + folderId;
 
                 Response response = RequestService.createGetRequest(url);
 
                 if (response.code() == 200) {
-                    JSONObject resultJson = new JSONObject(response.body().string());
-                    JSONArray tasksEntriesJson = resultJson.getJSONObject("list").getJSONArray("entries");
-                    for (int i = 0; i < tasksEntriesJson.length(); i++) {
-                        JSONObject object = tasksEntriesJson.getJSONObject(i).getJSONObject("entry");
-                        if (object.getBoolean("isFolder"))
-                            folders.add(new FolderEntry(object.getString("id"), folderId == null ? "" : folderId, object.getString("name"), false, false));
+                    JSONArray tasksEntriesJson;
+                    if (folderId == null) {
+                        tasksEntriesJson = new JSONArray(response.body().string());
+                        for (int i = 0; i < tasksEntriesJson.length(); i++) {
+                            JSONObject object = tasksEntriesJson.getJSONObject(i);
+                            folders.add(new FolderEntry(object.getString("id"), "", object.getString("name"), false, false));
+                        }
+                    } else {
+                        JSONObject resultJson = new JSONObject(response.body().string());
+                        tasksEntriesJson = resultJson.getJSONObject("list").getJSONArray("entries");
+                        for (int i = 0; i < tasksEntriesJson.length(); i++) {
+                            JSONObject object = tasksEntriesJson.getJSONObject(i).getJSONObject("entry");
+                            if (object.getBoolean("isFolder"))
+                                folders.add(new FolderEntry(object.getString("id"), folderId == null ? "" : folderId, object.getString("name"), false, false));
+                        }
                     }
                 }
 

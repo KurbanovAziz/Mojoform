@@ -23,7 +23,6 @@
         android:screenOrientation="portrait"
         android:theme="@style/Theme.AppCompat.Light.NoActionBar.FullScreen"
         tools:replace="allowBackup">
-
         <activity
             android:name=".activities.AuthActivity"
             android:configChanges="orientation|keyboardHidden|keyboard"
@@ -35,7 +34,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
         <activity
             android:name=".activities.MainActivity"
             android:configChanges="orientation|keyboardHidden|keyboard"
@@ -79,5 +77,7 @@
             android:exported="false"
             android:process=":second" />
 
+        <activity android:name=".activities.OnboardingActivity"></activity>
     </application>
+
 </manifest>

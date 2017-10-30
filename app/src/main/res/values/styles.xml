@@ -12,7 +12,7 @@
         <item name="material_drawer_secondary_text">@color/drawer_text_color</item>
         <item name="material_drawer_selected">@color/drawer_item_selected_color</item>
         <item name="material_drawer_selected_text">@color/drawer_text_color</item>
-        <item name="material_drawer_divider">@color/drawer_background</item>
+        <item name="material_drawer_divider">#CCC1D1</item>
     </style>
 
     <style name="AppTheme.NoActionBar">
