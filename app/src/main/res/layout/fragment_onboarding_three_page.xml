@@ -34,4 +34,17 @@
         android:textAlignment="center"
         android:textColor="@android:color/white"
         android:textSize="15sp" />
+
+
+    <TextView
+        android:id="@+id/finish"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="60dp"
+        android:padding="8dp"
+        android:text="@string/ready_to_start"
+        android:textColor="@android:color/white"
+        android:textSize="20sp" />
 </RelativeLayout>
