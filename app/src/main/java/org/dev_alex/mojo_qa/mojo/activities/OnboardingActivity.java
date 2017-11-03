@@ -70,7 +70,8 @@ public class OnboardingActivity extends AppCompatActivity {
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onOnboardingSkippedEvent(OnboardingSkippedEvent event) {
-        viewPager.setCurrentItem(3, true);
+        setOnboardingFinished(true);
+        finish();
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)

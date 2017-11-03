@@ -67,6 +67,13 @@ public class OnboardingPageFragment extends Fragment {
                 rootView = inflater.inflate(R.layout.fragment_onboarding_three_page, container, false);
                 ((TextView) rootView.findViewById(R.id.title)).setTypeface(tfBold);
                 ((TextView) rootView.findViewById(R.id.main_part)).setTypeface(tfMedium);
+
+                rootView.findViewById(R.id.finish).setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        EventBus.getDefault().post(new OnboardingFinishedEvent());
+                    }
+                });
                 break;
 
             case 3:
