@@ -117,7 +117,9 @@ public class MainActivity extends AppCompatActivity {
                                 finish();
                                 break;
                             case 4:
-                                startActivity(new Intent(MainActivity.this, OnboardingActivity.class));
+                                Intent intent = new Intent(MainActivity.this, OnboardingActivity.class);
+                                intent.putExtra("from_page", 1);
+                                startActivity(intent);
                                 break;
                         }
                         return false;

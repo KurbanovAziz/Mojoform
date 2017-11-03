@@ -109,6 +109,7 @@ import org.json.JSONObject;
 
 import java.io.File;
 import java.net.HttpURLConnection;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -1439,22 +1440,28 @@ public class TemplateFragment extends Fragment {
             expandableLayout.collapse();
 
             if (value.has("media_ids")) {
+                SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy\nHH:mm", Locale.getDefault());
+
                 ViewGroup mediaContainer = (ViewGroup) ((ViewGroup) mediaLayout.getChildAt(1)).getChildAt(0);
                 mediaContainer.removeAllViewsInLayout();
                 final JSONArray mediaIds = value.getJSONArray("media_ids");
                 final JSONArray fileNames = value.getJSONArray("file_names");
                 final JSONArray fileTypes = value.getJSONArray("file_types");
+                final JSONArray createDates = value.getJSONArray("create_date");
 
                 for (int i = 0; i < mediaIds.length(); i++) {
                     final String mediaId = mediaIds.getString(i);
                     final String fileName = fileNames.getString(i);
                     final String fileType = fileTypes.getString(i);
+                    final Long createDate = createDates.getLong(i);
 
                     View mediaFrame = LayoutInflater.from(getContext())
                             .inflate(R.layout.small_image_with_frame_layout, mediaContainer, false);
-                    if (fileType.contains("image"))
+                    if (fileType.contains("image")) {
                         ((ImageView) mediaFrame.findViewById(R.id.media_image)).setImageResource(R.drawable.add_photo_btn);
-                    else if (fileType.contains("video"))
+                        ((TextView) mediaFrame.findViewById(R.id.media_date)).setText(dateFormat.format(new Date(createDate)));
+                        mediaFrame.findViewById(R.id.media_date).setVisibility(View.VISIBLE);
+                    } else if (fileType.contains("video"))
                         ((ImageView) mediaFrame.findViewById(R.id.media_image)).setImageResource(R.drawable.add_video_btn);
                     else if (fileType.contains("audio"))
                         ((ImageView) mediaFrame.findViewById(R.id.media_image)).setImageResource(R.drawable.add_audio_btn);
@@ -2246,6 +2253,8 @@ public class TemplateFragment extends Fragment {
 
     private JSONObject transformFinishedTemplate(JSONObject finishedTemplate) {
         try {
+            SimpleDateFormat parseFormat = new SimpleDateFormat("yyyy.dd.MM HH:mm::ss", Locale.getDefault());
+
             JSONArray values = finishedTemplate.getJSONArray("values");
             JSONObject template = finishedTemplate.getJSONObject("template");
 
@@ -2308,6 +2317,11 @@ public class TemplateFragment extends Fragment {
                                 item.getJSONArray("media_ids").put(elemValue);
                                 item.getJSONArray("file_names").put(value.getString("fileName"));
                                 item.getJSONArray("file_types").put(value.getString("mimeType"));
+                                try {
+                                    item.getJSONArray("create_date").put(parseFormat.parse(value.getString("createDate")).getTime());
+                                } catch (ParseException e) {
+                                    item.getJSONArray("create_date").put(new Date().getTime());
+                                }
                             } else {
                                 JSONArray mediaIds = new JSONArray();
                                 mediaIds.put(elemValue);
@@ -2320,6 +2334,14 @@ public class TemplateFragment extends Fragment {
                                 JSONArray fileTypes = new JSONArray();
                                 fileTypes.put(value.getString("mimeType"));
                                 item.put("file_types", fileTypes);
+
+                                JSONArray createDates = new JSONArray();
+                                try {
+                                    createDates.put(parseFormat.parse(value.getString("createDate")).getTime());
+                                } catch (ParseException e) {
+                                    createDates.put(new Date().getTime());
+                                }
+                                item.put("create_date", createDates);
                             }
                         }
                 }

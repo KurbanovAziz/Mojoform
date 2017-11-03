@@ -52,6 +52,8 @@ public class OnboardingActivity extends AppCompatActivity {
 
             }
         });
+        if (getIntent() != null && getIntent().hasExtra("from_page"))
+            viewPager.setCurrentItem(getIntent().getIntExtra("from_page", 0), false);
     }
 
     @Override
