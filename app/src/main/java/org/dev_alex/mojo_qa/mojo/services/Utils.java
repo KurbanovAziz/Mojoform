@@ -18,6 +18,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.webkit.MimeTypeMap;
 import android.widget.EditText;
 
+import org.dev_alex.mojo_qa.mojo.R;
 import org.json.JSONArray;
 
 import java.io.File;
@@ -47,6 +48,7 @@ public class Utils {
 
         // Set up touch listener for non-text box views to hide keyboard.
         if (!(rootView instanceof EditText)) {
+
             rootView.setOnTouchListener(new View.OnTouchListener() {
                 public boolean onTouch(View v, MotionEvent event) {
                     hideSoftKeyboard(activity);
@@ -57,6 +59,7 @@ public class Utils {
 
         //If a layout container, iterate over children and seed recursion.
         if (rootView instanceof ViewGroup) {
+
             for (int i = 0; i < ((ViewGroup) rootView).getChildCount(); i++) {
                 View innerView = ((ViewGroup) rootView).getChildAt(i);
                 setupCloseKeyboardUI(activity, innerView);

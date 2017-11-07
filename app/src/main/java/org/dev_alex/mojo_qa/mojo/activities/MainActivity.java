@@ -24,6 +24,7 @@ import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import org.dev_alex.mojo_qa.mojo.R;
 import org.dev_alex.mojo_qa.mojo.custom_views.CustomDrawerItem;
 import org.dev_alex.mojo_qa.mojo.fragments.DocumentsFragment;
+import org.dev_alex.mojo_qa.mojo.fragments.PanelListFragment;
 import org.dev_alex.mojo_qa.mojo.fragments.TasksFragment;
 import org.dev_alex.mojo_qa.mojo.fragments.TemplateFragment;
 import org.dev_alex.mojo_qa.mojo.models.User;
@@ -94,6 +95,7 @@ public class MainActivity extends AppCompatActivity {
                 .addDrawerItems(
                         new CustomDrawerItem(15, -10).withIdentifier(1).withName(R.string.tasks).withIcon(R.drawable.tasks),
                         new CustomDrawerItem(15, 0).withIdentifier(2).withName(R.string.documents).withIcon(R.drawable.documents),
+                        new CustomDrawerItem(15, 0).withIdentifier(5).withName(R.string.analystics).withIcon(R.drawable.documents),
                         new CustomDrawerItem(15, 0).withIdentifier(3).withName(R.string.exit).withIcon(R.drawable.exit),
                         new DividerDrawerItem(),
                         new CustomDrawerItem(15, 0).withIdentifier(4).withName(R.string.about_app).withIcon(R.drawable.question)
@@ -104,9 +106,11 @@ public class MainActivity extends AppCompatActivity {
                     public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
                         switch ((int) drawerItem.getIdentifier()) {
                             case 1:
+                                getSupportFragmentManager().popBackStack(null, 0);
                                 getSupportFragmentManager().beginTransaction().replace(R.id.container, TasksFragment.newInstance(), "tasks").commit();
                                 break;
                             case 2:
+                                getSupportFragmentManager().popBackStack(null, 0);
                                 getSupportFragmentManager().beginTransaction().replace(R.id.container, DocumentsFragment.newInstance()).commit();
                                 break;
                             case 3:
@@ -120,6 +124,10 @@ public class MainActivity extends AppCompatActivity {
                                 Intent intent = new Intent(MainActivity.this, OnboardingActivity.class);
                                 intent.putExtra("from_page", 1);
                                 startActivity(intent);
+                                break;
+                            case 5:
+                                getSupportFragmentManager().popBackStack(null, 0);
+                                getSupportFragmentManager().beginTransaction().replace(R.id.container, PanelListFragment.newInstance()).commit();
                                 break;
                         }
                         return false;

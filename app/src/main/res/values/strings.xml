@@ -97,5 +97,7 @@
     <string name="ready_to_start">Теперь можно начинать!</string>
     <string name="about_app">О приложении</string>
     <string name="ref_about_app">Справка о приложении</string>
+    <string name="analystics">Аналитика</string>
+    <string name="page_short">Стр</string>
 
 </resources>
