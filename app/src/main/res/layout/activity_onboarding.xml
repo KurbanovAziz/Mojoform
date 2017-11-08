@@ -51,7 +51,7 @@
             android:enabled="false"
             android:gravity="center" />
 
-   <!--     <RadioButton
+        <RadioButton
             android:id="@+id/page_4"
             android:layout_width="5dp"
             android:layout_height="5dp"
@@ -59,6 +59,6 @@
             android:background="@drawable/page_circle_background"
             android:button="@null"
             android:enabled="false"
-            android:gravity="center" />-->
+            android:gravity="center" />
     </RadioGroup>
 </RelativeLayout>
