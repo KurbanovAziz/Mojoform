@@ -5,17 +5,15 @@
     android:orientation="vertical">
 
     <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        android:layout_width="98dp"
-        android:layout_height="98dp"
-        android:layout_marginBottom="8dp"
-        android:layout_marginRight="8dp"
-        android:layout_marginTop="8dp"
-        android:background="@android:color/white">
+        android:layout_width="75dp"
+        android:layout_height="75dp"
+        android:layout_gravity="center_horizontal"
+        android:background="@android:color/transparent">
 
         <ImageView
             android:id="@+id/media_image"
-            android:layout_width="52dp"
-            android:layout_height="52dp"
+            android:layout_width="64dp"
+            android:layout_height="64dp"
             android:layout_gravity="center"
             android:layout_margin="4dp"
             android:scaleType="centerCrop"
@@ -26,8 +24,8 @@
         android:id="@+id/media_date"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="1dp"
         android:gravity="center"
+        android:text="qwe"
         android:textAlignment="center"
         android:textColor="@color/colorAccent"
         android:textSize="13.5sp"

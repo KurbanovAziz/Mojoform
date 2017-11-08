@@ -95,7 +95,7 @@ public class MainActivity extends AppCompatActivity {
                 .addDrawerItems(
                         new CustomDrawerItem(15, -10).withIdentifier(1).withName(R.string.tasks).withIcon(R.drawable.tasks),
                         new CustomDrawerItem(15, 0).withIdentifier(2).withName(R.string.documents).withIcon(R.drawable.documents),
-                        new CustomDrawerItem(15, 0).withIdentifier(5).withName(R.string.analystics).withIcon(R.drawable.documents),
+                        new CustomDrawerItem(15, 0).withIdentifier(5).withName(R.string.analystics).withIcon(R.drawable.analystics_icon),
                         new CustomDrawerItem(15, 0).withIdentifier(3).withName(R.string.exit).withIcon(R.drawable.exit),
                         new DividerDrawerItem(),
                         new CustomDrawerItem(15, 0).withIdentifier(4).withName(R.string.about_app).withIcon(R.drawable.question)

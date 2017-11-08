@@ -2,6 +2,7 @@ package org.dev_alex.mojo_qa.mojo.models;
 
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class IndicatorModel {
     public ArrayList<Range> ranges;
@@ -12,6 +13,8 @@ public class IndicatorModel {
         public int to;
         public String color;
         public String name;
+        public boolean isNotify;
+        public List<String> emails;
 
         public Range() {
         }

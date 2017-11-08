@@ -1458,15 +1458,15 @@ public class TemplateFragment extends Fragment {
                     View mediaFrame = LayoutInflater.from(getContext())
                             .inflate(R.layout.small_image_with_frame_layout, mediaContainer, false);
                     if (fileType.contains("image")) {
-                        ((ImageView) mediaFrame.findViewById(R.id.media_image)).setImageResource(R.drawable.add_photo_btn);
+                        ((ImageView) mediaFrame.findViewById(R.id.media_image)).setImageResource(R.drawable.image_placeholder);
                         ((TextView) mediaFrame.findViewById(R.id.media_date)).setText(dateFormat.format(new Date(createDate)));
                         mediaFrame.findViewById(R.id.media_date).setVisibility(View.VISIBLE);
                     } else if (fileType.contains("video"))
-                        ((ImageView) mediaFrame.findViewById(R.id.media_image)).setImageResource(R.drawable.add_video_btn);
+                        ((ImageView) mediaFrame.findViewById(R.id.media_image)).setImageResource(R.drawable.video_placeholder);
                     else if (fileType.contains("audio"))
-                        ((ImageView) mediaFrame.findViewById(R.id.media_image)).setImageResource(R.drawable.add_audio_btn);
+                        ((ImageView) mediaFrame.findViewById(R.id.media_image)).setImageResource(R.drawable.audio_placeholder);
                     else
-                        ((ImageView) mediaFrame.findViewById(R.id.media_image)).setImageResource(R.drawable.add_file_btn);
+                        ((ImageView) mediaFrame.findViewById(R.id.media_image)).setImageResource(R.drawable.file_placeholder);
 
                     mediaFrame.setOnClickListener(new View.OnClickListener() {
                         @Override
