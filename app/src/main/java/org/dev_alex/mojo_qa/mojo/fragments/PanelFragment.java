@@ -90,7 +90,11 @@ public class PanelFragment extends Fragment {
                     rootView.findViewById(R.id.page_select_layout).setVisibility(View.VISIBLE);
                 }
             });
+
+            ((TextView) rootView.findViewById(R.id.dashbord_name)).setText(panel.name);
         }
+
+        setupHeader();
         return rootView;
     }
 
@@ -113,14 +117,21 @@ public class PanelFragment extends Fragment {
                 JSONArray rowItems = row.getJSONArray("items");
                 for (int j = 0; j < rowItems.length(); j++) {
                     JSONObject rowItem = rowItems.getJSONObject(j);
-                    if (rowItem.has("indicator"))
+
+                    if (rowItem.has("indicator")) {
+                        dashbordContainer.addView(renderGraphTitle(rowItem.getJSONObject("indicator").getString("autoCaption")));
                         dashbordContainer.addView(renderIndicator(rowItem.getJSONObject("indicator")));
+                    }
 
-                    if (rowItem.has("histogram"))
+                    if (rowItem.has("histogram")) {
+                        dashbordContainer.addView(renderGraphTitle(rowItem.getJSONObject("histogram").getString("autoCaption")));
                         dashbordContainer.addView(renderHistogramOrSpline(rowItem.getJSONObject("histogram"), false));
+                    }
 
-                    if (rowItem.has("spline"))
+                    if (rowItem.has("spline")) {
+                        dashbordContainer.addView(renderGraphTitle(rowItem.getJSONObject("spline").getString("autoCaption")));
                         dashbordContainer.addView(renderHistogramOrSpline(rowItem.getJSONObject("spline"), true));
+                    }
                 }
             }
         } catch (Exception e) {
@@ -245,7 +256,6 @@ public class PanelFragment extends Fragment {
         });
     }
 
-
     private View renderIndicator(JSONObject indicatorObj) throws Exception {
         IndicatorModel indicatorModel = new IndicatorModel();
 
@@ -260,11 +270,32 @@ public class PanelFragment extends Fragment {
         return indicatorLayout;
     }
 
+    private View renderGraphTitle(String title) {
+        View titleView = LayoutInflater.from(getContext()).inflate(R.layout.title_graph, null);
+        ((TextView) titleView.findViewById(R.id.title)).setText(title);
+        return titleView;
+    }
+
+    private void setupHeader() {
+        ((TextView) getActivity().findViewById(R.id.title)).setText(getString(R.string.analystics));
+        getActivity().findViewById(R.id.back_btn).setVisibility(View.VISIBLE);
+        getActivity().findViewById(R.id.back_btn).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                getActivity().getSupportFragmentManager().popBackStack();
+            }
+        });
+
+        getActivity().findViewById(R.id.grid_btn).setVisibility(View.GONE);
+        getActivity().findViewById(R.id.sandwich_btn).setVisibility(View.GONE);
+        getActivity().findViewById(R.id.group_by_btn).setVisibility(View.GONE);
+        getActivity().findViewById(R.id.search_btn).setVisibility(View.GONE);
+    }
+
     private void showPage(int pageI) {
         try {
             JSONObject page = panelJson.getJSONArray("items").getJSONObject(pageI).getJSONObject("page");
             ((TextView) rootView.findViewById(R.id.page_name)).setText(page.getString("caption"));
-            ((TextView) rootView.findViewById(R.id.page_i)).setText(String.valueOf(pageI + 1));
 
             for (int i = 0; i < ((LinearLayout) rootView.findViewById(R.id.page_container)).getChildCount(); i++)
                 if (pageI == i) {
