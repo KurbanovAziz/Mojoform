@@ -9,6 +9,7 @@ import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.Rect;
@@ -74,6 +75,7 @@ import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.AxisBase;
 import com.github.mikephil.charting.components.XAxis;
+import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.BarData;
 import com.github.mikephil.charting.data.BarDataSet;
 import com.github.mikephil.charting.data.BarEntry;
@@ -81,6 +83,10 @@ import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.formatter.IAxisValueFormatter;
+import com.github.mikephil.charting.renderer.XAxisRenderer;
+import com.github.mikephil.charting.utils.MPPointF;
+import com.github.mikephil.charting.utils.Transformer;
+import com.github.mikephil.charting.utils.ViewPortHandler;
 import com.mlsdev.rximagepicker.RxImageConverters;
 import com.mlsdev.rximagepicker.RxImagePicker;
 import com.mlsdev.rximagepicker.Sources;
@@ -148,6 +154,7 @@ public class TemplateFragment extends Fragment {
     private final String SIGNATURE_PREVIEW_JSON_ARRAY = "sign_state";
     private SimpleDateFormat isoDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ", Locale.getDefault());
     private SimpleDateFormat isoDateFormatNoTimeZone = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault());
+    SimpleDateFormat xDateFormat = new SimpleDateFormat("dd-MM\nHH:mm", Locale.getDefault());
     private final int VIDEO_REQUEST_CODE = 10;
     private final int PHOTO_REQUEST_CODE = 11;
     private final int AUDIO_REQUEST_CODE = 12;
@@ -1022,7 +1029,6 @@ public class TemplateFragment extends Fragment {
                                 final List<String> xValues = new ArrayList<>();
 
                                 SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
-                                SimpleDateFormat xDateFormat = new SimpleDateFormat("dd-MM HH:mm", Locale.getDefault());
 
                                 for (int k = 0; k < ticks.length(); k++) {
                                     JSONObject tick = ticks.getJSONObject(k);
@@ -1054,25 +1060,48 @@ public class TemplateFragment extends Fragment {
                                     lineChart.setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT));
 
                                     LineDataSet dataSet = new LineDataSet(entries, "");
-                                    dataSet.setColor(Color.RED);
+                                    dataSet.setMode(LineDataSet.Mode.LINEAR);
+                                    dataSet.setDrawCircles(false);
+
+                                    dataSet.setDrawHighlightIndicators(true);
+                                    dataSet.setHighlightEnabled(true);
+                                    dataSet.setHighLightColor(Color.RED);
+
                                     dataSet.setValueTextColor(Color.BLACK);
-                                    dataSet.setMode(LineDataSet.Mode.CUBIC_BEZIER);
-                                    dataSet.setLineWidth(1f);
+
+                                    dataSet.setLineWidth(2f);
+                                    dataSet.setColor(Color.parseColor("#AFA8DC"));
+
+                                    dataSet.setDrawFilled(true);
+                                    dataSet.setFillDrawable(ContextCompat.getDrawable(getContext(), R.drawable.spline_gradient_bg));
 
                                     LineData lineData = new LineData(dataSet);
+                                    lineData.setDrawValues(false);
 
                                     lineChart.setData(lineData);
                                     lineChart.getLegend().setEnabled(false);
                                     lineChart.getDescription().setEnabled(false);
                                     lineChart.setTouchEnabled(true);
-                                    lineChart.setScaleYEnabled(true);
-                                    lineChart.setScaleXEnabled(false);
+                                    lineChart.setScaleYEnabled(false);
+                                    lineChart.setScaleXEnabled(true);
+                                    lineChart.setAutoScaleMinMaxEnabled(true);
+
                                     setupAxis(lineChart.getXAxis(), xValues);
 
+                                    lineChart.getAxisRight().setEnabled(false);
                                     lineChart.invalidate(); // refresh
-
                                     lineChart.getAxisLeft().resetAxisMinimum();
                                     lineChart.getAxisLeft().setAxisMaximum(lineChart.getAxisLeft().getAxisMaximum() * 1.2f);
+
+                                    lineChart.getAxisLeft().setGridColor(Color.parseColor("#374E3F60"));
+                                    lineChart.getXAxis().setGridColor(Color.parseColor("#374E3F60"));
+
+
+                                    lineChart.getXAxis().setDrawAxisLine(false);
+                                    lineChart.getAxisLeft().setDrawAxisLine(false);
+                                    lineChart.getAxisRight().setDrawAxisLine(false);
+                                    lineChart.setXAxisRenderer(new CustomXAxisRenderer(lineChart.getViewPortHandler(), lineChart.getXAxis(), lineChart.getTransformer(YAxis.AxisDependency.LEFT)));
+                                    lineChart.setExtraBottomOffset(50);
 
                                     chartContainer.addView(lineChart);
                                 } else {
@@ -1090,7 +1119,10 @@ public class TemplateFragment extends Fragment {
                                     barChart.getLegend().setEnabled(false);
                                     barChart.getDescription().setEnabled(false);
                                     barChart.setScaleYEnabled(true);
+
                                     setupAxis(barChart.getXAxis(), xValues);
+                                    barChart.setXAxisRenderer(new CustomXAxisRenderer(barChart.getViewPortHandler(), barChart.getXAxis(), barChart.getTransformer(YAxis.AxisDependency.LEFT)));
+                                    barChart.setExtraBottomOffset(50);
 
                                     barChart.invalidate();
                                     chartContainer.addView(barChart);
@@ -1113,21 +1145,45 @@ public class TemplateFragment extends Fragment {
 
     private void setupAxis(XAxis xAxis, final List<String> xValues) {
         xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
-        xAxis.setLabelRotationAngle(90);
+        //xAxis.setLabelRotationAngle(90);
         xAxis.setDrawLabels(true);
         xAxis.setEnabled(true);
-        xAxis.setSpaceMin(2.0f);
-        xAxis.setSpaceMax(2.0f);
-        xAxis.setTextColor(Color.BLUE);
+        xAxis.setTextColor(Color.parseColor("#4E3F60"));
+        // xAxis.setGranularity(3f);
 
         xAxis.setValueFormatter(new IAxisValueFormatter() {
 
             @Override
             public String getFormattedValue(float value, AxisBase axis) {
                 String stringValue;
-                if (xValues.size() >= 0 && value >= 0 && (((int) value == value))) {
-                    if (value < xValues.size()) {
-                        stringValue = xValues.get((int) value);
+                if (xValues.size() >= 0 && value >= 0) {
+                    int finalIPos = -1;
+
+                    if ((((int) value == value)))
+                        finalIPos = (int) value;
+                    else {
+                        int startV = (int) value;
+                        int endV = startV + 1;
+                        if (endV >= xValues.size())
+                            finalIPos = (int) value;
+                        else {
+                            try {
+                                long startDate = xDateFormat.parse(xValues.get(startV)).getTime();
+                                long endDate = xDateFormat.parse(xValues.get(endV)).getTime();
+                                long delta = endDate - startDate;
+
+                                double valueDelta = value - ((int) value);
+                                long resultDate = startDate + (long) (delta * valueDelta);
+                                return xDateFormat.format(new Date(resultDate));
+                            } catch (Exception exc) {
+                                exc.printStackTrace();
+                                return "exc";
+                            }
+                        }
+                    }
+
+                    if (finalIPos != -1 && finalIPos < xValues.size()) {
+                        stringValue = xValues.get(finalIPos);
                     } else {
                         stringValue = "";
                     }
@@ -1138,6 +1194,7 @@ public class TemplateFragment extends Fragment {
             }
         });
     }
+
 
     private void scanQrCode(EditText scanTo) {
         try {
@@ -3598,5 +3655,18 @@ public class TemplateFragment extends Fragment {
             }
         }
         return containerValues;
+    }
+
+    public static class CustomXAxisRenderer extends XAxisRenderer {
+        public CustomXAxisRenderer(ViewPortHandler viewPortHandler, XAxis xAxis, Transformer trans) {
+            super(viewPortHandler, xAxis, trans);
+        }
+
+        @Override
+        protected void drawLabel(Canvas c, String formattedLabel, float x, float y, MPPointF anchor, float angleDegrees) {
+            String line[] = formattedLabel.split("\n");
+            com.github.mikephil.charting.utils.Utils.drawXAxisValue(c, line[0], x, y, mAxisLabelPaint, anchor, angleDegrees);
+            com.github.mikephil.charting.utils.Utils.drawXAxisValue(c, line[1], x, y + mAxisLabelPaint.getTextSize(), mAxisLabelPaint, anchor, angleDegrees);
+        }
     }
 }

@@ -7,6 +7,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.text.TextUtils;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
@@ -60,6 +61,7 @@ public class PanelFragment extends Fragment {
 
     private LinearLayout dashbordContainer;
     private SimpleDateFormat isoDateFormatNoTimeZone = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault());
+    private SimpleDateFormat xDateFormat = new SimpleDateFormat("dd-MM", Locale.getDefault());
 
 
     public static PanelFragment newInstance(Panel panel) {
@@ -118,20 +120,39 @@ public class PanelFragment extends Fragment {
                 for (int j = 0; j < rowItems.length(); j++) {
                     JSONObject rowItem = rowItems.getJSONObject(j);
 
+                    View title = null;
                     if (rowItem.has("indicator")) {
-                        dashbordContainer.addView(renderGraphTitle(rowItem.getJSONObject("indicator").getString("autoCaption")));
+                        title = renderGraphTitle(rowItem.getJSONObject("indicator").getString("autoCaption"));
+                        dashbordContainer.addView(title);
                         dashbordContainer.addView(renderIndicator(rowItem.getJSONObject("indicator")));
                     }
 
                     if (rowItem.has("histogram")) {
-                        dashbordContainer.addView(renderGraphTitle(rowItem.getJSONObject("histogram").getString("autoCaption")));
+                        title = renderGraphTitle(rowItem.getJSONObject("histogram").getString("autoCaption"));
+                        dashbordContainer.addView(title);
                         dashbordContainer.addView(renderHistogramOrSpline(rowItem.getJSONObject("histogram"), false));
                     }
 
                     if (rowItem.has("spline")) {
-                        dashbordContainer.addView(renderGraphTitle(rowItem.getJSONObject("spline").getString("autoCaption")));
+                        title = renderGraphTitle(rowItem.getJSONObject("spline").getString("autoCaption"));
+                        dashbordContainer.addView(title);
                         dashbordContainer.addView(renderHistogramOrSpline(rowItem.getJSONObject("spline"), true));
                     }
+
+
+                    if (title != null) {
+                        LinearLayout.LayoutParams layoutParams = ((LinearLayout.LayoutParams) title.getLayoutParams());
+
+                        layoutParams.topMargin = dpToPx(18);
+                        layoutParams.bottomMargin = dpToPx(-5);
+
+                        if (i == 0 && j == 0)
+                            layoutParams.topMargin = dpToPx(5);
+
+                        title.setLayoutParams(layoutParams);
+                        title.requestLayout();
+                    }
+
                 }
             }
         } catch (Exception e) {
@@ -139,7 +160,12 @@ public class PanelFragment extends Fragment {
         }
     }
 
-    private View renderHistogramOrSpline(JSONObject graphObj, boolean isSpine) throws Exception {
+    private int dpToPx(int dp) {
+        Resources resources = getContext().getResources();
+        return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, resources.getDisplayMetrics());
+    }
+
+    private View renderHistogramOrSpline(JSONObject graphObj, boolean isSpline) throws Exception {
         Resources resources = getContext().getResources();
         int chartHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 300, resources.getDisplayMetrics());
         RelativeLayout chartContainer = new RelativeLayout(getContext());
@@ -152,7 +178,6 @@ public class PanelFragment extends Fragment {
         final List<String> xValues = new ArrayList<>();
 
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
-        SimpleDateFormat xDateFormat = new SimpleDateFormat("dd-MM", Locale.getDefault());
 
         for (int k = 0; k < ticks.length(); k++) {
             JSONObject tick = ticks.getJSONObject(k);
@@ -178,31 +203,78 @@ public class PanelFragment extends Fragment {
             emptyText.requestLayout();
         }
 
+        ArrayList<Integer> colors = new ArrayList<>();
+        ArrayList<IndicatorModel.Range> ranges = new ArrayList<>();
+        if (graphObj.has("ranges")) {
+            ranges = new ObjectMapper()
+                    .readValue(graphObj.getJSONArray("ranges").toString(), new TypeReference<ArrayList<IndicatorModel.Range>>() {
+                    });
 
-        if (isSpine) {
+
+        }
+
+        for (int k = 0; k < entries.size(); k++) {
+            float value = entries.get(k).getY();
+            int defaultColor = Color.CYAN;
+
+            for (IndicatorModel.Range range : ranges) {
+                if (value >= range.from && value <= range.to)
+                    defaultColor = Color.parseColor(range.color);
+            }
+            colors.add(defaultColor);
+        }
+
+
+        if (isSpline) {
             LineChart lineChart = new LineChart(getContext());
             lineChart.setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT));
 
             LineDataSet dataSet = new LineDataSet(entries, "");
-            dataSet.setColor(Color.RED);
+
+            dataSet.setCircleColors(colors);
+            dataSet.setDrawCircles(true);
+            dataSet.setCircleRadius(3f);
+            dataSet.setDrawCircleHole(false);
+
+            dataSet.setMode(LineDataSet.Mode.LINEAR);
+
+            dataSet.setDrawHighlightIndicators(true);
+            dataSet.setHighlightEnabled(true);
+            dataSet.setHighLightColor(Color.RED);
+
             dataSet.setValueTextColor(Color.BLACK);
-            dataSet.setMode(LineDataSet.Mode.CUBIC_BEZIER);
-            dataSet.setLineWidth(1f);
+
+            dataSet.setLineWidth(2f);
+            dataSet.setColor(Color.parseColor("#AFA8DC"));
+
+            dataSet.setDrawFilled(true);
+            dataSet.setFillDrawable(ContextCompat.getDrawable(getContext(), R.drawable.spline_gradient_bg));
 
             LineData lineData = new LineData(dataSet);
+            lineData.setDrawValues(false);
 
             lineChart.setData(lineData);
             lineChart.getLegend().setEnabled(false);
             lineChart.getDescription().setEnabled(false);
             lineChart.setTouchEnabled(true);
-            lineChart.setScaleYEnabled(true);
-            lineChart.setScaleXEnabled(false);
+            lineChart.setScaleYEnabled(false);
+            lineChart.setScaleXEnabled(true);
+            lineChart.setAutoScaleMinMaxEnabled(true);
+
             setupAxis(lineChart.getXAxis(), xValues);
 
+            lineChart.getAxisRight().setEnabled(false);
             lineChart.invalidate(); // refresh
-
             lineChart.getAxisLeft().resetAxisMinimum();
             lineChart.getAxisLeft().setAxisMaximum(lineChart.getAxisLeft().getAxisMaximum() * 1.2f);
+
+            lineChart.getAxisLeft().setGridColor(Color.parseColor("#374E3F60"));
+            lineChart.getXAxis().setGridColor(Color.parseColor("#374E3F60"));
+
+
+            lineChart.getXAxis().setDrawAxisLine(false);
+            lineChart.getAxisLeft().setDrawAxisLine(false);
+            lineChart.getAxisRight().setDrawAxisLine(false);
 
             chartContainer.addView(lineChart);
         } else {
@@ -233,18 +305,41 @@ public class PanelFragment extends Fragment {
         //xAxis.setLabelRotationAngle(90);
         xAxis.setDrawLabels(true);
         xAxis.setEnabled(true);
-        xAxis.setSpaceMin(2.0f);
-        xAxis.setSpaceMax(2.0f);
-        xAxis.setTextColor(Color.BLUE);
+        xAxis.setTextColor(Color.parseColor("#4E3F60"));
 
         xAxis.setValueFormatter(new IAxisValueFormatter() {
 
             @Override
             public String getFormattedValue(float value, AxisBase axis) {
                 String stringValue;
-                if (xValues.size() >= 0 && value >= 0 && (((int) value == value))) {
-                    if (value < xValues.size()) {
-                        stringValue = xValues.get((int) value);
+                if (xValues.size() >= 0 && value >= 0) {
+                    int finalIPos = -1;
+
+                    if ((((int) value == value)))
+                        finalIPos = (int) value;
+                    else {
+                        int startV = (int) value;
+                        int endV = startV + 1;
+                        if (endV >= xValues.size())
+                            finalIPos = (int) value;
+                        else {
+                            try {
+                                long startDate = xDateFormat.parse(xValues.get(startV)).getTime();
+                                long endDate = xDateFormat.parse(xValues.get(endV)).getTime();
+                                long delta = endDate - startDate;
+
+                                double valueDelta = value - ((int) value);
+                                long resultDate = startDate + (long) (delta * valueDelta);
+                                return xDateFormat.format(new Date(resultDate));
+                            } catch (Exception exc) {
+                                exc.printStackTrace();
+                                return "exc";
+                            }
+                        }
+                    }
+
+                    if (finalIPos != -1 && finalIPos < xValues.size()) {
+                        stringValue = xValues.get(finalIPos);
                     } else {
                         stringValue = "";
                     }
@@ -392,7 +487,13 @@ public class PanelFragment extends Fragment {
                             JSONObject jsonObject = new JSONObject(responseStr);
 
 
-                            Object dataSet = jsonObject.getJSONObject("data").get("dataSet");
+                            Object dataSet;
+
+                            if (jsonObject.has("timeSeries")) {
+                                dataSet = jsonObject;
+                            } else
+                                dataSet = jsonObject.getJSONObject("data").get("dataSet");
+
                             JSONObject timeSeries;
 
                             if (dataSet instanceof JSONArray)
