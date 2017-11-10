@@ -18,7 +18,7 @@
         android:layout_height="25dp"
         android:layout_gravity="center_vertical"
         android:adjustViewBounds="true"
-        android:src="@drawable/folder_icon" />
+        android:src="@drawable/analystics_icon" />
 
     <TextView
         android:id="@+id/panel_name"
