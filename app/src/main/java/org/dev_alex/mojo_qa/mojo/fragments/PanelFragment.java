@@ -17,6 +17,7 @@ import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -215,11 +216,11 @@ public class PanelFragment extends Fragment {
 
         for (int k = 0; k < entries.size(); k++) {
             float value = entries.get(k).getY();
-            int defaultColor = Color.CYAN;
+            int defaultColor = Color.parseColor("#2baaf6");
 
             for (IndicatorModel.Range range : ranges) {
                 if (value >= range.from && value <= range.to)
-                    defaultColor = Color.parseColor(range.color);
+                    defaultColor = Color.parseColor("#AA" + range.color.substring(1));
             }
             colors.add(defaultColor);
         }
@@ -280,21 +281,32 @@ public class PanelFragment extends Fragment {
         } else {
             BarChart barChart = new BarChart(getContext());
             barChart.setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT));
+            barChart.setDrawValueAboveBar(false);
 
             BarDataSet set = new BarDataSet(barEntries, "BarDataSet");
+            set.setColors(colors);
 
             BarData barData = new BarData(set);
-            barData.setDrawValues(true);
-            barData.setBarWidth(0.9f);
+            barData.setDrawValues(false);
+            barData.setBarWidth(1f);
+
+            //barChart.getAxisLeft().setAxisMaximum(barChart.getAxisLeft().getAxisMaximum() * 1.2f);
+
+            barChart.getAxisRight().setEnabled(false);
+            barChart.getAxisLeft().setGridColor(Color.parseColor("#374E3F60"));
+            barChart.getAxisLeft().setAxisLineColor(Color.parseColor("#374E3F60"));
+            barChart.getXAxis().setGridColor(Color.parseColor("#374E3F60"));
+            barChart.getXAxis().setAxisLineColor(Color.parseColor("#374E3F60"));
 
             barChart.setData(barData);
-            barChart.setFitBars(true);
+            barChart.setFitBars(false);
             barChart.getLegend().setEnabled(false);
             barChart.getDescription().setEnabled(false);
             barChart.setScaleYEnabled(true);
             setupAxis(barChart.getXAxis(), xValues);
 
             barChart.invalidate();
+            barChart.zoom(barEntries.size() / 10, 1, 0, 0);
             chartContainer.addView(barChart);
         }
         return chartContainer;
@@ -496,10 +508,25 @@ public class PanelFragment extends Fragment {
 
                             JSONObject timeSeries;
 
-                            if (dataSet instanceof JSONArray)
-                                timeSeries = ((JSONArray) dataSet).getJSONObject(0).getJSONObject("timeSeries");
-                            else
-                                timeSeries = ((JSONObject) dataSet).getJSONObject("timeSeries");
+                            if (dataSet instanceof JSONArray) {
+                                String timeSeriesStr = ((JSONArray) dataSet).getJSONObject(0).getString("timeSeries");
+                                if (!timeSeriesStr.isEmpty())
+                                    timeSeries = ((JSONArray) dataSet).getJSONObject(0).getJSONObject("timeSeries");
+                                else {
+                                    graphObj.put("value", -11112222);
+                                    graphObj.put("tick", new JSONArray());
+                                    continue;
+                                }
+                            } else {
+                                String timeSeriesStr = ((JSONObject) dataSet).getString("timeSeries");
+                                if (!timeSeriesStr.isEmpty())
+                                    timeSeries = ((JSONObject) dataSet).getJSONObject("timeSeries");
+                                else {
+                                    graphObj.put("value", -11112222);
+                                    graphObj.put("tick", new JSONArray());
+                                    continue;
+                                }
+                            }
 
                             if (rowItem.has("indicator")) {
                                 graphObj.put("value", timeSeries.getJSONObject("tick").getInt("value"));
@@ -575,8 +602,11 @@ public class PanelFragment extends Fragment {
                 if (loopDialog != null && loopDialog.isShowing())
                     loopDialog.dismiss();
 
-                addPages();
-                showPage(0);
+                if (responseCode == 200) {
+                    addPages();
+                    showPage(0);
+                } else
+                    Toast.makeText(getContext(), "Во время загрузки произошла ошибка", Toast.LENGTH_LONG).show();
 
             } catch (Exception exc) {
                 exc.printStackTrace();

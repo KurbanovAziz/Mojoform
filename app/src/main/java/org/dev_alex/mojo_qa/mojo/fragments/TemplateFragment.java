@@ -1109,24 +1109,29 @@ public class TemplateFragment extends Fragment {
                                 } else {
                                     BarChart barChart = new BarChart(getContext());
                                     barChart.setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT));
+                                    barChart.setDrawValueAboveBar(false);
 
                                     BarDataSet set = new BarDataSet(barEntries, "BarDataSet");
 
                                     BarData barData = new BarData(set);
-                                    barData.setDrawValues(true);
-                                    barData.setBarWidth(0.9f);
+                                    barData.setDrawValues(false);
+                                    barData.setBarWidth(1f);
+                                    
+                                    barChart.getAxisRight().setEnabled(false);
+                                    barChart.getAxisLeft().setGridColor(Color.parseColor("#374E3F60"));
+                                    barChart.getAxisLeft().setAxisLineColor(Color.parseColor("#374E3F60"));
+                                    barChart.getXAxis().setGridColor(Color.parseColor("#374E3F60"));
+                                    barChart.getXAxis().setAxisLineColor(Color.parseColor("#374E3F60"));
 
                                     barChart.setData(barData);
-                                    barChart.setFitBars(true);
+                                    barChart.setFitBars(false);
                                     barChart.getLegend().setEnabled(false);
                                     barChart.getDescription().setEnabled(false);
                                     barChart.setScaleYEnabled(true);
-
                                     setupAxis(barChart.getXAxis(), xValues);
-                                    barChart.setXAxisRenderer(new CustomXAxisRenderer(barChart.getViewPortHandler(), barChart.getXAxis(), barChart.getTransformer(YAxis.AxisDependency.LEFT)));
-                                    barChart.setExtraBottomOffset(50);
 
                                     barChart.invalidate();
+                                    barChart.zoom(barEntries.size() / 10, 1, 0, 0);
                                     chartContainer.addView(barChart);
                                 }
                                 container.addView(chartContainer);
