@@ -1011,8 +1011,10 @@ public class TemplateFragment extends Fragment {
                                 }
 
                                 IndicatorLayout indicatorLayout = new IndicatorLayout(getContext(), indicatorModel);
-                                indicatorLayout.setCurrentValue(value.getInt("value"));
-                                container.addView(indicatorLayout);
+                                if (value.has("value")) {
+                                    indicatorLayout.setCurrentValue(value.getInt("value"));
+                                    container.addView(indicatorLayout);
+                                }
                                 break;
 
                             case "spline":
