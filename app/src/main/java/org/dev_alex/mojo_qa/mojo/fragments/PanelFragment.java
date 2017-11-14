@@ -1,6 +1,7 @@
 package org.dev_alex.mojo_qa.mojo.fragments;
 
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Color;
 import android.os.AsyncTask;
@@ -11,6 +12,7 @@ import android.support.v4.content.ContextCompat;
 import android.text.TextUtils;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
@@ -24,6 +26,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.AxisBase;
+import com.github.mikephil.charting.components.MarkerView;
 import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.data.BarData;
 import com.github.mikephil.charting.data.BarDataSet;
@@ -32,6 +35,7 @@ import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.formatter.IAxisValueFormatter;
+import com.github.mikephil.charting.highlight.Highlight;
 
 import org.dev_alex.mojo_qa.mojo.BuildConfig;
 import org.dev_alex.mojo_qa.mojo.R;
@@ -39,7 +43,6 @@ import org.dev_alex.mojo_qa.mojo.custom_views.indicator.IndicatorLayout;
 import org.dev_alex.mojo_qa.mojo.models.IndicatorModel;
 import org.dev_alex.mojo_qa.mojo.models.Panel;
 import org.dev_alex.mojo_qa.mojo.services.RequestService;
-import org.dev_alex.mojo_qa.mojo.services.Utils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -83,7 +86,7 @@ public class PanelFragment extends Fragment {
 
             panel = (Panel) getArguments().getSerializable("panel");
 
-            Utils.setupCloseKeyboardUI(getActivity(), rootView);
+            setupClosePageUI(rootView);
             initDialog();
             new GetPanelTask().execute();
 
@@ -277,6 +280,8 @@ public class PanelFragment extends Fragment {
             lineChart.getAxisLeft().setDrawAxisLine(false);
             lineChart.getAxisRight().setDrawAxisLine(false);
 
+            CustomMarkerView mv = new CustomMarkerView(getContext(), R.layout.higlight_marker);
+            lineChart.setMarker(mv);
             chartContainer.addView(lineChart);
         } else {
             BarChart barChart = new BarChart(getContext());
@@ -611,6 +616,47 @@ public class PanelFragment extends Fragment {
             } catch (Exception exc) {
                 exc.printStackTrace();
             }
+        }
+    }
+
+    public void setupClosePageUI(View rootView) {
+        // Set up touch listener for non-text box views to hide keyboard.
+        if (rootView.getId() != R.id.page_selector_block) {
+
+            rootView.setOnTouchListener(new View.OnTouchListener() {
+                public boolean onTouch(View v, MotionEvent event) {
+                    PanelFragment.this.rootView.findViewById(R.id.page_select_layout).setVisibility(View.GONE);
+                    return false;
+                }
+            });
+        }
+
+        //If a layout container, iterate over children and seed recursion.
+        if (rootView instanceof ViewGroup) {
+            for (int i = 0; i < ((ViewGroup) rootView).getChildCount(); i++) {
+                View innerView = ((ViewGroup) rootView).getChildAt(i);
+                setupClosePageUI(innerView);
+            }
+        }
+    }
+
+    public class CustomMarkerView extends MarkerView {
+
+        private TextView tvContent;
+
+        public CustomMarkerView(Context context, int layoutResource) {
+            super(context, layoutResource);
+            tvContent = (TextView) findViewById(R.id.tvContent);
+        }
+
+        @Override
+        public void refreshContent(Entry e, Highlight highlight) {
+            tvContent.setText("" + e.getX()); // set the entry-value as the display text
+        }
+
+        @Override
+        public void setOffset(float offsetX, float offsetY) {
+            super.setOffset(offsetX, offsetY);
         }
     }
 }

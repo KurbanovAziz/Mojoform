@@ -258,18 +258,22 @@ public class BitmapService {
 
     public static File saveBitmapToFile(Context context, Bitmap bitmap) throws Exception {
         File f = new File(context.getExternalCacheDir(), String.valueOf(System.currentTimeMillis()) + ".png");
-        if (f.createNewFile()) {
+        return saveBitmapToFile(f, bitmap);
+    }
+
+    public static File saveBitmapToFile(File file, Bitmap bitmap) throws Exception {
+        if (file.createNewFile()) {
             ByteArrayOutputStream bos = new ByteArrayOutputStream();
             bitmap.compress(Bitmap.CompressFormat.PNG, 100, bos);
             byte[] bitmapData = bos.toByteArray();
 
             //write the bytes in file
-            FileOutputStream fos = new FileOutputStream(f);
+            FileOutputStream fos = new FileOutputStream(file);
             fos.write(bitmapData);
             fos.flush();
             fos.close();
 
-            return f;
+            return file;
         } else
             throw new Exception("Не удалось создать файл");
     }

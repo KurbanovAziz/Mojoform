@@ -8,11 +8,14 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
+import android.graphics.Bitmap.Config;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Paint;
 import android.graphics.PorterDuff;
 import android.graphics.Rect;
+import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.LayerDrawable;
 import android.media.ExifInterface;
@@ -939,6 +942,10 @@ public class TemplateFragment extends Fragment {
                         LinearLayout.LayoutParams richEditLayoutParams = new LinearLayout.LayoutParams
                                 (ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
 
+                        richEdit.getSettings().setBuiltInZoomControls(true);
+                        richEdit.getSettings().setSupportZoom(true);
+                        richEdit.getSettings().setDisplayZoomControls(false);
+
                         richEditLayoutParams.leftMargin = paddings;
                         richEditLayoutParams.rightMargin = paddings;
                         richEditLayoutParams.topMargin = paddings;
@@ -1116,7 +1123,7 @@ public class TemplateFragment extends Fragment {
                                     BarData barData = new BarData(set);
                                     barData.setDrawValues(false);
                                     barData.setBarWidth(1f);
-                                    
+
                                     barChart.getAxisRight().setEnabled(false);
                                     barChart.getAxisLeft().setGridColor(Color.parseColor("#374E3F60"));
                                     barChart.getAxisLeft().setAxisLineColor(Color.parseColor("#374E3F60"));
@@ -2436,7 +2443,7 @@ public class TemplateFragment extends Fragment {
 
             if (resultFile.exists()) {
                 BitmapFactory.Options options = new BitmapFactory.Options();
-                options.inPreferredConfig = Bitmap.Config.ARGB_8888;
+                options.inPreferredConfig = Config.ARGB_8888;
                 Bitmap bitmap = BitmapFactory.decodeFile(resultFile.getAbsolutePath(), options);
                 signature.put(SIGNATURE_PREVIEW_JSON_ARRAY, BitmapService.getBitmapBytesEncodedBase64(bitmap));
             }
@@ -3133,6 +3140,7 @@ public class TemplateFragment extends Fragment {
     private void processImageFile(File file, final boolean isRestore, final Pair<LinearLayout, JSONObject> toBlock) {
         final int imgSize = Math.round(TypedValue.applyDimension
                 (TypedValue.COMPLEX_UNIT_DIP, 93, getResources().getDisplayMetrics()));
+        final int bigImgSize = 1300;
 
         Observable.just(file)
                 .subscribeOn(Schedulers.io())
@@ -3142,8 +3150,8 @@ public class TemplateFragment extends Fragment {
                     public ObservableSource<Pair<Bitmap, String>> apply(@NonNull File file) throws Exception {
                         String picturePath = file.getAbsolutePath();
 
-                        final BitmapFactory.Options tmpOptions = new BitmapFactory.Options();
-                        final BitmapFactory.Options options = new BitmapFactory.Options();
+                        BitmapFactory.Options tmpOptions = new BitmapFactory.Options();
+                        BitmapFactory.Options options = new BitmapFactory.Options();
 
                         tmpOptions.inJustDecodeBounds = true;
                         BitmapFactory.decodeFile(picturePath, tmpOptions);
@@ -3156,6 +3164,24 @@ public class TemplateFragment extends Fragment {
 
                         if (!isRestore) {
                             try {
+                                File resFile = new File(picturePath);
+                                tmpOptions = new BitmapFactory.Options();
+                                options = new BitmapFactory.Options();
+
+                                tmpOptions.inJustDecodeBounds = true;
+                                BitmapFactory.decodeFile(picturePath, tmpOptions);
+                                options.inSampleSize = BitmapService.calculateInSampleSize(tmpOptions, bigImgSize);
+                                options.inJustDecodeBounds = false;
+
+                                Bitmap resBitmap = BitmapFactory.decodeFile(picturePath, options);
+                                resBitmap = BitmapService.modifyOrientation(resBitmap, picturePath);
+
+                                SimpleDateFormat watermarkDateFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss", Locale.getDefault());
+                                resBitmap = drawWaterMarkOnBitmap(resBitmap, watermarkDateFormat.format(new Date()));
+
+                                resFile.delete();
+                                BitmapService.saveBitmapToFile(resFile, resBitmap);
+
                                 ExifInterface exif = new ExifInterface(picturePath);
 
                                 SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy:MM:dd", Locale.getDefault());
@@ -3202,6 +3228,39 @@ public class TemplateFragment extends Fragment {
                                 Toast.makeText(getContext(), "При обработке фото произошла ошибка:: " + throwable.getMessage(), Toast.LENGTH_LONG).show();
                             }
                         });
+    }
+
+    public Bitmap drawWaterMarkOnBitmap(Bitmap bitmap, String mText) {
+        try {
+            Config bitmapConfig = bitmap.getConfig();
+            if (bitmapConfig == null) {
+                bitmapConfig = Config.ARGB_8888;
+            }
+            bitmap = bitmap.copy(bitmapConfig, true);
+
+            Canvas canvas = new Canvas(bitmap);
+            Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
+            paint.setColor(Color.parseColor("#58317f"));
+            paint.setTextSize(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 15, getContext().getResources().getDisplayMetrics()));
+            paint.setShadowLayer(1f, 0f, 1f, Color.DKGRAY);
+
+            Rect bounds = new Rect();
+            paint.getTextBounds(mText, 0, mText.length(), bounds);
+            int x = (bitmap.getWidth() - bounds.width() - 25);
+            int y = (bitmap.getHeight() - bounds.height());
+
+            canvas.drawText(mText, x, y, paint);
+
+            Drawable d = getResources().getDrawable(R.drawable.watermark_logo);
+            int imageSize = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 45, getContext().getResources().getDisplayMetrics());
+            d.setBounds(25, 25, 25 + imageSize, 25 + imageSize);
+            d.draw(canvas);
+
+            return bitmap;
+        } catch (Exception exc) {
+            exc.printStackTrace();
+            return null;
+        }
     }
 
     private class OpenFileTask extends AsyncTask<Void, Void, Integer> {

@@ -18,7 +18,6 @@ import android.view.inputmethod.InputMethodManager;
 import android.webkit.MimeTypeMap;
 import android.widget.EditText;
 
-import org.dev_alex.mojo_qa.mojo.R;
 import org.json.JSONArray;
 
 import java.io.File;
@@ -167,7 +166,7 @@ public class Utils {
         String widthStr2 = "width:";
         String heightStr = "height=\"";
         String heightStr2 = "height:";
-        String endOfTag = "/>";
+        String endOfTag = ">";
         String closeTag = "</" + tag.substring(1);
 
         while ((index = html.indexOf(tag, index)) != -1) {
