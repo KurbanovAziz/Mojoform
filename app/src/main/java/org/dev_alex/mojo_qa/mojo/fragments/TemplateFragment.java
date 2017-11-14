@@ -51,7 +51,6 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.CookieManager;
-import android.webkit.WebView;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
@@ -103,6 +102,7 @@ import org.dev_alex.mojo_qa.mojo.R;
 import org.dev_alex.mojo_qa.mojo.activities.AuthActivity;
 import org.dev_alex.mojo_qa.mojo.activities.ImageViewActivity;
 import org.dev_alex.mojo_qa.mojo.activities.MainActivity;
+import org.dev_alex.mojo_qa.mojo.custom_views.CustomWebview;
 import org.dev_alex.mojo_qa.mojo.custom_views.indicator.IndicatorLayout;
 import org.dev_alex.mojo_qa.mojo.models.IndicatorModel;
 import org.dev_alex.mojo_qa.mojo.models.Page;
@@ -250,6 +250,8 @@ public class TemplateFragment extends Fragment {
             requiredCategoriesTags = new ArrayList<>();
 
             rootView = inflater.inflate(R.layout.fragment_template, container, false);
+            setupCloseKeyboardUI(getActivity(), rootView);
+
             ((MainActivity) getActivity()).drawer.getDrawerLayout().setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
             templateId = getArguments().getString("template_id");
             taskId = getArguments().getString("task_id");
@@ -268,7 +270,6 @@ public class TemplateFragment extends Fragment {
 
             initDialog();
             setupHeader();
-            setupCloseKeyboardUI(getActivity(), rootView);
             setListeners();
 
             new GetTemplateTask().execute();
@@ -938,13 +939,17 @@ public class TemplateFragment extends Fragment {
                     }
 
                     if (value.has("html")) {
-                        WebView richEdit = new WebView(getContext());
+                        CustomWebview richEdit = new CustomWebview(getContext());
                         LinearLayout.LayoutParams richEditLayoutParams = new LinearLayout.LayoutParams
                                 (ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
 
                         richEdit.getSettings().setBuiltInZoomControls(true);
                         richEdit.getSettings().setSupportZoom(true);
                         richEdit.getSettings().setDisplayZoomControls(false);
+                        richEdit.setFocusable(true);
+                        richEdit.setFocusableInTouchMode(true);
+                        richEdit.setDescendantFocusability(ViewGroup.FOCUS_BLOCK_DESCENDANTS);
+
 
                         richEditLayoutParams.leftMargin = paddings;
                         richEditLayoutParams.rightMargin = paddings;
