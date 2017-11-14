@@ -2,6 +2,7 @@ package org.dev_alex.mojo_qa.mojo.custom_views;
 
 import android.content.Context;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.webkit.WebView;
 
@@ -20,8 +21,10 @@ public class CustomWebview extends WebView {
     }
 
     @Override
-    public boolean onTouchEvent(MotionEvent event){
-        requestDisallowInterceptTouchEvent(true);
+    public boolean onTouchEvent(MotionEvent event) {
+        Log.d("touch_ct", "Touch Count =" + event.getPointerCount());
+        if (event.getPointerCount() > 1)
+            requestDisallowInterceptTouchEvent(true);
         return super.onTouchEvent(event);
-    }          
+    }
 }
