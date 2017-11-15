@@ -10,6 +10,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.text.TextUtils;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -46,6 +47,7 @@ import org.dev_alex.mojo_qa.mojo.services.RequestService;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -177,6 +179,7 @@ public class PanelFragment extends Fragment {
 
         final JSONArray ticks = graphObj.getJSONArray("tick");
 
+        float yMin = 0, yMax = 0;
         List<Entry> entries = new ArrayList<>();
         List<BarEntry> barEntries = new ArrayList<>();
         final List<String> xValues = new ArrayList<>();
@@ -191,6 +194,17 @@ public class PanelFragment extends Fragment {
             BarEntry barEntry = new BarEntry((float) k, (float) tick.getDouble("value"));
             barEntries.add(barEntry);
             xValues.add(xDateFormat.format(date));
+
+            if (k == 0) {
+                yMax = (float) tick.getDouble("value");
+                yMin = (float) tick.getDouble("value");
+            } else {
+                if (tick.getDouble("value") > yMax)
+                    yMax = (float) tick.getDouble("value");
+
+                if (tick.getDouble("value") < yMin)
+                    yMin = (float) tick.getDouble("value");
+            }
         }
         if (entries.isEmpty()) {
             entries.add(new Entry(0, 0));
@@ -280,7 +294,7 @@ public class PanelFragment extends Fragment {
             lineChart.getAxisLeft().setDrawAxisLine(false);
             lineChart.getAxisRight().setDrawAxisLine(false);
 
-            CustomMarkerView mv = new CustomMarkerView(getContext(), R.layout.higlight_marker);
+            CustomMarkerView mv = new CustomMarkerView(getContext(), R.layout.higlight_marker, xValues, 0, xValues.size() - 1, yMin, yMax);
             lineChart.setMarker(mv);
             chartContainer.addView(lineChart);
         } else {
@@ -311,7 +325,10 @@ public class PanelFragment extends Fragment {
             setupAxis(barChart.getXAxis(), xValues);
 
             barChart.invalidate();
-            barChart.zoom(barEntries.size() / 10, 1, 0, 0);
+            barChart.zoom(barEntries.size() / 10, 0.9f, 0, 0);
+
+            CustomMarkerView mv = new CustomMarkerView(getContext(), R.layout.higlight_marker, xValues, 0, xValues.size() - 1, yMin, yMax);
+            barChart.setMarker(mv);
             chartContainer.addView(barChart);
         }
         return chartContainer;
@@ -642,21 +659,57 @@ public class PanelFragment extends Fragment {
 
     public class CustomMarkerView extends MarkerView {
 
-        private TextView tvContent;
+        private TextView xValue;
+        private TextView yValue;
+        private List<String> xValues;
 
-        public CustomMarkerView(Context context, int layoutResource) {
+        private float xMin, xMax, yMin, yMax;
+
+        public CustomMarkerView(Context context, int layoutResource, List<String> xValues, float xMin, float xMax, float yMin, float yMax) {
             super(context, layoutResource);
-            tvContent = (TextView) findViewById(R.id.tvContent);
+            xValue = (TextView) findViewById(R.id.x_value);
+            yValue = (TextView) findViewById(R.id.y_value);
+            this.xValues = xValues;
+
+            this.xMin = xMin;
+            this.xMax = xMax;
+            this.yMin = yMin;
+            this.yMax = yMax;
         }
 
         @Override
         public void refreshContent(Entry e, Highlight highlight) {
-            tvContent.setText("" + e.getX()); // set the entry-value as the display text
-        }
+            super.refreshContent(e, highlight);
+            try {
+                SimpleDateFormat dateFotmat = new SimpleDateFormat("dd.MM.yyyy | HH:mm", Locale.getDefault());
+                xValue.setText(dateFotmat.format(xDateFormat.parse(xValues.get((int) e.getX())).getTime()));
+                yValue.setText(String.format(Locale.getDefault(), "%.2f", e.getY()));
+                xValue.requestLayout();
+                yValue.requestLayout();
 
-        @Override
-        public void setOffset(float offsetX, float offsetY) {
-            super.setOffset(offsetX, offsetY);
+                float xVal = e.getX();
+                float yVal = e.getY();
+
+                float xPosPercent = (xMax - xMin) == 0 ? 0 : (xVal - xMin) / (xMax - xMin);
+                float yPosPercent = (yMax - yMin) == 0 ? 0 : (yVal - yMin) / (yMax - yMin);
+
+                float xOffset, yOffset;
+                if (xPosPercent > 0.65)
+                    xOffset = -getMeasuredWidth();
+                else
+                    xOffset = dpToPx(10);
+
+                Log.d("testt", xPosPercent + " " + yPosPercent);
+                if (yPosPercent < 0.25)
+                    yOffset = -getMeasuredHeight();
+                else
+                    yOffset = dpToPx(-10);
+
+                setOffset(xOffset, yOffset);
+
+            } catch (ParseException e1) {
+                e1.printStackTrace();
+            }
         }
     }
 }

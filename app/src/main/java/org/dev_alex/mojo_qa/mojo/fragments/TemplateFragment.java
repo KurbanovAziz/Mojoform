@@ -3257,7 +3257,7 @@ public class TemplateFragment extends Fragment {
             canvas.drawText(mText, x, y, paint);
 
             Drawable d = getResources().getDrawable(R.drawable.watermark_logo);
-            int imageSize = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 45, getContext().getResources().getDisplayMetrics());
+            int imageSize = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 23, getContext().getResources().getDisplayMetrics());
             d.setBounds(25, 25, 25 + imageSize, 25 + imageSize);
             d.draw(canvas);
 
