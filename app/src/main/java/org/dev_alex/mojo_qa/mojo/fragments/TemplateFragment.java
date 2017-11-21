@@ -420,7 +420,9 @@ public class TemplateFragment extends Fragment {
         getActivity().findViewById(R.id.back_btn).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (getActivity() != null && getActivity().getSupportFragmentManager() != null) {
+                if (rootView.findViewById(R.id.scroll_view).canScrollVertically(-1))
+                    ((ScrollView) rootView.findViewById(R.id.scroll_view)).fullScroll(-1);
+                else if (getActivity() != null && getActivity().getSupportFragmentManager() != null) {
                     getActivity().getSupportFragmentManager().popBackStack();
                     ((MainActivity) getActivity()).drawer.getDrawerLayout().setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
                 }
