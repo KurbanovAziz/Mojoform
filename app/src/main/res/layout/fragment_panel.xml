@@ -5,16 +5,16 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/main_activity_background"
-    android:orientation="vertical"
-    android:paddingLeft="10dp"
-    android:paddingRight="10dp">
+    android:orientation="vertical">
 
     <LinearLayout
         android:id="@+id/top_block"
         android:layout_width="match_parent"
         android:layout_height="45dp"
         android:gravity="center_vertical"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp">
 
         <TextView
             android:id="@+id/dashbord_name"
@@ -34,7 +34,7 @@
             android:orientation="horizontal"
             android:paddingLeft="8dp"
             android:paddingRight="8dp">
-            
+
             <TextView
                 android:id="@+id/page_name"
                 android:layout_width="wrap_content"
@@ -47,25 +47,20 @@
         </LinearLayout>
     </LinearLayout>
 
-    <ScrollView
+    <android.support.v4.view.ViewPager
+        android:id="@+id/view_pager"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@+id/top_block">
-
-        <LinearLayout
-            android:id="@+id/dashbord_container"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:paddingBottom="15dp" />
-    </ScrollView>
+        android:layout_below="@+id/top_block" />
 
     <FrameLayout
         android:id="@+id/page_selector_block"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignRight="@+id/top_block"
-        android:layout_below="@+id/top_block">
+        android:layout_below="@+id/top_block"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp">
 
         <include
             layout="@layout/page_selector_window"
