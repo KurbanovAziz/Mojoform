@@ -126,8 +126,9 @@
 
     <View
         android:layout_width="match_parent"
-        android:layout_marginTop="-20dp"
         android:layout_height="0.8dp"
         android:layout_marginLeft="50dp"
-        android:background="#B6A9C9" />
+        android:layout_marginTop="-20dp"
+        android:background="#B6A9C9"
+        android:visibility="gone" />
 </LinearLayout>

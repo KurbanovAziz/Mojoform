@@ -99,5 +99,6 @@
     <string name="ref_about_app">Справка о приложении</string>
     <string name="analystics">Аналитика</string>
     <string name="page_short">Стр</string>
+    <string name="change_seq">Изменить расположение</string>
 
 </resources>

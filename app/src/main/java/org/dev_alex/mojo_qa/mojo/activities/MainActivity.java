@@ -3,25 +3,36 @@ package org.dev_alex.mojo_qa.mojo.activities;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.PersistableBundle;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
 import android.text.TextUtils;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.afollestad.materialdialogs.DialogAction;
+import com.afollestad.materialdialogs.MaterialDialog;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mikepenz.materialdrawer.Drawer;
 import com.mikepenz.materialdrawer.DrawerBuilder;
 import com.mikepenz.materialdrawer.model.DividerDrawerItem;
+import com.mikepenz.materialdrawer.model.SecondaryDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
+import com.woxthebox.draglistview.DragListView;
 
 import org.dev_alex.mojo_qa.mojo.R;
+import org.dev_alex.mojo_qa.mojo.adapters.DraggableItemAdapter;
 import org.dev_alex.mojo_qa.mojo.custom_views.CustomDrawerItem;
 import org.dev_alex.mojo_qa.mojo.fragments.DocumentsFragment;
 import org.dev_alex.mojo_qa.mojo.fragments.PanelListFragment;
@@ -34,7 +45,10 @@ import org.dev_alex.mojo_qa.mojo.services.RequestService;
 import org.dev_alex.mojo_qa.mojo.services.TokenService;
 
 import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 
 import okhttp3.Response;
@@ -55,8 +69,8 @@ public class MainActivity extends AppCompatActivity {
         if (drawer == null)
             return;
 
-        drawer.setSelection(1, false);
-        getSupportFragmentManager().beginTransaction().replace(R.id.container, TasksFragment.newInstance(), "tasks").commit();
+        drawer.setSelectionAtPosition(1, true);
+        //getSupportFragmentManager().beginTransaction().replace(R.id.container, TasksFragment.newInstance(), "tasks").commit();
         if (getIntent().hasExtra(AlarmService.TEMPLATE_ID)) {
             String templateId = getIntent().getStringExtra(AlarmService.TEMPLATE_ID);
             String siteId = getIntent().getStringExtra(AlarmService.SITE_ID);
@@ -88,18 +102,31 @@ public class MainActivity extends AppCompatActivity {
                     "%s %s", TextUtils.isEmpty(currentUser.firstName) ? "" : currentUser.firstName,
                     TextUtils.isEmpty(currentUser.lastName) ? "" : currentUser.lastName));
 
+
+        ArrayList<SecondaryDrawerItem> mainDraggableItems = new ArrayList<>();
+        for (String str : getDrawerMenuSequence()) {
+            if (str.equals("tasks"))
+                mainDraggableItems.add(new CustomDrawerItem(15, mainDraggableItems.isEmpty() ? -18 : 0).withIdentifier(1).withName(R.string.tasks).withIcon(R.drawable.tasks));
+            if (str.equals("docs"))
+                mainDraggableItems.add(new CustomDrawerItem(15, mainDraggableItems.isEmpty() ? -18 : 0).withIdentifier(2).withName(R.string.documents).withIcon(R.drawable.documents));
+            if (str.equals("analytics"))
+                mainDraggableItems.add(new CustomDrawerItem(15, mainDraggableItems.isEmpty() ? -18 : 0).withIdentifier(5).withName(R.string.analystics).withIcon(R.drawable.analystics_icon));
+        }
+
         drawer = new DrawerBuilder()
                 .withActivity(this)
                 .withDrawerWidthDp(305)
                 .withHeader(headerView)
                 .addDrawerItems(
-                        new CustomDrawerItem(15, -10).withIdentifier(1).withName(R.string.tasks).withIcon(R.drawable.tasks),
-                        new CustomDrawerItem(15, 0).withIdentifier(2).withName(R.string.documents).withIcon(R.drawable.documents),
-                        new CustomDrawerItem(15, 0).withIdentifier(5).withName(R.string.analystics).withIcon(R.drawable.analystics_icon),
+                        mainDraggableItems.get(0),
+                        new DividerDrawerItem(),
+                        mainDraggableItems.get(1),
+                        mainDraggableItems.get(2),
                         new CustomDrawerItem(15, 0).withIdentifier(3).withName(R.string.exit).withIcon(R.drawable.exit),
                         new DividerDrawerItem(),
-                        new CustomDrawerItem(15, 0).withIdentifier(4).withName(R.string.about_app).withIcon(R.drawable.question)
-
+                        new CustomDrawerItem(15, 0).withIdentifier(4).withName(R.string.about_app).withIcon(R.drawable.question),
+                        new DividerDrawerItem(),
+                        new CustomDrawerItem(15, 0).withIdentifier(6).withName(R.string.change_seq).withIcon(R.drawable.drag_icon)
                 )
                 .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
                     @Override
@@ -128,6 +155,9 @@ public class MainActivity extends AppCompatActivity {
                             case 5:
                                 getSupportFragmentManager().popBackStack(null, 0);
                                 getSupportFragmentManager().beginTransaction().replace(R.id.container, PanelListFragment.newInstance()).commit();
+                                break;
+                            case 6:
+                                showDragItemsDialog();
                                 break;
                         }
                         return false;
@@ -236,5 +266,81 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return dir.delete();
+    }
+
+    private void setDrawerMenuSequence(List<String> sequenceList) {
+        try {
+            SharedPreferences pref = getSharedPreferences("drawer_settings", Context.MODE_PRIVATE);
+            SharedPreferences.Editor editor = pref.edit();
+            editor.putString("drawer_sequence", new ObjectMapper().writeValueAsString(sequenceList));
+            editor.apply();
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private List<String> getDrawerMenuSequence() {
+        try {
+            SharedPreferences pref = getSharedPreferences("drawer_settings", Context.MODE_PRIVATE);
+            String jsonString = pref.getString("drawer_sequence", null);
+
+            List<String> seqList;
+            if (jsonString == null) {
+                seqList = new ArrayList<>();
+                seqList.add("tasks");
+                seqList.add("docs");
+                seqList.add("analytics");
+            } else {
+                seqList = new ObjectMapper().readValue(jsonString, new TypeReference<List<String>>() {
+                });
+            }
+
+            return seqList;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    private void showDragItemsDialog() {
+        View dialogRootView = getLayoutInflater().inflate(R.layout.drag_list_view, null);
+        DragListView dragListView = (DragListView) dialogRootView.findViewById(R.id.drag_list_view);
+        dragListView.setLayoutManager(new LinearLayoutManager(this));
+
+        List<String> values = getDrawerMenuSequence();
+        final DraggableItemAdapter draggableItemAdapter = new DraggableItemAdapter(this, values, R.layout.draggable_card, R.id.drag_icon, false);
+
+        dragListView.setAdapter(draggableItemAdapter, true);
+        dragListView.setCanDragHorizontally(false);
+        dragListView.setCanNotDragAboveTopItem(false);
+        dragListView.setCanNotDragBelowBottomItem(false);
+
+        new MaterialDialog.Builder(this)
+                .title(R.string.change_seq)
+                .customView(dragListView, false)
+                .positiveText(R.string.close)
+                .onPositive(new MaterialDialog.SingleButtonCallback() {
+                    @Override
+                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                        List<String> set = new ArrayList<>();
+                        for (int i = 0; i < 3; i++) {
+                            int itemId = (int) draggableItemAdapter.getUniqueItemId(i);
+                            switch (itemId) {
+                                case DraggableItemAdapter.TASKS:
+                                    set.add("tasks");
+                                    break;
+                                case DraggableItemAdapter.DOCS:
+                                    set.add("docs");
+                                    break;
+                                case DraggableItemAdapter.ANALYTICS:
+                                    set.add("analytics");
+                                    break;
+                            }
+                        }
+                        setDrawerMenuSequence(set);
+                        initDrawer();
+                    }
+                })
+                .show();
     }
 }
