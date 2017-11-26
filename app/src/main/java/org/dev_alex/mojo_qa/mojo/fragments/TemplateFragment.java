@@ -500,13 +500,14 @@ public class TemplateFragment extends Fragment {
                 .onPositive(new MaterialDialog.SingleButtonCallback() {
                     @Override
                     public void onClick(@android.support.annotation.NonNull MaterialDialog dialog, @android.support.annotation.NonNull DialogAction which) {
-                        RxImagePicker.with(getContext()).requestImage(Sources.CAMERA)
+                        RxImagePicker.with(getContext())
+                                .requestImage(Sources.CAMERA)
                                 .subscribeOn(Schedulers.io())
                                 .observeOn(AndroidSchedulers.mainThread())
                                 .flatMap(new Function<Uri, ObservableSource<File>>() {
                                     @Override
                                     public ObservableSource<File> apply(@NonNull Uri uri) throws Exception {
-                                        Thread.sleep(200);
+                                        Thread.sleep(420);
                                         File cacheFile = new File(getContext().getCacheDir(), UUID.randomUUID().toString() + ".jpg");
                                         return RxImageConverters.uriToFile(getContext(), uri, cacheFile);
                                     }
@@ -3737,9 +3738,15 @@ public class TemplateFragment extends Fragment {
 
         @Override
         protected void drawLabel(Canvas c, String formattedLabel, float x, float y, MPPointF anchor, float angleDegrees) {
-            String line[] = formattedLabel.split("\n");
-            com.github.mikephil.charting.utils.Utils.drawXAxisValue(c, line[0], x, y, mAxisLabelPaint, anchor, angleDegrees);
-            com.github.mikephil.charting.utils.Utils.drawXAxisValue(c, line[1], x, y + mAxisLabelPaint.getTextSize(), mAxisLabelPaint, anchor, angleDegrees);
+            if (formattedLabel == null || formattedLabel.isEmpty() || !formattedLabel.contains("\n")) {
+                if (formattedLabel == null)
+                    formattedLabel = "";
+                com.github.mikephil.charting.utils.Utils.drawXAxisValue(c, formattedLabel, x, y, mAxisLabelPaint, anchor, angleDegrees);
+            } else {
+                String line[] = formattedLabel.split("\n");
+                com.github.mikephil.charting.utils.Utils.drawXAxisValue(c, line[0], x, y, mAxisLabelPaint, anchor, angleDegrees);
+                com.github.mikephil.charting.utils.Utils.drawXAxisValue(c, line[1], x, y + mAxisLabelPaint.getTextSize(), mAxisLabelPaint, anchor, angleDegrees);
+            }
         }
     }
 }
