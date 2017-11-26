@@ -8,6 +8,7 @@ import org.dev_alex.mojo_qa.mojo.Data;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import okhttp3.Cookie;
 import okhttp3.CookieJar;
@@ -77,6 +78,9 @@ public class RequestService {
     private static OkHttpClient createOkHttpClient() {
         if (TokenService.isTokenExists())
             return new OkHttpClient().newBuilder()
+                    .connectTimeout(15, TimeUnit.SECONDS)
+                    .writeTimeout(15, TimeUnit.SECONDS)
+                    .readTimeout(30, TimeUnit.SECONDS)
                     .cookieJar(new CookieJar() {
                         @Override
                         public void saveFromResponse(HttpUrl url, List<Cookie> cookies) {
