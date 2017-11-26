@@ -396,6 +396,14 @@ public class PanelPageFragment extends Fragment {
         public void refreshContent(Entry e, Highlight highlight) {
             super.refreshContent(e, highlight);
             try {
+                if (xValues.isEmpty()) {
+                    xValue.setText("0");
+                    yValue.setText("0");
+                    xValue.requestLayout();
+                    yValue.requestLayout();
+                    return;
+                }
+                
                 SimpleDateFormat dateFotmat = new SimpleDateFormat("dd.MM.yyyy | HH:mm", Locale.getDefault());
                 xValue.setText(dateFotmat.format(xDateFormat.parse(xValues.get((int) e.getX())).getTime()));
                 yValue.setText(String.format(Locale.getDefault(), "%.2f", e.getY()));

@@ -132,6 +132,7 @@ public class FolderAdapter extends RecyclerView.Adapter<FolderAdapter.FolderView
                 }
             });
 
+
         viewHolder.folderIcon.setImageResource(folder.nodeType.equals("cm:org") ?
                 R.drawable.organization_icon : R.drawable.folder_icon);
 
@@ -141,6 +142,9 @@ public class FolderAdapter extends RecyclerView.Adapter<FolderAdapter.FolderView
         if ((LoginHistoryService.getCurrentUser().is_manager == null || !LoginHistoryService.getCurrentUser().is_manager)
                 && (LoginHistoryService.getCurrentUser().is_orgowner == null || !LoginHistoryService.getCurrentUser().is_orgowner))
             viewHolder.moreBtn.setVisibility(View.INVISIBLE);
+
+        if (folder.nodeType.equals("cm:org"))
+            viewHolder.moreBtn.setVisibility(View.GONE);
     }
 
     @Override
