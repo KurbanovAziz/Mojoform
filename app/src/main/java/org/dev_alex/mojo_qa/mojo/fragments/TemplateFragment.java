@@ -507,7 +507,7 @@ public class TemplateFragment extends Fragment {
                                 .flatMap(new Function<Uri, ObservableSource<File>>() {
                                     @Override
                                     public ObservableSource<File> apply(@NonNull Uri uri) throws Exception {
-                                        Thread.sleep(420);
+                                        Thread.sleep(780);
                                         File cacheFile = new File(getContext().getCacheDir(), UUID.randomUUID().toString() + ".jpg");
                                         return RxImageConverters.uriToFile(getContext(), uri, cacheFile);
                                     }
