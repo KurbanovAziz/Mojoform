@@ -78,7 +78,6 @@
             android:process=":second" />
 
         <activity android:name=".activities.OnboardingActivity" />
-        <activity android:name=".activities.AnalysticsActivity"></activity>
     </application>
 
 </manifest>

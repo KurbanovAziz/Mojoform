@@ -100,5 +100,7 @@
     <string name="analystics">Аналитика</string>
     <string name="page_short">Стр</string>
     <string name="change_seq">Изменить расположение</string>
+    <string name="plan">План</string>
+    <string name="fact">Факт</string>
 
 </resources>

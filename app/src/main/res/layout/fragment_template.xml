@@ -109,27 +109,20 @@
                 android:src="@drawable/left_arrow" />
         </FrameLayout>
 
-        <Space
-            android:id="@+id/left_space"
-            android:layout_width="0dp"
-            android:layout_height="54dp"
-            android:layout_weight="0.5"
-            android:visibility="gone" />
-
         <LinearLayout
             android:id="@+id/main_buttons_block"
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:baselineAligned="false"
+            android:gravity="center_horizontal"
             android:orientation="horizontal"
             android:visibility="visible">
 
             <FrameLayout
-                android:layout_width="0dp"
+                android:layout_width="140dp"
                 android:layout_height="54dp"
-                android:layout_marginTop="12dp"
-                android:layout_weight="1">
+                android:layout_marginTop="12dp">
 
                 <View
                     android:layout_width="match_parent"
@@ -151,10 +144,9 @@
 
             <FrameLayout
                 android:id="@+id/finish_btn_container"
-                android:layout_width="0dp"
+                android:layout_width="140dp"
                 android:layout_height="54dp"
-                android:layout_marginTop="12dp"
-                android:layout_weight="1">
+                android:layout_marginTop="12dp">
 
                 <View
                     android:layout_width="match_parent"
@@ -177,19 +169,19 @@
 
         <LinearLayout
             android:id="@+id/finished_buttons_block"
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:baselineAligned="false"
+            android:gravity="center_horizontal"
             android:orientation="horizontal"
             android:visibility="gone">
 
             <FrameLayout
                 android:id="@+id/download_pdf_btn_container"
-                android:layout_width="0dp"
+                android:layout_width="150dp"
                 android:layout_height="54dp"
-                android:layout_marginTop="12dp"
-                android:layout_weight="1">
+                android:layout_marginTop="12dp">
 
                 <View
                     android:layout_width="match_parent"
@@ -210,10 +202,9 @@
 
             <FrameLayout
                 android:id="@+id/close_btn_container"
-                android:layout_width="0dp"
+                android:layout_width="150dp"
                 android:layout_height="54dp"
-                android:layout_marginTop="12dp"
-                android:layout_weight="1">
+                android:layout_marginTop="12dp">
 
                 <View
                     android:layout_width="match_parent"
@@ -233,17 +224,11 @@
             </FrameLayout>
         </LinearLayout>
 
-        <Space
-            android:id="@+id/right_space"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="0.5"
-            android:visibility="gone" />
-
         <FrameLayout
             android:id="@+id/right_arrow"
             android:layout_width="30dp"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:layout_gravity="right">
 
             <ImageView
                 android:layout_width="22dp"

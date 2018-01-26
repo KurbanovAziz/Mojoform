@@ -606,19 +606,19 @@ public class TemplateFragment extends Fragment {
             rootView.findViewById(R.id.right_arrow).setVisibility(currentPagePos < pages.size() - 1 ? View.VISIBLE : View.INVISIBLE);
 
             if (currentPagePos == pages.size() - 1) {
-                rootView.findViewById(R.id.left_space).setVisibility(View.GONE);
-                rootView.findViewById(R.id.right_space).setVisibility(View.GONE);
+                /*rootView.findViewById(R.id.left_space).setVisibility(View.GONE);
+                rootView.findViewById(R.id.right_space).setVisibility(View.GONE);*/
                 rootView.findViewById(R.id.finish_btn_container).setVisibility(View.VISIBLE);
             } else {
                 if (!isTaskFinished) {
-                    rootView.findViewById(R.id.left_space).setVisibility(View.VISIBLE);
-                    rootView.findViewById(R.id.right_space).setVisibility(View.VISIBLE);
+                   /* rootView.findViewById(R.id.left_space).setVisibility(View.VISIBLE);
+                    rootView.findViewById(R.id.right_space).setVisibility(View.VISIBLE);*/
                     rootView.findViewById(R.id.finish_btn_container).setVisibility(View.GONE);
                 }
             }
         } else {
-            rootView.findViewById(R.id.left_space).setVisibility(View.GONE);
-            rootView.findViewById(R.id.right_space).setVisibility(View.GONE);
+         /*   rootView.findViewById(R.id.left_space).setVisibility(View.GONE);
+            rootView.findViewById(R.id.right_space).setVisibility(View.GONE);*/
             rootView.findViewById(R.id.finish_btn_container).setVisibility(View.VISIBLE);
 
 
@@ -889,6 +889,74 @@ public class TemplateFragment extends Fragment {
                     }
 
                     container.addView(boxInContainerWithId(editTextMultiLineContainer, value.getString("id")));
+                    break;
+
+                case "money":
+                    final LinearLayout moneyContainer = (LinearLayout) getActivity().getLayoutInflater().inflate(R.layout.text_plan, container, false);
+                    ((ViewGroup) moneyContainer.getChildAt(0)).getChildAt(1).setVisibility((value.has("is_required") && !value.getBoolean("is_required")) ? View.GONE : View.VISIBLE);
+
+                    if (value.has("caption"))
+                        ((TextView) ((ViewGroup) moneyContainer.getChildAt(0)).getChildAt(0)).setText(value.getString("caption"));
+                    else
+                        ((TextView) ((ViewGroup) moneyContainer.getChildAt(0)).getChildAt(0)).setText("Нет текста");
+
+                    if (value.has("plan"))
+                        ((EditText) ((ViewGroup) moneyContainer.getChildAt(2)).getChildAt(0)).setText(value.getString("plan"));
+
+                    if (value.has("fact"))
+                        ((EditText) ((ViewGroup) moneyContainer.getChildAt(2)).getChildAt(1)).setText(value.getString("fact"));
+
+                    if (isTaskFinished) {
+                        ((ViewGroup) moneyContainer.getChildAt(2)).getChildAt(0).setEnabled(false);
+                        ((ViewGroup) moneyContainer.getChildAt(2)).getChildAt(1).setEnabled(false);
+                    } else {
+                        ((EditText) ((ViewGroup) moneyContainer.getChildAt(2)).getChildAt(0)).addTextChangedListener(new TextWatcher() {
+                            @Override
+                            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+                            }
+
+                            @Override
+                            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+                            }
+
+                            @Override
+                            public void afterTextChanged(Editable s) {
+                                try {
+                                    if (s.toString().trim().isEmpty())
+                                        value.remove("plan");
+                                    else
+                                        value.put("plan", Integer.parseInt(s.toString().trim()));
+                                } catch (Exception ignored) {
+                                }
+                            }
+                        });
+                        ((EditText) ((ViewGroup) moneyContainer.getChildAt(2)).getChildAt(1)).addTextChangedListener(new TextWatcher() {
+                            @Override
+                            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+                            }
+
+                            @Override
+                            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+                            }
+
+                            @Override
+                            public void afterTextChanged(Editable s) {
+                                try {
+                                    if (s.toString().trim().isEmpty())
+                                        value.remove("fact");
+                                    else
+                                        value.put("fact", Integer.parseInt(s.toString().trim()));
+                                } catch (Exception ignored) {
+                                }
+                            }
+                        });
+                    }
+
+                    container.addView(boxInContainerWithId(moneyContainer, value.getString("id")));
                     break;
 
                 case "checkbox":
@@ -2385,6 +2453,14 @@ public class TemplateFragment extends Fragment {
                         item.put("value", boolValue);
                         break;
 
+                    case "plan":
+                        item.put("plan", value.getInt("value"));
+                        break;
+
+                    case "fact":
+                        item.put("fact", value.getInt("value"));
+                        break;
+
                     case "media_id":
                         if (elementName == null)
                             break;
@@ -3671,6 +3747,25 @@ public class TemplateFragment extends Fragment {
                         objectValue.put("value", value.getString("value"));
                         objectValue.put("type", "text");
 
+                        containerValues.put(objectValue);
+                    }
+                    break;
+
+                case "money":
+
+                    if (value.has("plan")) {
+                        JSONObject objectValue = new JSONObject();
+                        objectValue.put("id", value.getString("id"));
+                        objectValue.put("value", value.getInt("plan"));
+                        objectValue.put("type", "plan");
+                        containerValues.put(objectValue);
+                    }
+
+                    if (value.has("fact")) {
+                        JSONObject objectValue = new JSONObject();
+                        objectValue.put("id", value.getString("id"));
+                        objectValue.put("value", value.getInt("fact"));
+                        objectValue.put("type", "fact");
                         containerValues.put(objectValue);
                     }
                     break;

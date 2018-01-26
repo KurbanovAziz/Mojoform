@@ -32,4 +32,15 @@
         android:text="Прочее"
         android:textColor="#4c3d5f"
         android:textSize="17sp" />
+
+    <TextView
+        android:id="@+id/panel_stats"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:layout_marginLeft="15dp"
+        android:layout_marginRight="15dp"
+        android:text=""
+        android:textColor="#4c3d5f"
+        android:textSize="17sp" />
 </LinearLayout>

@@ -321,7 +321,7 @@ public class PanelFragment extends Fragment {
         @Override
         protected Integer doInBackground(Void... params) {
             try {
-                Response response = RequestService.createGetRequest("/api/fs-analytic/get/" + panel.panel_id);
+                Response response = RequestService.createGetRequest("/api/fs-analytic/get/" + panel.id);
                 String responseStr = response.body().string();
                 panelJson = new JSONObject(responseStr);
                 downloadGraphData();

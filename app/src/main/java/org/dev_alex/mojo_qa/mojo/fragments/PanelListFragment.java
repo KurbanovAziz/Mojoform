@@ -15,29 +15,24 @@ import android.widget.TextView;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import org.dev_alex.mojo_qa.mojo.BuildConfig;
 import org.dev_alex.mojo_qa.mojo.R;
 import org.dev_alex.mojo_qa.mojo.adapters.PanelAdapter;
 import org.dev_alex.mojo_qa.mojo.models.Panel;
-import org.dev_alex.mojo_qa.mojo.services.LoginHistoryService;
+import org.dev_alex.mojo_qa.mojo.services.RequestService;
 import org.dev_alex.mojo_qa.mojo.services.Utils;
 import org.json.JSONArray;
-import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
-import okhttp3.MediaType;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.RequestBody;
 import okhttp3.Response;
 
 public class PanelListFragment extends Fragment {
     private View rootView;
     private ProgressDialog loopDialog;
     private RecyclerView recyclerView;
-
 
     public static PanelListFragment newInstance() {
         return new PanelListFragment();
@@ -83,9 +78,46 @@ public class PanelListFragment extends Fragment {
         getActivity()
                 .getSupportFragmentManager()
                 .beginTransaction()
-                .addToBackStack("dd")
-                .replace(R.id.container, PanelFragment.newInstance(panel))
+                .replace(R.id.container, GraphListFragment.newInstance(panel))
+                .addToBackStack(null)
                 .commit();
+    }
+
+    private void showPanels(List<Panel> panels) {
+        List<Panel> synteticPanels = new ArrayList<>();
+        List<Panel> normalPanels = new ArrayList<>();
+
+        for (Panel panel : panels) {
+            if (panel.type.equals("complex"))
+                synteticPanels.add(panel);
+            else
+                normalPanels.add(panel);
+        }
+
+        Collections.sort(synteticPanels, new Comparator<Panel>() {
+            @Override
+            public int compare(Panel o1, Panel o2) {
+                return o1.name.compareToIgnoreCase(o2.name);
+            }
+        });
+        Collections.sort(normalPanels, new Comparator<Panel>() {
+            @Override
+            public int compare(Panel o1, Panel o2) {
+                return o1.name.compareToIgnoreCase(o2.name);
+            }
+        });
+
+        panels.clear();
+        panels.addAll(synteticPanels);
+        panels.add(Panel.getSeparatorPanel());
+        panels.addAll(normalPanels);
+
+        recyclerView.setAdapter(new PanelAdapter(panels, new PanelAdapter.OnPanelClickListener() {
+            @Override
+            public void onClick(Panel panel) {
+                onPanelClick(panel);
+            }
+        }));
     }
 
     public class GetPanelsTask extends AsyncTask<Void, Void, Integer> {
@@ -101,46 +133,10 @@ public class PanelListFragment extends Fragment {
         protected Integer doInBackground(Void... params) {
             try {
                 panels = new ArrayList<>();
-
-                String host;
-                switch (BuildConfig.FLAVOR) {
-                    case "release_flavor":
-                        host = "https://servlet.dss.mojo.mojoform.com/services";
-                        break;
-
-                    case "debug_flavor":
-                        host = "https://servlet.dss.dev-alex.org/services";
-                        break;
-
-                    default:
-                        host = "https://servlet.dss.mojo.mojoform.com/services";
-                        break;
-                }
-                host += "/mojo_datastore.HTTPEndpoint";
-
-                String url = host + "/getPanel";
-
-                JSONObject mainDataObject = new JSONObject();
-                mainDataObject.put("userId", LoginHistoryService.getCurrentUser().username);
-
-                JSONObject rootObject = new JSONObject();
-                rootObject.put("_postanalitycs_getpanel", mainDataObject);
-
-                final MediaType JSON = MediaType.parse("application/json");
-                RequestBody body = RequestBody.create(JSON, rootObject.toString());
-
-                OkHttpClient client = new OkHttpClient();
-                Request.Builder requestBuilder = new Request.Builder()
-                        .url(url)
-                        .post(body)
-                        .header("Authorization", "Basic YWRtaW46S0FESTdhc3VmandrbGVuaGtsOA==")
-                        .addHeader("Content-Type", "application/json")
-                        .header("Accept", "application/json");
-
-                Response response = client.newCall(requestBuilder.build()).execute();
+                Response response = RequestService.createGetRequest("/api/analytic");
                 String responseStr = response.body().string();
 
-                JSONArray panelsJson = new JSONObject(responseStr).getJSONObject("Results").getJSONArray("panels");
+                JSONArray panelsJson = new JSONArray(responseStr);
                 panels = new ObjectMapper().readValue(panelsJson.toString(), new TypeReference<ArrayList<Panel>>() {
                 });
                 return response.code();
@@ -157,12 +153,7 @@ public class PanelListFragment extends Fragment {
                 if (loopDialog != null && loopDialog.isShowing())
                     loopDialog.dismiss();
 
-                recyclerView.setAdapter(new PanelAdapter(panels, new PanelAdapter.OnPanelClickListener() {
-                    @Override
-                    public void onClick(Panel panel) {
-                        onPanelClick(panel);
-                    }
-                }));
+                showPanels(panels);
 
             } catch (Exception exc) {
                 exc.printStackTrace();
