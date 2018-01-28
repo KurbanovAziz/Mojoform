@@ -10,6 +10,8 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CompoundButton;
+import android.widget.Switch;
 import android.widget.TextView;
 
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -33,6 +35,9 @@ public class PanelListFragment extends Fragment {
     private View rootView;
     private ProgressDialog loopDialog;
     private RecyclerView recyclerView;
+    private Switch allAnalyticsSwitch;
+
+    private GetPanelsTask getPanelsTask = null;
 
     public static PanelListFragment newInstance() {
         return new PanelListFragment();
@@ -43,12 +48,29 @@ public class PanelListFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         if (rootView == null) {
             rootView = inflater.inflate(R.layout.fragment_panel_list, container, false);
+
+            allAnalyticsSwitch = (Switch) rootView.findViewById(R.id.all_analytics_switch);
+
             recyclerView = (RecyclerView) rootView.findViewById(R.id.recycler_view);
             recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+            Utils.setupCloseKeyboardUI(getActivity(), rootView);
 
             initDialog();
-            new GetPanelsTask().execute();
-            Utils.setupCloseKeyboardUI(getActivity(), rootView);
+
+            getPanelsTask = new GetPanelsTask();
+            getPanelsTask.execute();
+
+            allAnalyticsSwitch.setChecked(false);
+            allAnalyticsSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                @Override
+                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                    if (getPanelsTask != null && getPanelsTask.getStatus() != AsyncTask.Status.FINISHED)
+                        getPanelsTask.cancel(false);
+
+                    getPanelsTask = new GetPanelsTask();
+                    getPanelsTask.execute();
+                }
+            });
         }
 
         setupHeader();
@@ -120,12 +142,14 @@ public class PanelListFragment extends Fragment {
         }));
     }
 
-    public class GetPanelsTask extends AsyncTask<Void, Void, Integer> {
+    private class GetPanelsTask extends AsyncTask<Void, Void, Integer> {
         private List<Panel> panels;
+        private boolean isAll;
 
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
+            isAll = allAnalyticsSwitch.isChecked();
             loopDialog.show();
         }
 
@@ -133,7 +157,7 @@ public class PanelListFragment extends Fragment {
         protected Integer doInBackground(Void... params) {
             try {
                 panels = new ArrayList<>();
-                Response response = RequestService.createGetRequest("/api/analytic");
+                Response response = RequestService.createGetRequest("/api/analytic" + (isAll ? "/all" : ""));
                 String responseStr = response.body().string();
 
                 JSONArray panelsJson = new JSONArray(responseStr);
@@ -153,7 +177,8 @@ public class PanelListFragment extends Fragment {
                 if (loopDialog != null && loopDialog.isShowing())
                     loopDialog.dismiss();
 
-                showPanels(panels);
+                if (!isCancelled())
+                    showPanels(panels);
 
             } catch (Exception exc) {
                 exc.printStackTrace();

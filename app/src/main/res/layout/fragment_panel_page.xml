@@ -2,12 +2,13 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@drawable/main_activity_background"
     android:layout_below="@+id/top_block"
     android:paddingLeft="10dp"
     android:paddingRight="10dp">
 
     <LinearLayout
-        android:id="@+id/dashbord_container"
+        android:id="@+id/dashboard_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"

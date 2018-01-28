@@ -78,7 +78,7 @@ public class PanelPageFragment extends Fragment {
     public void refreshLayout() {
         try {
             if (rootView != null) {
-                dashbordContainer = (LinearLayout) rootView.findViewById(R.id.dashbord_container);
+                dashbordContainer = (LinearLayout) rootView.findViewById(R.id.dashboard_container);
                 JSONObject page = new JSONObject(getArguments().getString(PAGE));
                 renderPageLayout(page);
             }

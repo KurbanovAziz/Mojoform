@@ -1231,6 +1231,30 @@ public class TemplateFragment extends Fragment {
                     TypedValue.COMPLEX_UNIT_DIP, 10, getResources().getDisplayMetrics())));
             container.addView(space);
         }
+
+        if (isTaskFinished) {
+            JSONObject analyticsValue = template.getJSONObject("analytic_value");
+
+            TextView analyticsText = new TextView(getContext());
+            analyticsText.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+                analyticsText.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
+            }
+            analyticsText.setGravity(Gravity.CENTER);
+            analyticsText.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
+            analyticsText.setTextColor(Color.parseColor("#4E3F60"));
+
+            analyticsText.setText(String.format(Locale.getDefault(),
+                    "%d | %d баллов\n %d%% | %d%%",
+                    (int) analyticsValue.getDouble("val"), (int) analyticsValue.getDouble("max"),
+                    (int) analyticsValue.getDouble("prc"), 100));
+
+            container.addView(analyticsText);
+            Space space = new Space(getContext());
+            space.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, (int) TypedValue.applyDimension(
+                    TypedValue.COMPLEX_UNIT_DIP, 10, getResources().getDisplayMetrics())));
+            container.addView(space);
+        }
     }
 
     private void setupAxis(XAxis xAxis, final List<String> xValues) {
@@ -2502,6 +2526,7 @@ public class TemplateFragment extends Fragment {
                 }
             }
 
+            template.put("analytic_value", finishedTemplate.getJSONObject("analytic_value"));
             return template;
         } catch (JSONException e) {
             e.printStackTrace();
