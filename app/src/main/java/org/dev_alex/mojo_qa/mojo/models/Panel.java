@@ -28,7 +28,7 @@ public class Panel implements Serializable {
         return name == null && type.equals("separator") && id == -1;
     }
 
-    public static class TimeSeries {
+    public static class TimeSeries implements Serializable {
         public Value day;
         public Value week;
         public Value month;
