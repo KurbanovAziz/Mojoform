@@ -17,7 +17,6 @@ import android.widget.TextView;
 import org.dev_alex.mojo_qa.mojo.R;
 import org.dev_alex.mojo_qa.mojo.models.Panel;
 import org.dev_alex.mojo_qa.mojo.models.Value;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.List;
@@ -85,32 +84,42 @@ public class PanelAdapter extends RecyclerView.Adapter<PanelAdapter.TaskViewHold
             });
 
             try {
-                double firstVal, secondVal;
+                Double firstVal = null, secondVal = null;
                 boolean isPercents = true;
 
                 if (TextUtils.isEmpty(panel.config)) {
-                    firstVal = panel.current.day.prc;
-                    secondVal = panel.complete.day.prc;
+                    if (panel.current.day != null)
+                        firstVal = panel.current.day.prc;
+                    if (panel.complete.day != null)
+                        secondVal = panel.complete.day.prc;
                 } else {
                     JSONObject config = new JSONObject(panel.config);
-                    Value valueCurrent;
-                    Value valueComplete;
+                    Value valueCurrent = null;
+                    Value valueComplete = null;
                     switch (config.getString("aggregation")) {
                         case "day":
-                            valueCurrent = panel.current.day;
-                            valueComplete = panel.complete.day;
+                            if (panel.current.day != null)
+                                valueCurrent = panel.current.day;
+                            if (panel.complete.day != null)
+                                valueComplete = panel.complete.day;
                             break;
                         case "week":
-                            valueCurrent = panel.current.week;
-                            valueComplete = panel.complete.week;
+                            if (panel.current.week != null)
+                                valueCurrent = panel.current.week;
+                            if (panel.complete.week != null)
+                                valueComplete = panel.complete.week;
                             break;
                         case "month":
-                            valueCurrent = panel.current.month;
-                            valueComplete = panel.complete.month;
+                            if (panel.current.month != null)
+                                valueCurrent = panel.current.month;
+                            if (panel.complete.month != null)
+                                valueComplete = panel.complete.month;
                             break;
                         case "year":
-                            valueCurrent = panel.current.year;
-                            valueComplete = panel.complete.year;
+                            if (panel.current.year != null)
+                                valueCurrent = panel.current.year;
+                            if (panel.complete.year != null)
+                                valueComplete = panel.complete.year;
                             break;
 
                         default:
@@ -120,17 +129,25 @@ public class PanelAdapter extends RecyclerView.Adapter<PanelAdapter.TaskViewHold
 
                     isPercents = config.getInt("dataType") == 2;
                     if (isPercents) {
-                        firstVal = valueCurrent.prc;
-                        secondVal = valueComplete.prc;
+                        if (valueCurrent != null)
+                            firstVal = valueCurrent.prc;
+                        if (valueComplete != null)
+                            secondVal = valueComplete.prc;
                     } else {
-                        firstVal = valueCurrent.val;
-                        secondVal = valueComplete.val;
+                        if (valueCurrent != null)
+                            firstVal = valueCurrent.val;
+                        if (valueComplete != null)
+                            secondVal = valueComplete.val;
                     }
                 }
-                viewHolder.panelStats.setText(String.format(Locale.getDefault(), "%.1f | %.1f%s",
-                        firstVal, secondVal, isPercents ? "%" : " баллов"));
-            } catch (JSONException e) {
-                e.printStackTrace();
+                if (firstVal != null && secondVal != null) {
+                    viewHolder.panelStats.setText(String.format(Locale.getDefault(), "%.1f | %.1f%s",
+                            firstVal, secondVal, isPercents ? "%" : " баллов"));
+                } else {
+                    viewHolder.panelStats.setText("");
+                }
+            } catch (Exception exc) {
+                exc.printStackTrace();
             }
         }
     }
