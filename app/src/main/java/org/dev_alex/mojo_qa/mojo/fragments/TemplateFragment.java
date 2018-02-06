@@ -3152,19 +3152,20 @@ public class TemplateFragment extends Fragment {
                 resultJson.put("template_id", templateId);
                 resultJson.put("name", template.getString("name"));
                 resultJson.put("executor", LoginHistoryService.getCurrentUser().username);
+
                 if (template.has("StartTime"))
-                    resultJson.put("StartTime", template.getString("StartTime"));
+                    resultJson.put("start_time", isoDateFormat.parse(template.getString("StartTime")).getTime() / 1000);
                 else
-                    resultJson.put("StartTime", isoDateFormat.format(new Date()));
+                    resultJson.put("start_time", new Date().getTime() / 1000);
 
                 if (template.has("DueTime"))
-                    resultJson.put("DueTime", template.getString("DueTime"));
+                    resultJson.put("due_time", isoDateFormat.parse(template.getString("DueTime")).getTime() / 1000);
                 else
-                    resultJson.put("DueTime", isoDateFormat.format(new Date()));
+                    resultJson.put("due_time", new Date().getTime() / 1000);
 
                 resultJson.put("initiator", initiator);
                 resultJson.put("site_id", siteId);
-                resultJson.put("CompleteTime", isoDateFormat.format(new Date()));
+                resultJson.put("complete_time", new Date().getTime() / 1000);
                 resultJson.put("task_id", taskId);
 
                 TimeZone timeZone = TimeZone.getDefault();
@@ -3180,7 +3181,7 @@ public class TemplateFragment extends Fragment {
         @Override
         protected Integer doInBackground(Void... params) {
             try {
-                String url = "/api/fs-mojo/create/" + NODE_FOR_TASKS + "/document";
+                String url = "/api/fs-mojo/create/" + NODE_FOR_TASKS + "/document/" + templateId;
                 Response response = RequestService.createPostRequest(url, resultJson.toString());
                 String responseBody = response.body().string();
                 if (response.code() == 201 || response.code() == 200 || response.code() == 409) {
