@@ -34,4 +34,44 @@ public class Panel implements Serializable {
         public Value month;
         public Value year;
     }
+
+    public void fixDate() {
+        if (current != null) {
+            if (current.day != null) {
+                current.day.from *= 1000;
+                current.day.to *= 1000;
+            }
+            if (current.week != null) {
+                current.week.from *= 1000;
+                current.week.to *= 1000;
+            }
+            if (current.month != null) {
+                current.month.from *= 1000;
+                current.month.to *= 1000;
+            }
+            if (current.year != null) {
+                current.year.from *= 1000;
+                current.year.to *= 1000;
+            }
+        }
+
+        if (complete != null) {
+            if (complete.day != null) {
+                complete.day.from *= 1000;
+                complete.day.to *= 1000;
+            }
+            if (complete.week != null) {
+                complete.week.from *= 1000;
+                complete.week.to *= 1000;
+            }
+            if (complete.month != null) {
+                complete.month.from *= 1000;
+                complete.month.to *= 1000;
+            }
+            if (complete.year != null) {
+                complete.year.from *= 1000;
+                complete.year.to *= 1000;
+            }
+        }
+    }
 }

@@ -163,6 +163,10 @@ public class PanelListFragment extends Fragment {
                 JSONArray panelsJson = new JSONArray(responseStr);
                 panels = new ObjectMapper().readValue(panelsJson.toString(), new TypeReference<ArrayList<Panel>>() {
                 });
+
+                for (Panel panel : panels)
+                    panel.fixDate();
+
                 return response.code();
             } catch (Exception exc) {
                 exc.printStackTrace();

@@ -142,8 +142,8 @@ public class MainActivity extends AppCompatActivity {
                                 break;
                             case 3:
                                 TokenService.deleteToken();
-                                getSharedPreferences("templates", Context.MODE_PRIVATE).edit().clear().apply();
-                                trimCache(MainActivity.this);
+                                //getSharedPreferences("templates", Context.MODE_PRIVATE).edit().clear().apply();
+                                //trimCache(MainActivity.this);
                                 startActivity(new Intent(MainActivity.this, AuthActivity.class));
                                 finish();
                                 break;

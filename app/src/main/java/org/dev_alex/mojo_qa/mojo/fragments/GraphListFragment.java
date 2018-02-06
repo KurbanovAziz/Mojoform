@@ -15,6 +15,7 @@ import android.widget.TextView;
 import org.dev_alex.mojo_qa.mojo.R;
 import org.dev_alex.mojo_qa.mojo.models.Panel;
 import org.dev_alex.mojo_qa.mojo.services.Utils;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -78,10 +79,19 @@ public class GraphListFragment extends Fragment {
 
     private void setupViewPager() {
         ViewPagerAdapter adapter = new ViewPagerAdapter(getChildFragmentManager());
-        adapter.addFragment(GraphFragment.newInstance(GraphFragment.DAY, panel.id), "День");
-        adapter.addFragment(GraphFragment.newInstance(GraphFragment.WEEK, panel.id), "Неделя");
-        adapter.addFragment(GraphFragment.newInstance(GraphFragment.MONTH, panel.id), "Месяц");
-        adapter.addFragment(GraphFragment.newInstance(GraphFragment.YEAR, panel.id), "Год");
+
+        boolean isPercents = true;
+        try {
+            if (panel.config != null)
+                isPercents = new JSONObject(panel.config).getInt("dataType") == 2;
+        } catch (Exception exc) {
+            exc.printStackTrace();
+        }
+
+        adapter.addFragment(GraphFragment.newInstance(GraphFragment.DAY, panel.id, isPercents), "День");
+        adapter.addFragment(GraphFragment.newInstance(GraphFragment.WEEK, panel.id, isPercents), "Неделя");
+        adapter.addFragment(GraphFragment.newInstance(GraphFragment.MONTH, panel.id, isPercents), "Месяц");
+        adapter.addFragment(GraphFragment.newInstance(GraphFragment.YEAR, panel.id, isPercents), "Год");
         viewPager.setAdapter(adapter);
     }
 

@@ -53,20 +53,23 @@ public class GraphFragment extends Fragment {
 
     private static final String TYPE_ARG = "type";
     private static final String ID_ARG = "panel_id";
+    private static final String IS_PERCENTS_ARG = "is_percents";
 
     private View rootView;
     private String type;
     private long panelId;
+    private boolean isPercents;
     private GraphInfo graphInfo;
-    private SimpleDateFormat xDateFormat = new SimpleDateFormat("dd-MM", Locale.getDefault());
+    private SimpleDateFormat xDateFormat = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
 
 
-    public static GraphFragment newInstance(String type, long id) {
+    public static GraphFragment newInstance(String type, long id, boolean isPersents) {
         Bundle args = new Bundle();
         GraphFragment fragment = new GraphFragment();
 
         args.putString(TYPE_ARG, type);
         args.putLong(ID_ARG, id);
+        args.putBoolean(IS_PERCENTS_ARG, isPersents);
         fragment.setArguments(args);
         return fragment;
     }
@@ -76,6 +79,7 @@ public class GraphFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         type = getArguments().getString(TYPE_ARG);
         panelId = getArguments().getLong(ID_ARG);
+        isPercents = getArguments().getBoolean(IS_PERCENTS_ARG);
 
         if (rootView == null) {
             rootView = inflater.inflate(R.layout.fragment_graph, container, false);
@@ -284,9 +288,17 @@ public class GraphFragment extends Fragment {
 
                 SimpleDateFormat dateFotmat = new SimpleDateFormat("dd.MM.yyyy | HH:mm", Locale.getDefault());
                 xValue.setText(dateFotmat.format(xDateFormat.parse(xValues.get((int) e.getX())).getTime()));
-                yValue.setText(String.format(Locale.getDefault(), "%.2f", e.getY()));
+
+                String yValStr = String.format(Locale.getDefault(), "%.2f", e.getY());
+                if(isPercents)
+                    yValStr+=" %";
+                else
+                    yValStr+=" б.";
+
+                yValue.setText(yValStr);
                 xValue.requestLayout();
                 yValue.requestLayout();
+                yValue.invalidate();
 
                 float xVal = e.getX();
                 float yVal = e.getY();
