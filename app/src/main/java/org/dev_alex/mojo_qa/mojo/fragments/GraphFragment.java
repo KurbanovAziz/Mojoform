@@ -61,6 +61,7 @@ public class GraphFragment extends Fragment {
     private boolean isPercents;
     private GraphInfo graphInfo;
     private SimpleDateFormat xDateFormat = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
+    private SimpleDateFormat xDateFormatNoYear = new SimpleDateFormat("dd-MM", Locale.getDefault());
 
 
     public static GraphFragment newInstance(String type, long id, boolean isPersents) {
@@ -117,20 +118,37 @@ public class GraphFragment extends Fragment {
         for (Value value : graphInfo.values) {
             Date date = new Date(value.from);
 
-            BarEntry barEntry = new BarEntry((float) k, (float) value.val);
+            BarEntry barEntry;
+
+            if (isPercents) {
+                barEntry = new BarEntry((float) k, (float) value.prc);
+
+                if (k == 0) {
+                    yMax = (float) value.prc;
+                    yMin = (float) value.prc;
+                } else {
+                    if (value.prc > yMax)
+                        yMax = (float) value.prc;
+
+                    if (value.prc < yMin)
+                        yMin = (float) value.prc;
+                }
+            } else {
+                barEntry = new BarEntry((float) k, (float) value.val);
+
+                if (k == 0) {
+                    yMax = (float) value.val;
+                    yMin = (float) value.val;
+                } else {
+                    if (value.val > yMax)
+                        yMax = (float) value.val;
+
+                    if (value.val < yMin)
+                        yMin = (float) value.val;
+                }
+            }
             barEntries.add(barEntry);
             xValues.add(xDateFormat.format(date));
-
-            if (k == 0) {
-                yMax = (float) value.val;
-                yMin = (float) value.val;
-            } else {
-                if (value.val > yMax)
-                    yMax = (float) value.val;
-
-                if (value.val < yMin)
-                    yMin = (float) value.val;
-            }
             k++;
         }
         if (barEntries.isEmpty()) {
@@ -155,7 +173,9 @@ public class GraphFragment extends Fragment {
                     });
         }
         */
-        for (k = 0; k < barEntries.size(); k++) {
+        for (k = 0; k < barEntries.size(); k++)
+
+        {
             float value = barEntries.get(k).getY();
             int defaultColor = Color.parseColor("#2baaf6");
 
@@ -180,17 +200,32 @@ public class GraphFragment extends Fragment {
 
         //barChart.getAxisLeft().setAxisMaximum(barChart.getAxisLeft().getAxisMaximum() * 1.2f);
 
-        barChart.getAxisRight().setEnabled(false);
-        barChart.getAxisLeft().setGridColor(Color.parseColor("#374E3F60"));
-        barChart.getAxisLeft().setAxisLineColor(Color.parseColor("#374E3F60"));
-        barChart.getXAxis().setGridColor(Color.parseColor("#374E3F60"));
-        barChart.getXAxis().setAxisLineColor(Color.parseColor("#374E3F60"));
+        barChart.getAxisRight().
+
+                setEnabled(false);
+        barChart.getAxisLeft().
+
+                setGridColor(Color.parseColor("#374E3F60"));
+        barChart.getAxisLeft().
+
+                setAxisLineColor(Color.parseColor("#374E3F60"));
+        barChart.getXAxis().
+
+                setGridColor(Color.parseColor("#374E3F60"));
+        barChart.getXAxis().
+
+                setAxisLineColor(Color.parseColor("#374E3F60"));
 
         barChart.setData(barData);
         barChart.setFitBars(false);
-        barChart.getLegend().setEnabled(false);
-        barChart.getDescription().setEnabled(false);
+        barChart.getLegend().
+
+                setEnabled(false);
+        barChart.getDescription().
+
+                setEnabled(false);
         barChart.setScaleYEnabled(true);
+
         setupAxis(barChart.getXAxis(), xValues);
 
         barChart.invalidate();
@@ -233,7 +268,7 @@ public class GraphFragment extends Fragment {
 
                                 double valueDelta = value - ((int) value);
                                 long resultDate = startDate + (long) (delta * valueDelta);
-                                return xDateFormat.format(new Date(resultDate));
+                                return xDateFormatNoYear.format(new Date(resultDate));
                             } catch (Exception exc) {
                                 exc.printStackTrace();
                                 return "exc";
@@ -242,7 +277,12 @@ public class GraphFragment extends Fragment {
                     }
 
                     if (finalIPos != -1 && finalIPos < xValues.size()) {
-                        stringValue = xValues.get(finalIPos);
+                        try {
+                            stringValue = xDateFormatNoYear.format(xDateFormat.parse(xValues.get(finalIPos)));
+                        } catch (ParseException e) {
+                            e.printStackTrace();
+                            stringValue = "";
+                        }
                     } else {
                         stringValue = "";
                     }
@@ -290,10 +330,10 @@ public class GraphFragment extends Fragment {
                 xValue.setText(dateFotmat.format(xDateFormat.parse(xValues.get((int) e.getX())).getTime()));
 
                 String yValStr = String.format(Locale.getDefault(), "%.2f", e.getY());
-                if(isPercents)
-                    yValStr+=" %";
+                if (isPercents)
+                    yValStr += " %";
                 else
-                    yValStr+=" б.";
+                    yValStr += " б.";
 
                 yValue.setText(yValStr);
                 xValue.requestLayout();
