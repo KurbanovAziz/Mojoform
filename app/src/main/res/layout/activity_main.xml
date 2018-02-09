@@ -133,7 +133,7 @@
                 android:ellipsize="end"
                 android:maxLines="1"
                 android:paddingBottom="11dp"
-                android:text="Документы"
+                android:text="@string/documents"
                 android:textAllCaps="true"
                 android:textColor="@android:color/white"
                 android:textSize="18sp" />
