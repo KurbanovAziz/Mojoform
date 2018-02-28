@@ -70,8 +70,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:el_duration="1000"
-        app:el_expanded="false"
-        app:layout_expandable="true">
+        app:el_expanded="false">
 
         <include layout="@layout/calendar_expanding_part" />
     </net.cachapa.expandablelayout.ExpandableLayout>

@@ -1,12 +1,12 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 25
-    buildToolsVersion "25.0.2"
+    compileSdkVersion 26
+    buildToolsVersion "26.0.2"
     defaultConfig {
         applicationId "org.dev_alex.mojo_qa.mojo"
         minSdkVersion 16
-        targetSdkVersion 25
+        targetSdkVersion 26
         versionCode 17
         versionName "1.0.16"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
@@ -61,6 +61,19 @@ android {
 }
 repositories {
     maven { url "https://clojars.org/repo/" }
+
+    configurations.all {
+        resolutionStrategy.eachDependency { details ->
+            def requested = details.requested
+
+
+            if (requested.group == 'com.android.support') {
+                if (!requested.name.startsWith("multidex")) {
+                    details.useVersion '26.1.0'
+                }
+            }
+        }
+    }
 }
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
@@ -70,22 +83,22 @@ dependencies {
     compile('com.mikepenz:materialdrawer:5.9.0@aar') {
         transitive = true
     }
-    compile 'com.android.support:appcompat-v7:25.3.1'
+    compile 'com.android.support:appcompat-v7:26.1.0'
     compile 'com.android.support.constraint:constraint-layout:1.0.2'
     compile 'com.squareup.okhttp3:okhttp:3.9.0'
     compile 'com.fasterxml.jackson.core:jackson-databind:2.9.0.pr2'
-    compile 'net.cachapa.expandablelayout:expandablelayout:2.9.1'
-    compile 'de.hdodenhof:circleimageview:2.1.0'
+    compile 'net.cachapa.expandablelayout:expandablelayout:2.9.2'
+    compile 'de.hdodenhof:circleimageview:2.2.0'
     compile 'com.github.gcacace:signature-pad:1.2.1'
 
     compile 'frankiesardo:icepick:3.2.0'
     provided 'frankiesardo:icepick-processor:3.2.0'
-    compile 'com.mlsdev.rximagepicker:library:2.0.0'
-    compile 'com.afollestad.material-dialogs:core:0.9.4.5'
+    compile 'com.mlsdev.rximagepicker:library:2.0.2'
+    compile 'com.afollestad.material-dialogs:core:0.9.6.0'
 
     compile 'com.github.darsh2:MultipleImageSelect:v0.0.4'
     compile 'com.github.PhilJay:MPAndroidChart:v3.0.3'
-    compile 'org.greenrobot:eventbus:3.0.0'
+    compile 'org.greenrobot:eventbus:3.1.1'
 
     compile 'com.github.woxthebox:draglistview:1.5.1'
     testCompile 'junit:junit:4.12'

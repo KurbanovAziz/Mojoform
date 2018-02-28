@@ -1760,10 +1760,29 @@ public class TemplateFragment extends Fragment {
         container.addView(boxInContainerWithId(mediaLayout, value.getString("id")));
 
         currentMediaBlock = new Pair<>(mediaLayout, value);
+
+        if (value.has(MEDIA_PATH_JSON_ARRAY)) {
+            JSONArray valuesArray = value.getJSONArray(MEDIA_PATH_JSON_ARRAY);
+            boolean needToRestart = true;
+            while (needToRestart) {
+                needToRestart = false;
+                for (int j = 0; j < valuesArray.length(); j++) {
+                    String mediaPath = value.getJSONArray(MEDIA_PATH_JSON_ARRAY).getJSONObject(j).getString("path");
+                    if (!new File(mediaPath).exists()) {
+                        valuesArray = Utils.removeItemAt(valuesArray, j);
+                        needToRestart = true;
+                        break;
+                    }
+
+                }
+            }
+        }
+
         if (value.has(MEDIA_PATH_JSON_ARRAY)) {
             for (int j = 0; j < value.getJSONArray(MEDIA_PATH_JSON_ARRAY).length(); j++) {
                 String mediaPath = value.getJSONArray(MEDIA_PATH_JSON_ARRAY).getJSONObject(j).getString("path");
                 String mimeType = value.getJSONArray(MEDIA_PATH_JSON_ARRAY).getJSONObject(j).getString("mime");
+
                 if (mimeType.startsWith("image"))
                     processImageFile(new File(mediaPath), true, new Pair<>(mediaLayout, value));
                 else if (mimeType.startsWith("audio"))
