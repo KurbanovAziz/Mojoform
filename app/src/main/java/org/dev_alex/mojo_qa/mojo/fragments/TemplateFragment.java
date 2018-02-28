@@ -1767,7 +1767,7 @@ public class TemplateFragment extends Fragment {
             while (needToRestart) {
                 needToRestart = false;
                 for (int j = 0; j < valuesArray.length(); j++) {
-                    String mediaPath = value.getJSONArray(MEDIA_PATH_JSON_ARRAY).getJSONObject(j).getString("path");
+                    String mediaPath = valuesArray.getJSONObject(j).getString("path");
                     if (!new File(mediaPath).exists()) {
                         valuesArray = Utils.removeItemAt(valuesArray, j);
                         needToRestart = true;
@@ -1776,6 +1776,7 @@ public class TemplateFragment extends Fragment {
 
                 }
             }
+            value.put(MEDIA_PATH_JSON_ARRAY,valuesArray);
         }
 
         if (value.has(MEDIA_PATH_JSON_ARRAY)) {
