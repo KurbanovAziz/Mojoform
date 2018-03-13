@@ -2701,7 +2701,6 @@ public class TemplateFragment extends Fragment {
                         if (response.code() == 200) {
                             String responseStr = response.body().string();
                             JSONObject responseJson = new JSONObject(responseStr);
-                            documentId = responseJson.getLong("document_id");
 
                             template = responseJson.getJSONObject("template");
                             template.put("StartTime", isoDateFormat.format(new Date()));
