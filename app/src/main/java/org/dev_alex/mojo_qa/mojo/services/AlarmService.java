@@ -31,7 +31,6 @@ import org.dev_alex.mojo_qa.mojo.R;
 import org.dev_alex.mojo_qa.mojo.activities.AuthActivity;
 import org.dev_alex.mojo_qa.mojo.activities.MainActivity;
 import org.dev_alex.mojo_qa.mojo.models.Task;
-import org.dev_alex.mojo_qa.mojo.models.Variable;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -79,11 +78,11 @@ public class AlarmService extends Service {
             String templateId = intent.getStringExtra(TEMPLATE_ID);
             String nodeForTasksID = intent.getStringExtra(NODE_FOR_TASKS);
             String message = intent.getStringExtra(MESSAGE);
-            new CheckIfTaskFinishedTask(taskId, taskName, templateId, message, nodeForTasksID, initiator, siteId).execute();
+            //new CheckIfTaskFinishedTask(taskId, taskName, templateId, message, nodeForTasksID, initiator, siteId).execute();
         } else {
             Log.d("mojo-alarm-log", "onStartCommand update tasks" + new Date().toString());
             if (TokenService.isTokenExists()) {
-                new UpdateTasksTask().execute();
+                //new UpdateTasksTask().execute();
                 new KeepTokenAliveTask().execute();
             }
         }
@@ -98,7 +97,7 @@ public class AlarmService extends Service {
         am.setInexactRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), 10 * 60 * 1000, pi);
     }
 
-    private boolean checkIfTaskScheduled(String taskId) {
+    private boolean checkIfTaskScheduled(long taskId) {
         SharedPreferences mSettings;
         mSettings = App.getContext().getSharedPreferences(SCHEDULE_PREFERENCES, Context.MODE_PRIVATE);
 
@@ -107,14 +106,18 @@ public class AlarmService extends Service {
     }
 
     private void scheduleTask(Task task) {
-        Random random = new Random(SystemClock.elapsedRealtime());
+    /*    Random random = new Random(SystemClock.elapsedRealtime());
         Log.d("mojo-alarm-log", "scheduleTask " + task.id);
 
         SharedPreferences mSettings;
         mSettings = App.getContext().getSharedPreferences(SCHEDULE_PREFERENCES, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = mSettings.edit();
 
-        if (task.dueDate.getTime() - new Date().getTime() > 60 * 60 * 1000) {
+        if (task.expire_time == null)
+            return;
+
+
+        if (task.expire_time - new Date().getTime() > 60 * 60 * 1000) {
             Intent intent = new Intent(getApplicationContext(), AlarmService.class);
             intent.putExtra(TASK_ID, task.id);
             intent.putExtra(TASK_NAME, getTaskName(task));
@@ -123,10 +126,10 @@ public class AlarmService extends Service {
             intent.putExtra(TEMPLATE_ID, getTaskTemplateId(task));
             intent.putExtra(NODE_FOR_TASKS, getTaskNodeId(task));
             intent.putExtra(MESSAGE, "Через час.");
-            createAlarmTask(random, intent, task.dueDate.getTime() - 60 * 60 * 1000);
+            createAlarmTask(random, intent, task.expire_time - 60 * 60 * 1000);
         }
 
-        if (task.dueDate.getTime() - new Date().getTime() > 15 * 60 * 1000) {
+        if (task.expire_time - new Date().getTime() > 15 * 60 * 1000) {
             Intent intent = new Intent(getApplicationContext(), AlarmService.class);
             intent.putExtra(TASK_ID, task.id);
             intent.putExtra(TASK_NAME, getTaskName(task));
@@ -135,10 +138,10 @@ public class AlarmService extends Service {
             intent.putExtra(TEMPLATE_ID, getTaskTemplateId(task));
             intent.putExtra(NODE_FOR_TASKS, getTaskNodeId(task));
             intent.putExtra(MESSAGE, "Через 15 минут.");
-            createAlarmTask(random, intent, task.dueDate.getTime() - 15 * 60 * 1000);
+            createAlarmTask(random, intent, task.expire_time - 15 * 60 * 1000);
         }
 
-        if (task.dueDate.after(new Date())) {
+        if (new Date(task.expire_time).after(new Date())) {
             Intent intent = new Intent(getApplicationContext(), AlarmService.class);
             intent.putExtra(TASK_ID, task.id);
             intent.putExtra(TASK_NAME, getTaskName(task));
@@ -147,11 +150,11 @@ public class AlarmService extends Service {
             intent.putExtra(TEMPLATE_ID, getTaskTemplateId(task));
             intent.putExtra(NODE_FOR_TASKS, getTaskNodeId(task));
             intent.putExtra(MESSAGE, "Сейчас.");
-            createAlarmTask(random, intent, task.dueDate.getTime());
+            createAlarmTask(random, intent, task.expire_time);
         }
 
         boolean overdueAlarmSent = false;
-        long overDueTime = task.dueDate.getTime() + 60 * 60 * 1000;
+        long overDueTime = task.expire_time + 60 * 60 * 1000;
         while (!overdueAlarmSent) {
             if (new Date().after(new Date(overDueTime)))
                 overDueTime += 60 * 60 * 1000;
@@ -170,7 +173,7 @@ public class AlarmService extends Service {
         }
 
         editor.putString("task_" + task.id, "yea");
-        editor.apply();
+        editor.apply();*/
     }
 
     private void createAlarmTask(Random random, Intent intent, long triggerAt) {
@@ -276,54 +279,9 @@ public class AlarmService extends Service {
     }
 
     private String getTaskName(Task task) {
-        if (task.processInstanceId == null) {
-            return task.name;
-        } else {
-            if (task.variables != null)
-                for (Variable variable : task.variables) {
-                    if (variable.name.equals("TemplateName"))
-                        return (variable.value);
-                }
-            return "";
-        }
+        return task.ref.name;
     }
 
-    private String getTaskNodeId(Task task) {
-        if (task.processInstanceId == null) {
-            return task.name;
-        } else {
-            if (task.variables != null)
-                for (Variable variable : task.variables) {
-                    if (variable.name.equals("DocumentFolderUUID"))
-                        return (variable.value);
-                }
-            return "";
-        }
-    }
-
-    private String getTaskTemplateId(Task task) {
-        for (Variable variable : task.variables) {
-            if (variable.name.equals("TemplateId"))
-                return (variable.value);
-        }
-        return "";
-    }
-
-    private String getTaskSiteId(Task task) {
-        for (Variable variable : task.variables) {
-            if (variable.name.equals("DocumentSiteId"))
-                return (variable.value);
-        }
-        return "gzip";
-    }
-
-    private String getTaskInitiator(Task task) {
-        for (Variable variable : task.variables) {
-            if (variable.name.equals("initiator"))
-                return (variable.value);
-        }
-        return "admin";
-    }
 
     private class KeepTokenAliveTask extends AsyncTask<Void, Void, Void> {
         @Override
@@ -371,6 +329,10 @@ public class AlarmService extends Service {
                     JSONArray tasksJson = new JSONObject(response.body().string()).getJSONArray("data");
                     tasks = new ObjectMapper().readValue(tasksJson.toString(), new TypeReference<ArrayList<Task>>() {
                     });
+
+                    for (Task task : tasks)
+                        task.fixTime();
+
                     return true;
                 }
                 return false;
@@ -390,9 +352,8 @@ public class AlarmService extends Service {
                     for (Task task : tasks) {
                         if (!checkIfTaskScheduled(task.id))
                             scheduleTask(task);
-                        if (task.dueDate.getTime() - new Date().getTime() < 60 * 60 * 1000)
-                            if (task.assignee.toLowerCase().equals(TokenService.getUsername().toLowerCase()))
-                                notificationsCt++;
+                        if (task.expire_time != null && (task.expire_time - new Date().getTime() < 60 * 60 * 1000))
+                            notificationsCt++;
                     }
                     setNotificationsCt(notificationsCt);
                 }
@@ -402,6 +363,7 @@ public class AlarmService extends Service {
         }
     }
 
+/*
     private class CheckIfTaskFinishedTask extends AsyncTask<Void, Void, Boolean> {
         private Task task;
         private String taskId;
@@ -453,7 +415,7 @@ public class AlarmService extends Service {
                 Log.d("mojo-alarm-log", "CheckIfTaskFinishedTask " + result);
 
                 if (result) {
-                    if (task.suspended != null && !task.suspended && task.assignee.toLowerCase().equals(TokenService.getUsername().toLowerCase())) {
+                    if (!task.suspended && task.assignee.toLowerCase().equals(TokenService.getUsername().toLowerCase())) {
                         if (message.startsWith("overdue")) {
                             Log.d("mojo-test-log", "currentDate " + new Date().getTime() + " dueDate " + task.dueDate.getTime());
                             int hoursCt = (int) Math.abs((new Date().getTime() - task.dueDate.getTime()) / (60 * 60 * 1000));
@@ -473,6 +435,7 @@ public class AlarmService extends Service {
             }
         }
     }
+*/
 
     public boolean isForeground(String myPackage) {
         ActivityManager manager = (ActivityManager) getSystemService(ACTIVITY_SERVICE);

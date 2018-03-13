@@ -96,7 +96,6 @@ import com.mlsdev.rximagepicker.Sources;
 import net.cachapa.expandablelayout.ExpandableLayout;
 
 import org.dev_alex.mojo_qa.mojo.App;
-import org.dev_alex.mojo_qa.mojo.BuildConfig;
 import org.dev_alex.mojo_qa.mojo.Data;
 import org.dev_alex.mojo_qa.mojo.R;
 import org.dev_alex.mojo_qa.mojo.activities.AuthActivity;
@@ -137,11 +136,7 @@ import io.reactivex.annotations.NonNull;
 import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
-import okhttp3.Credentials;
 import okhttp3.MediaType;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.RequestBody;
 import okhttp3.Response;
 import okio.BufferedSink;
 import okio.Okio;
@@ -165,11 +160,8 @@ public class TemplateFragment extends Fragment {
     private final int IMAGE_SHOW_REQUEST_CODE = 110;
     private final int SCAN_CODE_REQUEST_CODE = 120;
 
-    public String templateId;
-    public String taskId;
-    public String siteId;
-    public String initiator;
-    public Long dueDate;
+    public long taskId;
+    public long documentId;
 
     private View rootView;
     private ProgressDialog loopDialog;
@@ -188,38 +180,10 @@ public class TemplateFragment extends Fragment {
     private ProgressDialog progressDialog;
     private Handler handler;
 
-    public static TemplateFragment newInstance(String templateId, String taskId, String nodeForTasks,
-                                               Long dueDate, String siteId, String initiator) {
+    public static TemplateFragment newInstance(long taskId, boolean isTaskFinished) {
         Bundle args = new Bundle();
-        args.putString("template_id", templateId);
-        if (dueDate != null)
-            args.putLong("due_date", dueDate);
-        args.putString("task_id", taskId);
-        args.putString("initiator", initiator);
-        args.putString("site_id", siteId);
-        args.putBoolean("is_finished", false);
-
-        if (nodeForTasks != null && !nodeForTasks.isEmpty())
-            args.putString("task_node_id", nodeForTasks);
-        else
-            args.putString("task_node_id", NODE_FOR_TASKS);
-
-
-        TemplateFragment fragment = new TemplateFragment();
-        fragment.setArguments(args);
-        return fragment;
-    }
-
-    public static TemplateFragment newInstance(String docId, long dueDate) {
-        Bundle args = new Bundle();
-        args.putString("template_id", docId);
-        args.putString("task_id", "");
-        args.putString("initiator", "");
-        args.putString("site_id", "");
-        args.putBoolean("is_finished", true);
-        args.putString("task_node_id", "");
-
-        args.putLong("due_date", dueDate);
+        args.putLong("task_id", taskId);
+        args.putBoolean("is_finished", isTaskFinished);
 
         TemplateFragment fragment = new TemplateFragment();
         fragment.setArguments(args);
@@ -232,6 +196,9 @@ public class TemplateFragment extends Fragment {
         Icepick.restoreInstanceState(this, savedInstanceState);
         setRetainInstance(true);
         handler = new Handler();
+
+        taskId = getArguments().getLong("task_id");
+        isTaskFinished = getArguments().getBoolean("is_finished");
     }
 
     @Override
@@ -253,17 +220,7 @@ public class TemplateFragment extends Fragment {
             setupCloseKeyboardUI(getActivity(), rootView);
 
             ((MainActivity) getActivity()).drawer.getDrawerLayout().setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
-            templateId = getArguments().getString("template_id");
-            taskId = getArguments().getString("task_id");
-            if (getArguments().containsKey("due_date"))
-                dueDate = getArguments().getLong("due_date");
-            else
-                dueDate = null;
-            siteId = getArguments().getString("site_id");
-            initiator = getArguments().getString("initiator");
-            NODE_FOR_TASKS = getArguments().getString("task_node_id");
-            NODE_FOR_FILES = getArguments().getString("task_node_id");
-            isTaskFinished = getArguments().getBoolean("is_finished");
+
 
             rootView.findViewById(R.id.page_selector_block).getLayoutParams().width =
                     (int) (getResources().getDisplayMetrics().widthPixels * (2.0 / 5.0));
@@ -394,7 +351,7 @@ public class TemplateFragment extends Fragment {
     @Override
     public void onPause() {
         super.onPause();
-        Data.currentTaskId = "";
+        Data.currentTaskId = null;
     }
 
     @Override
@@ -452,10 +409,8 @@ public class TemplateFragment extends Fragment {
         rootView.findViewById(R.id.hold_task_btn).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (templateId != null) {
-                    saveTemplateState();
-                    getActivity().getSupportFragmentManager().popBackStack();
-                }
+                saveTemplateState();
+                getActivity().getSupportFragmentManager().popBackStack();
             }
         });
 
@@ -554,7 +509,7 @@ public class TemplateFragment extends Fragment {
 
     private void setPage(Page page) {
         try {
-            FrameLayout rootTemplateContainer = (FrameLayout) rootView.findViewById(R.id.root_container);
+            FrameLayout rootTemplateContainer = rootView.findViewById(R.id.root_container);
             rootTemplateContainer.removeAllViewsInLayout();
 
             LinearLayout rootPageContainer = new LinearLayout(getContext());
@@ -660,7 +615,7 @@ public class TemplateFragment extends Fragment {
                     final Page page = new Page(pageJson.getString("caption"), pageJson.getString("id"));
                     pages.add(page);
 
-                    LinearLayout pageContainer = (LinearLayout) rootView.findViewById(R.id.page_container);
+                    LinearLayout pageContainer = rootView.findViewById(R.id.page_container);
                     TextView cardPage = (TextView) getActivity().getLayoutInflater().inflate(R.layout.card_page, pageContainer, false);
                     cardPage.setText(page.name);
                     cardPage.setMaxLines(1);
@@ -708,7 +663,7 @@ public class TemplateFragment extends Fragment {
                                     try {
                                         String pdfName = template.getString("name") + "_" +
                                                 new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss", Locale.getDefault()).format(new Date());
-                                        new DownloadPdfTask(templateId, pdfName).execute();
+                                        new DownloadPdfTask(documentId, pdfName).execute();
                                     } catch (Exception exc) {
                                         exc.printStackTrace();
                                     }
@@ -1776,7 +1731,7 @@ public class TemplateFragment extends Fragment {
 
                 }
             }
-            value.put(MEDIA_PATH_JSON_ARRAY,valuesArray);
+            value.put(MEDIA_PATH_JSON_ARRAY, valuesArray);
         }
 
         if (value.has(MEDIA_PATH_JSON_ARRAY)) {
@@ -2450,11 +2405,8 @@ public class TemplateFragment extends Fragment {
         try {
             SimpleDateFormat parseFormat = new SimpleDateFormat("yyyy.dd.MM HH:mm::ss", Locale.getDefault());
 
-            JSONArray values = finishedTemplate.getJSONArray("values");
+            JSONArray values = finishedTemplate.getJSONObject("document").getJSONArray("values");
             JSONObject template = finishedTemplate.getJSONObject("template");
-
-            if (dueDate != null)
-                downloadIndicatorValue(template, dueDate);
 
             for (int i = 0; i < values.length(); i++) {
                 JSONObject value;
@@ -2550,7 +2502,7 @@ public class TemplateFragment extends Fragment {
                 }
             }
 
-            template.put("analytic_value", finishedTemplate.getJSONObject("analytic_value"));
+            template.put("analytic_value", finishedTemplate.getJSONObject("document").getJSONObject("analytic_value"));
             return template;
         } catch (JSONException e) {
             e.printStackTrace();
@@ -2714,128 +2666,6 @@ public class TemplateFragment extends Fragment {
     }
 
 
-    private void downloadIndicatorValue(JSONObject template, long dueDate) {
-        try {
-            JSONArray pages = template.getJSONArray("items");
-            for (int i = 0; i < pages.length(); i++) {
-                JSONArray items = pages.getJSONObject(i).getJSONObject("page").getJSONArray("items");
-                downloadIndicatorValueInTemplate(items, dueDate);
-            }
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void downloadIndicatorValueInTemplate(JSONArray items, long dueDate) {
-        try {
-            for (int i = 0; i < items.length(); i++) {
-                JSONObject item = items.getJSONObject(i);
-
-                String elementName = null;
-                Iterator<String> iterator = item.keys();
-                if (iterator.hasNext())
-                    elementName = iterator.next();
-
-                if (elementName == null)
-                    continue;
-
-                switch (elementName) {
-                    case "category":
-                        downloadIndicatorValueInTemplate(item.getJSONObject(elementName).getJSONArray("items"), dueDate);
-
-                        break;
-
-                    case "question":
-                        JSONObject question = item.getJSONObject(elementName);
-                        if (question.has("optionals")) {
-                            JSONArray optionals = question.getJSONArray("optionals");
-                            for (int j = 0; j < optionals.length(); j++) {
-                                downloadIndicatorValueInTemplate(optionals.getJSONObject(j).getJSONObject("optional").getJSONArray("items"), dueDate);
-                            }
-                        }
-                        break;
-
-                    case "indicator":
-                        JSONObject indicator = item.getJSONObject("indicator");
-                        try {
-                            TimeZone tz = TimeZone.getDefault();
-                            Date now = new Date();
-                            int offsetFromUtc = tz.getOffset(now.getTime());
-
-                            long timeGMT = dueDate - offsetFromUtc;
-
-                            String host;
-                            switch (BuildConfig.FLAVOR) {
-                                case "release_flavor":
-                                    host = "https://servlet.dss.mojo.mojoform.com/services";
-                                    break;
-
-                                case "debug_flavor":
-                                    host = "https://servlet.dss.dev-alex.org/services";
-                                    break;
-
-                                default:
-                                    host = "https://servlet.dss.mojo.mojoform.com/services";
-                                    break;
-                            }
-                            host += "/mojo_datastore.HTTPEndpoint";
-
-                            String url;
-                            if (indicator.get("type").equals("indicator")) {
-                                url = host + indicator.getString("datasource_url") +
-                                        "&userId=" + LoginHistoryService.getCurrentUser().username +
-                                        "&documentId=" + templateId;
-                            } else {
-                                url = host + indicator.getString("datasource_url") +
-                                        "&userId=" + LoginHistoryService.getCurrentUser().username +
-                                        "&Past=" + isoDateFormatNoTimeZone.format(new Date(timeGMT - 24 * 60 * 60 * 1000)) +
-                                        "&Before=" + isoDateFormatNoTimeZone.format(new Date(timeGMT + 5 * 60 * 1000));
-                            }
-
-                            OkHttpClient client = new OkHttpClient();
-                            Request.Builder requestBuilder = new Request.Builder()
-                                    .url(url)
-                                    .header("Authorization", "Basic YWRtaW46S0FESTdhc3VmandrbGVuaGtsOA==")
-                                    .header("Accept", "application/json");
-
-                            Response response = client.newCall(requestBuilder.build()).execute();
-                            String responseStr = response.body().string();
-                            JSONObject jsonObject = new JSONObject(responseStr);
-
-                            if (indicator.get("type").equals("indicator")) {
-                                try {
-                                    indicator.put("value", jsonObject.getJSONObject("timeSeries").getJSONObject("tick").getInt("value"));
-                                } catch (Exception exc) {
-                                    indicator.put("value", -11112222);
-                                }
-                            } else {
-                                JSONArray tick = new JSONArray();
-                                try {
-                                    Object obj = jsonObject.getJSONObject("timeSeries").get("tick");
-                                    if (obj instanceof JSONArray)
-                                        tick = (JSONArray) obj;
-                                    else {
-                                        tick.put(obj);
-                                    }
-                                } catch (Exception exc) {
-                                    exc.printStackTrace();
-                                }
-                                indicator.put("tick", tick);
-                            }
-
-                        } catch (Exception exc) {
-                            exc.printStackTrace();
-                        }
-                        break;
-                }
-            }
-
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-    }
-
-
     private class GetTemplateTask extends AsyncTask<Void, Void, Integer> {
         @Override
         protected void onPreExecute() {
@@ -2847,11 +2677,14 @@ public class TemplateFragment extends Fragment {
         protected Integer doInBackground(Void... params) {
             try {
                 if (isTaskFinished) {
-                    String url = "/api/fs-mojo/get/document/" + templateId;
+                    String url = "/api/tasks/" + taskId;
                     Response response = RequestService.createGetRequest(url);
                     if (response.code() == 200) {
                         String responseStr = response.body().string();
-                        template = transformFinishedTemplate(new JSONObject(responseStr));
+                        JSONObject responseJson = new JSONObject(responseStr);
+                        documentId = responseJson.getLong("document_id");
+
+                        template = transformFinishedTemplate(responseJson);
                     }
                     return response.code();
                 } else {
@@ -2862,15 +2695,18 @@ public class TemplateFragment extends Fragment {
                         template = new JSONObject(templateJson);
                         return HttpURLConnection.HTTP_OK;
                     } else {
-                        String url = "/api/fs-mojo/get/template/" + templateId;
+                        String url = "/api/tasks/" + taskId;
                         Response response = RequestService.createGetRequest(url);
 
                         if (response.code() == 200) {
                             String responseStr = response.body().string();
-                            template = new JSONObject(responseStr);
+                            JSONObject responseJson = new JSONObject(responseStr);
+                            documentId = responseJson.getLong("document_id");
+
+                            template = responseJson.getJSONObject("template");
                             template.put("StartTime", isoDateFormat.format(new Date()));
-                            if (dueDate != null)
-                                template.put("DueTime", isoDateFormat.format(new Date(dueDate)));
+                            if (responseJson.has("expire_time"))
+                                template.put("DueTime", isoDateFormat.format(new Date(responseJson.getLong("expire_time"))));
                         }
                         return response.code();
                     }
@@ -3169,24 +3005,12 @@ public class TemplateFragment extends Fragment {
                 JSONArray values = getTemplateElementValues(template);
                 resultJson.put("values", values);
 
-                resultJson.put("template_id", templateId);
-                resultJson.put("name", template.getString("name"));
-                resultJson.put("executor", LoginHistoryService.getCurrentUser().username);
-
                 if (template.has("StartTime"))
                     resultJson.put("start_time", isoDateFormat.parse(template.getString("StartTime")).getTime() / 1000);
                 else
                     resultJson.put("start_time", new Date().getTime() / 1000);
 
-                if (template.has("DueTime"))
-                    resultJson.put("due_time", isoDateFormat.parse(template.getString("DueTime")).getTime() / 1000);
-                else
-                    resultJson.put("due_time", new Date().getTime() / 1000);
-
-                resultJson.put("initiator", initiator);
-                resultJson.put("site_id", siteId);
                 resultJson.put("complete_time", new Date().getTime() / 1000);
-                resultJson.put("task_id", taskId);
 
                 TimeZone timeZone = TimeZone.getDefault();
                 resultJson.put("timezone", timeZone.getID());
@@ -3201,38 +3025,8 @@ public class TemplateFragment extends Fragment {
         @Override
         protected Integer doInBackground(Void... params) {
             try {
-                String url = "/api/fs-mojo/create/" + NODE_FOR_TASKS + "/document/" + templateId;
+                String url = "/api/tasks/" + taskId + "/complete";
                 Response response = RequestService.createPostRequest(url, resultJson.toString());
-                String responseBody = response.body().string();
-                if (response.code() == 201 || response.code() == 200 || response.code() == 409) {
-                    String resId = new JSONObject(responseBody).getJSONObject("entry").getString("id");
-
-                    JSONObject completeVar = new JSONObject();
-                    completeVar.put("name", "result_doc");
-                    completeVar.put("value", resId);
-                    completeVar.put("type", "string");
-                    completeVar.put("scope", "local");
-
-                    url = App.getTask_host() + "/runtime/tasks/" + taskId + "/variables/result_doc";
-                    RequestBody body = RequestBody.create(MediaType.parse("application/json"), completeVar.toString());
-                    OkHttpClient client = new OkHttpClient();
-                    Request request = new Request.Builder()
-                            .header("Authorization", Credentials.basic(Data.getTaskAuthLogin(), Data.taskAuthPass))
-                            .url(url)
-                            .method("PUT", body)
-                            .build();
-                    response = client.newCall(request).execute();
-                    if (response.code() != 200 && response.code() != 201)
-                        return response.code();
-
-                    JSONObject jsonObject = new JSONObject();
-                    jsonObject.put("action", "complete");
-                    jsonObject.put("variables", new JSONArray());
-
-                    response = RequestService.createPostRequestWithCustomUrl(App.getTask_host() + "/runtime/tasks/" + taskId, jsonObject.toString());
-                    int responseCode = response.code();
-                    Log.d("mojo-log", "task complete response code: " + responseCode);
-                }
                 return response.code();
 
             } catch (Exception exc) {
@@ -3479,11 +3273,11 @@ public class TemplateFragment extends Fragment {
 
     private class DownloadPdfTask extends AsyncTask<Void, Void, Integer> {
         private java.io.File resultFile;
-        private String nodeId;
+        private long documentId;
         private String name;
 
-        DownloadPdfTask(String nodeId, String name) {
-            this.nodeId = nodeId;
+        DownloadPdfTask(long documentId, String name) {
+            this.documentId = documentId;
             this.name = name;
         }
 
@@ -3501,7 +3295,7 @@ public class TemplateFragment extends Fragment {
                 if (resultFile.exists())
                     return 200;
 
-                String url = "/api/fs-mojo/download/" + nodeId + "/document/pdf";
+                String url = "/api/fs-mojo/document/id/"+ documentId + "/pdf";
                 Response response = RequestService.createGetRequest(url);
 
                 if (response.code() == 200) {

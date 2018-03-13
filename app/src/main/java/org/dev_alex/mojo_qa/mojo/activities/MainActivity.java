@@ -47,7 +47,6 @@ import org.dev_alex.mojo_qa.mojo.services.TokenService;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
@@ -72,17 +71,10 @@ public class MainActivity extends AppCompatActivity {
         drawer.setSelectionAtPosition(1, true);
         //getSupportFragmentManager().beginTransaction().replace(R.id.container, TasksFragment.newInstance(), "tasks").commit();
         if (getIntent().hasExtra(AlarmService.TEMPLATE_ID)) {
-            String templateId = getIntent().getStringExtra(AlarmService.TEMPLATE_ID);
-            String siteId = getIntent().getStringExtra(AlarmService.SITE_ID);
-            String initiator = getIntent().getStringExtra(AlarmService.INITIATOR);
-            String taskId = getIntent().getStringExtra(AlarmService.TASK_ID);
-            String nodeForTasks = getIntent().getStringExtra(AlarmService.NODE_FOR_TASKS);
-            long dueDate = getIntent().getLongExtra(AlarmService.DUE_DATE, new Date().getTime());
-
-            if (templateId != null && !templateId.isEmpty() && taskId != null && !taskId.isEmpty())
+            long taskId = getIntent().getLongExtra(AlarmService.TASK_ID, -1);
                 getSupportFragmentManager().beginTransaction()
                         .replace(R.id.container, TemplateFragment.newInstance(
-                                templateId, taskId, nodeForTasks, dueDate, siteId, initiator)).addToBackStack(null).commit();
+                                taskId, false)).addToBackStack(null).commit();
         }
     }
 

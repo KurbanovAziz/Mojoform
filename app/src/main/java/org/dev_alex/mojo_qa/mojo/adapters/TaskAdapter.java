@@ -11,13 +11,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import org.dev_alex.mojo_qa.mojo.App;
 import org.dev_alex.mojo_qa.mojo.R;
 import org.dev_alex.mojo_qa.mojo.fragments.TasksFragment;
 import org.dev_alex.mojo_qa.mojo.models.Task;
-import org.dev_alex.mojo_qa.mojo.models.Variable;
 import org.dev_alex.mojo_qa.mojo.services.LoginHistoryService;
 
 import java.text.SimpleDateFormat;
@@ -72,106 +70,60 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
         String resultDocId = null;
 
         viewHolder.delayed.setVisibility(View.GONE);
-        viewHolder.taskActiveCircle.setVisibility((task.suspended == null || task.suspended) ? View.INVISIBLE : View.VISIBLE);
+        viewHolder.taskActiveCircle.setVisibility((task.suspended) ? View.INVISIBLE : View.VISIBLE);
 
-        if (task.suspended == null || task.suspended) {
+        if (task.suspended) {
             viewHolder.taskActiveCircle.setVisibility(View.INVISIBLE);
 
-            if (task.endTime != null) {
+            if (task.complete_time != null) {
                 viewHolder.taskDate.setVisibility(View.VISIBLE);
-                viewHolder.taskDate.setText(sdf.format(task.endTime));
+                viewHolder.taskDate.setText(sdf.format(new Date(task.complete_time)));
             } else
                 viewHolder.taskDate.setVisibility(View.INVISIBLE);
         } else {
             viewHolder.taskActiveCircle.setVisibility(View.VISIBLE);
 
-            if (task.dueDate != null) {
+            if (task.expire_time != null) {
                 viewHolder.taskDate.setVisibility(View.VISIBLE);
-                if (task.suspended != null && !task.suspended) {
-                    ((GradientDrawable) viewHolder.taskActiveCircle.getBackground()).setColor(task.dueDate.after(new Date()) ? Color.GREEN : Color.RED);
-                }
-                viewHolder.taskDate.setText(sdf.format(task.dueDate));
+
+                ((GradientDrawable) viewHolder.taskActiveCircle.getBackground()).setColor(new Date(task.expire_time).after(new Date()) ? Color.GREEN : Color.RED);
+
+                viewHolder.taskDate.setText(sdf.format(task.expire_time));
             } else {
                 viewHolder.taskDate.setVisibility(View.INVISIBLE);
                 viewHolder.taskActiveCircle.setVisibility(View.INVISIBLE);
             }
         }
 
+        viewHolder.taskIcon.setImageResource(R.drawable.file_icon);
+        viewHolder.moreBtn.setVisibility(View.GONE);
 
-        if (task.processInstanceId == null) {
-            viewHolder.taskIcon.setImageResource(R.drawable.profile_icon);
-            viewHolder.taskTitle.setText(task.name);
-            viewHolder.moreBtn.setVisibility(View.VISIBLE);
-        } else {
-            viewHolder.taskIcon.setImageResource(R.drawable.file_icon);
-            viewHolder.moreBtn.setVisibility(View.GONE);
+        viewHolder.taskTitle.setText(task.ref.name);
 
-            viewHolder.taskTitle.setText("");
-            if (task.variables != null)
-                for (Variable variable : task.variables) {
-                    if (variable.name.equals("TemplateName"))
-                        viewHolder.taskTitle.setText(variable.value);
-                    if (variable.name.equals("TemplateId"))
-                        templateId = variable.value;
-                    if (variable.name.equals("DocumentFolderUUID"))
-                        nodeForTasksId = variable.value;
-                    if (variable.name.equals("DocumentSiteId"))
-                        siteId = variable.value;
-                    if (variable.name.equals("initiator"))
-                        initiator = variable.value;
-                    if (variable.name.equals("result_doc")) {
-                        if (variable.scope.equals("local") && !variable.value.equals("empty"))
-                            resultDocId = variable.value;
-                        else if (variable.scope.equals("global") && resultDocId == null)
-                            resultDocId = variable.value;
-                    }
+
+        if (task.suspended) {
+            viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    parentFragment.showTemplateWindow(task.id,true);
                 }
+            });
+        } else {
+            viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+
+                    parentFragment.showTemplateWindow(task.id,false);
+                }
+            });
+
+            SharedPreferences mSettings;
+            mSettings = App.getContext().getSharedPreferences("templates", Context.MODE_PRIVATE);
+            String templateJson = mSettings.getString(task.id + LoginHistoryService.getCurrentUser().username, "");
+
+            viewHolder.delayed.setVisibility(templateJson.equals("") ? View.GONE : View.VISIBLE);
         }
 
-        if (templateId != null) {
-            final String finalTemplateId = templateId;
-            final String finalNodeForTasksId = nodeForTasksId;
-            final String finalResultDocId = resultDocId;
-
-            if (task.suspended == null || task.suspended) {
-                viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        if (finalResultDocId == null)
-                            Toast.makeText(parentFragment.getContext(), "Не удалось открыть документ", Toast.LENGTH_LONG).show();
-                        else {
-                            if (task.dueDate != null)
-                                parentFragment.showFilledDocById(finalResultDocId, task.dueDate.getTime());
-                            else
-                                parentFragment.showFilledDocById(finalResultDocId, task.endTime.getTime());
-                        }
-
-                    }
-                });
-            } else {
-                if (initiator == null || initiator.isEmpty())
-                    initiator = "admin";
-                if (siteId == null || siteId.isEmpty())
-                    initiator = "gzip";
-
-                final String finalInitiator = initiator;
-                final String finalSiteId = siteId;
-                viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        Long dueDate = task.dueDate == null ? null : task.dueDate.getTime();
-                        parentFragment.showFillTemplateWindow(finalTemplateId,
-                                task.id, finalNodeForTasksId, dueDate, finalInitiator, finalSiteId);
-                    }
-                });
-
-                SharedPreferences mSettings;
-                mSettings = App.getContext().getSharedPreferences("templates", Context.MODE_PRIVATE);
-                String templateJson = mSettings.getString(task.id + LoginHistoryService.getCurrentUser().username, "");
-
-                viewHolder.delayed.setVisibility(templateJson.equals("") ? View.GONE : View.VISIBLE);
-            }
-        }
     }
 
     @Override

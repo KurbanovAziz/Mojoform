@@ -45,8 +45,8 @@ import org.dev_alex.mojo_qa.mojo.R;
 import org.dev_alex.mojo_qa.mojo.adapters.TaskAdapter;
 import org.dev_alex.mojo_qa.mojo.models.Task;
 import org.dev_alex.mojo_qa.mojo.models.User;
-import org.dev_alex.mojo_qa.mojo.models.Variable;
 import org.dev_alex.mojo_qa.mojo.services.LoginHistoryService;
+import org.dev_alex.mojo_qa.mojo.services.RequestService;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -225,19 +225,8 @@ public class TasksFragment extends Fragment {
 
         ArrayList<Task> searchResult = new ArrayList<>();
         for (Task task : currentTaskList) {
-            if (task.processInstanceId == null) {
-                if (task.name.toLowerCase().contains(searchText.toLowerCase()))
-                    searchResult.add(task);
-            } else {
-                if (task.variables != null)
-                    for (Variable variable : task.variables) {
-                        if (variable.name.equals("TemplateName")) {
-                            if (variable.value.toLowerCase().contains(searchText.toLowerCase()))
-                                searchResult.add(task);
-                            break;
-                        }
-                    }
-            }
+            if (task.ref.name.toLowerCase().contains(searchText.toLowerCase()))
+                searchResult.add(task);
         }
         recyclerView.setAdapter(new TaskAdapter(this, searchResult));
     }
@@ -418,13 +407,20 @@ public class TasksFragment extends Fragment {
     }
 
     private void updateDecorators(ArrayList<Task> monthTasks) {
-        MaterialCalendarView calendarView = (MaterialCalendarView) rootView.findViewById(R.id.calendarView);
-        for (Task task : monthTasks)
-            if (task.dueDate.after(new Date())) {
-                if (!daysWithActualTasks.contains(CalendarDay.from(task.dueDate)))
-                    daysWithActualTasks.add(CalendarDay.from(task.dueDate));
-            } else if (!daysWithOverdueTasks.contains(CalendarDay.from(task.dueDate)))
-                daysWithOverdueTasks.add(CalendarDay.from(task.dueDate));
+        MaterialCalendarView calendarView = rootView.findViewById(R.id.calendarView);
+
+        for (Task task : monthTasks) {
+            if (task.expire_time == null)
+                continue;
+
+            Date dueDate = new Date(task.expire_time);
+
+            if (dueDate.after(new Date())) {
+                if (!daysWithActualTasks.contains(CalendarDay.from(dueDate)))
+                    daysWithActualTasks.add(CalendarDay.from(dueDate));
+            } else if (!daysWithOverdueTasks.contains(CalendarDay.from(dueDate)))
+                daysWithOverdueTasks.add(CalendarDay.from(dueDate));
+        }
 
         calendarView.removeDecorators();
         calendarView.invalidateDecorators();
@@ -457,17 +453,11 @@ public class TasksFragment extends Fragment {
         loopDialog.setCancelable(false);
     }
 
-    public void showFillTemplateWindow(String templateId, String taskId, String taskNodeId,
-                                       Long dueDate, String initiator, String siteId) {
+    public void showTemplateWindow(long taskId, boolean isFinished) {
         getActivity().getSupportFragmentManager().beginTransaction()
-                .replace(R.id.container, TemplateFragment.newInstance
-                        (templateId, taskId, taskNodeId, dueDate, siteId, initiator)).addToBackStack(null).commit();
+                .replace(R.id.container, TemplateFragment.newInstance(taskId, isFinished)).addToBackStack(null).commit();
     }
 
-    public void showFilledDocById(String nodeId, long dueDate) {
-        getActivity().getSupportFragmentManager().beginTransaction()
-                .replace(R.id.container, TemplateFragment.newInstance(nodeId, dueDate)).addToBackStack(null).commit();
-    }
 
     private class GetTasksTask extends AsyncTask<Void, Void, Integer> {
 
@@ -517,45 +507,40 @@ public class TasksFragment extends Fragment {
                 User currentUser = LoginHistoryService.getCurrentUser();
                 for (int i = 0; i < 3; i++) {
                     if (i == 0) {
-                        url = App.getTask_host() + "/history/historic-task-instances?size=1000&finished=TRUE&" +
-                                "includeTaskLocalVariables=TRUE&includeProcessVariables=TRUE&taskAssignee=" + currentUser.username + "&start=0" + endDateParams + "&sort=endTime&order=desc";
+                        url = "/api/tasks/archive";
                     } else if (i == 1) {
                         sortParams = "&sort=dueDate&order=desc&size=100";
-                        url = App.getTask_host() + "/runtime/tasks?assignee="
-                                + currentUser.username + "&includeProcessVariables=TRUE" + dateParams + sortParams;
+                        url = "/api/tasks/active?filter=oneshot,periodic";
                     } else {
-                        url = App.getTask_host() + "/runtime/tasks?sort=createTime&order=desc&size=170&assignee="
-                                + currentUser.username + "&includeProcessVariables=TRUE&withoutDueDate=true";
+                        url = "/api/tasks/active?filter=constantly";
                     }
-                    OkHttpClient client = new OkHttpClient();
-                    Request request = new Request.Builder().header("Authorization", Credentials.basic(Data.getTaskAuthLogin(), Data.taskAuthPass))
-                            .url(url).build();
 
-                    response = client.newCall(request).execute();
+                    response = RequestService.createGetRequest(url);
                     Log.d("mojo-response", "url = " + url);
 
                     if (response.code() == 200) {
-                        JSONArray tasksJson = new JSONObject(response.body().string()).getJSONArray("data");
+                        JSONArray tasksJson = new JSONArray(response.body().string());
                         Log.d("mojo-response", "tasks size = " + tasksJson.length());
                         Log.d("mojo-response", "tasks = " + tasksJson.toString());
 
                         if (i == 0) {
                             finishedTasks = new ObjectMapper().readValue(tasksJson.toString(), new TypeReference<ArrayList<Task>>() {
                             });
-                            ArrayList<Task> resultTasks = new ArrayList<>();
                             for (Task task : finishedTasks)
-                                if (task.deleteReason == null)
-                                    resultTasks.add(task);
-                            finishedTasks = resultTasks;
+                                task.fixTime();
                             Log.d("mojo-response", "finished tasks size = " + finishedTasks.size());
                         } else {
-                            if (i == 1)
+                            if (i == 1) {
                                 busyTasks = new ObjectMapper().readValue(tasksJson.toString(), new TypeReference<ArrayList<Task>>() {
                                 });
-                            else {
+                                for (Task task : busyTasks)
+                                    task.fixTime();
+                            } else {
                                 permanentTasks = new ObjectMapper().readValue(tasksJson.toString(), new TypeReference<ArrayList<Task>>() {
                                 });
-                                Log.d("mojo-tasks", "tasks without date = " + permanentTasks.size());
+
+                                for (Task task : permanentTasks)
+                                    task.fixTime();
                             }
                         }
                     }
