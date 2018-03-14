@@ -39,12 +39,12 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
 
         TaskViewHolder(View itemView) {
             super(itemView);
-            taskDate = (TextView) itemView.findViewById(R.id.task_date);
-            taskTitle = (TextView) itemView.findViewById(R.id.task_title);
-            delayed = (TextView) itemView.findViewById(R.id.delayed);
+            taskDate = itemView.findViewById(R.id.task_date);
+            taskTitle = itemView.findViewById(R.id.task_title);
+            delayed = itemView.findViewById(R.id.delayed);
             taskActiveCircle = itemView.findViewById(R.id.task_active);
-            taskIcon = (ImageView) itemView.findViewById(R.id.task_icon);
-            moreBtn = (ImageView) itemView.findViewById(R.id.more_btn);
+            taskIcon = itemView.findViewById(R.id.task_icon);
+            moreBtn = itemView.findViewById(R.id.more_btn);
         }
     }
 
@@ -63,15 +63,11 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
     @Override
     public void onBindViewHolder(TaskViewHolder viewHolder, int i) {
         final Task task = tasks.get(i);
-        String templateId = null;
-        String nodeForTasksId = null;
-        String siteId = null;
-        String initiator = null;
-        String resultDocId = null;
 
         viewHolder.delayed.setVisibility(View.GONE);
         viewHolder.taskActiveCircle.setVisibility((task.suspended) ? View.INVISIBLE : View.VISIBLE);
 
+        viewHolder.moreBtn.setVisibility(View.GONE);
         if (task.suspended) {
             viewHolder.taskActiveCircle.setVisibility(View.INVISIBLE);
 
@@ -96,7 +92,12 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
         }
 
         viewHolder.taskIcon.setImageResource(R.drawable.file_icon);
-        viewHolder.moreBtn.setVisibility(View.GONE);
+        viewHolder.moreBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                parentFragment.showPopUpWindow(task);
+            }
+        });
 
         viewHolder.taskTitle.setText(task.ref.name);
 
@@ -105,15 +106,14 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
             viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    parentFragment.showTemplateWindow(task.id,true);
+                    parentFragment.showTemplateWindow(task.id, true);
                 }
             });
         } else {
             viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-
-                    parentFragment.showTemplateWindow(task.id,false);
+                    parentFragment.showTemplateWindow(task.id, false);
                 }
             });
 
@@ -121,7 +121,8 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
             mSettings = App.getContext().getSharedPreferences("templates", Context.MODE_PRIVATE);
             String templateJson = mSettings.getString(task.id + LoginHistoryService.getCurrentUser().username, "");
 
-            viewHolder.delayed.setVisibility(templateJson.equals("") ? View.GONE : View.VISIBLE);
+            viewHolder.delayed.setVisibility((task.suspended || templateJson.equals("")) ? View.GONE : View.VISIBLE);
+            viewHolder.moreBtn.setVisibility((task.suspended || templateJson.equals("")) ? View.GONE : View.VISIBLE);
         }
 
     }

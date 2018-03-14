@@ -2,6 +2,7 @@ package org.dev_alex.mojo_qa.mojo.fragments;
 
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -24,6 +25,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -43,6 +45,7 @@ import org.dev_alex.mojo_qa.mojo.Data;
 import org.dev_alex.mojo_qa.mojo.EventDecorator;
 import org.dev_alex.mojo_qa.mojo.R;
 import org.dev_alex.mojo_qa.mojo.adapters.TaskAdapter;
+import org.dev_alex.mojo_qa.mojo.custom_views.RelativeLayoutWithPopUp;
 import org.dev_alex.mojo_qa.mojo.models.Task;
 import org.dev_alex.mojo_qa.mojo.models.User;
 import org.dev_alex.mojo_qa.mojo.services.LoginHistoryService;
@@ -66,7 +69,9 @@ import okhttp3.Response;
 public class TasksFragment extends Fragment {
     private enum CurrentAdapterType {FINISHED, BUSY, PERMANENT}
 
-    private View rootView;
+    private RelativeLayoutWithPopUp rootView;
+    private RelativeLayout taskPopupWindow;
+
     private ProgressDialog loopDialog;
     private RecyclerView recyclerView;
 
@@ -84,6 +89,7 @@ public class TasksFragment extends Fragment {
     private CurrentAdapterType currentAdapterType = null;
 
     public boolean needUpdate = false;
+
 
     public static TasksFragment newInstance() {
         Bundle args = new Bundle();
@@ -105,9 +111,13 @@ public class TasksFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         if (rootView == null) {
-            rootView = inflater.inflate(R.layout.fragment_tasks, container, false);
+            rootView = (RelativeLayoutWithPopUp) inflater.inflate(R.layout.fragment_tasks, container, false);
+            taskPopupWindow = rootView.findViewById(R.id.task_popup_layout);
+            taskPopupWindow.setVisibility(View.GONE);
+            rootView.addPopUpWindow(taskPopupWindow);
 
-            recyclerView = (RecyclerView) rootView.findViewById(R.id.recycler_view);
+
+            recyclerView = rootView.findViewById(R.id.recycler_view);
             recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
             ((RadioButton) rootView.findViewById(R.id.busy)).setChecked(true);
 
@@ -456,6 +466,31 @@ public class TasksFragment extends Fragment {
     public void showTemplateWindow(long taskId, boolean isFinished) {
         getActivity().getSupportFragmentManager().beginTransaction()
                 .replace(R.id.container, TemplateFragment.newInstance(taskId, isFinished)).addToBackStack(null).commit();
+    }
+
+    public void showPopUpWindow(final Task task) {
+        taskPopupWindow.setVisibility(View.VISIBLE);
+
+        taskPopupWindow.findViewById(R.id.delete_block).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                SharedPreferences mSettings;
+                mSettings = App.getContext().getSharedPreferences("templates", Context.MODE_PRIVATE);
+                SharedPreferences.Editor editor = mSettings.edit();
+                editor.putString(task.id + LoginHistoryService.getCurrentUser().username, "");
+                editor.apply();
+
+                taskPopupWindow.setVisibility(View.GONE);
+                recyclerView.getAdapter().notifyDataSetChanged();
+            }
+        });
+        taskPopupWindow.findViewById(R.id.continue_block).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                taskPopupWindow.setVisibility(View.GONE);
+                showTemplateWindow(task.id, false);
+            }
+        });
     }
 
 

@@ -102,5 +102,7 @@
     <string name="change_seq">Изменить расположение</string>
     <string name="plan">План</string>
     <string name="fact">Факт</string>
+    <string name="continue_exec">Продолжить выполнение</string>
+    <string name="delete_draft">Удалить черновик</string>
 
 </resources>
