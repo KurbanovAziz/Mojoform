@@ -1185,7 +1185,7 @@ public class TemplateFragment extends Fragment {
             container.addView(space);
         }
 
-        if (isTaskFinished) {
+        if (isTaskFinished && template.has("analytic_value")) {
             try {
                 JSONObject analyticsValue = template.getJSONObject("analytic_value");
 
@@ -2540,8 +2540,8 @@ public class TemplateFragment extends Fragment {
                         }
                 }
             }
-
-            template.put("analytic_value", finishedTemplate.getJSONObject("document").getJSONObject("analytic_value"));
+            if (template.has("analytic_value"))
+                template.put("analytic_value", finishedTemplate.getJSONObject("document").getJSONObject("analytic_value"));
             return template;
         } catch (JSONException e) {
             e.printStackTrace();
