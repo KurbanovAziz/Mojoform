@@ -89,6 +89,7 @@ import com.github.mikephil.charting.renderer.XAxisRenderer;
 import com.github.mikephil.charting.utils.MPPointF;
 import com.github.mikephil.charting.utils.Transformer;
 import com.github.mikephil.charting.utils.ViewPortHandler;
+import com.lalongooo.videocompressor.video.MediaController;
 import com.mlsdev.rximagepicker.RxImageConverters;
 import com.mlsdev.rximagepicker.RxImagePicker;
 import com.mlsdev.rximagepicker.Sources;
@@ -179,6 +180,8 @@ public class TemplateFragment extends Fragment {
     public boolean isTaskFinished;
     private ProgressDialog progressDialog;
     private Handler handler;
+
+    private boolean waiting = false;
 
     public static TemplateFragment newInstance(long taskId, boolean isTaskFinished) {
         Bundle args = new Bundle();
@@ -417,12 +420,7 @@ public class TemplateFragment extends Fragment {
         rootView.findViewById(R.id.finish_btn).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Pair<Boolean, ArrayList<JSONObject>> result = checkIfTemplateIsFilled(template);
-
-                if (result.first) {
-                    new SendMediaTask(result.second).execute();
-                } else
-                    Toast.makeText(getContext(), R.string.not_all_required_fields_are_filled, Toast.LENGTH_LONG).show();
+                new WaitForMediaReadyTask().execute();
             }
         });
     }
@@ -2126,7 +2124,7 @@ public class TemplateFragment extends Fragment {
 
     private FrameLayout createImgFrame(Bitmap photo) {
         LinearLayout imageContainer = (LinearLayout) ((HorizontalScrollView) currentMediaBlock.first.getChildAt(1)).getChildAt(0);
-        FrameLayout imageFrame = (FrameLayout) getActivity().getLayoutInflater().inflate(R.layout.image_with_frame_layout, imageContainer, false);
+        FrameLayout imageFrame = (FrameLayout) LayoutInflater.from(getContext()).inflate(R.layout.image_with_frame_layout, imageContainer, false);
         ImageView imageView = (ImageView) imageFrame.getChildAt(0);
         imageView.setImageBitmap(photo);
 
@@ -2301,6 +2299,8 @@ public class TemplateFragment extends Fragment {
                 videoPathInCache = getContext().getExternalCacheDir() + "/" + System.currentTimeMillis() + path.substring(path.lastIndexOf("."));
                 Utils.copy(new File(path), new File(videoPathInCache));
                 videoPathInCache = new File(videoPathInCache).getAbsolutePath();
+                new VideoCompressor(videoPathInCache).execute();
+                return;
             } else
                 videoPathInCache = path;
 
@@ -2321,7 +2321,7 @@ public class TemplateFragment extends Fragment {
                         startActivity(viewIntent);
                     } catch (Exception exc) {
                         exc.printStackTrace();
-                        Toast.makeText(getContext(), "Нет установленного аудиоплеера", Toast.LENGTH_LONG).show();
+                        Toast.makeText(getContext(), "Нет установленного видиоплеера", Toast.LENGTH_LONG).show();
                     }
                 }
             });
@@ -2346,13 +2346,52 @@ public class TemplateFragment extends Fragment {
             });
 
             videoContainer.addView(videoPreview);
-            if (copyToCache)
-                addMediaPath(videoPathInCache, Utils.getMimeType(videoPathInCache));
+
 
         } catch (Exception exc) {
             Toast.makeText(getContext(), "Ошибка при добавлении вижео: " + exc.getLocalizedMessage(), Toast.LENGTH_LONG).show();
         }
+    }
 
+    private class VideoCompressor extends AsyncTask<Void, Void, Boolean> {
+        private String filePath;
+        private String newFilePath;
+
+        public VideoCompressor(String filePath) {
+            this.filePath = filePath;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            loopDialog.show();
+        }
+
+        @Override
+        protected Boolean doInBackground(Void... voids) {
+            newFilePath = getContext().getExternalCacheDir() + "/" + UUID.randomUUID().toString() + ".mp4";
+            return MediaController.getInstance().convertVideo(filePath, newFilePath);
+        }
+
+        @Override
+        protected void onPostExecute(Boolean compressed) {
+            super.onPostExecute(compressed);
+            try {
+                String resPath = filePath;
+                loopDialog.dismiss();
+                if (compressed) {
+                    resPath = newFilePath;
+                    new File(filePath).delete();
+                    Log.d("qweqw", "Compression successfully!");
+
+                }
+
+                addMediaPath(resPath, Utils.getMimeType(resPath));
+                createVideoPreview(resPath, false);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     private void addMediaPath(String mediaPath, String mimeType) throws JSONException {
@@ -2473,7 +2512,7 @@ public class TemplateFragment extends Fragment {
                                 item.getJSONArray("file_names").put(value.getString("fileName"));
                                 item.getJSONArray("file_types").put(value.getString("mimeType"));
                                 try {
-                                    item.getJSONArray("create_date").put(parseFormat.parse(value.getString("createDate")).getTime());
+                                    item.getJSONArray("create_date").put(parseFormat.parse(value.getString("create_date")).getTime());
                                 } catch (ParseException e) {
                                     item.getJSONArray("create_date").put(new Date().getTime());
                                 }
@@ -2492,7 +2531,7 @@ public class TemplateFragment extends Fragment {
 
                                 JSONArray createDates = new JSONArray();
                                 try {
-                                    createDates.put(parseFormat.parse(value.getString("createDate")).getTime());
+                                    createDates.put(parseFormat.parse(value.getString("create_date")).getTime());
                                 } catch (ParseException e) {
                                     createDates.put(new Date().getTime());
                                 }
@@ -2742,6 +2781,40 @@ public class TemplateFragment extends Fragment {
         }
     }
 
+    private class WaitForMediaReadyTask extends AsyncTask<Void, Void, Void> {
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            if (waiting)
+                loopDialog.show();
+        }
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            while (waiting) {
+                try {
+                    Thread.sleep(200);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            loopDialog.dismiss();
+
+            Pair<Boolean, ArrayList<JSONObject>> result = checkIfTemplateIsFilled(template);
+
+            if (result.first) {
+                new SendMediaTask(result.second).execute();
+            } else
+                Toast.makeText(getContext(), R.string.not_all_required_fields_are_filled, Toast.LENGTH_LONG).show();
+        }
+    }
+
     private class SendMediaTask extends AsyncTask<Void, Integer, Integer> {
         private final int SUCCESS = 0;
         private ArrayList<JSONObject> mediaObjects;
@@ -2779,6 +2852,11 @@ public class TemplateFragment extends Fragment {
         @Override
         protected Integer doInBackground(Void... params) {
             try {
+                if (waiting) {
+                    while (waiting) {
+                        Thread.sleep(250);
+                    }
+                }
                 int sentCt = 0;
 
                 Response tokenResponse = RequestService.createGetRequest("/api/user/");
@@ -2979,11 +3057,7 @@ public class TemplateFragment extends Fragment {
                     LoginHistoryService.addUser(user);
                     TokenService.updateToken(user.token, user.username);
 
-                    Pair<Boolean, ArrayList<JSONObject>> result = checkIfTemplateIsFilled(template);
-                    if (result.first) {
-                        new SendMediaTask(result.second).execute();
-                    } else
-                        Toast.makeText(getContext(), R.string.not_all_required_fields_are_filled, Toast.LENGTH_LONG).show();
+                    new WaitForMediaReadyTask().execute();
                 } else
                     Toast.makeText(getContext(), getString(R.string.unknown_error) + "  code: " + responseCode, Toast.LENGTH_LONG).show();
             } catch (Exception exc) {
@@ -3064,10 +3138,14 @@ public class TemplateFragment extends Fragment {
         }
     }
 
+
     private void processImageFile(File file, final boolean isRestore, final Pair<LinearLayout, JSONObject> toBlock) {
         final int imgSize = Math.round(TypedValue.applyDimension
                 (TypedValue.COMPLEX_UNIT_DIP, 93, getResources().getDisplayMetrics()));
         final int bigImgSize = 1300;
+
+        if (!isRestore)
+            waiting = true;
 
         Observable.just(file)
                 .subscribeOn(Schedulers.io())
@@ -3120,7 +3198,6 @@ public class TemplateFragment extends Fragment {
                                 exif.setAttribute(ExifInterface.TAG_GPS_DATESTAMP, dateFormat.format(new Date()));
                                 exif.setAttribute(ExifInterface.TAG_GPS_TIMESTAMP, timeFormat.format(new Date()));
                                 exif.saveAttributes();
-
                             } catch (Exception e) {
                                 e.printStackTrace();
                             }
@@ -3145,8 +3222,10 @@ public class TemplateFragment extends Fragment {
                                     ((LinearLayout) ((HorizontalScrollView) currentMediaBlock.first.getChildAt(1)).getChildAt(0)).addView(imageContainer);
                                 }
 
-                                if (!isRestore)
+                                if (!isRestore) {
                                     addMediaPath(bitmapStringPair.second, Utils.getMimeType(bitmapStringPair.second));
+                                    waiting = false;
+                                }
                             }
                         },
                         new Consumer<Throwable>() {
@@ -3294,7 +3373,7 @@ public class TemplateFragment extends Fragment {
                 if (resultFile.exists())
                     return 200;
 
-                String url = "/api/fs-mojo/document/id/"+ documentId + "/pdf";
+                String url = "/api/fs-mojo/document/id/" + documentId + "/pdf";
                 Response response = RequestService.createGetRequest(url);
 
                 if (response.code() == 200) {

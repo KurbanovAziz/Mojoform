@@ -5,11 +5,16 @@ android {
     buildToolsVersion "26.0.2"
     defaultConfig {
         applicationId "org.dev_alex.mojo_qa.mojo"
-        minSdkVersion 16
+        minSdkVersion 17
         targetSdkVersion 26
+        multiDexEnabled true
         versionCode 19
         versionName "1.0.18"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+
+        ndk {
+            moduleName "webp"
+        }
     }
     buildTypes {
         release {
@@ -26,6 +31,11 @@ android {
             }
         }
     }
+    sourceSets.main {
+        jniLibs.srcDir 'libs'
+        jni.srcDirs = [] //disable automatic ndk-build call
+    }
+
     dexOptions {
         javaMaxHeapSize "4G"
     }
@@ -75,6 +85,7 @@ repositories {
         }
     }
 }
+
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
@@ -83,6 +94,8 @@ dependencies {
     compile('com.mikepenz:materialdrawer:5.9.0@aar') {
         transitive = true
     }
+    compile 'com.android.support:multidex:1.0.3'
+
     compile 'com.android.support:appcompat-v7:26.1.0'
     compile 'com.android.support.constraint:constraint-layout:1.0.2'
     compile 'com.squareup.okhttp3:okhttp:3.9.0'

@@ -25,7 +25,7 @@ import java.util.Locale;
 
 
 public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder> {
-    SimpleDateFormat sdf = new SimpleDateFormat("dd MMMM yyyy | HH.mm", Locale.getDefault());
+    SimpleDateFormat sdf = new SimpleDateFormat("dd MMMM yyyy | HH:mm", Locale.getDefault());
     private ArrayList<Task> tasks;
     private TasksFragment parentFragment;
 

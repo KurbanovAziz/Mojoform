@@ -20,6 +20,7 @@
         android:icon="${appIcon}"
         android:label="@string/app_name"
         android:largeHeap="true"
+        android:hardwareAccelerated="true"
         android:screenOrientation="portrait"
         android:theme="@style/Theme.AppCompat.Light.NoActionBar.FullScreen"
         tools:replace="allowBackup">

@@ -2,6 +2,7 @@ package org.dev_alex.mojo_qa.mojo;
 
 import android.app.Application;
 import android.content.Context;
+import android.support.multidex.MultiDex;
 import android.util.DisplayMetrics;
 
 import java.lang.ref.WeakReference;
@@ -53,5 +54,11 @@ public class App extends Application {
 
     public static String getTask_host() {
         return task_host;
+    }
+
+    @Override
+    protected void attachBaseContext(Context base) {
+        super.attachBaseContext(base);
+        MultiDex.install(this);
     }
 }

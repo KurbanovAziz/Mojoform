@@ -537,15 +537,13 @@ public class TasksFragment extends Fragment {
                     dateParams += "&dueBefore=" + isoDateFormat.format(monthCalendar.getTime());
                     endDateParams += "&taskCompletedBefore=" + isoDateFormat.format(monthCalendar.getTime());
                 }
-                String sortParams;
 
                 User currentUser = LoginHistoryService.getCurrentUser();
                 for (int i = 0; i < 3; i++) {
                     if (i == 0) {
                         url = "/api/tasks/archive";
                     } else if (i == 1) {
-                        sortParams = "&sort=dueDate&order=desc&size=100";
-                        url = "/api/tasks/active?filter=oneshot,periodic";
+                        url = "/api/tasks/active?order=expire&filter=oneshot,periodic";
                     } else {
                         url = "/api/tasks/active?filter=constantly";
                     }
