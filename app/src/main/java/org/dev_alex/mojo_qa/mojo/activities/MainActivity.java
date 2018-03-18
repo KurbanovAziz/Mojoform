@@ -70,7 +70,7 @@ public class MainActivity extends AppCompatActivity {
 
         drawer.setSelectionAtPosition(1, true);
         //getSupportFragmentManager().beginTransaction().replace(R.id.container, TasksFragment.newInstance(), "tasks").commit();
-        if (getIntent().hasExtra(AlarmService.TEMPLATE_ID)) {
+        if (getIntent().hasExtra(AlarmService.TASK_ID )) {
             long taskId = getIntent().getLongExtra(AlarmService.TASK_ID, -1);
                 getSupportFragmentManager().beginTransaction()
                         .replace(R.id.container, TemplateFragment.newInstance(

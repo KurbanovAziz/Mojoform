@@ -31,21 +31,17 @@ import org.dev_alex.mojo_qa.mojo.R;
 import org.dev_alex.mojo_qa.mojo.activities.AuthActivity;
 import org.dev_alex.mojo_qa.mojo.activities.MainActivity;
 import org.dev_alex.mojo_qa.mojo.models.Task;
+import org.dev_alex.mojo_qa.mojo.models.User;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Random;
-import java.util.TimeZone;
 
-import okhttp3.Credentials;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
 import okhttp3.Response;
 
 public class AlarmService extends Service {
@@ -53,13 +49,7 @@ public class AlarmService extends Service {
     public final static String NOTIFICATIONS_CT = "notifications_count";
 
     public final static String TASK_ID = "task_id";
-    public final static String NODE_FOR_TASKS = "task_node_id";
-    public final static String TASK_NAME = "task_name";
-    public final static String TEMPLATE_ID = "template_id";
     public final static String MESSAGE = "message";
-    public final static String DUE_DATE = "due_date";
-    public final static String INITIATOR = "initiator";
-    public final static String SITE_ID = "site_id";
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -68,21 +58,18 @@ public class AlarmService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        Log.d("mojo-alarm-log", "onStartCommand");
+
         if (intent != null && intent.hasExtra(TASK_ID)) {
             Log.d("mojo-alarm-log", "onStartCommand task_id =" + intent.getStringExtra(TASK_ID));
 
-            String taskId = intent.getStringExtra(TASK_ID);
-            String taskName = intent.getStringExtra(TASK_NAME);
-            String initiator = intent.getStringExtra(INITIATOR);
-            String siteId = intent.getStringExtra(SITE_ID);
-            String templateId = intent.getStringExtra(TEMPLATE_ID);
-            String nodeForTasksID = intent.getStringExtra(NODE_FOR_TASKS);
+            long taskId = intent.getLongExtra(TASK_ID, 0);
             String message = intent.getStringExtra(MESSAGE);
-            //new CheckIfTaskFinishedTask(taskId, taskName, templateId, message, nodeForTasksID, initiator, siteId).execute();
+            new CheckIfTaskFinishedTask(taskId, message).execute();
         } else {
             Log.d("mojo-alarm-log", "onStartCommand update tasks" + new Date().toString());
             if (TokenService.isTokenExists()) {
-                //new UpdateTasksTask().execute();
+                new UpdateTasksTask().execute();
                 new KeepTokenAliveTask().execute();
             }
         }
@@ -93,8 +80,9 @@ public class AlarmService extends Service {
     public static void scheduleAlarm(Context context) {
         AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         Intent i = new Intent(context, AlarmService.class);
-        PendingIntent pi = PendingIntent.getService(context, 5857500, i, PendingIntent.FLAG_UPDATE_CURRENT);
-        am.setInexactRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), 10 * 60 * 1000, pi);
+        PendingIntent pi = PendingIntent.getService(context, 58550, i, PendingIntent.FLAG_UPDATE_CURRENT);
+        if (am != null)
+            am.setInexactRepeating(AlarmManager.RTC_WAKEUP, SystemClock.elapsedRealtime() + 100, 10 * 60 * 1000, pi);
     }
 
     private boolean checkIfTaskScheduled(long taskId) {
@@ -106,7 +94,7 @@ public class AlarmService extends Service {
     }
 
     private void scheduleTask(Task task) {
-    /*    Random random = new Random(SystemClock.elapsedRealtime());
+        Random random = new Random(SystemClock.elapsedRealtime());
         Log.d("mojo-alarm-log", "scheduleTask " + task.id);
 
         SharedPreferences mSettings;
@@ -120,11 +108,6 @@ public class AlarmService extends Service {
         if (task.expire_time - new Date().getTime() > 60 * 60 * 1000) {
             Intent intent = new Intent(getApplicationContext(), AlarmService.class);
             intent.putExtra(TASK_ID, task.id);
-            intent.putExtra(TASK_NAME, getTaskName(task));
-            intent.putExtra(SITE_ID, getTaskSiteId(task));
-            intent.putExtra(INITIATOR, getTaskInitiator(task));
-            intent.putExtra(TEMPLATE_ID, getTaskTemplateId(task));
-            intent.putExtra(NODE_FOR_TASKS, getTaskNodeId(task));
             intent.putExtra(MESSAGE, "Через час.");
             createAlarmTask(random, intent, task.expire_time - 60 * 60 * 1000);
         }
@@ -132,11 +115,6 @@ public class AlarmService extends Service {
         if (task.expire_time - new Date().getTime() > 15 * 60 * 1000) {
             Intent intent = new Intent(getApplicationContext(), AlarmService.class);
             intent.putExtra(TASK_ID, task.id);
-            intent.putExtra(TASK_NAME, getTaskName(task));
-            intent.putExtra(SITE_ID, getTaskSiteId(task));
-            intent.putExtra(INITIATOR, getTaskInitiator(task));
-            intent.putExtra(TEMPLATE_ID, getTaskTemplateId(task));
-            intent.putExtra(NODE_FOR_TASKS, getTaskNodeId(task));
             intent.putExtra(MESSAGE, "Через 15 минут.");
             createAlarmTask(random, intent, task.expire_time - 15 * 60 * 1000);
         }
@@ -144,11 +122,6 @@ public class AlarmService extends Service {
         if (new Date(task.expire_time).after(new Date())) {
             Intent intent = new Intent(getApplicationContext(), AlarmService.class);
             intent.putExtra(TASK_ID, task.id);
-            intent.putExtra(TASK_NAME, getTaskName(task));
-            intent.putExtra(SITE_ID, getTaskSiteId(task));
-            intent.putExtra(INITIATOR, getTaskInitiator(task));
-            intent.putExtra(TEMPLATE_ID, getTaskTemplateId(task));
-            intent.putExtra(NODE_FOR_TASKS, getTaskNodeId(task));
             intent.putExtra(MESSAGE, "Сейчас.");
             createAlarmTask(random, intent, task.expire_time);
         }
@@ -161,11 +134,6 @@ public class AlarmService extends Service {
             else {
                 Intent intent = new Intent(getApplicationContext(), AlarmService.class);
                 intent.putExtra(TASK_ID, task.id);
-                intent.putExtra(TASK_NAME, getTaskName(task));
-                intent.putExtra(SITE_ID, getTaskSiteId(task));
-                intent.putExtra(INITIATOR, getTaskInitiator(task));
-                intent.putExtra(TEMPLATE_ID, getTaskTemplateId(task));
-                intent.putExtra(NODE_FOR_TASKS, getTaskNodeId(task));
                 intent.putExtra(MESSAGE, "overdue");
                 createAlarmTask(random, intent, overDueTime, 60 * 60 * 1000);
                 overdueAlarmSent = true;
@@ -173,7 +141,7 @@ public class AlarmService extends Service {
         }
 
         editor.putString("task_" + task.id, "yea");
-        editor.apply();*/
+        editor.apply();
     }
 
     private void createAlarmTask(Random random, Intent intent, long triggerAt) {
@@ -194,8 +162,7 @@ public class AlarmService extends Service {
         am.setInexactRepeating(AlarmManager.RTC_WAKEUP, triggerAt, interval, pi);
     }
 
-    private void showNotification(String taskName, String message, String taskId, String templateId,
-                                  String nodeForTasksId, long dueDate, String initiator, String siteId) {
+    private void showNotification(long taskId, String taskName, String message) {
         Log.d("mojo-alarm-log", "showNotification " + message);
         try {
             if (Data.currentTaskId != null && Data.currentTaskId.equals(taskId) && isForeground(MainActivity.class.getPackage().getName()))
@@ -204,18 +171,10 @@ public class AlarmService extends Service {
             exc.printStackTrace();
         }
 
-        if (taskName.isEmpty())
-            taskName = "NoName";
-
         Context context = getApplicationContext();
 
         Intent notificationIntent = new Intent(context, AuthActivity.class);
         notificationIntent.putExtra(TASK_ID, taskId);
-        notificationIntent.putExtra(TEMPLATE_ID, templateId);
-        notificationIntent.putExtra(NODE_FOR_TASKS, nodeForTasksId);
-        notificationIntent.putExtra(DUE_DATE, dueDate);
-        notificationIntent.putExtra(SITE_ID, siteId);
-        notificationIntent.putExtra(INITIATOR, initiator);
         notificationIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         PendingIntent contentIntent = PendingIntent.getActivity(context, (int) new Date().getTime(), notificationIntent, PendingIntent.FLAG_CANCEL_CURRENT);
 
@@ -278,11 +237,6 @@ public class AlarmService extends Service {
         editor.apply();
     }
 
-    private String getTaskName(Task task) {
-        return task.ref.name;
-    }
-
-
     private class KeepTokenAliveTask extends AsyncTask<Void, Void, Void> {
         @Override
         protected Void doInBackground(Void... params) {
@@ -303,30 +257,30 @@ public class AlarmService extends Service {
         @Override
         protected Boolean doInBackground(Void... params) {
             try {
-                String userName = TokenService.getUsername();
-                SimpleDateFormat isoDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ", Locale.getDefault());
-                isoDateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
-                String dateParams;
+                Response response = RequestService.createGetRequest("/api/user/");
+                if (!response.isSuccessful()) {
+                    JSONObject requestJson = new JSONObject();
+                    requestJson.put("app", "android");
+                    requestJson.put("username", LoginHistoryService.getCurrentUser().username);
+                    requestJson.put("refresh_token", LoginHistoryService.getCurrentUser().refresh_token);
+                    response = RequestService.createPostRequest("/api/user/login/app", requestJson.toString());
 
-                Calendar monthCalendar = Calendar.getInstance();
-                monthCalendar.setTime(new Date());
-                monthCalendar.set(Calendar.DAY_OF_MONTH, 1);
-                dateParams = "&dueAfter=" + isoDateFormat.format(monthCalendar.getTime());
+                    if (response.isSuccessful()) {
+                        String userJson = response.body().string();
+                        User user = new ObjectMapper().readValue(userJson, User.class);
 
-                monthCalendar.add(Calendar.MONTH, 1);
-                dateParams += "&dueBefore=" + isoDateFormat.format(monthCalendar.getTime());
-                String sortParams = "&sort=dueDate&order=desc&size=100";
+                        LoginHistoryService.setCurrentUser(user);
+                        TokenService.updateToken(user.token, user.username);
+                    } else {
+                        return false;
+                    }
+                }
 
-                String url = App.getTask_host() + "/runtime/tasks?assignee="
-                        + userName + "&includeProcessVariables=TRUE" + dateParams + sortParams;
+                response = RequestService.createGetRequest("/api/tasks/active?order=expire&filter=oneshot,periodic");
+                //Log.d("mojo-alarm-log", "tasks upd response code = " + response.code());
 
-                OkHttpClient client = new OkHttpClient();
-                Request request = new Request.Builder().header("Authorization", Credentials.basic(userName, Data.taskAuthPass))
-                        .url(url).build();
-
-                Response response = client.newCall(request).execute();
                 if (response.code() == 200) {
-                    JSONArray tasksJson = new JSONObject(response.body().string()).getJSONArray("data");
+                    JSONArray tasksJson = new JSONArray(response.body().string());
                     tasks = new ObjectMapper().readValue(tasksJson.toString(), new TypeReference<ArrayList<Task>>() {
                     });
 
@@ -347,6 +301,8 @@ public class AlarmService extends Service {
         protected void onPostExecute(Boolean result) {
             super.onPostExecute(result);
             try {
+                Log.d("mojo-alarm-log", "tasks size = " + ((result == null || !result) ? "exc" : tasks.size()));
+
                 int notificationsCt = 0;
                 if (result) {
                     for (Task task : tasks) {
@@ -363,40 +319,45 @@ public class AlarmService extends Service {
         }
     }
 
-/*
+
     private class CheckIfTaskFinishedTask extends AsyncTask<Void, Void, Boolean> {
         private Task task;
-        private String taskId;
-        private String taskName;
-        private String nodeForTasksId;
-        private String templateId;
+        private long taskId;
+        private boolean isSuspended;
         private String message;
-        private String initiator;
-        private String siteId;
 
-        CheckIfTaskFinishedTask(String taskId, String taskName, String templateId, String message,
-                                String nodeForTasksId, String initiator, String siteId) {
+        CheckIfTaskFinishedTask(long taskId, String message) {
             this.taskId = taskId;
-            this.taskName = taskName;
-            this.templateId = templateId;
             this.message = message;
-            this.nodeForTasksId = nodeForTasksId;
-            this.initiator = initiator;
-            this.siteId = siteId;
         }
 
         @Override
         protected Boolean doInBackground(Void... params) {
             try {
-                String url = App.getTask_host() + "/runtime/tasks/" + taskId;
+                Response response = RequestService.createGetRequest("/api/user/");
+                if (!response.isSuccessful()) {
+                    JSONObject requestJson = new JSONObject();
+                    requestJson.put("app", "android");
+                    requestJson.put("username", LoginHistoryService.getCurrentUser().username);
+                    requestJson.put("refresh_token", LoginHistoryService.getCurrentUser().refresh_token);
+                    response = RequestService.createPostRequest("/api/user/login/app", requestJson.toString());
 
-                OkHttpClient client = new OkHttpClient();
-                Request request = new Request.Builder().header("Authorization", Credentials.basic(TokenService.getUsername(), Data.taskAuthPass))
-                        .url(url).build();
+                    if (response.isSuccessful()) {
+                        String userJson = response.body().string();
+                        User user = new ObjectMapper().readValue(userJson, User.class);
 
-                Response response = client.newCall(request).execute();
+                        LoginHistoryService.setCurrentUser(user);
+                        TokenService.updateToken(user.token, user.username);
+                    } else {
+                        return false;
+                    }
+                }
+
+                response = RequestService.createGetRequest("/api/tasks/" + taskId);
                 if (response.code() == 200) {
-                    task = new ObjectMapper().readValue(response.body().string(), Task.class);
+                    String jsonStr = response.body().string();
+                    task = new ObjectMapper().readValue(jsonStr, Task.class);
+                    isSuspended = new JSONObject(jsonStr).has("document");
                     Log.d("mojo-alarm-log", "CheckIfTaskFinishedTask task= " + task.toString());
                     return true;
                 }
@@ -415,18 +376,16 @@ public class AlarmService extends Service {
                 Log.d("mojo-alarm-log", "CheckIfTaskFinishedTask " + result);
 
                 if (result) {
-                    if (!task.suspended && task.assignee.toLowerCase().equals(TokenService.getUsername().toLowerCase())) {
+                    if (!isSuspended) {
                         if (message.startsWith("overdue")) {
-                            Log.d("mojo-test-log", "currentDate " + new Date().getTime() + " dueDate " + task.dueDate.getTime());
-                            int hoursCt = (int) Math.abs((new Date().getTime() - task.dueDate.getTime()) / (60 * 60 * 1000));
+                            Log.d("mojo-test-log", "currentDate " + new Date().getTime() + " dueDate " + task.expire_time);
+                            int hoursCt = (int) Math.abs((new Date().getTime() - task.expire_time) / (60 * 60 * 1000));
                             message = String.format(Locale.getDefault(), "Просрочено %d час%s(ов)", hoursCt, hoursCt == 1 ? "" : "a");
 
                             if (hoursCt < 4)
-                                showNotification(taskName, message, taskId, templateId, nodeForTasksId,
-                                        task.dueDate != null ? task.dueDate.getTime() : new Date().getTime(), initiator, siteId);
+                                showNotification(taskId, message, task.ref.name);
                         } else {
-                            showNotification(taskName, message, taskId, templateId, nodeForTasksId,
-                                    task.dueDate != null ? task.dueDate.getTime() : new Date().getTime(), initiator, siteId);
+                            showNotification(taskId, message, task.ref.name);
                         }
                     }
                 }
@@ -435,7 +394,6 @@ public class AlarmService extends Service {
             }
         }
     }
-*/
 
     public boolean isForeground(String myPackage) {
         ActivityManager manager = (ActivityManager) getSystemService(ACTIVITY_SERVICE);

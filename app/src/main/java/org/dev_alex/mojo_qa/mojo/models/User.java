@@ -9,6 +9,7 @@ public class User implements Serializable {
     public String firstName;
     public String lastName;
     public String token;
+    public String refresh_token;
     public String username;
     public boolean has_avatar;
     public Boolean is_orgowner = null;

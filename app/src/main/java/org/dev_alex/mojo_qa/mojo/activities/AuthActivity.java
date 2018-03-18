@@ -35,7 +35,7 @@ public class AuthActivity extends AppCompatActivity {
 
         if (!OnboardingActivity.isOnboardingFinished())
             startActivity(new Intent(this, OnboardingActivity.class));
-        
+
         getSupportFragmentManager().beginTransaction().replace(R.id.container, LogoFragment.newInstance()).commit();
         if (!TokenService.isTokenExists())
             new Handler().postDelayed(new Runnable() {
@@ -43,9 +43,9 @@ public class AuthActivity extends AppCompatActivity {
                 public void run() {
                     replaceWithLoginFragment();
                 }
-            }, 3000);
+            }, 2500);
         else
-            new LoginTask(TokenService.getToken()).execute();
+            new LoginTask().execute();
     }
 
     @Override
@@ -81,12 +81,10 @@ public class AuthActivity extends AppCompatActivity {
 
     public class LoginTask extends AsyncTask<Void, Void, Integer> {
         private String username, password;
-        private String token;
         private boolean loginWithinToken;
         private User user;
 
-        LoginTask(String token) {
-            this.token = token;
+        LoginTask() {
             loginWithinToken = true;
         }
 
@@ -107,16 +105,17 @@ public class AuthActivity extends AppCompatActivity {
         protected Integer doInBackground(Void... params) {
             try {
                 JSONObject requestJson = new JSONObject();
-                if (!loginWithinToken) {
+                requestJson.put("app", "android");
+
+                if (loginWithinToken) {
+                    requestJson.put("username", LoginHistoryService.getCurrentUser().username);
+                    requestJson.put("refresh_token", LoginHistoryService.getCurrentUser().refresh_token);
+                } else {
                     requestJson.put("username", username);
                     requestJson.put("password", password);
                 }
 
-                Response response;
-                if (loginWithinToken)
-                    response = RequestService.createGetRequest("/api/user/");
-                else
-                    response = RequestService.createPostRequest("/api/user/login", requestJson.toString());
+                Response response = RequestService.createPostRequest("/api/user/login/app", requestJson.toString());
 
                 if (response.code() == 202 || response.code() == 200) {
                     String userJson = response.body().string();
@@ -144,6 +143,7 @@ public class AuthActivity extends AppCompatActivity {
                             return;
                         }
                         LoginHistoryService.setCurrentUser(user);
+                        TokenService.updateToken(user.token, user.username);
                         Intent intent = new Intent(AuthActivity.this, MainActivity.class);
                         intent.putExtras(getIntent());
                         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
