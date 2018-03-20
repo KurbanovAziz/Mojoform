@@ -146,6 +146,7 @@ public class AuthActivity extends AppCompatActivity {
                         TokenService.updateToken(user.token, user.username);
                         Intent intent = new Intent(AuthActivity.this, MainActivity.class);
                         intent.putExtras(getIntent());
+                        intent.setData(getIntent().getData());
                         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                         startActivity(intent);
                         finish();
@@ -168,6 +169,7 @@ public class AuthActivity extends AppCompatActivity {
                         TokenService.updateToken(user.token, user.username);
                         Intent intent = new Intent(AuthActivity.this, MainActivity.class);
                         intent.putExtras(getIntent());
+                        intent.setData(getIntent().getData());
                         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                         startActivity(intent);
                         finish();

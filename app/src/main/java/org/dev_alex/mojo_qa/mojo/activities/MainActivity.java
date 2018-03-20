@@ -6,11 +6,14 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.PersistableBundle;
 import android.support.annotation.NonNull;
+import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.text.TextUtils;
@@ -18,6 +21,7 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
@@ -51,6 +55,8 @@ import java.util.List;
 import java.util.Locale;
 
 import okhttp3.Response;
+import okio.BufferedSink;
+import okio.Okio;
 
 public class MainActivity extends AppCompatActivity {
     public Drawer drawer;
@@ -70,12 +76,37 @@ public class MainActivity extends AppCompatActivity {
 
         drawer.setSelectionAtPosition(1, true);
         //getSupportFragmentManager().beginTransaction().replace(R.id.container, TasksFragment.newInstance(), "tasks").commit();
-        if (getIntent().hasExtra(AlarmService.TASK_ID )) {
+        if (getIntent().hasExtra(AlarmService.TASK_ID)) {
             long taskId = getIntent().getLongExtra(AlarmService.TASK_ID, -1);
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.container, TemplateFragment.newInstance(
+                            taskId, false)).addToBackStack(null).commit();
+        }
+        checkData(getIntent());
+    }
+
+    void checkData(Intent intent){
+        Uri data = intent.getData();
+        if (data != null) {
+            if (data.getPath().contains("pdf/view/")) {
+                long documentId = Long.parseLong(data.getPath().substring(data.getPath().lastIndexOf("/") + 1));
+                String name = "document_pdf_" + documentId;
+                new DownloadPdfTask(documentId, name).execute();
+            }
+
+            if (data.getPath().contains("task/view/")) {
+                long taskId = Long.parseLong(data.getPath().substring(data.getPath().lastIndexOf("/") + 1));
                 getSupportFragmentManager().beginTransaction()
                         .replace(R.id.container, TemplateFragment.newInstance(
-                                taskId, false)).addToBackStack(null).commit();
+                                taskId, true)).addToBackStack(null).commit();
+            }
         }
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        checkData(intent);
     }
 
     @Override
@@ -335,4 +366,77 @@ public class MainActivity extends AppCompatActivity {
                 })
                 .show();
     }
+
+    private class DownloadPdfTask extends AsyncTask<Void, Void, Integer> {
+        private java.io.File resultFile;
+        private long documentId;
+        private String name;
+
+        DownloadPdfTask(long documentId, String name) {
+            this.documentId = documentId;
+            this.name = name;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            File downloadsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+            resultFile = new File(downloadsDir, name + ".pdf");
+        }
+
+        @Override
+        protected Integer doInBackground(Void... params) {
+            try {
+                if (resultFile.exists())
+                    return 200;
+
+                String url = "/api/fs-mojo/document/id/" + documentId + "/pdf";
+                Response response = RequestService.createGetRequest(url);
+
+                if (response.code() == 200) {
+                    BufferedSink sink = Okio.buffer(Okio.sink(resultFile));
+                    sink.writeAll(response.body().source());
+                    sink.close();
+                }
+                response.body().close();
+
+                return response.code();
+            } catch (Exception exc) {
+                exc.printStackTrace();
+                return null;
+            }
+        }
+
+        @Override
+        protected void onPostExecute(Integer responseCode) {
+            super.onPostExecute(responseCode);
+            try {
+                if (responseCode == null)
+                    Toast.makeText(MainActivity.this, R.string.network_error, Toast.LENGTH_LONG).show();
+                else if (responseCode == 200) {
+                    try {
+                        Intent viewIntent = new Intent(Intent.ACTION_VIEW);
+                        Uri fileUri = FileProvider.getUriForFile(MainActivity.this, getApplicationContext().getPackageName() + ".provider", resultFile);
+                        viewIntent.setDataAndType(fileUri, "application/pdf");
+                        viewIntent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                        startActivity(viewIntent);
+
+                        Toast.makeText(MainActivity.this, "Сохранено в загрузках", Toast.LENGTH_LONG).show();
+                    } catch (Exception exc) {
+                        exc.printStackTrace();
+                        Toast.makeText(MainActivity.this, "Нет приложения, которое может открыть этот файл", Toast.LENGTH_LONG).show();
+                        try {
+                            resultFile.delete();
+                        } catch (Exception exc1) {
+                            exc1.printStackTrace();
+                        }
+                    }
+                } else
+                    Toast.makeText(MainActivity.this, R.string.unknown_error, Toast.LENGTH_LONG).show();
+            } catch (Exception exc) {
+                exc.printStackTrace();
+            }
+        }
+    }
+
 }
