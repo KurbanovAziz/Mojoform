@@ -1,5 +1,8 @@
 package org.dev_alex.mojo_qa.mojo.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Task {
     public long id;
     public long document_id;

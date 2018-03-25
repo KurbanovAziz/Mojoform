@@ -3,6 +3,7 @@ package org.dev_alex.mojo_qa.mojo.services;
 import android.app.ActivityManager;
 import android.app.AlarmManager;
 import android.app.Notification;
+import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
@@ -16,6 +17,7 @@ import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.IBinder;
 import android.os.SystemClock;
+import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -45,6 +47,8 @@ import java.util.Random;
 import okhttp3.Response;
 
 public class AlarmService extends Service {
+    public static final String CHANNEL_ID = "mojoб_channel_1";
+
     private final static String SCHEDULE_PREFERENCES = "task_scheduler";
     public final static String NOTIFICATIONS_CT = "notifications_count";
 
@@ -61,13 +65,14 @@ public class AlarmService extends Service {
         Log.d("mojo-alarm-log", "onStartCommand");
 
         if (intent != null && intent.hasExtra(TASK_ID)) {
-            Log.d("mojo-alarm-log", "onStartCommand task_id =" + intent.getStringExtra(TASK_ID));
-
             long taskId = intent.getLongExtra(TASK_ID, 0);
+
+            Log.d("mojo-alarm-log", "onStartCommand task_id =" + taskId);
+
             String message = intent.getStringExtra(MESSAGE);
             new CheckIfTaskFinishedTask(taskId, message).execute();
         } else {
-            Log.d("mojo-alarm-log", "onStartCommand update tasks" + new Date().toString());
+            Log.d("mojo-alarm-log", "onStartCommand update tasks " + new Date().toString());
             if (TokenService.isTokenExists()) {
                 new UpdateTasksTask().execute();
                 new KeepTokenAliveTask().execute();
@@ -81,8 +86,10 @@ public class AlarmService extends Service {
         AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         Intent i = new Intent(context, AlarmService.class);
         PendingIntent pi = PendingIntent.getService(context, 58550, i, PendingIntent.FLAG_UPDATE_CURRENT);
-        if (am != null)
-            am.setInexactRepeating(AlarmManager.RTC_WAKEUP, SystemClock.elapsedRealtime() + 100, 10 * 60 * 1000, pi);
+        if (am != null) {
+            am.setInexactRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + 200, 5 * 60 * 1000, pi);
+            Log.d("mojo-alarm-log", "scheduleAlarm");
+        }
     }
 
     private boolean checkIfTaskScheduled(long taskId) {
@@ -146,20 +153,40 @@ public class AlarmService extends Service {
 
     private void createAlarmTask(Random random, Intent intent, long triggerAt) {
         SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss", Locale.getDefault());
-        Log.d("mojo-alarm-log", "scheduleTask time= " + sdf.format(triggerAt));
+        Log.d("mojo-alarm-log", "scheduleTask time= " + sdf.format(triggerAt) + " current time= " + sdf.format(new Date()));
 
-        PendingIntent pi = PendingIntent.getService(getApplicationContext(), (int) Math.abs(SystemClock.elapsedRealtime() * random.nextInt(10012)), intent, 0);
+        PendingIntent pi = PendingIntent.getService(getApplicationContext(), ((int) Math.abs(SystemClock.elapsedRealtime() * random.nextInt(10012))) % 55432, intent, 0);
         AlarmManager am = (AlarmManager) getApplicationContext().getSystemService(Context.ALARM_SERVICE);
         am.set(AlarmManager.RTC_WAKEUP, triggerAt, pi);
     }
 
     private void createAlarmTask(Random random, Intent intent, long triggerAt, long interval) {
         SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss", Locale.getDefault());
-        Log.d("mojo-alarm-log", "scheduleTask time= " + sdf.format(triggerAt));
+        Log.d("mojo-alarm-log", "scheduleTask time interval = " + sdf.format(triggerAt)+ " current time= " + sdf.format(new Date()));
 
         PendingIntent pi = PendingIntent.getService(getApplicationContext(), (int) Math.abs(SystemClock.elapsedRealtime() * random.nextInt(10012)), intent, 0);
         AlarmManager am = (AlarmManager) getApplicationContext().getSystemService(Context.ALARM_SERVICE);
         am.setInexactRepeating(AlarmManager.RTC_WAKEUP, triggerAt, interval, pi);
+    }
+
+    private void createNotificationChannel() {
+        NotificationManager notificationManager =
+                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            CharSequence name = "adal_channel";
+            String Description = "Adal Main Channel";
+            int importance = NotificationManager.IMPORTANCE_HIGH;
+            NotificationChannel mChannel = new NotificationChannel(CHANNEL_ID, name, importance);
+            mChannel.setDescription(Description);
+            mChannel.enableLights(true);
+            mChannel.setLightColor(Color.parseColor("#632E83"));
+            mChannel.enableVibration(true);
+            mChannel.setShowBadge(false);
+
+            if (notificationManager != null)
+                notificationManager.createNotificationChannel(mChannel);
+        }
     }
 
     private void showNotification(long taskId, String taskName, String message) {
@@ -178,21 +205,25 @@ public class AlarmService extends Service {
         notificationIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         PendingIntent contentIntent = PendingIntent.getActivity(context, (int) new Date().getTime(), notificationIntent, PendingIntent.FLAG_CANCEL_CURRENT);
 
-        Notification.Builder builder = new Notification.Builder(context);
+
         Bitmap notificationIcon = getNotificationIcon();
         if (notificationIcon == null)
             notificationIcon = BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher);
 
-        builder.setContentIntent(contentIntent)
+
+        createNotificationChannel();
+        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this, CHANNEL_ID)
                 .setSmallIcon(R.drawable.logo_notification)
                 .setLargeIcon(notificationIcon)
+                .setContentTitle(getString(R.string.app_name))
+                .setContentTitle(taskName)
+                .setContentText(message)
                 .setAutoCancel(true)
                 .setLights(Color.parseColor("#632E83"), 1000, 3000)
                 .setVibrate(new long[]{1000, 1000, 1000, 1000, 1000})
-                .setContentTitle(taskName)
-                .setContentText(message);
+                .setContentIntent(contentIntent);
 
-        Notification notification = builder.build();
+        Notification notification = notificationBuilder.build();
         NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         notificationManager.notify(123321, notification);
     }
@@ -277,8 +308,6 @@ public class AlarmService extends Service {
                 }
 
                 response = RequestService.createGetRequest("/api/tasks/active?order=expire&filter=oneshot,periodic");
-                //Log.d("mojo-alarm-log", "tasks upd response code = " + response.code());
-
                 if (response.code() == 200) {
                     JSONArray tasksJson = new JSONArray(response.body().string());
                     tasks = new ObjectMapper().readValue(tasksJson.toString(), new TypeReference<ArrayList<Task>>() {
@@ -287,6 +316,7 @@ public class AlarmService extends Service {
                     for (Task task : tasks)
                         task.fixTime();
 
+                    Log.d("mojo-alarm-log", "tasks response list= " + tasksJson.toString());
                     return true;
                 }
                 return false;
@@ -361,10 +391,12 @@ public class AlarmService extends Service {
                     Log.d("mojo-alarm-log", "CheckIfTaskFinishedTask task= " + task.toString());
                     return true;
                 }
+                Log.d("mojo-alarm-log", "CheckIfTaskFinishedTask response code =" + response.code());
                 return false;
 
             } catch (Exception exc) {
                 exc.printStackTrace();
+                Log.d("mojo-alarm-log", "CheckIfTaskFinishedTask exc =" + exc.getMessage());
                 return false;
             }
         }
