@@ -358,13 +358,6 @@ public class TasksFragment extends Fragment {
         rootView.findViewById(R.id.calendar_control_panel).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (!expandableLayout.isExpanded())
-                    new Handler().postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            new UpdateCurrentMonthDecorators().execute();
-                        }
-                    }, 700);
                 expandableLayout.toggle();
             }
         });
@@ -620,60 +613,6 @@ public class TasksFragment extends Fragment {
 
                 } else
                     Toast.makeText(getContext(), R.string.unknown_error, Toast.LENGTH_LONG).show();
-            } catch (Exception exc) {
-                exc.printStackTrace();
-            }
-        }
-    }
-
-    private class UpdateCurrentMonthDecorators extends AsyncTask<Void, Void, Integer> {
-        private ArrayList<Task> monthTasks;
-
-        protected Integer doInBackground(Void... params) {
-            try {
-                monthTasks = new ArrayList<>();
-                String url;
-
-                SimpleDateFormat isoDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ", Locale.getDefault());
-                isoDateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
-
-
-                String dateParams;
-                Calendar monthCalendar = Calendar.getInstance();
-                monthCalendar.setTime(currentDate.getTime());
-                monthCalendar.set(Calendar.DAY_OF_MONTH, 1);
-                dateParams = "&dueAfter=" + isoDateFormat.format(monthCalendar.getTime());
-
-                monthCalendar.add(Calendar.MONTH, 1);
-                dateParams += "&dueBefore=" + isoDateFormat.format(monthCalendar.getTime());
-                String sortParams = "&sort=dueDate&order=desc&size=100";
-
-                url = App.getTask_host() + "/runtime/tasks?assignee="
-                        + LoginHistoryService.getCurrentUser().username + "&includeProcessVariables=TRUE" + dateParams + sortParams;
-
-                OkHttpClient client = new OkHttpClient();
-                Request request = new Request.Builder().header("Authorization", Credentials.basic(Data.getTaskAuthLogin(), Data.taskAuthPass))
-                        .url(url).build();
-
-                Response response = client.newCall(request).execute();
-
-                if (response.code() == 200) {
-                    JSONArray tasksJson = new JSONObject(response.body().string()).getJSONArray("data");
-                    monthTasks = new ObjectMapper().readValue(tasksJson.toString(), new TypeReference<ArrayList<Task>>() {
-                    });
-                }
-                return null;
-            } catch (Exception exc) {
-                exc.printStackTrace();
-                return null;
-            }
-        }
-
-        @Override
-        protected void onPostExecute(Integer responseCode) {
-            super.onPostExecute(responseCode);
-            try {
-                updateDecorators(monthTasks);
             } catch (Exception exc) {
                 exc.printStackTrace();
             }
