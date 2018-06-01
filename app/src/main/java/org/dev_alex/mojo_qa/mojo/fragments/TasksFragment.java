@@ -504,37 +504,26 @@ public class TasksFragment extends Fragment {
                 permanentTasks = new ArrayList<>();
                 String url;
 
-                SimpleDateFormat isoDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ", Locale.getDefault());
-                isoDateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
-
-
-                String dateParams;
-                String endDateParams;
+                String dateFilters = "";
                 if (withDay) {
                     Calendar dayCalendar = Calendar.getInstance();
                     dayCalendar.setTime(currentDate.getTime());
-                    dateParams = "&dueAfter=" + isoDateFormat.format(dayCalendar.getTime());
-                    endDateParams = "&taskCompletedAfter=" + isoDateFormat.format(dayCalendar.getTime());
-
+                    dateFilters += "from=" + dayCalendar.getTime().getTime() / 1000;
                     dayCalendar.add(Calendar.DAY_OF_MONTH, 1);
-                    dateParams += "&dueBefore=" + isoDateFormat.format(dayCalendar.getTime());
-                    endDateParams += "&taskCompletedBefore=" + isoDateFormat.format(dayCalendar.getTime());
+                    dateFilters += "&to=" + dayCalendar.getTime().getTime() / 1000;
                 } else {
                     Calendar monthCalendar = Calendar.getInstance();
                     monthCalendar.setTime(currentDate.getTime());
                     monthCalendar.set(Calendar.DAY_OF_MONTH, 1);
-                    dateParams = "&dueAfter=" + isoDateFormat.format(monthCalendar.getTime());
-                    endDateParams = "&taskCompletedAfter=" + isoDateFormat.format(monthCalendar.getTime());
-
+                    dateFilters += "from=" + monthCalendar.getTime().getTime() / 1000;
                     monthCalendar.add(Calendar.MONTH, 1);
-                    dateParams += "&dueBefore=" + isoDateFormat.format(monthCalendar.getTime());
-                    endDateParams += "&taskCompletedBefore=" + isoDateFormat.format(monthCalendar.getTime());
+                    monthCalendar.set(Calendar.DAY_OF_MONTH, 1);
+                    dateFilters += "&to=" + monthCalendar.getTime().getTime() / 1000;
                 }
 
-                User currentUser = LoginHistoryService.getCurrentUser();
                 for (int i = 0; i < 3; i++) {
                     if (i == 0) {
-                        url = "/api/tasks/archive";
+                        url = "/api/tasks/archive?" + dateFilters;
                     } else if (i == 1) {
                         url = "/api/tasks/active?order=expire&filter=oneshot,periodic";
                     } else {
