@@ -1,6 +1,7 @@
 package org.dev_alex.mojo_qa.mojo.fragments;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
@@ -380,11 +381,15 @@ public class TemplateFragment extends Fragment {
         getActivity().findViewById(R.id.back_btn).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (rootView.findViewById(R.id.scroll_view).canScrollVertically(-1))
-                    ((ScrollView) rootView.findViewById(R.id.scroll_view)).fullScroll(-1);
-                else if (getActivity() != null && getActivity().getSupportFragmentManager() != null) {
-                    getActivity().getSupportFragmentManager().popBackStack();
-                    ((MainActivity) getActivity()).drawer.getDrawerLayout().setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
+                try {
+                    if (rootView.findViewById(R.id.scroll_view).canScrollVertically(-1))
+                        ((ScrollView) rootView.findViewById(R.id.scroll_view)).fullScroll(View.FOCUS_UP);
+                    else if (getActivity() != null && getActivity().getSupportFragmentManager() != null) {
+                        getActivity().getSupportFragmentManager().popBackStack();
+                        ((MainActivity) getActivity()).drawer.getDrawerLayout().setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
+                    }
+                } catch (Exception exc) {
+                    exc.printStackTrace();
                 }
             }
         });
@@ -3139,6 +3144,7 @@ public class TemplateFragment extends Fragment {
     }
 
 
+    @SuppressLint("CheckResult")
     private void processImageFile(File file, final boolean isRestore, final Pair<LinearLayout, JSONObject> toBlock) {
         final int imgSize = Math.round(TypedValue.applyDimension
                 (TypedValue.COMPLEX_UNIT_DIP, 93, getResources().getDisplayMetrics()));
