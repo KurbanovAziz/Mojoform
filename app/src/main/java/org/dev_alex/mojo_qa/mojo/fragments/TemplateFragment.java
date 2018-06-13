@@ -3135,12 +3135,27 @@ public class TemplateFragment extends Fragment {
                     editor.apply();
                     ((TasksFragment) getActivity().getSupportFragmentManager().findFragmentByTag("tasks")).needUpdate = true;
                     getActivity().getSupportFragmentManager().popBackStack();
+                } else if (responseCode == 404) {
+                    removeTemplate();
+                    ((TasksFragment) getActivity().getSupportFragmentManager().findFragmentByTag("tasks")).needUpdate = true;
+
+                    Toast.makeText(getContext(), R.string.no_task_error, Toast.LENGTH_LONG).show();
+                    getActivity().getSupportFragmentManager().popBackStack();
+                    ((MainActivity) getActivity()).drawer.getDrawerLayout().setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
                 } else
                     Toast.makeText(getContext(), R.string.unknown_error, Toast.LENGTH_LONG).show();
             } catch (Exception exc) {
                 exc.printStackTrace();
             }
         }
+    }
+
+    private void removeTemplate() {
+        SharedPreferences mSettings;
+        mSettings = App.getContext().getSharedPreferences("templates", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = mSettings.edit();
+        editor.putString(taskId + LoginHistoryService.getCurrentUser().username, "");
+        editor.apply();
     }
 
 

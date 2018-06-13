@@ -104,5 +104,6 @@
     <string name="fact">Факт</string>
     <string name="continue_exec">Продолжить выполнение</string>
     <string name="delete_draft">Удалить черновик</string>
+    <string name="no_task_error">Такой задачи не существует</string>
 
 </resources>
