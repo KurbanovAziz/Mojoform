@@ -358,13 +358,6 @@ public class TasksFragment extends Fragment {
         rootView.findViewById(R.id.calendar_control_panel).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (!expandableLayout.isExpanded())
-                    new Handler().postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            new UpdateCurrentMonthDecorators().execute();
-                        }
-                    }, 700);
                 expandableLayout.toggle();
             }
         });
@@ -511,37 +504,26 @@ public class TasksFragment extends Fragment {
                 permanentTasks = new ArrayList<>();
                 String url;
 
-                SimpleDateFormat isoDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ", Locale.getDefault());
-                isoDateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
-
-
-                String dateParams;
-                String endDateParams;
+                String dateFilters = "";
                 if (withDay) {
                     Calendar dayCalendar = Calendar.getInstance();
                     dayCalendar.setTime(currentDate.getTime());
-                    dateParams = "&dueAfter=" + isoDateFormat.format(dayCalendar.getTime());
-                    endDateParams = "&taskCompletedAfter=" + isoDateFormat.format(dayCalendar.getTime());
-
+                    dateFilters += "from=" + dayCalendar.getTime().getTime() / 1000;
                     dayCalendar.add(Calendar.DAY_OF_MONTH, 1);
-                    dateParams += "&dueBefore=" + isoDateFormat.format(dayCalendar.getTime());
-                    endDateParams += "&taskCompletedBefore=" + isoDateFormat.format(dayCalendar.getTime());
+                    dateFilters += "&to=" + dayCalendar.getTime().getTime() / 1000;
                 } else {
                     Calendar monthCalendar = Calendar.getInstance();
                     monthCalendar.setTime(currentDate.getTime());
                     monthCalendar.set(Calendar.DAY_OF_MONTH, 1);
-                    dateParams = "&dueAfter=" + isoDateFormat.format(monthCalendar.getTime());
-                    endDateParams = "&taskCompletedAfter=" + isoDateFormat.format(monthCalendar.getTime());
-
+                    dateFilters += "from=" + monthCalendar.getTime().getTime() / 1000;
                     monthCalendar.add(Calendar.MONTH, 1);
-                    dateParams += "&dueBefore=" + isoDateFormat.format(monthCalendar.getTime());
-                    endDateParams += "&taskCompletedBefore=" + isoDateFormat.format(monthCalendar.getTime());
+                    monthCalendar.set(Calendar.DAY_OF_MONTH, 1);
+                    dateFilters += "&to=" + monthCalendar.getTime().getTime() / 1000;
                 }
 
-                User currentUser = LoginHistoryService.getCurrentUser();
                 for (int i = 0; i < 3; i++) {
                     if (i == 0) {
-                        url = "/api/tasks/archive";
+                        url = "/api/tasks/archive?" + dateFilters;
                     } else if (i == 1) {
                         url = "/api/tasks/active?order=expire&filter=oneshot,periodic";
                     } else {
@@ -620,60 +602,6 @@ public class TasksFragment extends Fragment {
 
                 } else
                     Toast.makeText(getContext(), R.string.unknown_error, Toast.LENGTH_LONG).show();
-            } catch (Exception exc) {
-                exc.printStackTrace();
-            }
-        }
-    }
-
-    private class UpdateCurrentMonthDecorators extends AsyncTask<Void, Void, Integer> {
-        private ArrayList<Task> monthTasks;
-
-        protected Integer doInBackground(Void... params) {
-            try {
-                monthTasks = new ArrayList<>();
-                String url;
-
-                SimpleDateFormat isoDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ", Locale.getDefault());
-                isoDateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
-
-
-                String dateParams;
-                Calendar monthCalendar = Calendar.getInstance();
-                monthCalendar.setTime(currentDate.getTime());
-                monthCalendar.set(Calendar.DAY_OF_MONTH, 1);
-                dateParams = "&dueAfter=" + isoDateFormat.format(monthCalendar.getTime());
-
-                monthCalendar.add(Calendar.MONTH, 1);
-                dateParams += "&dueBefore=" + isoDateFormat.format(monthCalendar.getTime());
-                String sortParams = "&sort=dueDate&order=desc&size=100";
-
-                url = App.getTask_host() + "/runtime/tasks?assignee="
-                        + LoginHistoryService.getCurrentUser().username + "&includeProcessVariables=TRUE" + dateParams + sortParams;
-
-                OkHttpClient client = new OkHttpClient();
-                Request request = new Request.Builder().header("Authorization", Credentials.basic(Data.getTaskAuthLogin(), Data.taskAuthPass))
-                        .url(url).build();
-
-                Response response = client.newCall(request).execute();
-
-                if (response.code() == 200) {
-                    JSONArray tasksJson = new JSONObject(response.body().string()).getJSONArray("data");
-                    monthTasks = new ObjectMapper().readValue(tasksJson.toString(), new TypeReference<ArrayList<Task>>() {
-                    });
-                }
-                return null;
-            } catch (Exception exc) {
-                exc.printStackTrace();
-                return null;
-            }
-        }
-
-        @Override
-        protected void onPostExecute(Integer responseCode) {
-            super.onPostExecute(responseCode);
-            try {
-                updateDecorators(monthTasks);
             } catch (Exception exc) {
                 exc.printStackTrace();
             }
