@@ -122,8 +122,8 @@ public class MainActivity extends AppCompatActivity {
             ((TextView) headerView.findViewById(R.id.user_name)).setText(currentUser.username);
         else
             ((TextView) headerView.findViewById(R.id.user_name)).setText(String.format(Locale.getDefault(),
-                    "%s %s", TextUtils.isEmpty(currentUser.firstName) ? "" : currentUser.firstName,
-                    TextUtils.isEmpty(currentUser.lastName) ? "" : currentUser.lastName));
+                    "%s %s", TextUtils.isEmpty(currentUser.lastName) ? "" : currentUser.lastName,
+                    TextUtils.isEmpty(currentUser.firstName) ? "" : currentUser.firstName));
 
 
         ArrayList<SecondaryDrawerItem> mainDraggableItems = new ArrayList<>();
