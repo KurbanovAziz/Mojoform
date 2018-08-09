@@ -91,9 +91,6 @@ import com.github.mikephil.charting.utils.MPPointF;
 import com.github.mikephil.charting.utils.Transformer;
 import com.github.mikephil.charting.utils.ViewPortHandler;
 import com.lalongooo.videocompressor.video.MediaController;
-import com.mlsdev.rximagepicker.RxImageConverters;
-import com.mlsdev.rximagepicker.RxImagePicker;
-import com.mlsdev.rximagepicker.Sources;
 
 import net.cachapa.expandablelayout.ExpandableLayout;
 
@@ -104,6 +101,7 @@ import org.dev_alex.mojo_qa.mojo.activities.AuthActivity;
 import org.dev_alex.mojo_qa.mojo.activities.ImageViewActivity;
 import org.dev_alex.mojo_qa.mojo.activities.MainActivity;
 import org.dev_alex.mojo_qa.mojo.custom_views.CustomWebview;
+import org.dev_alex.mojo_qa.mojo.custom_views.camera.CustomCamera2Activity;
 import org.dev_alex.mojo_qa.mojo.custom_views.indicator.IndicatorLayout;
 import org.dev_alex.mojo_qa.mojo.models.IndicatorModel;
 import org.dev_alex.mojo_qa.mojo.models.Page;
@@ -233,6 +231,7 @@ public class TemplateFragment extends Fragment {
             setupHeader();
             setListeners();
 
+            Log.e("rrr", "get_tasks");
             new GetTemplateTask().execute();
         } else
             initDialog();
@@ -246,42 +245,15 @@ public class TemplateFragment extends Fragment {
 
         if (requestCode == Constants.REQUEST_CODE && resultCode == RESULT_OK && data != null) {
             ArrayList<Image> images = data.getParcelableArrayListExtra(Constants.INTENT_EXTRA_IMAGES);
-            for (Image image : images)
+            for (Image image : images) {
                 processImageFile(new File(image.path), false, null);
-        }
-       /* try {
-            if (requestCode == PHOTO_REQUEST_CODE && resultCode == RESULT_OK) {
-                if (new File(cameraImagePath).exists() || data == null)
-                    new ProcessingBitmapTask(cameraImagePath, true).execute();
-                else {
-                    try {
-                        String picturePath = Utils.getRealPathFromIntentData(getContext(), data.getData());
-                        if (picturePath == null) {
-                            Toast.makeText(getContext(), "что-то пошло не так", Toast.LENGTH_SHORT).show();
-                            return;
-                        }
-
-                        String expansion = picturePath.substring(picturePath.lastIndexOf('.') + 1);
-                        if (!expansion.equals("jpg") && !expansion.equals("png") && !expansion.equals("jpeg") && !expansion.equals("bmp")) {
-                            Toast.makeText(getContext(), "Пожалуйста, выберите файл в формет jpg, png или bmp", Toast.LENGTH_SHORT).show();
-                            return;
-                        }
-                        new ProcessingBitmapTask(picturePath, true).execute();
-                    } catch (Exception exc) {
-                        exc.printStackTrace();
-                        try {
-                            new ProcessingBitmapTask(cameraImagePath, true).execute();
-                        } catch (Exception exc1) {
-                            Toast.makeText(getContext(), "Не удалось прикрепить изображение", Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                }
             }
-        } catch (Exception exc) {
-            exc.printStackTrace();
-            String error = "camera_path = " + (cameraImagePath == null ? "null" : cameraImagePath);
-            Toast.makeText(getContext(), error, Toast.LENGTH_LONG).show();
-        }*/
+        }
+
+        if (requestCode == PHOTO_REQUEST_CODE && resultCode == RESULT_OK && data != null) {
+            String photoPath = data.getStringExtra("photo_path");
+            processImageFile(new File(photoPath), false, null);
+        }
 
         if (requestCode == VIDEO_REQUEST_CODE && resultCode == RESULT_OK) {
             if (new File(cameraVideoPath).exists() || data == null)
@@ -456,26 +428,10 @@ public class TemplateFragment extends Fragment {
                 .positiveText("Камера")
                 .negativeText("Галерея")
                 .onPositive(new MaterialDialog.SingleButtonCallback() {
+                    @SuppressLint("CheckResult")
                     @Override
                     public void onClick(@android.support.annotation.NonNull MaterialDialog dialog, @android.support.annotation.NonNull DialogAction which) {
-                        RxImagePicker.with(getContext())
-                                .requestImage(Sources.CAMERA)
-                                .subscribeOn(Schedulers.io())
-                                .observeOn(AndroidSchedulers.mainThread())
-                                .flatMap(new Function<Uri, ObservableSource<File>>() {
-                                    @Override
-                                    public ObservableSource<File> apply(@NonNull Uri uri) throws Exception {
-                                        Thread.sleep(780);
-                                        File cacheFile = new File(getContext().getCacheDir(), UUID.randomUUID().toString() + ".jpg");
-                                        return RxImageConverters.uriToFile(getContext(), uri, cacheFile);
-                                    }
-                                })
-                                .subscribe(new Consumer<File>() {
-                                    @Override
-                                    public void accept(@NonNull File file) throws Exception {
-                                        processImageFile(file, false, null);
-                                    }
-                                });
+                        CustomCamera2Activity.startForResult(TemplateFragment.this, PHOTO_REQUEST_CODE);
                     }
                 })
                 .onNegative(new MaterialDialog.SingleButtonCallback() {
@@ -1623,7 +1579,7 @@ public class TemplateFragment extends Fragment {
             buttonsContainer.getChildAt(0).setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if (checkExternalPermissions()) {
+                    if (checkExternalPermissions() && checkCameraPermissions()) {
                         try {
                             currentMediaBlock = new Pair<>(mediaLayout, value);
                             showGalleryOrPhotoPickDialog();
@@ -1634,8 +1590,9 @@ public class TemplateFragment extends Fragment {
                         } catch (Exception exc) {
                             Toast.makeText(getContext(), "У вас нет камеры", Toast.LENGTH_SHORT).show();
                         }
-                    } else
-                        requestExternalPermissions();
+                    } else {
+                        requestCameraPermissions();
+                    }
                 }
             });
 
@@ -2030,6 +1987,11 @@ public class TemplateFragment extends Fragment {
         return (permissionCheckRead == PackageManager.PERMISSION_GRANTED && permissionCheckWrite == PackageManager.PERMISSION_GRANTED);
     }
 
+    private boolean checkCameraPermissions() {
+        int permissionCheckCamera = ContextCompat.checkSelfPermission(getContext(), Manifest.permission.CAMERA);
+        return (permissionCheckCamera == PackageManager.PERMISSION_GRANTED);
+    }
+
     private boolean checkAudioPermissions() {
         return (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED)
                 && checkExternalPermissions();
@@ -2038,6 +2000,11 @@ public class TemplateFragment extends Fragment {
     private void requestExternalPermissions() {
         ActivityCompat.requestPermissions(getActivity(),
                 new String[]{Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE}, 0);
+    }
+
+    private void requestCameraPermissions() {
+        ActivityCompat.requestPermissions(getActivity(),
+                new String[]{Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.CAMERA}, 0);
     }
 
     private void requestAudioPermissions() {
@@ -3162,7 +3129,7 @@ public class TemplateFragment extends Fragment {
     @SuppressLint("CheckResult")
     private void processImageFile(File file, final boolean isRestore, final Pair<LinearLayout, JSONObject> toBlock) {
         final int imgSize = Math.round(TypedValue.applyDimension
-                (TypedValue.COMPLEX_UNIT_DIP, 93, getResources().getDisplayMetrics()));
+                (TypedValue.COMPLEX_UNIT_DIP, 93, App.getContext().getResources().getDisplayMetrics()));
         final int bigImgSize = 1300;
 
         if (!isRestore)

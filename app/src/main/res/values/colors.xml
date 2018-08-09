@@ -19,4 +19,6 @@
     <color name="multiple_image_select_toolbarPrimaryText">#FFFFFF</color>
     <color name="multiple_image_select_albumTextBackground">#99212121</color>
     <color name="multiple_image_select_imageSelectBackground">#000000</color>
+
+    <color name="shutter_bg">#88ff00ff</color>
 </resources>

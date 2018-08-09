@@ -12,6 +12,7 @@
     <uses-permission android:name="android.permission.GET_TASKS" />
     <uses-permission android:name="android.permission.REAL_GET_TASKS" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.CAMERA" />
 
     <application
         android:name=".App"
@@ -75,6 +76,8 @@
             android:configChanges="orientation|keyboardHidden|keyboard"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar.FullScreen" />
+
+        <activity android:name=".custom_views.camera.CustomCamera2Activity" />
 
         <receiver
             android:name=".services.BootEventReceiver"

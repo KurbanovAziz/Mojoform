@@ -1,4 +1,5 @@
 apply plugin: 'com.android.application'
+apply plugin: 'me.tatarka.retrolambda'
 
 android {
     compileSdkVersion 26
@@ -68,8 +69,14 @@ android {
             ]
         }
     }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
 }
 repositories {
+    mavenCentral()
     maven { url "https://clojars.org/repo/" }
 
     configurations.all {
@@ -120,5 +127,6 @@ dependencies {
     compile 'org.greenrobot:eventbus:3.1.1'
 
     compile 'com.github.woxthebox:draglistview:1.5.1'
+
     testCompile 'junit:junit:4.12'
 }
