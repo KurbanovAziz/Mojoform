@@ -4,14 +4,11 @@ buildscript {
     repositories {
         mavenCentral()
         jcenter()
-        maven { url "https://clojars.org/repo/" }
-        maven {
-            url 'https://maven.google.com/'
-            name 'Google'
-        }
+        maven { url 'https://clojars.org/repo/' }
+        google()
     }
     dependencies {
-        classpath 'me.tatarka:gradle-retrolambda:3.7.0'
+        classpath 'com.android.tools.build:gradle:3.1.0'
         classpath 'com.android.tools.build:gradle:2.3.3'
 
         // NOTE: Do not place your application dependencies here; they belong
