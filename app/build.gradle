@@ -1,9 +1,8 @@
 apply plugin: 'com.android.application'
-apply plugin: 'me.tatarka.retrolambda'
 
 android {
     compileSdkVersion 26
-    buildToolsVersion "26.0.2"
+    buildToolsVersion '27.0.3'
     defaultConfig {
         applicationId "org.dev_alex.mojo_qa.mojo"
         minSdkVersion 17
@@ -21,15 +20,6 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-        }
-        debug {
-            applicationVariants.all { variant ->
-                variant.outputs.each { output ->
-                    project.ext { appName = 'Mojo.apk' }
-                    def newName = project.ext.appName;
-                    output.outputFile = new File(output.outputFile.parent, newName)
-                }
-            }
         }
     }
     sourceSets.main {
@@ -52,8 +42,10 @@ android {
         exclude 'META-INF/dependencies.txt'
         exclude 'META-INF/LGPL2.1'
     }
+    flavorDimensions "version"
     productFlavors {
         release_flavor {
+            dimension "version"
             applicationId 'com.mojoform.Mojoform'
             resValue "string", "app_name", "Mojoform"
             manifestPlaceholders = [
@@ -62,6 +54,7 @@ android {
         }
 
         debug_flavor {
+            dimension "version"
             applicationId 'org.dev_alex.mojo_qa.mojo.debug'
             resValue "string", "app_name", "Mojo"
             manifestPlaceholders = [
@@ -100,33 +93,33 @@ repositories {
 }
 
 dependencies {
-    compile fileTree(include: ['*.jar'], dir: 'libs')
-    androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    androidTestImplementation('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
-    compile('com.mikepenz:materialdrawer:5.9.0@aar') {
+    implementation('com.mikepenz:materialdrawer:5.9.0@aar') {
         transitive = true
     }
-    compile 'com.android.support:multidex:1.0.3'
+    implementation 'com.android.support:multidex:1.0.3'
 
-    compile 'com.android.support:appcompat-v7:26.1.0'
-    compile 'com.android.support.constraint:constraint-layout:1.0.2'
-    compile 'com.squareup.okhttp3:okhttp:3.9.0'
-    compile 'com.fasterxml.jackson.core:jackson-databind:2.9.0.pr2'
-    compile 'net.cachapa.expandablelayout:expandablelayout:2.9.2'
-    compile 'de.hdodenhof:circleimageview:2.2.0'
-    compile 'com.github.gcacace:signature-pad:1.2.1'
+    implementation 'com.android.support:appcompat-v7:26.1.0'
+    implementation 'com.android.support.constraint:constraint-layout:1.0.2'
+    implementation 'com.squareup.okhttp3:okhttp:3.9.0'
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.9.0.pr2'
+    implementation 'net.cachapa.expandablelayout:expandablelayout:2.9.2'
+    implementation 'de.hdodenhof:circleimageview:2.2.0'
+    implementation 'com.github.gcacace:signature-pad:1.2.1'
 
-    compile 'frankiesardo:icepick:3.2.0'
-    provided 'frankiesardo:icepick-processor:3.2.0'
-    compile 'com.mlsdev.rximagepicker:library:2.0.2'
-    compile 'com.afollestad.material-dialogs:core:0.9.6.0'
+    implementation 'frankiesardo:icepick:3.2.0'
+    annotationProcessor 'frankiesardo:icepick-processor:3.2.0'
+    implementation 'com.mlsdev.rximagepicker:library:2.0.2'
+    implementation 'com.afollestad.material-dialogs:core:0.9.6.0'
 
-    compile 'com.github.darsh2:MultipleImageSelect:v0.0.4'
-    compile 'com.github.PhilJay:MPAndroidChart:v3.0.3'
-    compile 'org.greenrobot:eventbus:3.1.1'
+    implementation 'com.github.darsh2:MultipleImageSelect:v0.0.4'
+    implementation 'com.github.PhilJay:MPAndroidChart:v3.0.3'
+    implementation 'org.greenrobot:eventbus:3.1.1'
 
-    compile 'com.github.woxthebox:draglistview:1.5.1'
+    implementation 'com.github.woxthebox:draglistview:1.5.1'
 
-    testCompile 'junit:junit:4.12'
+    testImplementation 'junit:junit:4.12'
 }
