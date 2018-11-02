@@ -42,8 +42,8 @@ import org.dev_alex.mojo_qa.mojo.fragments.DocumentsFragment;
 import org.dev_alex.mojo_qa.mojo.fragments.PanelListFragment;
 import org.dev_alex.mojo_qa.mojo.fragments.TasksFragment;
 import org.dev_alex.mojo_qa.mojo.fragments.TemplateFragment;
+import org.dev_alex.mojo_qa.mojo.gcm.MyFirebaseMessagingService;
 import org.dev_alex.mojo_qa.mojo.models.User;
-import org.dev_alex.mojo_qa.mojo.services.AlarmService;
 import org.dev_alex.mojo_qa.mojo.services.LoginHistoryService;
 import org.dev_alex.mojo_qa.mojo.services.RequestService;
 import org.dev_alex.mojo_qa.mojo.services.TokenService;
@@ -65,7 +65,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(null);
         setContentView(R.layout.activity_main);
-        AlarmService.scheduleAlarm(this);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
             getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
@@ -76,8 +75,8 @@ public class MainActivity extends AppCompatActivity {
 
         drawer.setSelectionAtPosition(1, true);
         //getSupportFragmentManager().beginTransaction().replace(R.id.container, TasksFragment.newInstance(), "tasks").commit();
-        if (getIntent().hasExtra(AlarmService.TASK_ID)) {
-            long taskId = getIntent().getLongExtra(AlarmService.TASK_ID, -1);
+        if (getIntent().hasExtra(MyFirebaseMessagingService.TASK_ID)) {
+            long taskId = getIntent().getIntExtra(MyFirebaseMessagingService.TASK_ID, -1);
             getSupportFragmentManager().beginTransaction()
                     .replace(R.id.container, TemplateFragment.newInstance(
                             taskId, false)).addToBackStack(null).commit();

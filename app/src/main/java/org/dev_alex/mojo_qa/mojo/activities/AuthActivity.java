@@ -110,9 +110,11 @@ public class AuthActivity extends AppCompatActivity {
                 if (loginWithinToken) {
                     requestJson.put("username", LoginHistoryService.getCurrentUser().username);
                     requestJson.put("refresh_token", LoginHistoryService.getCurrentUser().refresh_token);
+                    requestJson.put("device_id", TokenService.getFirebaseToken());
                 } else {
                     requestJson.put("username", username);
                     requestJson.put("password", password);
+                    requestJson.put("device_id", TokenService.getFirebaseToken());
                 }
 
                 Response response = RequestService.createPostRequest("/api/user/login/app", requestJson.toString());
