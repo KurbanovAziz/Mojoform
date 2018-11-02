@@ -1,58 +1,27 @@
 {
   "project_info": {
-    "project_number": "223522076708",
-    "firebase_url": "https://mojoforms-164911.firebaseio.com",
-    "project_id": "mojoforms-164911",
-    "storage_bucket": "mojoforms-164911.appspot.com"
+    "project_number": "603711195404",
+    "firebase_url": "https://mojoform-193811.firebaseio.com",
+    "project_id": "mojoform-193811",
+    "storage_bucket": "mojoform-193811.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:223522076708:android:5920de3503a2d18c",
+        "mobilesdk_app_id": "1:603711195404:android:94d29d2fc7a17963",
         "android_client_info": {
-          "package_name": "com.google.firebase.quickstart.fcm"
+          "package_name": "com.mojoform.Mojoform"
         }
       },
       "oauth_client": [
         {
-          "client_id": "223522076708-39ld3ujcoog2i5prbq9iacb6f5q7ilsg.apps.googleusercontent.com",
+          "client_id": "603711195404-ornohgnoo2mubj8ajcpscda3m9h29p1o.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyC20SAw6elQNL0UjwaURbQ7A9dq64byzU4"
-        }
-      ],
-      "services": {
-        "analytics_service": {
-          "status": 1
-        },
-        "appinvite_service": {
-          "status": 1,
-          "other_platform_oauth_client": []
-        },
-        "ads_service": {
-          "status": 2
-        }
-      }
-    },
-    {
-      "client_info": {
-        "mobilesdk_app_id": "1:223522076708:android:3740828e3c0643b4",
-        "android_client_info": {
-          "package_name": "org.dev_alex.mojo_qa.mojo.debug"
-        }
-      },
-      "oauth_client": [
-        {
-          "client_id": "223522076708-39ld3ujcoog2i5prbq9iacb6f5q7ilsg.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
-      "api_key": [
-        {
-          "current_key": "AIzaSyC20SAw6elQNL0UjwaURbQ7A9dq64byzU4"
+          "current_key": "AIzaSyD4OiiPCNYF39PpweVO0IFXzafGd1w83V0"
         }
       ],
       "services": {
