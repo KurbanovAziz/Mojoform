@@ -126,9 +126,10 @@ dependencies {
     implementation 'com.github.woxthebox:draglistview:1.5.1'
 
     // Firebase
+
+    implementation 'com.google.android.gms:play-services-base:11.8.0'
+    implementation 'com.google.android.gms:play-services-gcm:11.8.0'
     implementation 'com.google.firebase:firebase-messaging:11.8.0'
     implementation 'com.google.firebase:firebase-core:11.8.0'
-
-    testImplementation 'junit:junit:4.12'
 }
 apply plugin: 'com.google.gms.google-services'
