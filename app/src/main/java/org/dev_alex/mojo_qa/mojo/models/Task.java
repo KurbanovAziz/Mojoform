@@ -12,6 +12,7 @@ public class Task {
     public Long start_time;
     public Long complete_time;
 
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class Ref {
         public long id;
         public String name;
