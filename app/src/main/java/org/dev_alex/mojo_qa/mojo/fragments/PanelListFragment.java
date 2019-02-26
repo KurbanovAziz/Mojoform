@@ -106,31 +106,21 @@ public class PanelListFragment extends Fragment {
     }
 
     private void showPanels(List<Panel> panels) {
-        List<Panel> synteticPanels = new ArrayList<>();
+        List<Panel> syntheticPanels = new ArrayList<>();
         List<Panel> normalPanels = new ArrayList<>();
 
         for (Panel panel : panels) {
             if (panel.type.equals("complex"))
-                synteticPanels.add(panel);
+                syntheticPanels.add(panel);
             else
                 normalPanels.add(panel);
         }
 
-        Collections.sort(synteticPanels, new Comparator<Panel>() {
-            @Override
-            public int compare(Panel o1, Panel o2) {
-                return o1.name.compareToIgnoreCase(o2.name);
-            }
-        });
-        Collections.sort(normalPanels, new Comparator<Panel>() {
-            @Override
-            public int compare(Panel o1, Panel o2) {
-                return o1.name.compareToIgnoreCase(o2.name);
-            }
-        });
+        Collections.sort(syntheticPanels, (o1, o2) -> o1.name.compareToIgnoreCase(o2.name));
+        Collections.sort(normalPanels, (o1, o2) -> o1.name.compareToIgnoreCase(o2.name));
 
         panels.clear();
-        panels.addAll(synteticPanels);
+        panels.addAll(syntheticPanels);
         panels.add(Panel.getSeparatorPanel());
         panels.addAll(normalPanels);
 

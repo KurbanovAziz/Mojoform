@@ -173,9 +173,7 @@ public class GraphFragment extends Fragment {
                     });
         }
         */
-        for (k = 0; k < barEntries.size(); k++)
-
-        {
+        for (k = 0; k < barEntries.size(); k++) {
             float value = barEntries.get(k).getY();
             int defaultColor = Color.parseColor("#2baaf6");
 
@@ -200,30 +198,16 @@ public class GraphFragment extends Fragment {
 
         //barChart.getAxisLeft().setAxisMaximum(barChart.getAxisLeft().getAxisMaximum() * 1.2f);
 
-        barChart.getAxisRight().
-
-                setEnabled(false);
-        barChart.getAxisLeft().
-
-                setGridColor(Color.parseColor("#374E3F60"));
-        barChart.getAxisLeft().
-
-                setAxisLineColor(Color.parseColor("#374E3F60"));
-        barChart.getXAxis().
-
-                setGridColor(Color.parseColor("#374E3F60"));
-        barChart.getXAxis().
-
-                setAxisLineColor(Color.parseColor("#374E3F60"));
+        barChart.getAxisRight().setEnabled(false);
+        barChart.getAxisLeft().setGridColor(Color.parseColor("#374E3F60"));
+        barChart.getAxisLeft().setAxisLineColor(Color.parseColor("#374E3F60"));
+        barChart.getXAxis().setGridColor(Color.parseColor("#374E3F60"));
+        barChart.getXAxis().setAxisLineColor(Color.parseColor("#374E3F60"));
 
         barChart.setData(barData);
         barChart.setFitBars(false);
-        barChart.getLegend().
-
-                setEnabled(false);
-        barChart.getDescription().
-
-                setEnabled(false);
+        barChart.getLegend().setEnabled(false);
+        barChart.getDescription().setEnabled(false);
         barChart.setScaleYEnabled(true);
 
         setupAxis(barChart.getXAxis(), xValues);
