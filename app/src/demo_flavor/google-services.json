@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "131732852180",
+    "firebase_url": "https://mojodemoapp.firebaseio.com",
+    "project_id": "mojodemoapp",
+    "storage_bucket": "mojodemoapp.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:131732852180:android:cfb62bb3b27d6f3c",
+        "android_client_info": {
+          "package_name": "com.mojoform.demo"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "131732852180-41khksinr6n866dm77uj4ii9aeqgadop.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCL53OUjWxIuhi_W_odX-qPhjt_ItXZOA4"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

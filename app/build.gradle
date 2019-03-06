@@ -17,6 +17,11 @@ android {
         }
     }
     buildTypes {
+        sourceSets.main {
+            jniLibs.srcDir 'libs'
+            jni.srcDirs = [] //disable automatic ndk-build call
+        }
+
         android.applicationVariants.all { variant ->
             variant.outputs.all {
                 outputFileName = "${variant.buildType.name}_mojo-v-${variant.versionName}-flavor-${variant.productFlavors[0].name}.apk"
@@ -26,15 +31,16 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
-    }
-    sourceSets.main {
-        jniLibs.srcDir 'libs'
-        jni.srcDirs = [] //disable automatic ndk-build call
+
+        debug {
+
+        }
     }
 
     dexOptions {
         javaMaxHeapSize "4G"
     }
+
     packagingOptions {
         exclude 'META-INF/DEPENDENCIES.txt'
         exclude 'META-INF/LICENSE.txt'
@@ -47,6 +53,7 @@ android {
         exclude 'META-INF/dependencies.txt'
         exclude 'META-INF/LGPL2.1'
     }
+
     flavorDimensions "version"
     productFlavors {
         release_flavor {
