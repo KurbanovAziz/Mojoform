@@ -302,6 +302,10 @@ public class PanelFragment extends Fragment {
                 host = "https://servlet.dss.dev-alex.org/services";
                 break;
 
+            case "demo_flavor":
+                host = "https://servlet.dss.demo.mojoform.com/services";
+                break;
+
             default:
                 host = "https://servlet.dss.mojo.mojoform.com/services";
                 break;

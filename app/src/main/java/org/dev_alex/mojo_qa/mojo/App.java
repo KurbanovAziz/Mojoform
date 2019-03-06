@@ -12,7 +12,6 @@ public class App extends Application {
     public static DisplayMetrics displayMetrics;
 
     private static String host;
-    private static String task_host;
 
 
     public static DisplayMetrics getDisplayMetrics() {
@@ -23,23 +22,24 @@ public class App extends Application {
     public void onCreate() {
         super.onCreate();
         
-        mContext = new WeakReference<Context>(this);
+        mContext = new WeakReference<>(this);
         displayMetrics = getResources().getDisplayMetrics();
 
         switch (BuildConfig.FLAVOR) {
             case "release_flavor":
                 host = "https://system.mojoform.com";
-                task_host = "https://tasks.mojo.mojoform.com/activiti-rest/service";
                 break;
 
             case "debug_flavor":
                 host = "https://mojo-qa.dev-alex.org";
-                task_host = "https://activiti.dev-alex.org/activiti-rest/service";
+                break;
+
+            case "demo_flavor":
+                host = "https://demo.mojoform.com";
                 break;
 
             default:
                 host = "https://system.mojoform.com";
-                task_host = "https://tasks.mojo.mojoform.com/activiti-rest/service";
                 break;
         }
     }
@@ -50,10 +50,6 @@ public class App extends Application {
 
     public static String getHost() {
         return host;
-    }
-
-    public static String getTask_host() {
-        return task_host;
     }
 
     @Override
