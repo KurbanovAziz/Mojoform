@@ -61,6 +61,15 @@ android {
                     appIcon: "@drawable/test"
             ]
         }
+
+        demo_flavor {
+            dimension "version"
+            applicationId 'com.mojoform.demo'
+            resValue "string", "app_name", "Demo"
+            manifestPlaceholders = [
+                    appIcon: "@drawable/ic_launcher"
+            ]
+        }
     }
 
     compileOptions {
