@@ -17,6 +17,11 @@ android {
         }
     }
     buildTypes {
+        android.applicationVariants.all { variant ->
+            variant.outputs.all {
+                outputFileName = "${variant.buildType.name}_mojo-v-${variant.versionName}-flavor-${variant.productFlavors[0].name}.apk"
+            }
+        }
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
