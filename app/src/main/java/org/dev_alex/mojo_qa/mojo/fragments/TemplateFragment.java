@@ -114,8 +114,11 @@ import org.dev_alex.mojo_qa.mojo.services.Utils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -136,8 +139,15 @@ import io.reactivex.annotations.NonNull;
 import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.FormBody;
 import okhttp3.MediaType;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
 import okhttp3.Response;
+import okhttp3.ResponseBody;
 import okio.BufferedSink;
 import okio.Okio;
 
@@ -172,7 +182,10 @@ public class TemplateFragment extends Fragment {
 
     public int currentPagePos;
     public JSONObject template;
-    public EditText scanTo;
+
+    public TextView scanTo = null;
+    public JSONObject scanToObj = null;
+
     public Pair<LinearLayout, JSONObject> currentMediaBlock;
     @State
     public String cameraVideoPath;
@@ -318,8 +331,7 @@ public class TemplateFragment extends Fragment {
         if (requestCode == SCAN_CODE_REQUEST_CODE) {
             if (resultCode == RESULT_OK) {
                 String contents = data.getStringExtra("SCAN_RESULT");
-                if (scanTo != null)
-                    scanTo.setText(contents);
+                tryParseCode(contents);
             }
         }
     }
@@ -734,14 +746,14 @@ public class TemplateFragment extends Fragment {
                         ((ViewGroup) editTextSingleLineContainer.getChildAt(1)).getChildAt(1).setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
-                                scanQrCode(((EditText) ((ViewGroup) editTextSingleLineContainer.getChildAt(1)).getChildAt(0)));
+                                scanQrCode(((EditText) ((ViewGroup) editTextSingleLineContainer.getChildAt(1)).getChildAt(0)), null);
                             }
                         });
 
                         ((ViewGroup) editTextSingleLineContainer.getChildAt(1)).getChildAt(2).setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
-                                scanBarCode(((EditText) ((ViewGroup) editTextSingleLineContainer.getChildAt(1)).getChildAt(0)));
+                                scanBarCode(((EditText) ((ViewGroup) editTextSingleLineContainer.getChildAt(1)).getChildAt(0)), null);
                             }
                         });
                     }
@@ -790,14 +802,14 @@ public class TemplateFragment extends Fragment {
                         ((ViewGroup) editTextMultiLineContainer.getChildAt(1)).getChildAt(1).setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
-                                scanQrCode(((EditText) ((ViewGroup) editTextMultiLineContainer.getChildAt(1)).getChildAt(0)));
+                                scanQrCode(((EditText) ((ViewGroup) editTextMultiLineContainer.getChildAt(1)).getChildAt(0)), null);
                             }
                         });
 
                         ((ViewGroup) editTextMultiLineContainer.getChildAt(1)).getChildAt(2).setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
-                                scanBarCode(((EditText) ((ViewGroup) editTextMultiLineContainer.getChildAt(1)).getChildAt(0)));
+                                scanBarCode(((EditText) ((ViewGroup) editTextMultiLineContainer.getChildAt(1)).getChildAt(0)), null);
                             }
                         });
                     }
@@ -808,23 +820,36 @@ public class TemplateFragment extends Fragment {
                 case "money":
                     final LinearLayout moneyContainer = (LinearLayout) getActivity().getLayoutInflater().inflate(R.layout.text_plan, container, false);
                     ((ViewGroup) moneyContainer.getChildAt(0)).getChildAt(1).setVisibility((value.has("is_required") && !value.getBoolean("is_required")) ? View.GONE : View.VISIBLE);
+                    final EditText etPlan = ((EditText) ((ViewGroup) ((ViewGroup) ((ViewGroup) moneyContainer.getChildAt(1)).getChildAt(0)).getChildAt(1)).getChildAt(0));
+                    final EditText etFact = ((EditText) ((ViewGroup) ((ViewGroup) ((ViewGroup) moneyContainer.getChildAt(1)).getChildAt(0)).getChildAt(1)).getChildAt(1));
 
-                    if (value.has("caption"))
-                        ((TextView) ((ViewGroup) moneyContainer.getChildAt(0)).getChildAt(0)).setText(value.getString("caption"));
-                    else
-                        ((TextView) ((ViewGroup) moneyContainer.getChildAt(0)).getChildAt(0)).setText("Нет текста");
+                    final View btQrCode = ((ViewGroup) moneyContainer.getChildAt(1)).getChildAt(1);
+                    final View btBarcode = ((ViewGroup) moneyContainer.getChildAt(1)).getChildAt(2);
+
+                    final TextView captionLabel = ((TextView) ((ViewGroup) moneyContainer.getChildAt(0)).getChildAt(0));
+
+                    if (value.has("barcode")) {
+                        captionLabel.setText(value.getString("barcode"));
+                    } else {
+                        if (value.has("caption"))
+                            captionLabel.setText(value.getString("caption"));
+                        else
+                            captionLabel.setText("Нет текста");
+                    }
 
                     if (value.has("plan"))
-                        ((EditText) ((ViewGroup) moneyContainer.getChildAt(2)).getChildAt(0)).setText(value.getString("plan"));
+                        etPlan.setText(value.getString("plan"));
 
                     if (value.has("fact"))
-                        ((EditText) ((ViewGroup) moneyContainer.getChildAt(2)).getChildAt(1)).setText(value.getString("fact"));
+                        etFact.setText(value.getString("fact"));
 
                     if (isTaskFinished) {
-                        ((ViewGroup) moneyContainer.getChildAt(2)).getChildAt(0).setEnabled(false);
-                        ((ViewGroup) moneyContainer.getChildAt(2)).getChildAt(1).setEnabled(false);
+                        etPlan.setEnabled(false);
+                        etFact.setEnabled(false);
+                        btBarcode.setVisibility(View.GONE);
+                        btQrCode.setVisibility(View.GONE);
                     } else {
-                        ((EditText) ((ViewGroup) moneyContainer.getChildAt(2)).getChildAt(0)).addTextChangedListener(new TextWatcher() {
+                        etPlan.addTextChangedListener(new TextWatcher() {
                             @Override
                             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 
@@ -846,7 +871,7 @@ public class TemplateFragment extends Fragment {
                                 }
                             }
                         });
-                        ((EditText) ((ViewGroup) moneyContainer.getChildAt(2)).getChildAt(1)).addTextChangedListener(new TextWatcher() {
+                        etFact.addTextChangedListener(new TextWatcher() {
                             @Override
                             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 
@@ -868,6 +893,9 @@ public class TemplateFragment extends Fragment {
                                 }
                             }
                         });
+
+                        btBarcode.setOnClickListener(view -> scanBarCode(captionLabel, value));
+                        btQrCode.setOnClickListener(view -> scanQrCode(captionLabel, value));
                     }
 
                     container.addView(boxInContainerWithId(moneyContainer, value.getString("id")));
@@ -1227,10 +1255,78 @@ public class TemplateFragment extends Fragment {
         });
     }
 
+    private void tryParseCode(String code) {
+        if (scanTo != null && scanToObj == null) {
+            scanTo.setText(code);
+        }
 
-    private void scanQrCode(EditText scanTo) {
+        OkHttpClient client = new OkHttpClient.Builder().addInterceptor(chain -> {
+            Response response = chain.proceed(chain.request());
+
+            return response.newBuilder()
+                    .removeHeader("Content-Type")
+                    .addHeader("Content-Type", "text/html; charset=windows-1251")
+                    .build();
+        }).build();
+
+        RequestBody formBody = new FormBody.Builder()
+                .add("search_query", code)
+                .build();
+
+        Request request = new Request.Builder()
+                .post(formBody)
+                .url("http://ru.disai.org")
+                .addHeader("Content-Type", "application/x-www-form-urlencoded;charset=UTF-8")
+                .addHeader("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.100 Safari/537.36")
+                .build();
+
+        loopDialog.show();
+
+        Handler handler = new Handler();
+        client.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(@android.support.annotation.NonNull Call call, @android.support.annotation.NonNull IOException e) {
+                if (loopDialog != null && loopDialog.isShowing()) {
+                    loopDialog.dismiss();
+                }
+                e.printStackTrace();
+            }
+
+            @Override
+            public void onResponse(@android.support.annotation.NonNull Call call, @android.support.annotation.NonNull Response response) {
+                if (loopDialog != null && loopDialog.isShowing()) {
+                    loopDialog.dismiss();
+                }
+
+                try {
+                    ResponseBody responseBody = response.body();
+                    if (response.isSuccessful() && responseBody != null) {
+                        Document doc = Jsoup.parse(responseBody.source().inputStream(), "windows-1251", "");
+                        String valueHtml = doc.select("table").first().child(0).child(1).child(0).html();
+                        String value = valueHtml.substring(valueHtml.indexOf(">") + 1, valueHtml.indexOf("</"));
+                        if (!value.isEmpty()) {
+                            handler.post(() -> {
+                                if (scanTo != null) {
+                                    scanTo.setText(value);
+                                }
+                            });
+
+                            if (scanToObj != null) {
+                                scanToObj.put("barcode", value);
+                            }
+                        }
+                    }
+                } catch (Exception exc) {
+                    exc.printStackTrace();
+                }
+            }
+        });
+    }
+
+    private void scanQrCode(TextView scanTo, JSONObject scanToObj) {
         try {
             this.scanTo = scanTo;
+            this.scanToObj = scanToObj;
             Intent intent = new Intent("com.google.zxing.client.android.SCAN");
             intent.putExtra("SCAN_MODE", "QR_CODE_MODE"); // "PRODUCT_MODE for bar codes
             intent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
@@ -1245,16 +1341,16 @@ public class TemplateFragment extends Fragment {
         }
     }
 
-    private void scanBarCode(EditText scanTo) {
+    private void scanBarCode(TextView scanTo, JSONObject scanToObj) {
         try {
             this.scanTo = scanTo;
+            this.scanToObj = scanToObj;
             Intent intent = new Intent("com.google.zxing.client.android.SCAN");
             intent.putExtra("SCAN_MODE", "PRODUCT_MODE");
             intent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
             startActivityForResult(intent, SCAN_CODE_REQUEST_CODE);
-
         } catch (Exception e) {
             Uri marketUri = Uri.parse("market://details?id=com.google.zxing.client.android");
             Intent marketIntent = new Intent(Intent.ACTION_VIEW, marketUri);
@@ -1326,17 +1422,24 @@ public class TemplateFragment extends Fragment {
 
     private void createSeekBar(final JSONObject value, LinearLayout container) throws Exception {
         final LinearLayout seekBarContainer = (LinearLayout) getActivity().getLayoutInflater().inflate(R.layout.slider, container, false);
+        final View qrCodeBtn = ((ViewGroup) seekBarContainer.getChildAt(3)).getChildAt(1);
+        final View barcodeBtn = ((ViewGroup) seekBarContainer.getChildAt(3)).getChildAt(2);
+        final TextView captionLabel = ((TextView) seekBarContainer.getChildAt(0));
 
-        if (value.has("caption"))
-            ((TextView) seekBarContainer.getChildAt(0)).setText(value.getString("caption"));
-        else
-            ((TextView) seekBarContainer.getChildAt(0)).setText("Нет текста");
+        if (value.has("barcode")) {
+            captionLabel.setText(value.getString("barcode"));
+        } else {
+            if (value.has("caption"))
+                captionLabel.setText(value.getString("caption"));
+            else
+                captionLabel.setText("Нет текста");
+        }
 
         if (value.has("measure"))
-            ((TextView) ((LinearLayout) ((LinearLayout) seekBarContainer.getChildAt(3)).getChildAt(1)).getChildAt(1)).setText(value.getString("measure"));
+            ((TextView) ((LinearLayout) ((LinearLayout) seekBarContainer.getChildAt(3)).getChildAt(0)).getChildAt(2)).setText(value.getString("measure"));
 
         final SeekBar seekBar = ((SeekBar) seekBarContainer.getChildAt(1));
-        final EditText changeValue = (EditText) ((LinearLayout) ((LinearLayout) seekBarContainer.getChildAt(3)).getChildAt(1)).getChildAt(0);
+        final EditText changeValue = (EditText) ((LinearLayout) ((LinearLayout) seekBarContainer.getChildAt(3)).getChildAt(0)).getChildAt(1);
 
         final float minValue = (float) value.getDouble("min_value");
         final float maxValue = (float) value.getDouble("max_value");
@@ -1450,7 +1553,13 @@ public class TemplateFragment extends Fragment {
         if (isTaskFinished) {
             seekBar.setEnabled(false);
             changeValue.setEnabled(false);
+            qrCodeBtn.setVisibility(View.GONE);
+            barcodeBtn.setVisibility(View.GONE);
         }
+
+        qrCodeBtn.setOnClickListener(view -> scanQrCode(captionLabel, value));
+
+        barcodeBtn.setOnClickListener(view -> scanBarCode(captionLabel, value));
     }
 
     private void createSignature(final JSONObject value, LinearLayout container) throws Exception {
@@ -2457,6 +2566,10 @@ public class TemplateFragment extends Fragment {
                     case "slider":
                     case "float":
                         item.put("value", elemValue);
+                        break;
+
+                    case "barcode":
+                        item.put("barcode", elemValue);
                         break;
 
                     case "checkbox":
@@ -3662,7 +3775,6 @@ public class TemplateFragment extends Fragment {
                     break;
 
                 case "money":
-
                     if (value.has("plan")) {
                         JSONObject objectValue = new JSONObject();
                         objectValue.put("id", value.getString("id"));
@@ -3676,6 +3788,14 @@ public class TemplateFragment extends Fragment {
                         objectValue.put("id", value.getString("id"));
                         objectValue.put("value", value.getInt("fact"));
                         objectValue.put("type", "fact");
+                        containerValues.put(objectValue);
+                    }
+
+                    if (value.has("barcode")) {
+                        JSONObject objectValue = new JSONObject();
+                        objectValue.put("id", value.getString("id"));
+                        objectValue.put("value", value.getString("barcode"));
+                        objectValue.put("type", "barcode");
                         containerValues.put(objectValue);
                     }
                     break;
@@ -3692,6 +3812,14 @@ public class TemplateFragment extends Fragment {
                     break;
 
                 case "slider":
+                    if (value.has("barcode")) {
+                        JSONObject objectValue = new JSONObject();
+                        objectValue.put("id", value.getString("id"));
+                        objectValue.put("value", value.getString("barcode"));
+                        objectValue.put("type", "barcode");
+                        containerValues.put(objectValue);
+                    }
+
                     if (value.has("value")) {
                         JSONObject objectValue = new JSONObject();
                         objectValue.put("id", value.getString("id"));

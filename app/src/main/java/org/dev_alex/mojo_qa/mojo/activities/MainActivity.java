@@ -84,7 +84,7 @@ public class MainActivity extends AppCompatActivity {
         checkData(getIntent());
     }
 
-    void checkData(Intent intent){
+    void checkData(Intent intent) {
         Uri data = intent.getData();
         if (data != null) {
             if (data.getPath().contains("pdf/view/")) {
