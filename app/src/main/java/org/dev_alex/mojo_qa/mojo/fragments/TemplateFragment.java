@@ -1256,8 +1256,15 @@ public class TemplateFragment extends Fragment {
     }
 
     private void tryParseCode(String code) {
-        if (scanTo != null && scanToObj == null) {
+        if (scanTo != null) {
             scanTo.setText(code);
+        }
+        if (scanToObj != null) {
+            try {
+                scanToObj.put("barcode", code);
+            } catch (Exception exc) {
+                exc.printStackTrace();
+            }
         }
 
         OkHttpClient client = new OkHttpClient.Builder().addInterceptor(chain -> {
@@ -1307,7 +1314,7 @@ public class TemplateFragment extends Fragment {
                         if (!value.isEmpty()) {
                             handler.post(() -> {
                                 if (scanTo != null) {
-                                    scanTo.setText(value);
+                                    scanTo.setText(value + " " + code);
                                 }
                             });
 
