@@ -163,11 +163,7 @@ public class MainActivity extends AppCompatActivity {
                                 getSupportFragmentManager().beginTransaction().replace(R.id.container, DocumentsFragment.newInstance()).commit();
                                 break;
                             case 3:
-                                TokenService.deleteToken();
-                                //getSharedPreferences("templates", Context.MODE_PRIVATE).edit().clear().apply();
-                                //trimCache(MainActivity.this);
-                                startActivity(new Intent(MainActivity.this, AuthActivity.class));
-                                finish();
+                                new LogoutTask().execute();
                                 break;
                             case 4:
                                 Intent intent = new Intent(MainActivity.this, OnboardingActivity.class);
@@ -435,6 +431,30 @@ public class MainActivity extends AppCompatActivity {
             } catch (Exception exc) {
                 exc.printStackTrace();
             }
+        }
+    }
+
+    private class LogoutTask extends AsyncTask<Void, Void, Integer> {
+        @Override
+        protected Integer doInBackground(Void... params) {
+            try {
+                String url = "/api/user/logout";
+                Response response = RequestService.createPostRequest(url, "{}");
+                response.body().close();
+
+                return response.code();
+            } catch (Exception exc) {
+                exc.printStackTrace();
+                return null;
+            }
+        }
+
+        @Override
+        protected void onPostExecute(Integer responseCode) {
+            super.onPostExecute(responseCode);
+            TokenService.deleteToken();
+            startActivity(new Intent(MainActivity.this, AuthActivity.class));
+            finish();
         }
     }
 
