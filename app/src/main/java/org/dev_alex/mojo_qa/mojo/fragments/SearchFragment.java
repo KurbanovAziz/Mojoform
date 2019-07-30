@@ -332,7 +332,7 @@ public class SearchFragment extends Fragment {
                         startActivityForResult(viewIntent, FILE_OPEN_REQUEST_CODE);
                     } catch (Exception exc) {
                         exc.printStackTrace();
-                        Toast.makeText(getContext(), "Нет приложения, которое может открыть этот файл", Toast.LENGTH_LONG).show();
+                        Toast.makeText(getContext(), R.string.no_app_to_open, Toast.LENGTH_LONG).show();
                         try {
                             resultFile.delete();
                         } catch (Exception exc1) {

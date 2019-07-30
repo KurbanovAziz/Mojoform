@@ -384,7 +384,7 @@ public class GraphFragment extends Fragment {
             if (responseCode == 200 || responseCode == 201)
                 buildGraph();
             else {
-                Toast.makeText(getContext(), "Попробуйте позже", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), R.string.try_later, Toast.LENGTH_SHORT).show();
                 getActivity().getSupportFragmentManager().popBackStack();
             }
         }

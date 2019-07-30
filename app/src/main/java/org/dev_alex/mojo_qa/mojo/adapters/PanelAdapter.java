@@ -142,7 +142,7 @@ public class PanelAdapter extends RecyclerView.Adapter<PanelAdapter.TaskViewHold
                 }
                 if (firstVal != null && secondVal != null) {
                     viewHolder.panelStats.setText(String.format(Locale.getDefault(), "%.1f | %.1f%s",
-                            firstVal, secondVal, isPercents ? "%" : " баллов"));
+                            firstVal, secondVal, isPercents ? "%" : " " + viewHolder.itemView.getContext().getString(R.string.balls)));
                 } else {
                     viewHolder.panelStats.setText("");
                 }

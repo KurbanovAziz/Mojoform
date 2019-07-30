@@ -140,10 +140,10 @@ public class DocumentsFragment extends Fragment {
         int filesCt = fileAdapter.getSelectedIds().size();
 
         ((TextView) selectionMenu.findViewById(R.id.folder_count)).setText(String.format(Locale.getDefault(),
-                "%d %s", foldersCt, foldersCt % 10 == 1 ? "папка" : "папки(ок)"));
+                "%d %s", foldersCt, foldersCt % 10 == 1 ? getString(R.string.one_folder) : getString(R.string.folder_pl)));
 
         ((TextView) selectionMenu.findViewById(R.id.files_count)).setText(String.format(Locale.getDefault(),
-                "%d %s", filesCt, filesCt % 10 == 1 ? "файл" : "файла(ов)"));
+                "%d %s", filesCt, filesCt % 10 == 1 ? getString(R.string.file) : getString(R.string.file_pl)));
 
     }
 
@@ -1035,7 +1035,7 @@ public class DocumentsFragment extends Fragment {
                         startActivityForResult(viewIntent, FILE_OPEN_REQUEST_CODE);
                     } catch (Exception exc) {
                         exc.printStackTrace();
-                        Toast.makeText(getContext(), "Нет приложения, которое может открыть этот файл", Toast.LENGTH_LONG).show();
+                        Toast.makeText(getContext(), R.string.no_app_to_open, Toast.LENGTH_LONG).show();
                         try {
                             resultFile.delete();
                         } catch (Exception exc1) {
@@ -1048,7 +1048,6 @@ public class DocumentsFragment extends Fragment {
                 exc.printStackTrace();
             }
         }
-
     }
 
     private class DownloadImagesTask extends AsyncTask<Void, Void, Void> {

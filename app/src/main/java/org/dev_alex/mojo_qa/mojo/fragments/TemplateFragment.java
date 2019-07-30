@@ -274,7 +274,7 @@ public class TemplateFragment extends Fragment {
             else {
                 String videoPath = Utils.getRealPathFromIntentData(getContext(), data.getData());
                 if (videoPath == null)
-                    Toast.makeText(getContext(), "что-то пошло не так", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), R.string.something_wrong, Toast.LENGTH_SHORT).show();
                 else
                     createVideoPreview(videoPath, true);
             }
@@ -306,7 +306,7 @@ public class TemplateFragment extends Fragment {
                 documentPath = Utils.getPathFromUri(getContext(), data.getData());
 
             if (documentPath == null)
-                Toast.makeText(getContext(), "что-то пошло не так", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), R.string.something_wrong, Toast.LENGTH_SHORT).show();
             else {
                 String mimeType = Utils.getMimeType(documentPath);
                 if (mimeType.startsWith("image"))
@@ -323,7 +323,7 @@ public class TemplateFragment extends Fragment {
         if (requestCode == AUDIO_REQUEST_CODE && resultCode == RESULT_OK) {
             String audioPath = Utils.getRealPathFromIntentData(getContext(), data.getData());
             if (audioPath == null)
-                Toast.makeText(getContext(), "что-то пошло не так " + data.getDataString(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), getString(R.string.something_wrong) + " " + data.getDataString(), Toast.LENGTH_SHORT).show();
             else
                 createAudioPreview(audioPath, true);
         }
@@ -432,13 +432,13 @@ public class TemplateFragment extends Fragment {
 
     private void showGalleryOrPhotoPickDialog() {
         new MaterialDialog.Builder(getContext())
-                .title("Добавить фото")
+                .title(R.string.to_add_photo)
                 .cancelable(true)
-                .content("Выберите откуда добавить фото")
+                .content(R.string.select_photo_source)
                 .buttonsGravity(GravityEnum.CENTER)
                 .autoDismiss(true)
-                .positiveText("Камера")
-                .negativeText("Галерея")
+                .positiveText(R.string.camera)
+                .negativeText(R.string.gallery)
                 .onPositive(new MaterialDialog.SingleButtonCallback() {
                     @SuppressLint("CheckResult")
                     @Override
@@ -521,7 +521,7 @@ public class TemplateFragment extends Fragment {
 
             updateArrows();
         } catch (Exception exc) {
-            Toast.makeText(getContext(), "Ошибка при рендеринге - " + exc.getMessage(), Toast.LENGTH_LONG).show();
+            Toast.makeText(getContext(), getString(R.string.render_error) + exc.getMessage(), Toast.LENGTH_LONG).show();
             exc.printStackTrace();
         }
     }
@@ -652,7 +652,7 @@ public class TemplateFragment extends Fragment {
             }
         } catch (Exception exc) {
             exc.printStackTrace();
-            Toast.makeText(getContext(), "Некорректный шаблон", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), R.string.invalid_template, Toast.LENGTH_SHORT).show();
             getActivity().getSupportFragmentManager().popBackStack();
             exc.printStackTrace();
         }
@@ -834,7 +834,7 @@ public class TemplateFragment extends Fragment {
                         if (value.has("caption"))
                             captionLabel.setText(value.getString("caption"));
                         else
-                            captionLabel.setText("Нет текста");
+                            captionLabel.setText(R.string.no_text);
                     }
 
                     if (value.has("plan"))
@@ -907,7 +907,7 @@ public class TemplateFragment extends Fragment {
                     if (value.has("caption"))
                         ((TextView) checkBoxContainer.getChildAt(1)).setText(value.getString("caption"));
                     else
-                        ((TextView) checkBoxContainer.getChildAt(1)).setText("Нет текста");
+                        ((TextView) checkBoxContainer.getChildAt(1)).setText(R.string.no_text);
 
                     if (!isTaskFinished)
                         ((CheckBox) checkBoxContainer.getChildAt(0)).setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -1188,7 +1188,7 @@ public class TemplateFragment extends Fragment {
                 analyticsText.setTextColor(Color.parseColor("#4E3F60"));
 
                 analyticsText.setText(String.format(Locale.getDefault(),
-                        "%d | %d баллов\n %d%% | %d%%",
+                        "%d | %d " + getString(R.string.balls) + "\n %d%% | %d%%",
                         (int) analyticsValue.getDouble("val"), (int) analyticsValue.getDouble("max"),
                         (int) analyticsValue.getDouble("prc"), 100));
 
@@ -1396,7 +1396,7 @@ public class TemplateFragment extends Fragment {
         if (value.has("name"))
             ((TextView) categoryHeader.getChildAt(1)).setText(value.getString("name"));
         else
-            ((TextView) categoryHeader.getChildAt(1)).setText("Нет заголовка");
+            ((TextView) categoryHeader.getChildAt(1)).setText(R.string.no_title);
 
         LinearLayout expandableContent = (LinearLayout) getActivity().getLayoutInflater().inflate(R.layout.expandable_content, container, false);
         expandableContent.setTag(value.getString("id") + "_cont");
@@ -1439,7 +1439,7 @@ public class TemplateFragment extends Fragment {
             if (value.has("caption"))
                 captionLabel.setText(value.getString("caption"));
             else
-                captionLabel.setText("Нет текста");
+                captionLabel.setText(R.string.no_text);
         }
 
         if (value.has("measure"))
@@ -1480,7 +1480,6 @@ public class TemplateFragment extends Fragment {
                         currentValue = maxValue;
 
                     currentValue = Utils.trimFloatAfterPointValue(currentValue, finalDigitsAfterPoint);
-                    Log.d("jekaaa", progress + " floatValue = " + currentValue);
 
                     changeValue.setText(formatFloat(currentValue));
                 }
@@ -1704,7 +1703,7 @@ public class TemplateFragment extends Fragment {
                             cameraImagePath = intentFilePair.second.getAbsolutePath();
                             startActivityForResult(intentFilePair.first, PHOTO_REQUEST_CODE);*/
                         } catch (Exception exc) {
-                            Toast.makeText(getContext(), "У вас нет камеры", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getContext(), R.string.no_camera, Toast.LENGTH_SHORT).show();
                         }
                     } else {
                         requestCameraPermissions();
@@ -1722,7 +1721,7 @@ public class TemplateFragment extends Fragment {
                             cameraVideoPath = intentFilePair.second.getAbsolutePath();
                             startActivityForResult(intentFilePair.first, VIDEO_REQUEST_CODE);
                         } catch (Exception exc) {
-                            Toast.makeText(getContext(), "У вас нет камеры", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getContext(), R.string.no_camera, Toast.LENGTH_SHORT).show();
                         }
                     } else
                         requestExternalPermissions();
@@ -1742,7 +1741,7 @@ public class TemplateFragment extends Fragment {
                             startActivityForResult(intent, AUDIO_REQUEST_CODE);
                         } catch (Exception exc) {
                             exc.printStackTrace();
-                            Toast.makeText(getContext(), "У вас нет приложения для записи аудио", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getContext(), R.string.no_audio_recorder_app, Toast.LENGTH_SHORT).show();
                         }
                     } else
                         requestAudioPermissions();
@@ -1769,18 +1768,18 @@ public class TemplateFragment extends Fragment {
                             Intent chooserIntent;
                             if (getActivity().getPackageManager().resolveActivity(sIntent, 0) != null) {
                                 // it is device with samsung file manager
-                                chooserIntent = Intent.createChooser(sIntent, "Выбрать файл");
+                                chooserIntent = Intent.createChooser(sIntent, getString(R.string.to_select_file));
                                 chooserIntent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
                                 chooserIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                                 chooserIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                                 chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, new Intent[]{intent});
                             } else
-                                chooserIntent = Intent.createChooser(intent, "Выбрать файл");
+                                chooserIntent = Intent.createChooser(intent, getString(R.string.to_select_file));
 
                             startActivityForResult(chooserIntent, DOCUMENT_REQUEST_CODE);
 
                         } catch (Exception exc) {
-                            Toast.makeText(getContext(), "У вас нет файлового менеджера, чтобы выбрать файл", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getContext(), R.string.no_file_manager, Toast.LENGTH_SHORT).show();
                         }
                     } else
                         requestExternalPermissions();
@@ -1931,7 +1930,7 @@ public class TemplateFragment extends Fragment {
                 if (option.has("caption"))
                     selectBtnText.setText(option.getString("caption"));
                 else
-                    selectBtnText.setText("Нет текста:(");
+                    selectBtnText.setText(R.string.no_text_);
 
                 if (j == 0) {
                     if (isList)
@@ -2050,7 +2049,7 @@ public class TemplateFragment extends Fragment {
                         if (option.has("caption"))
                             selectBtnText.setText(option.getString("caption"));
                         else
-                            selectBtnText.setText("Нет текста:(");
+                            selectBtnText.setText(R.string.no_text_);
 
                         if (isFirst) {
                             ((LinearLayout.LayoutParams) selectBtnFrame.getLayoutParams()).topMargin = 0;
@@ -2276,7 +2275,7 @@ public class TemplateFragment extends Fragment {
                         startActivity(viewIntent);
                     } catch (Exception exc) {
                         exc.printStackTrace();
-                        Toast.makeText(getContext(), "Нет приложения, которое может открыть этот файл", Toast.LENGTH_LONG).show();
+                        Toast.makeText(getContext(), R.string.no_app_to_open, Toast.LENGTH_LONG).show();
                     }
                 }
             });
@@ -2305,7 +2304,7 @@ public class TemplateFragment extends Fragment {
             fileContainer.addView(fileLayout);
 
         } catch (Exception exc) {
-            Toast.makeText(getContext(), "Ошибка при добавлении файла: " + exc.getLocalizedMessage(), Toast.LENGTH_LONG).show();
+            Toast.makeText(getContext(), getString(R.string.error_adding_file) + exc.getLocalizedMessage(), Toast.LENGTH_LONG).show();
         }
 
     }
@@ -2327,7 +2326,7 @@ public class TemplateFragment extends Fragment {
             final LinearLayout audioContainer = (LinearLayout) currentMediaBlock.first.getChildAt(3);
             final LinearLayout audioLayout = (LinearLayout) getActivity().getLayoutInflater().inflate(R.layout.audio_layout, audioContainer, false);
 
-            String fileName = "Запись " + new SimpleDateFormat("dd-MM-yyyy HH:mm:ss", Locale.getDefault()).format(
+            String fileName = getString(R.string.record) + new SimpleDateFormat("dd-MM-yyyy HH:mm:ss", Locale.getDefault()).format(
                     new Date(Long.parseLong(audioPathInCache.substring(audioPathInCache.lastIndexOf("/") + 1,
                             audioPathInCache.lastIndexOf("."))))) + audioPathInCache.substring(audioPathInCache.lastIndexOf("."));
 
@@ -2343,7 +2342,7 @@ public class TemplateFragment extends Fragment {
                         startActivity(viewIntent);
                     } catch (Exception exc) {
                         exc.printStackTrace();
-                        Toast.makeText(getContext(), "Нет установленного аудиоплеера", Toast.LENGTH_LONG).show();
+                        Toast.makeText(getContext(), R.string.no_audio_app, Toast.LENGTH_LONG).show();
                     }
                 }
             });
@@ -2374,7 +2373,7 @@ public class TemplateFragment extends Fragment {
 
         } catch (Exception exc) {
             exc.printStackTrace();
-            Toast.makeText(getContext(), "Ошибка при добавлении аудио: " + exc.getLocalizedMessage(), Toast.LENGTH_LONG).show();
+            Toast.makeText(getContext(), getString(R.string.error_adding_audio) + exc.getLocalizedMessage(), Toast.LENGTH_LONG).show();
         }
 
     }
@@ -2409,7 +2408,7 @@ public class TemplateFragment extends Fragment {
                         startActivity(viewIntent);
                     } catch (Exception exc) {
                         exc.printStackTrace();
-                        Toast.makeText(getContext(), "Нет установленного видиоплеера", Toast.LENGTH_LONG).show();
+                        Toast.makeText(getContext(), R.string.no_videoplayer, Toast.LENGTH_LONG).show();
                     }
                 }
             });
@@ -2437,7 +2436,7 @@ public class TemplateFragment extends Fragment {
 
 
         } catch (Exception exc) {
-            Toast.makeText(getContext(), "Ошибка при добавлении вижео: " + exc.getLocalizedMessage(), Toast.LENGTH_LONG).show();
+            Toast.makeText(getContext(), getString(R.string.error_adding_video) + exc.getLocalizedMessage(), Toast.LENGTH_LONG).show();
         }
     }
 
@@ -2957,11 +2956,11 @@ public class TemplateFragment extends Fragment {
                         @Override
                         public void run() {
                             new MaterialDialog.Builder(getContext())
-                                    .title("Подтвердите аккаунт")
-                                    .content("Введите пароль")
+                                    .title(R.string.accept_account)
+                                    .content(R.string.input_pass)
                                     .inputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD)
                                     .autoDismiss(false)
-                                    .input("Пароль", "", new MaterialDialog.InputCallback() {
+                                    .input(getString(R.string.pass), "", new MaterialDialog.InputCallback() {
                                         @Override
                                         public void onInput(@android.support.annotation.NonNull MaterialDialog dialog, CharSequence input) {
                                             if (input.length() > 0) {
@@ -2970,8 +2969,8 @@ public class TemplateFragment extends Fragment {
                                             }
                                         }
                                     })
-                                    .positiveText("Готово")
-                                    .negativeText("Отмена")
+                                    .positiveText(R.string.done)
+                                    .negativeText(R.string.cancel_)
                                     .onNegative(new MaterialDialog.SingleButtonCallback() {
                                         @Override
                                         public void onClick(@android.support.annotation.NonNull MaterialDialog dialog, @android.support.annotation.NonNull DialogAction which) {
@@ -3021,7 +3020,7 @@ public class TemplateFragment extends Fragment {
                                         getActivity().runOnUiThread(new Runnable() {
                                             @Override
                                             public void run() {
-                                                Toast.makeText(getContext(), "Сбой при отправке " + response.code(), Toast.LENGTH_LONG).show();
+                                                Toast.makeText(getContext(), getString(R.string.send_error) + response.code(), Toast.LENGTH_LONG).show();
                                             }
                                         });
 
@@ -3032,7 +3031,7 @@ public class TemplateFragment extends Fragment {
                                     getActivity().runOnUiThread(new Runnable() {
                                         @Override
                                         public void run() {
-                                            Toast.makeText(getContext(), "Эксепшн при отправке" + exc.getMessage(), Toast.LENGTH_LONG).show();
+                                            Toast.makeText(getContext(), getString(R.string.send_exc) + exc.getMessage(), Toast.LENGTH_LONG).show();
                                         }
                                     });
                                 }
@@ -3339,7 +3338,7 @@ public class TemplateFragment extends Fragment {
                         new Consumer<Throwable>() {
                             @Override
                             public void accept(@NonNull Throwable throwable) throws Exception {
-                                Toast.makeText(getContext(), "При обработке фото произошла ошибка:: " + throwable.getMessage(), Toast.LENGTH_LONG).show();
+                                Toast.makeText(getContext(), getString(R.string.error_processing_photo) + throwable.getMessage(), Toast.LENGTH_LONG).show();
                             }
                         });
     }
@@ -3442,7 +3441,7 @@ public class TemplateFragment extends Fragment {
                         startActivity(viewIntent);
                     } catch (Exception exc) {
                         exc.printStackTrace();
-                        Toast.makeText(getContext(), "Нет приложения, которое может открыть этот файл", Toast.LENGTH_LONG).show();
+                        Toast.makeText(getContext(), R.string.no_app_to_open, Toast.LENGTH_LONG).show();
                         try {
                             resultFile.delete();
                         } catch (Exception exc1) {
@@ -3518,10 +3517,10 @@ public class TemplateFragment extends Fragment {
                         viewIntent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                         startActivity(viewIntent);
 
-                        Toast.makeText(getContext(), "Сохранено в загрузках", Toast.LENGTH_LONG).show();
+                        Toast.makeText(getContext(), R.string.saved_to_gallery, Toast.LENGTH_LONG).show();
                     } catch (Exception exc) {
                         exc.printStackTrace();
-                        Toast.makeText(getContext(), "Нет приложения, которое может открыть этот файл", Toast.LENGTH_LONG).show();
+                        Toast.makeText(getContext(), R.string.no_app_to_open, Toast.LENGTH_LONG).show();
                         try {
                             resultFile.delete();
                         } catch (Exception exc1) {

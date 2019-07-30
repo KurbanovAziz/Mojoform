@@ -347,7 +347,7 @@ public class PanelFragment extends Fragment {
                     addPages();
                     showPage(0, true);
                 } else
-                    Toast.makeText(getContext(), "Во время загрузки произошла ошибка", Toast.LENGTH_LONG).show();
+                    Toast.makeText(getContext(), R.string.error_during_load, Toast.LENGTH_LONG).show();
 
             } catch (Exception exc) {
                 exc.printStackTrace();

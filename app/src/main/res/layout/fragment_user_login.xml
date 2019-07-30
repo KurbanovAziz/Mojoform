@@ -121,7 +121,7 @@
         android:layout_marginLeft="0dp"
         android:layout_marginRight="0dp"
         android:background="@drawable/blue_button"
-        android:text="Войти"
+        android:text="@string/log_in"
         android:textColor="@android:color/white"
         app:layout_constraintBottom_toTopOf="@+id/bottom_guideline"
         app:layout_constraintHorizontal_bias="0.0"
