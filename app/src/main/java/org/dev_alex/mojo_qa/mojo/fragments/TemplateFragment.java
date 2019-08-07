@@ -866,8 +866,9 @@ public class TemplateFragment extends Fragment {
                                     if (s.toString().trim().isEmpty())
                                         value.remove("plan");
                                     else
-                                        value.put("plan", Integer.parseInt(s.toString().trim()));
+                                        value.put("plan", Double.parseDouble(s.toString().trim()));
                                 } catch (Exception ignored) {
+                                    value.remove("plan");
                                 }
                             }
                         });
@@ -888,8 +889,9 @@ public class TemplateFragment extends Fragment {
                                     if (s.toString().trim().isEmpty())
                                         value.remove("fact");
                                     else
-                                        value.put("fact", Integer.parseInt(s.toString().trim()));
+                                        value.put("fact", Double.parseDouble(s.toString().trim()));
                                 } catch (Exception ignored) {
+                                    value.remove("fact");
                                 }
                             }
                         });
@@ -2584,11 +2586,11 @@ public class TemplateFragment extends Fragment {
                         break;
 
                     case "plan":
-                        item.put("plan", value.getInt("value"));
+                        item.put("plan", value.getDouble("value"));
                         break;
 
                     case "fact":
-                        item.put("fact", value.getInt("value"));
+                        item.put("fact", value.getDouble("value"));
                         break;
 
                     case "media_id":
@@ -3784,7 +3786,7 @@ public class TemplateFragment extends Fragment {
                     if (value.has("plan")) {
                         JSONObject objectValue = new JSONObject();
                         objectValue.put("id", value.getString("id"));
-                        objectValue.put("value", value.getInt("plan"));
+                        objectValue.put("value", value.getDouble("plan"));
                         objectValue.put("type", "plan");
                         containerValues.put(objectValue);
                     }
@@ -3792,7 +3794,7 @@ public class TemplateFragment extends Fragment {
                     if (value.has("fact")) {
                         JSONObject objectValue = new JSONObject();
                         objectValue.put("id", value.getString("id"));
-                        objectValue.put("value", value.getInt("fact"));
+                        objectValue.put("value", value.getDouble("fact"));
                         objectValue.put("type", "fact");
                         containerValues.put(objectValue);
                     }
