@@ -642,6 +642,11 @@ public class TemplateFragment extends Fragment {
                                     requestExternalPermissions();
                             }
                         });
+
+                        User me = LoginHistoryService.getCurrentUser();
+                        if ((me.is_manager == null || !me.is_manager) && (me.is_orgowner == null || !me.is_orgowner)) {
+                            rootView.findViewById(R.id.download_pdf_btn_container).setVisibility(View.GONE);
+                        }
                     } else {
                         rootView.findViewById(R.id.main_buttons_block).setVisibility(View.VISIBLE);
                         rootView.findViewById(R.id.finished_buttons_block).setVisibility(View.GONE);
