@@ -3280,12 +3280,12 @@ public class TemplateFragment extends Fragment {
                         Bitmap bitmap = BitmapFactory.decodeFile(picturePath, options);
                         bitmap = BitmapService.modifyOrientation(bitmap, picturePath);
 
-
                         if (!isRestore) {
                             try {
                                 File resFile = new File(picturePath);
                                 tmpOptions = new BitmapFactory.Options();
                                 options = new BitmapFactory.Options();
+
 
                                 tmpOptions.inJustDecodeBounds = true;
                                 BitmapFactory.decodeFile(picturePath, tmpOptions);
@@ -3295,22 +3295,28 @@ public class TemplateFragment extends Fragment {
                                 Bitmap resBitmap = BitmapFactory.decodeFile(picturePath, options);
                                 resBitmap = BitmapService.modifyOrientation(resBitmap, picturePath);
 
+                                ExifInterface exif = new ExifInterface(picturePath);
+
+                                Date pictureDate = new Date();
+                                if (!exif.getAttribute(ExifInterface.TAG_DATETIME).isEmpty()) {
+                                    pictureDate = new SimpleDateFormat("yyyy:MM:dd HH:mm:ss", Locale.getDefault()).parse(exif.getAttribute(ExifInterface.TAG_DATETIME));
+                                }
+
                                 SimpleDateFormat watermarkDateFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss", Locale.getDefault());
-                                resBitmap = drawWaterMarkOnBitmap(resBitmap, watermarkDateFormat.format(new Date()));
+                                resBitmap = drawWaterMarkOnBitmap(resBitmap, watermarkDateFormat.format(pictureDate));
 
                                 resFile.delete();
                                 BitmapService.saveBitmapToFile(resFile, resBitmap);
 
-                                ExifInterface exif = new ExifInterface(picturePath);
 
                                 SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy:MM:dd", Locale.getDefault());
                                 SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm:ss", Locale.getDefault());
 
-                                exif.setAttribute(ExifInterface.TAG_DATETIME, dateFormat.format(new Date()) + " " + timeFormat.format(new Date()));
-                                exif.setAttribute(ExifInterface.TAG_EXPOSURE_TIME, dateFormat.format(new Date()) + " " + timeFormat.format(new Date()));
+                                exif.setAttribute(ExifInterface.TAG_DATETIME, dateFormat.format(pictureDate) + " " + timeFormat.format(pictureDate));
+                                exif.setAttribute(ExifInterface.TAG_EXPOSURE_TIME, dateFormat.format(pictureDate) + " " + timeFormat.format(pictureDate));
 
-                                exif.setAttribute(ExifInterface.TAG_GPS_DATESTAMP, dateFormat.format(new Date()));
-                                exif.setAttribute(ExifInterface.TAG_GPS_TIMESTAMP, timeFormat.format(new Date()));
+                                exif.setAttribute(ExifInterface.TAG_GPS_DATESTAMP, dateFormat.format(pictureDate));
+                                exif.setAttribute(ExifInterface.TAG_GPS_TIMESTAMP, timeFormat.format(pictureDate));
                                 exif.saveAttributes();
                             } catch (Exception e) {
                                 e.printStackTrace();
