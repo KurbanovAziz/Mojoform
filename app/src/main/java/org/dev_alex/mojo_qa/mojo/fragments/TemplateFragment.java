@@ -3296,10 +3296,13 @@ public class TemplateFragment extends Fragment {
                                 resBitmap = BitmapService.modifyOrientation(resBitmap, picturePath);
 
                                 ExifInterface exif = new ExifInterface(picturePath);
-
                                 Date pictureDate = new Date();
-                                if (!exif.getAttribute(ExifInterface.TAG_DATETIME).isEmpty()) {
-                                    pictureDate = new SimpleDateFormat("yyyy:MM:dd HH:mm:ss", Locale.getDefault()).parse(exif.getAttribute(ExifInterface.TAG_DATETIME));
+                                try {
+                                    if (!exif.getAttribute(ExifInterface.TAG_DATETIME).isEmpty()) {
+                                        pictureDate = new SimpleDateFormat("yyyy:MM:dd HH:mm:ss", Locale.getDefault()).parse(exif.getAttribute(ExifInterface.TAG_DATETIME));
+                                    }
+                                } catch (Exception exc) {
+                                    exc.printStackTrace();
                                 }
 
                                 SimpleDateFormat watermarkDateFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss", Locale.getDefault());
@@ -3308,16 +3311,19 @@ public class TemplateFragment extends Fragment {
                                 resFile.delete();
                                 BitmapService.saveBitmapToFile(resFile, resBitmap);
 
+                                try {
+                                    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy:MM:dd", Locale.getDefault());
+                                    SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm:ss", Locale.getDefault());
 
-                                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy:MM:dd", Locale.getDefault());
-                                SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm:ss", Locale.getDefault());
+                                    exif.setAttribute(ExifInterface.TAG_DATETIME, dateFormat.format(pictureDate) + " " + timeFormat.format(pictureDate));
+                                    exif.setAttribute(ExifInterface.TAG_EXPOSURE_TIME, dateFormat.format(pictureDate) + " " + timeFormat.format(pictureDate));
 
-                                exif.setAttribute(ExifInterface.TAG_DATETIME, dateFormat.format(pictureDate) + " " + timeFormat.format(pictureDate));
-                                exif.setAttribute(ExifInterface.TAG_EXPOSURE_TIME, dateFormat.format(pictureDate) + " " + timeFormat.format(pictureDate));
-
-                                exif.setAttribute(ExifInterface.TAG_GPS_DATESTAMP, dateFormat.format(pictureDate));
-                                exif.setAttribute(ExifInterface.TAG_GPS_TIMESTAMP, timeFormat.format(pictureDate));
-                                exif.saveAttributes();
+                                    exif.setAttribute(ExifInterface.TAG_GPS_DATESTAMP, dateFormat.format(pictureDate));
+                                    exif.setAttribute(ExifInterface.TAG_GPS_TIMESTAMP, timeFormat.format(pictureDate));
+                                    exif.saveAttributes();
+                                } catch (Exception exc) {
+                                    exc.printStackTrace();
+                                }
                             } catch (Exception e) {
                                 e.printStackTrace();
                             }
