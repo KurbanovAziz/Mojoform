@@ -259,13 +259,13 @@ public class TemplateFragment extends Fragment {
         if (requestCode == Constants.REQUEST_CODE && resultCode == RESULT_OK && data != null) {
             ArrayList<Image> images = data.getParcelableArrayListExtra(Constants.INTENT_EXTRA_IMAGES);
             for (Image image : images) {
-                processImageFile(new File(image.path), false, null);
+                processImageFile(new File(image.path), false, null, true);
             }
         }
 
         if (requestCode == PHOTO_REQUEST_CODE && resultCode == RESULT_OK && data != null) {
             String photoPath = data.getStringExtra("photo_path");
-            processImageFile(new File(photoPath), false, null);
+            processImageFile(new File(photoPath), false, null, false);
         }
 
         if (requestCode == VIDEO_REQUEST_CODE && resultCode == RESULT_OK) {
@@ -310,7 +310,7 @@ public class TemplateFragment extends Fragment {
             else {
                 String mimeType = Utils.getMimeType(documentPath);
                 if (mimeType.startsWith("image"))
-                    processImageFile(new File(documentPath), false, null);
+                    processImageFile(new File(documentPath), false, null, true);
                 else if (mimeType.startsWith("audio"))
                     createAudioPreview(documentPath, true);
                 else if (mimeType.startsWith("video"))
@@ -1822,7 +1822,7 @@ public class TemplateFragment extends Fragment {
                 String mimeType = value.getJSONArray(MEDIA_PATH_JSON_ARRAY).getJSONObject(j).getString("mime");
 
                 if (mimeType.startsWith("image"))
-                    processImageFile(new File(mediaPath), true, new Pair<>(mediaLayout, value));
+                    processImageFile(new File(mediaPath), true, new Pair<>(mediaLayout, value), false);
                 else if (mimeType.startsWith("audio"))
                     createAudioPreview(mediaPath, false);
                 else if (mimeType.startsWith("video"))
@@ -3253,7 +3253,7 @@ public class TemplateFragment extends Fragment {
 
 
     @SuppressLint("CheckResult")
-    private void processImageFile(File file, final boolean isRestore, final Pair<LinearLayout, JSONObject> toBlock) {
+    private void processImageFile(File file, final boolean isRestore, final Pair<LinearLayout, JSONObject> toBlock, final boolean isFolder) {
         final int imgSize = Math.round(TypedValue.applyDimension
                 (TypedValue.COMPLEX_UNIT_DIP, 93, App.getContext().getResources().getDisplayMetrics()));
         final int bigImgSize = 1300;
@@ -3281,9 +3281,9 @@ public class TemplateFragment extends Fragment {
                         bitmap = BitmapService.modifyOrientation(bitmap, picturePath);
 
 
+                        String resPicturePath = picturePath;
                         if (!isRestore) {
                             try {
-                                File resFile = new File(picturePath);
                                 tmpOptions = new BitmapFactory.Options();
                                 options = new BitmapFactory.Options();
 
@@ -3296,12 +3296,13 @@ public class TemplateFragment extends Fragment {
                                 resBitmap = BitmapService.modifyOrientation(resBitmap, picturePath);
 
                                 SimpleDateFormat watermarkDateFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss", Locale.getDefault());
-                                resBitmap = drawWaterMarkOnBitmap(resBitmap, watermarkDateFormat.format(new Date()));
+                                resBitmap = drawWaterMarkOnBitmap(resBitmap, watermarkDateFormat.format(new Date()), isFolder);
 
-                                resFile.delete();
-                                BitmapService.saveBitmapToFile(resFile, resBitmap);
+                                //resFile.delete();
+                                File newFile = BitmapService.saveBitmapToFile(getContext(), resBitmap);
+                                resPicturePath = newFile.getAbsolutePath();
 
-                                ExifInterface exif = new ExifInterface(picturePath);
+                                ExifInterface exif = new ExifInterface(resPicturePath);
 
                                 SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy:MM:dd", Locale.getDefault());
                                 SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm:ss", Locale.getDefault());
@@ -3317,7 +3318,7 @@ public class TemplateFragment extends Fragment {
                             }
                         }
 
-                        return Observable.just(new Pair<>(bitmap, picturePath));
+                        return Observable.just(new Pair<>(bitmap, resPicturePath));
                     }
                 })
                 .observeOn(AndroidSchedulers.mainThread())
@@ -3350,7 +3351,7 @@ public class TemplateFragment extends Fragment {
                         });
     }
 
-    public Bitmap drawWaterMarkOnBitmap(Bitmap bitmap, String mText) {
+    public Bitmap drawWaterMarkOnBitmap(Bitmap bitmap, String mText, boolean isFolder) {
         try {
             Config bitmapConfig = bitmap.getConfig();
             if (bitmapConfig == null) {
@@ -3375,6 +3376,15 @@ public class TemplateFragment extends Fragment {
             int imageSize = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 23, getContext().getResources().getDisplayMetrics());
             d.setBounds(25, 25, 25 + imageSize, 25 + imageSize);
             d.draw(canvas);
+
+            if (isFolder) {
+                Drawable folderLogo = getResources().getDrawable(R.drawable.ic_folder_watermark);
+                int imageSizeFolder = 50;
+                int xOffset = 20;
+                int yOffset = 40;
+                folderLogo.setBounds(x - imageSizeFolder - xOffset, y - yOffset, x - xOffset, y - yOffset + imageSizeFolder);
+                folderLogo.draw(canvas);
+            }
 
             return bitmap;
         } catch (Exception exc) {
