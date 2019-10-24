@@ -25,7 +25,9 @@
         android:largeHeap="true"
         android:screenOrientation="portrait"
         android:theme="@style/Theme.AppCompat.Light.NoActionBar.FullScreen"
-        tools:replace="android:allowBackup,android:icon">
+        android:usesCleartextTraffic="true"
+        tools:replace="android:allowBackup,android:icon"
+        tools:targetApi="m">
 
         <activity
             android:name=".activities.AuthActivity"
