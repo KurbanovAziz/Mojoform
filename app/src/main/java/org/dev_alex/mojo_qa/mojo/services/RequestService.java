@@ -48,6 +48,7 @@ public class RequestService {
         Log.d("mojo-log", "send file to server. file about " + file.toString());
 
         OkHttpClient client = createOkHttpClient();
+
         String url = App.getHost() + path;
         RequestBody requestBody = new MultipartBody.Builder()
                 .setType(MultipartBody.FORM)
@@ -78,8 +79,8 @@ public class RequestService {
     private static OkHttpClient createOkHttpClient() {
         if (TokenService.isTokenExists())
             return new OkHttpClient().newBuilder()
-                    .connectTimeout(15, TimeUnit.SECONDS)
-                    .writeTimeout(15, TimeUnit.SECONDS)
+                    .connectTimeout(30, TimeUnit.SECONDS)
+                    .writeTimeout(35, TimeUnit.SECONDS)
                     .readTimeout(30, TimeUnit.SECONDS)
                     .cookieJar(new CookieJar() {
                         @Override
