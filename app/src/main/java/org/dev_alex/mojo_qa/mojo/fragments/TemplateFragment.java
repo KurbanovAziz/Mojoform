@@ -3683,6 +3683,13 @@ public class TemplateFragment extends Fragment {
                     }
                     break;
 
+                case "money":
+                    if (!value.has("plan") && !value.has("fact")) {
+                        totalResult = false;
+                        setBlockMarkedAsRequired(value.getString("id"));
+                    }
+                    break;
+
                 case "signature":
                     if (!value.has(SIGNATURE_PREVIEW_JSON_ARRAY) && !(value.has("is_required") && !value.getBoolean("is_required"))) {
                         totalResult = false;
