@@ -2,6 +2,7 @@ package org.dev_alex.mojo_qa.mojo.fragments;
 
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.AsyncTask;
@@ -41,17 +42,15 @@ import com.prolificinteractive.materialcalendarview.OnMonthChangedListener;
 import net.cachapa.expandablelayout.ExpandableLayout;
 
 import org.dev_alex.mojo_qa.mojo.App;
-import org.dev_alex.mojo_qa.mojo.Data;
 import org.dev_alex.mojo_qa.mojo.EventDecorator;
 import org.dev_alex.mojo_qa.mojo.R;
+import org.dev_alex.mojo_qa.mojo.activities.AuthActivity;
 import org.dev_alex.mojo_qa.mojo.adapters.TaskAdapter;
 import org.dev_alex.mojo_qa.mojo.custom_views.RelativeLayoutWithPopUp;
 import org.dev_alex.mojo_qa.mojo.models.Task;
-import org.dev_alex.mojo_qa.mojo.models.User;
 import org.dev_alex.mojo_qa.mojo.services.LoginHistoryService;
 import org.dev_alex.mojo_qa.mojo.services.RequestService;
 import org.json.JSONArray;
-import org.json.JSONObject;
 
 import java.text.DateFormatSymbols;
 import java.text.SimpleDateFormat;
@@ -59,11 +58,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
-import java.util.TimeZone;
 
-import okhttp3.Credentials;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
 import okhttp3.Response;
 
 public class TasksFragment extends Fragment {
@@ -578,7 +573,8 @@ public class TasksFragment extends Fragment {
                 if (responseCode == null)
                     Toast.makeText(getContext(), R.string.network_error, Toast.LENGTH_LONG).show();
                 else if (responseCode == 401) {
-                    Toast.makeText(getContext(), R.string.tasks_are_temporary_unavailable, Toast.LENGTH_LONG).show();
+                    startActivity(new Intent(getContext(), AuthActivity.class));
+                    getActivity().finish();
                 } else if (responseCode == 200) {
                     if (!withDay)
                         updateDecorators(busyTasks);
