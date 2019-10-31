@@ -147,6 +147,7 @@
     <orderEntry type="library" scope="TEST" name="Gradle: com.android.support.test.espresso:espresso-idling-resource:2.2.2@aar" level="project" />
     <orderEntry type="library" scope="TEST" name="Gradle: com.android.support.test:exposed-instrumentation-api-publish:0.5@aar" level="project" />
     <orderEntry type="library" name="Gradle: __local_aars__:/Users/evgeniidolenko/projects/Android/Mojo/app/libs/isoparser-1.1.22.jar:unspecified@jar" level="project" />
+    <orderEntry type="library" name="Gradle: com.squareup.okhttp3:logging-interceptor:3.9.0@jar" level="project" />
     <orderEntry type="library" name="Gradle: com.squareup.okhttp3:okhttp:3.9.0@jar" level="project" />
     <orderEntry type="library" name="Gradle: com.fasterxml.jackson.core:jackson-databind:2.9.0.pr2@jar" level="project" />
     <orderEntry type="library" name="Gradle: frankiesardo:icepick:3.2.0@jar" level="project" />

@@ -3,7 +3,6 @@ package org.dev_alex.mojo_qa.mojo.services;
 import android.util.Log;
 
 import org.dev_alex.mojo_qa.mojo.App;
-import org.dev_alex.mojo_qa.mojo.Data;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -12,7 +11,6 @@ import java.util.concurrent.TimeUnit;
 
 import okhttp3.Cookie;
 import okhttp3.CookieJar;
-import okhttp3.Credentials;
 import okhttp3.HttpUrl;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
@@ -20,6 +18,7 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
+import okhttp3.logging.HttpLoggingInterceptor;
 
 public class RequestService {
     private final static MediaType JSON = MediaType.parse("application/json");
@@ -35,8 +34,8 @@ public class RequestService {
         OkHttpClient client = createOkHttpClient();
         RequestBody body = RequestBody.create(JSON, jsonStr);
         Request.Builder requestBuilder = new Request.Builder().url(url).post(body)
-                .addHeader("Content-Type", "application/json")
-                .addHeader("Authorization", Credentials.basic(Data.getTaskAuthLogin(), Data.taskAuthPass));
+                .addHeader("Content-Type", "application/json");
+                //.addHeader("Authorization", Credentials.basic(Data.getTaskAuthLogin(), Data.taskAuthPass));
 
         Request request = requestBuilder.build();
         Log.d("mojo-log", "send file to server. request: " + request.toString());
@@ -77,6 +76,9 @@ public class RequestService {
 
 
     private static OkHttpClient createOkHttpClient() {
+        HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
+        logging.setLevel(HttpLoggingInterceptor.Level.BODY);
+
         if (TokenService.isTokenExists())
             return new OkHttpClient().newBuilder()
                     .connectTimeout(30, TimeUnit.SECONDS)
@@ -94,9 +96,16 @@ public class RequestService {
                             return oneCookie;
                         }
                     })
+                    .addInterceptor(logging)
                     .build();
-        else
-            return new OkHttpClient();
+        else {
+            return new OkHttpClient().newBuilder()
+                    .connectTimeout(30, TimeUnit.SECONDS)
+                    .writeTimeout(35, TimeUnit.SECONDS)
+                    .readTimeout(30, TimeUnit.SECONDS)
+                    .addInterceptor(logging)
+                    .build();
+        }
     }
 
     private static Cookie createNonPersistentCookie() {
