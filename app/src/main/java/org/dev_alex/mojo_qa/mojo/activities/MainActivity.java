@@ -135,52 +135,64 @@ public class MainActivity extends AppCompatActivity {
                 mainDraggableItems.add(new CustomDrawerItem(15, mainDraggableItems.isEmpty() ? -18 : 0).withIdentifier(5).withName(R.string.analystics).withIcon(R.drawable.analystics_icon));
         }
 
-        drawer = new DrawerBuilder()
+        DrawerBuilder builder = new DrawerBuilder()
                 .withActivity(this)
                 .withDrawerWidthDp(305)
-                .withHeader(headerView)
-                .addDrawerItems(
-                        mainDraggableItems.get(0),
-                        new DividerDrawerItem(),
-                        mainDraggableItems.get(1),
-                        mainDraggableItems.get(2),
-                        new CustomDrawerItem(15, 0).withIdentifier(3).withName(R.string.exit).withIcon(R.drawable.exit),
-                        new DividerDrawerItem(),
-                        new CustomDrawerItem(15, 0).withIdentifier(4).withName(R.string.about_app).withIcon(R.drawable.question),
-                        new DividerDrawerItem(),
-                        new CustomDrawerItem(15, 0).withIdentifier(6).withName(R.string.change_seq).withIcon(R.drawable.drag_icon)
-                )
-                .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
-                    @Override
-                    public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
-                        switch ((int) drawerItem.getIdentifier()) {
-                            case 1:
-                                getSupportFragmentManager().popBackStack(null, 0);
-                                getSupportFragmentManager().beginTransaction().replace(R.id.container, TasksFragment.newInstance(), "tasks").commit();
-                                break;
-                            case 2:
-                                getSupportFragmentManager().popBackStack(null, 0);
-                                getSupportFragmentManager().beginTransaction().replace(R.id.container, DocumentsFragment.newInstance()).commit();
-                                break;
-                            case 3:
-                                new LogoutTask().execute();
-                                break;
-                            case 4:
-                                Intent intent = new Intent(MainActivity.this, OnboardingActivity.class);
-                                intent.putExtra("from_page", 1);
-                                startActivity(intent);
-                                break;
-                            case 5:
-                                getSupportFragmentManager().popBackStack(null, 0);
-                                getSupportFragmentManager().beginTransaction().replace(R.id.container, PanelListFragment.newInstance()).commit();
-                                break;
-                            case 6:
-                                showDragItemsDialog();
-                                break;
-                        }
-                        return false;
-                    }
-                })
+                .withHeader(headerView);
+
+        builder.addDrawerItems(
+                mainDraggableItems.get(0),
+                new DividerDrawerItem()
+        );
+
+        if (mainDraggableItems.size() > 1) {
+            builder.addDrawerItems(mainDraggableItems.get(1));
+        }
+
+        if (mainDraggableItems.size() > 2) {
+            builder.addDrawerItems(mainDraggableItems.get(2));
+        }
+
+        builder.addDrawerItems(
+                new CustomDrawerItem(15, 0).withIdentifier(3).withName(R.string.exit).withIcon(R.drawable.exit),
+                new DividerDrawerItem(),
+                new CustomDrawerItem(15, 0).withIdentifier(4).withName(R.string.about_app).withIcon(R.drawable.question),
+                new DividerDrawerItem(),
+                new CustomDrawerItem(15, 0).withIdentifier(6).withName(R.string.change_seq).withIcon(R.drawable.drag_icon)
+
+        );
+
+        drawer = builder.withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
+            @Override
+            public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
+                switch ((int) drawerItem.getIdentifier()) {
+                    case 1:
+                        getSupportFragmentManager().popBackStack(null, 0);
+                        getSupportFragmentManager().beginTransaction().replace(R.id.container, TasksFragment.newInstance(), "tasks").commit();
+                        break;
+                    case 2:
+                        getSupportFragmentManager().popBackStack(null, 0);
+                        getSupportFragmentManager().beginTransaction().replace(R.id.container, DocumentsFragment.newInstance()).commit();
+                        break;
+                    case 3:
+                        new LogoutTask().execute();
+                        break;
+                    case 4:
+                        Intent intent = new Intent(MainActivity.this, OnboardingActivity.class);
+                        intent.putExtra("from_page", 1);
+                        startActivity(intent);
+                        break;
+                    case 5:
+                        getSupportFragmentManager().popBackStack(null, 0);
+                        getSupportFragmentManager().beginTransaction().replace(R.id.container, PanelListFragment.newInstance()).commit();
+                        break;
+                    case 6:
+                        showDragItemsDialog();
+                        break;
+                }
+                return false;
+            }
+        })
                 .build();
 
         findViewById(R.id.sandwich_btn).setOnClickListener(new View.OnClickListener() {
