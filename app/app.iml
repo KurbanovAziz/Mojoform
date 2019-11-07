@@ -198,6 +198,7 @@
     <orderEntry type="library" name="Gradle: com.android.support.constraint:constraint-layout:1.0.2@aar" level="project" />
     <orderEntry type="library" name="Gradle: net.cachapa.expandablelayout:expandablelayout:2.9.2@aar" level="project" />
     <orderEntry type="library" name="Gradle: de.hdodenhof:circleimageview:2.2.0@aar" level="project" />
+    <orderEntry type="library" name="Gradle: net.yslibrary.keyboardvisibilityevent:keyboardvisibilityevent:2.3.0@aar" level="project" />
     <orderEntry type="library" name="Gradle: com.android.support:support-vector-drawable:28.0.0@aar" level="project" />
     <orderEntry type="library" name="Gradle: com.android.support:transition:28.0.0@aar" level="project" />
     <orderEntry type="library" name="Gradle: com.android.support:loader:28.0.0@aar" level="project" />

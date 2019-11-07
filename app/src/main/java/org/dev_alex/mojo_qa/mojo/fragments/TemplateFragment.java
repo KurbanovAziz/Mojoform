@@ -93,6 +93,7 @@ import com.github.mikephil.charting.utils.ViewPortHandler;
 import com.lalongooo.videocompressor.video.MediaController;
 
 import net.cachapa.expandablelayout.ExpandableLayout;
+import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent;
 
 import org.dev_alex.mojo_qa.mojo.App;
 import org.dev_alex.mojo_qa.mojo.Data;
@@ -244,13 +245,31 @@ public class TemplateFragment extends Fragment {
             setupHeader();
             setListeners();
 
-            Log.e("rrr", "get_tasks");
             new GetTemplateTask().execute();
+
+            KeyboardVisibilityEvent.setEventListener(
+                    getActivity(),
+                    isOpen -> {
+                        if (!isAdded()) {
+                            return;
+                        }
+                        View rootContainer = rootView.findViewById(R.id.root_container);
+                        RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) rootContainer.getLayoutParams();
+                        Resources resources = getResources();
+                        if (isOpen) {
+                            params.bottomMargin = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 200, resources.getDisplayMetrics());
+                        } else {
+                            params.bottomMargin = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 0, resources.getDisplayMetrics());
+                        }
+                        rootContainer.setLayoutParams(params);
+                        rootContainer.requestLayout();
+                    });
         } else
             initDialog();
 
         return rootView;
     }
+
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {

@@ -7,8 +7,8 @@ android {
         minSdkVersion 17
         targetSdkVersion 28
         multiDexEnabled true
-        versionCode 41
-        versionName "1.7.1"
+        versionCode 42
+        versionName "1.7.2"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
@@ -148,6 +148,8 @@ dependencies {
     implementation 'com.google.firebase:firebase-messaging:11.8.0'
     implementation 'com.google.firebase:firebase-core:11.8.0'
     implementation("com.squareup.okhttp3:logging-interceptor:3.9.0")
+
+    implementation 'net.yslibrary.keyboardvisibilityevent:keyboardvisibilityevent:2.3.0'
 
     implementation 'org.jsoup:jsoup:1.11.3'
 }
