@@ -39,6 +39,7 @@ import org.dev_alex.mojo_qa.mojo.R;
 import org.dev_alex.mojo_qa.mojo.adapters.DraggableItemAdapter;
 import org.dev_alex.mojo_qa.mojo.custom_views.CustomDrawerItem;
 import org.dev_alex.mojo_qa.mojo.fragments.DocumentsFragment;
+import org.dev_alex.mojo_qa.mojo.fragments.NotificationsFragment;
 import org.dev_alex.mojo_qa.mojo.fragments.PanelListFragment;
 import org.dev_alex.mojo_qa.mojo.fragments.TasksFragment;
 import org.dev_alex.mojo_qa.mojo.fragments.TemplateFragment;
@@ -154,6 +155,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         builder.addDrawerItems(
+                new CustomDrawerItem(15, 0).withIdentifier(11).withName(R.string.notifications).withIcon(R.drawable.bell),
                 new CustomDrawerItem(15, 0).withIdentifier(3).withName(R.string.exit).withIcon(R.drawable.exit),
                 new DividerDrawerItem(),
                 new CustomDrawerItem(15, 0).withIdentifier(4).withName(R.string.about_app).withIcon(R.drawable.question),
@@ -188,6 +190,10 @@ public class MainActivity extends AppCompatActivity {
                         break;
                     case 6:
                         showDragItemsDialog();
+                        break;
+                    case 11:
+                        getSupportFragmentManager().popBackStack(null, 0);
+                        getSupportFragmentManager().beginTransaction().replace(R.id.container, NotificationsFragment.newInstance()).commit();
                         break;
                 }
                 return false;

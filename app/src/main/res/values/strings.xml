@@ -142,4 +142,10 @@
     <string name="send_exc">Эксепшн при отправке</string>
     <string name="error_processing_photo">При обработке фото произошла ошибка::</string>
     <string name="saved_to_gallery">Сохранено в загрузках</string>
+
+    <string name="notifications">Уведомления</string>
+    <string name="date_asc">По дате (сначала старые)</string>
+    <string name="date_desc">По дате (сначала новые)</string>
+    <string name="name_asc">По имени</string>
+    <string name="name_desc">По имени (с конца)</string>
 </resources>
