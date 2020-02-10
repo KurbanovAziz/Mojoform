@@ -2,7 +2,7 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="90dp"
-    android:background="@drawable/task_card_background"
+    android:background="@drawable/notification_card_background"
     android:paddingRight="15dp">
 
     <LinearLayout

@@ -142,4 +142,13 @@
     <string name="send_exc">Ексепшн при відправці</string>
     <string name="error_processing_photo">При обробці фото сталася помилка::</string>
     <string name="saved_to_gallery">Збережено в завантаженнях</string>
+
+    <string name="notifications">Повідомлення</string>
+    <string name="date_asc">За датою (спочатку старі)</string>
+    <string name="date_desc">За датою (спочатку нові)</string>
+    <string name="name_asc">На ім\'я</string>
+    <string name="name_desc">На ім\'я (з кінця)</string>
+    <string name="executor">Працівник</string>
+    <string name="finish_time">Час завершення</string>
+    <string name="unknown">невідомо</string>
 </resources>

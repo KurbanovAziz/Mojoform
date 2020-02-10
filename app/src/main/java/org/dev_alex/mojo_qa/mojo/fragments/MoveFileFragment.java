@@ -114,6 +114,7 @@ public class MoveFileFragment extends Fragment {
         getActivity().findViewById(R.id.sandwich_btn).setVisibility(View.GONE);
         getActivity().findViewById(R.id.group_by_btn).setVisibility(View.GONE);
         getActivity().findViewById(R.id.search_btn).setVisibility(View.GONE);
+        getActivity().findViewById(R.id.notification_btn).setVisibility(View.GONE);
 
         getActivity().findViewById(R.id.back_btn).setOnClickListener(new View.OnClickListener() {
             @Override

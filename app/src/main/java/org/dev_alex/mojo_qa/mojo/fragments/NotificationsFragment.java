@@ -39,7 +39,7 @@ import java.util.ArrayList;
 
 import okhttp3.Response;
 
-public class NotificationsFragment extends Fragment {
+public class NotificationsFragment extends Fragment implements NotificationAdapter.NotificationClickListener {
     private final int SORT_BY_NAME = 1;
     private final int SORT_BY_NAME_DESC = 2;
     private final int SORT_BY_CREATED_AT = 3;
@@ -113,6 +113,7 @@ public class NotificationsFragment extends Fragment {
         getActivity().findViewById(R.id.group_by_btn).setVisibility(View.VISIBLE);
         getActivity().findViewById(R.id.sandwich_btn).setVisibility(View.VISIBLE);
         getActivity().findViewById(R.id.search_btn).setVisibility(View.VISIBLE);
+        getActivity().findViewById(R.id.notification_btn).setVisibility(View.VISIBLE);
 
         getActivity().findViewById(R.id.group_by_btn).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -184,11 +185,11 @@ public class NotificationsFragment extends Fragment {
             if (notification.task.ref.name.toLowerCase().contains(searchText.toLowerCase()))
                 searchResult.add(notification);
         }
-        recyclerView.setAdapter(new NotificationAdapter(searchResult));
+        recyclerView.setAdapter(new NotificationAdapter(searchResult, this));
     }
 
     private void resetSearch() {
-        recyclerView.setAdapter(new NotificationAdapter(notifications));
+        recyclerView.setAdapter(new NotificationAdapter(notifications, this));
     }
 
     private void updateAdapter(NotificationAdapter adapter) {
@@ -290,6 +291,27 @@ public class NotificationsFragment extends Fragment {
         new GetNotificationsTask().execute();
     }
 
+    private void styleNotificationBadge() {
+        boolean needToShow = false;
+
+        for (Notification notification : notifications) {
+            if (!notification.is_readed) {
+                needToShow = true;
+                break;
+            }
+        }
+
+        View badgeView = getActivity().findViewById(R.id.vNotificationButtonBadge);
+        if (badgeView != null) {
+            badgeView.setVisibility(needToShow ? View.VISIBLE : View.GONE);
+        }
+    }
+
+    @Override
+    public void onNotificationRead(Notification notification) {
+        new ReadNotificationsTask(notification.id).execute();
+    }
+
     private class GetNotificationsTask extends AsyncTask<Void, Void, Integer> {
 
         @Override
@@ -351,7 +373,7 @@ public class NotificationsFragment extends Fragment {
                     startActivity(new Intent(getContext(), AuthActivity.class));
                     getActivity().finish();
                 } else if (responseCode == 200) {
-                    updateAdapter(new NotificationAdapter(notifications));
+                    updateAdapter(new NotificationAdapter(notifications, NotificationsFragment.this));
                 } else
                     Toast.makeText(getContext(), R.string.unknown_error, Toast.LENGTH_LONG).show();
             } catch (Exception exc) {
@@ -359,4 +381,51 @@ public class NotificationsFragment extends Fragment {
             }
         }
     }
+
+    private class ReadNotificationsTask extends AsyncTask<Void, Void, Integer> {
+        private long notificationId;
+
+        public ReadNotificationsTask(long notificationId) {
+            this.notificationId = notificationId;
+        }
+
+        @Override
+        protected Integer doInBackground(Void... params) {
+            try {
+                Response response;
+
+                String url = "/api/notifications/" + notificationId + "/readed";
+
+                response = RequestService.createPostRequest(url, "{}");
+
+                if (response.code() == 200) {
+
+                }
+
+                return response.code();
+            } catch (Exception exc) {
+                exc.printStackTrace();
+                return null;
+            }
+        }
+
+        @Override
+        protected void onPostExecute(Integer responseCode) {
+            super.onPostExecute(responseCode);
+            try {
+                if (responseCode == null)
+                    Toast.makeText(getContext(), R.string.network_error, Toast.LENGTH_LONG).show();
+                else if (responseCode == 401) {
+                    startActivity(new Intent(getContext(), AuthActivity.class));
+                    getActivity().finish();
+                } else if (responseCode == 200) {
+
+                } else
+                    Toast.makeText(getContext(), R.string.unknown_error, Toast.LENGTH_LONG).show();
+            } catch (Exception exc) {
+                exc.printStackTrace();
+            }
+        }
+    }
+
 }

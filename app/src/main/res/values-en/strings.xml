@@ -142,4 +142,13 @@
     <string name="send_exc">Exception while sending</string>
     <string name="error_processing_photo">Error while processing photo::</string>
     <string name="saved_to_gallery">Saved in downloads</string>
+
+    <string name="notifications">Notifications</string>
+    <string name="date_asc">By date (old first)</string>
+    <string name="date_desc">By date (first new)</string>
+    <string name="name_asc">By name</string>
+    <string name="name_desc">By name (from the end)</string>
+    <string name="executor">Worker</string>
+    <string name="finish_time">End time</string>
+    <string name="unknown">unknown</string>
 </resources>

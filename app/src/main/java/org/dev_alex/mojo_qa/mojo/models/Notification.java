@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Notification {
     public long id;
-    public Task task;
+    public NotificationTask task;
     public String type;
     public boolean is_readed;
     public Long create_date;
@@ -14,5 +14,6 @@ public class Notification {
         if (create_date != null) {
             create_date *= 1000;
         }
+        task.fixTime();
     }
 }

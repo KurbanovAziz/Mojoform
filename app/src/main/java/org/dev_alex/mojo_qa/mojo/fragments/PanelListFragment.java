@@ -26,7 +26,6 @@ import org.json.JSONArray;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 import okhttp3.Response;
@@ -85,6 +84,7 @@ public class PanelListFragment extends Fragment {
         getActivity().findViewById(R.id.sandwich_btn).setVisibility(View.VISIBLE);
         getActivity().findViewById(R.id.group_by_btn).setVisibility(View.GONE);
         getActivity().findViewById(R.id.search_btn).setVisibility(View.GONE);
+        getActivity().findViewById(R.id.notification_btn).setVisibility(View.GONE);
     }
 
     private void initDialog() {

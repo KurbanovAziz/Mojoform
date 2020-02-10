@@ -148,4 +148,7 @@
     <string name="date_desc">По дате (сначала новые)</string>
     <string name="name_asc">По имени</string>
     <string name="name_desc">По имени (с конца)</string>
+    <string name="executor">Исполнитель</string>
+    <string name="finish_time">Время завершения</string>
+    <string name="unknown">неизвестно</string>
 </resources>

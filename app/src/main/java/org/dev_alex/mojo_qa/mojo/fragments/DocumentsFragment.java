@@ -216,6 +216,7 @@ public class DocumentsFragment extends Fragment {
     private void setupHeader() {
         ((TextView) getActivity().findViewById(R.id.title)).setText(getString(R.string.documents));
         getActivity().findViewById(R.id.back_btn).setVisibility(View.GONE);
+        getActivity().findViewById(R.id.notification_btn).setVisibility(View.GONE);
 
         getActivity().findViewById(R.id.grid_btn).setVisibility(View.VISIBLE);
         getActivity().findViewById(R.id.sandwich_btn).setVisibility(View.VISIBLE);

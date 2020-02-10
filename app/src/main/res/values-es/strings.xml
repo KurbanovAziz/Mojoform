@@ -143,4 +143,13 @@
     <string name="send_exc">Excepción al enviar</string>
     <string name="error_processing_photo">Se produjo un error al procesar la foto::</string>
     <string name="saved_to_gallery">Сохранено в загрузках</string>
+
+    <string name="notifications">Notificaciones</string>
+    <string name="date_asc">Por fecha (antigua primero)</string>
+    <string name="date_desc">Por fecha (primera vez)</string>
+    <string name="name_asc">Por nombre</string>
+    <string name="name_desc">Por nombre (desde el final)</string>
+    <string name="executor">Empleado</string>
+    <string name="finish_time">Hora de finalización</string>
+    <string name="unknown">unknown</string>
 </resources>
