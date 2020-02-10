@@ -151,4 +151,8 @@
     <string name="executor">Исполнитель</string>
     <string name="finish_time">Время завершения</string>
     <string name="unknown">неизвестно</string>
+
+    <string name="result">Результат</string>
+    <string name="points">баллы</string>
+    <string name="percent">процент</string>
 </resources>

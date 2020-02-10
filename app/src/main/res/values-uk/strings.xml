@@ -151,4 +151,7 @@
     <string name="executor">Працівник</string>
     <string name="finish_time">Час завершення</string>
     <string name="unknown">невідомо</string>
+    <string name="result">Результат</string>
+    <string name="points">Бали</string>
+    <string name="percent">Відсоток</string>
 </resources>
