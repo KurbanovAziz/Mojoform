@@ -4,6 +4,7 @@ package org.dev_alex.mojo_qa.mojo.adapters;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
+import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -74,11 +75,12 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
         String finishTime = notification.task.complete_time == null ? context.getString(R.string.unknown) :
                 sdf.format(new Date(notification.task.complete_time));
 
-        String notificationDescription = context.getString(R.string.result) + ":\n" +
-                context.getString(R.string.points) + ": " + notification.task.value.val + " " + context.getString(R.string.percent) + ": " + notification.task.value.prc + "%\n\n" +
-                context.getString(R.string.executor) + " - " + notification.task.executor.fullname + "(" + notification.task.executor.username + ")\n\n" +
+        String notificationDescription = context.getString(R.string.result) + ":<br/>" +
+                context.getString(R.string.points) + ": <b>" + notification.task.value.val + "</b> " + context.getString(R.string.percent) + ": <b>" + notification.task.value.prc + "</b>%<br/><br/>" +
+                context.getString(R.string.executor) + " - <b>" + notification.task.executor.fullname + "</b>(" + notification.task.executor.username + ")<br/><br/>" +
                 context.getString(R.string.finish_time) + " - " + finishTime;
-        viewHolder.notificationDescription.setText(notificationDescription);
+
+        viewHolder.notificationDescription.setText(Html.fromHtml(notificationDescription));
 
         viewHolder.btClose.setOnClickListener(v -> viewHolder.expandableLayout.collapse(true));
         viewHolder.mainNotificationView.setOnClickListener(v -> {
