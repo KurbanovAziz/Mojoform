@@ -75,10 +75,10 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
         String finishTime = notification.task.complete_time == null ? context.getString(R.string.unknown) :
                 sdf.format(new Date(notification.task.complete_time));
 
-        String notificationDescription = context.getString(R.string.result) + ":<br/>" +
-                context.getString(R.string.points) + ": <b>" + notification.task.value.val + "</b> " + context.getString(R.string.percent) + ": <b>" + notification.task.value.prc + "</b>%<br/><br/>" +
-                context.getString(R.string.executor) + " - <b>" + notification.task.executor.fullname + "</b>(" + notification.task.executor.username + ")<br/><br/>" +
-                context.getString(R.string.finish_time) + " - " + finishTime;
+        String notificationDescription = context.getString(R.string.result) + "<br/>" +
+                context.getString(R.string.points) + ": <b>" + notification.task.value.val + "</b><br/>" + context.getString(R.string.percent) + ": <b>" + notification.task.value.prc + "%</b><br/><br/>" +
+                context.getString(R.string.executor) + "<br/><b>" + notification.task.executor.fullname + "</b> (" + notification.task.executor.username + ")<br/><br/>" +
+                context.getString(R.string.finish_time) + "<br/>" + finishTime;
 
         viewHolder.notificationDescription.setText(Html.fromHtml(notificationDescription));
 
