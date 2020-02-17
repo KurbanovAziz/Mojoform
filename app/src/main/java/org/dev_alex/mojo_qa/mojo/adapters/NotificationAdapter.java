@@ -75,9 +75,16 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
         String finishTime = notification.task.complete_time == null ? context.getString(R.string.unknown) :
                 sdf.format(new Date(notification.task.complete_time));
 
+        String executorPart;
+        if (notification.task.executor == null) {
+            executorPart = context.getString(R.string.executor) + "<b> -<br/><br/>";
+        } else {
+            executorPart = context.getString(R.string.executor) + "<br/><b>" + notification.task.executor.fullname + "</b> (" + notification.task.executor.username + ")<br/><br/>";
+        }
+
         String notificationDescription = context.getString(R.string.result) + "<br/>" +
                 context.getString(R.string.points) + ": <b>" + notification.task.value.val + "</b><br/>" + context.getString(R.string.percent) + ": <b>" + notification.task.value.prc + "%</b><br/><br/>" +
-                context.getString(R.string.executor) + "<br/><b>" + notification.task.executor.fullname + "</b> (" + notification.task.executor.username + ")<br/><br/>" +
+                executorPart +
                 context.getString(R.string.finish_time) + "<br/>" + finishTime;
 
         viewHolder.notificationDescription.setText(Html.fromHtml(notificationDescription));
@@ -94,7 +101,13 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
             }
         });
 
-        viewHolder.expandableLayout.collapse(false);
+        if (notification.needExpand) {
+            notification.needExpand = false;
+            viewHolder.expandableLayout.expand(false);
+        } else {
+            viewHolder.expandableLayout.collapse(false);
+        }
+
 
         viewHolder.notificationNewBorder.setVisibility(notification.is_readed ? View.GONE : View.VISIBLE);
     }

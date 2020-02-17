@@ -40,6 +40,8 @@ import java.util.ArrayList;
 import okhttp3.Response;
 
 public class NotificationsFragment extends Fragment implements NotificationAdapter.NotificationClickListener {
+    private static final String ARG_NOTIFICATION_ID = "ARG_NOTIF";
+
     private final int SORT_BY_NAME = 1;
     private final int SORT_BY_NAME_DESC = 2;
     private final int SORT_BY_CREATED_AT = 3;
@@ -57,9 +59,14 @@ public class NotificationsFragment extends Fragment implements NotificationAdapt
     private String searchText = null;
     private TextWatcher searchListener;
 
+    private Integer pendingNotificationId = null;
 
-    public static NotificationsFragment newInstance() {
+    public static NotificationsFragment newInstance(Integer notificationId) {
         Bundle args = new Bundle();
+        if (notificationId != null) {
+            args.putInt(ARG_NOTIFICATION_ID, notificationId);
+        }
+
         NotificationsFragment fragment = new NotificationsFragment();
         fragment.setArguments(args);
         return fragment;
@@ -75,6 +82,10 @@ public class NotificationsFragment extends Fragment implements NotificationAdapt
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         if (rootView == null) {
+            if (getArguments() != null && getArguments().containsKey(ARG_NOTIFICATION_ID)) {
+                pendingNotificationId = getArguments().getInt(ARG_NOTIFICATION_ID);
+            }
+
             rootView = (RelativeLayoutWithPopUp) inflater.inflate(R.layout.fragment_notifications, container, false);
 
             recyclerView = rootView.findViewById(R.id.recycler_view);
@@ -193,7 +204,27 @@ public class NotificationsFragment extends Fragment implements NotificationAdapt
     }
 
     private void updateAdapter(NotificationAdapter adapter) {
+        int pendingPos = -1;
+
+        Log.d("lambada","pending id = " + pendingNotificationId);
+        if (pendingNotificationId != null) {
+            for (int i = 0; i < notifications.size(); i++) {
+                Notification notification = notifications.get(i);
+                if (notification.id == pendingNotificationId) {
+                    notification.needExpand = true;
+                    pendingPos = i;
+                    break;
+                }
+            }
+        }
+
         recyclerView.setAdapter(adapter);
+
+        Log.d("lambada","find pos = " + pendingPos);
+        if (pendingPos >= 0) {
+            pendingNotificationId = null;
+            recyclerView.scrollToPosition(pendingPos);
+        }
 
         if (searchText == null || searchText.isEmpty())
             resetSearch();
@@ -340,7 +371,7 @@ public class NotificationsFragment extends Fragment implements NotificationAdapt
                 url = "/api/notifications" + sortParameter;
 
                 response = RequestService.createGetRequest(url);
-                Log.d("mojo-response", "url = " + url);
+                Log.d("mojo-response", "url = " + url + "&size=100");
 
                 if (response.code() == 200) {
                     JSONObject responseJson = new JSONObject(response.body().string());

@@ -8,7 +8,6 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.widget.Toast;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -110,14 +109,10 @@ public class AuthActivity extends AppCompatActivity {
                 requestJson.put("app", "android");
 
                 if (loginWithinToken) {
-                    Log.d("lambada", "go refresh = " + LoginHistoryService.getCurrentUser().refresh_token);
-
                     requestJson.put("username", LoginHistoryService.getCurrentUser().username);
                     requestJson.put("refresh_token", LoginHistoryService.getCurrentUser().refresh_token);
                     requestJson.put("device_id", TokenService.getFirebaseToken());
                 } else {
-                    Log.d("lambada", "go login");
-
                     requestJson.put("username", username);
                     requestJson.put("password", password);
                     requestJson.put("device_id", TokenService.getFirebaseToken());
@@ -130,7 +125,6 @@ public class AuthActivity extends AppCompatActivity {
                     user = new ObjectMapper().readValue(userJson, User.class);
                 }
 
-                Log.d("lambada", String.valueOf(response.code()));
                 return response.code();
             } catch (Exception exc) {
                 exc.printStackTrace();
@@ -152,7 +146,6 @@ public class AuthActivity extends AppCompatActivity {
                             return;
                         }
                         LoginHistoryService.setCurrentUser(user);
-                        Log.d("lambada", "get refresh = " + user.refresh_token);
                         TokenService.updateToken(user.token, user.username);
                         Intent intent = new Intent(AuthActivity.this, MainActivity.class);
                         intent.putExtras(getIntent());
@@ -175,7 +168,6 @@ public class AuthActivity extends AppCompatActivity {
                             return;
                         }
                         LoginHistoryService.setCurrentUser(user);
-                        Log.d("lambada", "get refresh = " + user.refresh_token);
                         LoginHistoryService.addUser(user);
                         TokenService.updateToken(user.token, user.username);
                         Intent intent = new Intent(AuthActivity.this, MainActivity.class);

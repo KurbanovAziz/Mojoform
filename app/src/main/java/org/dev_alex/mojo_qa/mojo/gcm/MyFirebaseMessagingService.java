@@ -16,30 +16,34 @@ import com.google.firebase.messaging.RemoteMessage;
 
 import org.dev_alex.mojo_qa.mojo.R;
 import org.dev_alex.mojo_qa.mojo.activities.AuthActivity;
-import org.json.JSONException;
-import org.json.JSONObject;
 
+import java.util.Map;
 import java.util.Random;
 
 public class MyFirebaseMessagingService extends FirebaseMessagingService {
     public static final String CHANNEL_ID = "mojo_channel_1";
     private static final String TAG = "MyFirebaseMsgService";
-    public final static String TASK_ID = "task_id";
+
+    public final static String TASK_ID = "taskID";
+    public final static String NOTIFY_ID = "notifyID";
 
     @Override
     public void onMessageReceived(RemoteMessage remoteMessage) {
-        Log.d(TAG, "From: " + remoteMessage.getData().toString());
-        if (remoteMessage.getNotification() == null) {
+        if (remoteMessage == null || remoteMessage.getNotification() == null) {
             return;
         }
 
         String title = remoteMessage.getNotification().getTitle();
         String body = remoteMessage.getNotification().getBody();
+        Map<String, String> data = remoteMessage.getData();
+        if (data == null) {
+            return;
+        }
+
         try {
-            int taskId = Integer.parseInt(remoteMessage.getData().get("taskID"));
-            sendNotification(title, body, taskId);
-        } catch (Exception exc) {
-            exc.printStackTrace();
+            sendNotification(title, body, data);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
@@ -47,8 +51,8 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-            CharSequence name = "adal_channel";
-            String Description = "Adal Main Channel";
+            CharSequence name = "mojo_channel";
+            String Description = "Mojo Main Channel";
             int importance = NotificationManager.IMPORTANCE_HIGH;
             NotificationChannel mChannel = new NotificationChannel(CHANNEL_ID, name, importance);
             mChannel.setDescription(Description);
@@ -63,14 +67,18 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         }
     }
 
-    private void sendNotification(String title, String body, int taskId) throws JSONException {
+    private void sendNotification(String title, String body, Map<String, String> data) {
         Intent intent = new Intent(this, AuthActivity.class);
-        intent.putExtra(TASK_ID, taskId);
+
+        for (Map.Entry<String, String> entry : data.entrySet()) {
+            Log.d(TAG, entry.getKey() + " " + entry.getValue());
+            intent.putExtra(entry.getKey(), entry.getValue());
+        }
+
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, new Random().nextInt(222222), intent,
-                PendingIntent.FLAG_ONE_SHOT);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, new Random().nextInt(222222), intent, PendingIntent.FLAG_ONE_SHOT);
 
         Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
 
@@ -84,7 +92,15 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                 .setSound(defaultSoundUri)
                 .setContentIntent(pendingIntent);
 
+        int notificationId = 4213;
+
+        if (data.containsKey(NOTIFY_ID)) {
+            notificationId = Integer.parseInt(data.get(NOTIFY_ID));
+        } else if (data.containsKey(TASK_ID)) {
+            notificationId = Integer.parseInt(data.get(TASK_ID));
+        }
+
         NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        notificationManager.notify(taskId, notificationBuilder.build());
+        notificationManager.notify(notificationId, notificationBuilder.build());
     }
 }

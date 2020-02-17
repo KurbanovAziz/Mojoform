@@ -76,16 +76,35 @@ public class MainActivity extends AppCompatActivity {
 
         drawer.setSelectionAtPosition(1, true);
         //getSupportFragmentManager().beginTransaction().replace(R.id.container, TasksFragment.newInstance(), "tasks").commit();
-        if (getIntent().hasExtra(MyFirebaseMessagingService.TASK_ID)) {
-            long taskId = getIntent().getIntExtra(MyFirebaseMessagingService.TASK_ID, -1);
-            getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.container, TemplateFragment.newInstance(
-                            taskId, false)).addToBackStack(null).commit();
-        }
         checkData(getIntent());
     }
 
     void checkData(Intent intent) {
+        Bundle extras = intent.getExtras();
+        if (extras != null) {
+            if (getIntent().hasExtra(MyFirebaseMessagingService.NOTIFY_ID)) {
+                String notificationIdStr = getIntent().getStringExtra(MyFirebaseMessagingService.NOTIFY_ID);
+                if (notificationIdStr != null && !notificationIdStr.isEmpty()) {
+                    getSupportFragmentManager().beginTransaction()
+                            .replace(R.id.container, NotificationsFragment.newInstance(Integer.parseInt(notificationIdStr)))
+                            .addToBackStack(null).commit();
+                }
+                return;
+            }
+
+            if (getIntent().hasExtra(MyFirebaseMessagingService.TASK_ID)) {
+                String taskIdStr = getIntent().getStringExtra(MyFirebaseMessagingService.TASK_ID);
+                if (taskIdStr != null && !taskIdStr.isEmpty()) {
+                    getSupportFragmentManager().beginTransaction()
+                            .replace(R.id.container, TemplateFragment.newInstance(
+                                    Integer.parseInt(taskIdStr), false
+                            ))
+                            .addToBackStack(null).commit();
+                }
+                return;
+            }
+        }
+
         Uri data = intent.getData();
         if (data != null) {
             if (data.getPath().contains("pdf/view/")) {
@@ -193,7 +212,7 @@ public class MainActivity extends AppCompatActivity {
                         break;
                     case 11:
                         getSupportFragmentManager().popBackStack(null, 0);
-                        getSupportFragmentManager().beginTransaction().replace(R.id.container, NotificationsFragment.newInstance()).commit();
+                        getSupportFragmentManager().beginTransaction().replace(R.id.container, NotificationsFragment.newInstance(null)).commit();
                         break;
                 }
                 return false;

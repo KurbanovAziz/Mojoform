@@ -10,6 +10,8 @@ public class Notification {
     public boolean is_readed;
     public Long create_date;
 
+    public boolean needExpand = false;
+
     public void fixTime() {
         if (create_date != null) {
             create_date *= 1000;
