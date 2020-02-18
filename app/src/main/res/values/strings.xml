@@ -154,5 +154,5 @@
 
     <string name="result">Результат</string>
     <string name="points">баллы</string>
-    <string name="percent">процент</string>
+    <string name="percent">проценты</string>
 </resources>
