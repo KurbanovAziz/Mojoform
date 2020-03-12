@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
@@ -61,7 +62,11 @@ import java.util.Locale;
 
 import okhttp3.Response;
 
+import static android.app.Activity.RESULT_OK;
+
 public class TasksFragment extends Fragment {
+    private final int SCAN_CODE_REQUEST_CODE = 5222;
+
     private enum CurrentAdapterType {FINISHED, BUSY, PERMANENT}
 
     private RelativeLayoutWithPopUp rootView;
@@ -136,6 +141,18 @@ public class TasksFragment extends Fragment {
     }
 
     @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == SCAN_CODE_REQUEST_CODE) {
+            if (resultCode == RESULT_OK) {
+                String contents = data.getStringExtra("SCAN_RESULT");
+                String UUID = contents.substring(contents.lastIndexOf("/")).replace("/", "");
+                getActivity().getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.container, TemplateFragment.newInstance(UUID)).addToBackStack(null).commit();
+            }
+        }
+    }
+    @Override
     public void onResume() {
         super.onResume();
         setupHeader();
@@ -149,10 +166,28 @@ public class TasksFragment extends Fragment {
         getActivity().findViewById(R.id.back_btn).setVisibility(View.GONE);
         getActivity().findViewById(R.id.group_by_btn).setVisibility(View.GONE);
         getActivity().findViewById(R.id.notification_btn).setVisibility(View.GONE);
+        getActivity().findViewById(R.id.qr_btn).setVisibility(View.VISIBLE);
 
         getActivity().findViewById(R.id.sandwich_btn).setVisibility(View.VISIBLE);
         getActivity().findViewById(R.id.search_btn).setVisibility(View.VISIBLE);
 
+        getActivity().findViewById(R.id.qr_btn).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                try {
+                    Intent intent = new Intent("com.google.zxing.client.android.SCAN");
+                    intent.putExtra("SCAN_MODE", "QR_CODE_MODE"); // "PRODUCT_MODE for bar codes
+                    intent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                    startActivityForResult(intent, SCAN_CODE_REQUEST_CODE);
+                } catch (Exception e) {
+                    Uri marketUri = Uri.parse("market://details?id=com.google.zxing.client.android");
+                    Intent marketIntent = new Intent(Intent.ACTION_VIEW, marketUri);
+                    startActivity(marketIntent);
+                }
+            }
+        });
     }
 
     private void stopSearch() {
@@ -177,6 +212,7 @@ public class TasksFragment extends Fragment {
                 stopSearch();
             }
         });
+
 
         getActivity().findViewById(R.id.search_reset).setOnClickListener(new View.OnClickListener() {
             @Override

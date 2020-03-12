@@ -171,6 +171,9 @@ public class TemplateFragment extends Fragment {
     private final int IMAGE_SHOW_REQUEST_CODE = 110;
     private final int SCAN_CODE_REQUEST_CODE = 120;
 
+    public boolean isOpenLink = false;
+    public String taskUUID = null;
+
     public long taskId;
     public long documentId;
 
@@ -206,6 +209,16 @@ public class TemplateFragment extends Fragment {
         return fragment;
     }
 
+    public static TemplateFragment newInstance(String taskUUID) {
+        Bundle args = new Bundle();
+        args.putString("task_uuid", taskUUID);
+        args.putBoolean("is_finished", false);
+
+        TemplateFragment fragment = new TemplateFragment();
+        fragment.setArguments(args);
+        return fragment;
+    }
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(null);
@@ -213,7 +226,13 @@ public class TemplateFragment extends Fragment {
         setRetainInstance(true);
         handler = new Handler();
 
-        taskId = getArguments().getLong("task_id");
+        if (getArguments().containsKey("task_id")) {
+            taskId = getArguments().getLong("task_id");
+            isOpenLink = false;
+        } else {
+            taskUUID = getArguments().getString("task_uuid");
+            isOpenLink = true;
+        }
         isTaskFinished = getArguments().getBoolean("is_finished");
     }
 
@@ -235,8 +254,9 @@ public class TemplateFragment extends Fragment {
             rootView = inflater.inflate(R.layout.fragment_template, container, false);
             setupCloseKeyboardUI(getActivity(), rootView);
 
-            ((MainActivity) getActivity()).drawer.getDrawerLayout().setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
-
+            if (getActivity() instanceof MainActivity) {
+                ((MainActivity) getActivity()).drawer.getDrawerLayout().setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
+            }
 
             rootView.findViewById(R.id.page_selector_block).getLayoutParams().width =
                     (int) (getResources().getDisplayMetrics().widthPixels * (2.0 / 5.0));
@@ -380,6 +400,7 @@ public class TemplateFragment extends Fragment {
         getActivity().findViewById(R.id.group_by_btn).setVisibility(View.GONE);
         getActivity().findViewById(R.id.search_btn).setVisibility(View.GONE);
         getActivity().findViewById(R.id.notification_btn).setVisibility(View.GONE);
+        getActivity().findViewById(R.id.qr_btn).setVisibility(View.GONE);
 
         getActivity().findViewById(R.id.back_btn).setVisibility(View.VISIBLE);
         getActivity().findViewById(R.id.back_btn).setOnClickListener(new View.OnClickListener() {
@@ -390,7 +411,9 @@ public class TemplateFragment extends Fragment {
                         ((ScrollView) rootView.findViewById(R.id.scroll_view)).fullScroll(View.FOCUS_UP);
                     else if (getActivity() != null && getActivity().getSupportFragmentManager() != null) {
                         getActivity().getSupportFragmentManager().popBackStack();
-                        ((MainActivity) getActivity()).drawer.getDrawerLayout().setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
+                        if (getActivity() instanceof MainActivity) {
+                            ((MainActivity) getActivity()).drawer.getDrawerLayout().setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
+                        }
                     }
                 } catch (Exception exc) {
                     exc.printStackTrace();
@@ -575,7 +598,7 @@ public class TemplateFragment extends Fragment {
 
     private void saveTemplateState() {
         try {
-            if (isTaskFinished)
+            if (isTaskFinished || isOpenLink)
                 return;
 
             if (!template.has("StartTime"))
@@ -2845,14 +2868,19 @@ public class TemplateFragment extends Fragment {
                     }
                     return response.code();
                 } else {
-                    SharedPreferences mSettings;
-                    mSettings = App.getContext().getSharedPreferences("templates", Context.MODE_PRIVATE);
-                    String templateJson = mSettings.getString(taskId + LoginHistoryService.getCurrentUser().username, "");
-                    if (!templateJson.equals("")) {
+                    String templateJson = "";
+
+                    if (!isOpenLink) {
+                        SharedPreferences mSettings;
+                        mSettings = App.getContext().getSharedPreferences("templates", Context.MODE_PRIVATE);
+                        templateJson = mSettings.getString(taskId + LoginHistoryService.getCurrentUser().username, "");
+                    }
+
+                    if (templateJson != null && !templateJson.equals("")) {
                         template = new JSONObject(templateJson);
                         return HttpURLConnection.HTTP_OK;
                     } else {
-                        String url = "/api/tasks/" + taskId;
+                        String url = isOpenLink ? "/api/openlink/" + taskUUID : "/api/tasks/" + taskId;
                         Response response = RequestService.createGetRequest(url);
 
                         if (response.code() == 200) {
@@ -2977,39 +3005,43 @@ public class TemplateFragment extends Fragment {
                 }
                 int sentCt = 0;
 
-                Response tokenResponse = RequestService.createGetRequest("/api/user/");
-                if (tokenResponse.code() != 202 && tokenResponse.code() != 200) {
-                    handler.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            new MaterialDialog.Builder(getContext())
-                                    .title(R.string.accept_account)
-                                    .content(R.string.input_pass)
-                                    .inputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD)
-                                    .autoDismiss(false)
-                                    .input(getString(R.string.pass), "", new MaterialDialog.InputCallback() {
-                                        @Override
-                                        public void onInput(@android.support.annotation.NonNull MaterialDialog dialog, CharSequence input) {
-                                            if (input.length() > 0) {
-                                                new LoginTask(LoginHistoryService.getCurrentUser().username, input.toString()).execute();
+                if (!isOpenLink) {
+                    Response tokenResponse = RequestService.createGetRequest("/api/user/");
+                    if (tokenResponse.code() != 202 && tokenResponse.code() != 200) {
+                        handler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                new MaterialDialog.Builder(getContext())
+                                        .title(R.string.accept_account)
+                                        .content(R.string.input_pass)
+                                        .inputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD)
+                                        .autoDismiss(false)
+                                        .input(getString(R.string.pass), "", new MaterialDialog.InputCallback() {
+                                            @Override
+                                            public void onInput(@android.support.annotation.NonNull MaterialDialog dialog, CharSequence input) {
+                                                if (input.length() > 0) {
+                                                    new LoginTask(LoginHistoryService.getCurrentUser().username, input.toString()).execute();
+                                                    dialog.dismiss();
+                                                }
+                                            }
+                                        })
+                                        .positiveText(R.string.done)
+                                        .negativeText(R.string.cancel_)
+                                        .onNegative(new MaterialDialog.SingleButtonCallback() {
+                                            @Override
+                                            public void onClick(@android.support.annotation.NonNull MaterialDialog dialog, @android.support.annotation.NonNull DialogAction which) {
+                                                Toast.makeText(getContext(), "bbb", Toast.LENGTH_LONG).show();
                                                 dialog.dismiss();
                                             }
-                                        }
-                                    })
-                                    .positiveText(R.string.done)
-                                    .negativeText(R.string.cancel_)
-                                    .onNegative(new MaterialDialog.SingleButtonCallback() {
-                                        @Override
-                                        public void onClick(@android.support.annotation.NonNull MaterialDialog dialog, @android.support.annotation.NonNull DialogAction which) {
-                                            Toast.makeText(getContext(), "bbb", Toast.LENGTH_LONG).show();
-                                            dialog.dismiss();
-                                        }
-                                    })
-                                    .show();
-                        }
-                    });
-                    return -102;
+                                        })
+                                        .show();
+                            }
+                        });
+                        return -102;
+                    }
                 }
+
+                String mediaUploadUrl = isOpenLink ? "/api/openlink/" + taskUUID + "/upload" : "/api/file/upload";
 
                 successfullySentMediaCt = 0;
                 for (JSONObject jsonObject : mediaObjects)
@@ -3022,7 +3054,8 @@ public class TemplateFragment extends Fragment {
                                 String mimeType = media.getString("mime");
                                 try {
                                     File mediaFile = new File(mediaPath);
-                                    final Response response = RequestService.createSendFileRequest("/api/file/upload", MediaType.parse(mimeType), mediaFile);
+
+                                    final Response response = RequestService.createSendFileRequest(mediaUploadUrl, MediaType.parse(mimeType), mediaFile);
 
                                     if (response.code() == 200) {
                                         String mediaId = "attach:" + new JSONObject(response.body().string()).getString("id");
@@ -3071,7 +3104,7 @@ public class TemplateFragment extends Fragment {
                         Bitmap bitmap = BitmapFactory.decodeByteArray(decodedByte, 0, decodedByte.length);
                         if (bitmap != null) {
                             File mediaFile = BitmapService.saveBitmapToFile(getContext(), bitmap);
-                            Response response = RequestService.createSendFileRequest("/api/file/upload", MediaType.parse("image/jpg"), mediaFile);
+                            Response response = RequestService.createSendFileRequest(mediaUploadUrl, MediaType.parse("image/jpg"), mediaFile);
                             if (response.code() == 200) {
                                 mediaFile.delete();
                                 String mediaId = "attach:" + new JSONObject(response.body().string()).getString("id");
@@ -3216,7 +3249,7 @@ public class TemplateFragment extends Fragment {
         @Override
         protected Integer doInBackground(Void... params) {
             try {
-                String url = "/api/tasks/" + taskId + "/complete";
+                String url = isOpenLink ? "/api/openlink/" + taskUUID + "/complete" : "/api/tasks/" + taskId + "/complete";
                 Response response = RequestService.createPostRequest(url, resultJson.toString());
                 return response.code();
 
@@ -3241,20 +3274,37 @@ public class TemplateFragment extends Fragment {
                     startActivity(new Intent(getContext(), AuthActivity.class));
                     getActivity().finish();
                 } else if (responseCode == 200) {
-                    SharedPreferences mSettings;
-                    mSettings = App.getContext().getSharedPreferences("templates", Context.MODE_PRIVATE);
-                    SharedPreferences.Editor editor = mSettings.edit();
-                    editor.putString(taskId + LoginHistoryService.getCurrentUser().username, "");
-                    editor.apply();
-                    ((TasksFragment) getActivity().getSupportFragmentManager().findFragmentByTag("tasks")).needUpdate = true;
-                    getActivity().getSupportFragmentManager().popBackStack();
+                    if (!isOpenLink) {
+                        SharedPreferences mSettings;
+                        mSettings = App.getContext().getSharedPreferences("templates", Context.MODE_PRIVATE);
+                        SharedPreferences.Editor editor = mSettings.edit();
+                        editor.putString(taskId + LoginHistoryService.getCurrentUser().username, "");
+                        editor.apply();
+                    }
+
+                    if (getActivity() != null && getActivity().getSupportFragmentManager().findFragmentByTag("tasks") != null) {
+                        ((TasksFragment) getActivity().getSupportFragmentManager().findFragmentByTag("tasks")).needUpdate = true;
+                        if (getActivity() instanceof MainActivity) {
+                            ((MainActivity) getActivity()).drawer.getDrawerLayout().setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
+                        }
+                        getActivity().getSupportFragmentManager().popBackStack();
+                    } else {
+                        getActivity().finish();
+                    }
+
                 } else if (responseCode == 404) {
                     removeTemplate();
-                    ((TasksFragment) getActivity().getSupportFragmentManager().findFragmentByTag("tasks")).needUpdate = true;
+                    if (getActivity() != null && getActivity().getSupportFragmentManager().findFragmentByTag("tasks") != null) {
+                        ((TasksFragment) getActivity().getSupportFragmentManager().findFragmentByTag("tasks")).needUpdate = true;
+                        if (getActivity() instanceof MainActivity) {
+                            ((MainActivity) getActivity()).drawer.getDrawerLayout().setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
+                        }
+                        getActivity().getSupportFragmentManager().popBackStack();
+                    } else {
+                        getActivity().finish();
+                    }
 
                     Toast.makeText(getContext(), R.string.no_task_error, Toast.LENGTH_LONG).show();
-                    getActivity().getSupportFragmentManager().popBackStack();
-                    ((MainActivity) getActivity()).drawer.getDrawerLayout().setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
                 } else
                     Toast.makeText(getContext(), R.string.unknown_error, Toast.LENGTH_LONG).show();
             } catch (Exception exc) {
@@ -3264,13 +3314,16 @@ public class TemplateFragment extends Fragment {
     }
 
     private void removeTemplate() {
+        if (isOpenLink) {
+            return;
+        }
+
         SharedPreferences mSettings;
         mSettings = App.getContext().getSharedPreferences("templates", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = mSettings.edit();
         editor.putString(taskId + LoginHistoryService.getCurrentUser().username, "");
         editor.apply();
     }
-
 
     @SuppressLint("CheckResult")
     private void processImageFile(File file, final boolean isRestore, final Pair<LinearLayout, JSONObject> toBlock, final boolean isFolder) {

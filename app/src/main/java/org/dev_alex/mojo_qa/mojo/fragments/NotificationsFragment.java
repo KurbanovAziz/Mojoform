@@ -120,6 +120,7 @@ public class NotificationsFragment extends Fragment implements NotificationAdapt
         ((TextView) getActivity().findViewById(R.id.title)).setText(getString(R.string.notifications));
         getActivity().findViewById(R.id.grid_btn).setVisibility(View.GONE);
         getActivity().findViewById(R.id.back_btn).setVisibility(View.GONE);
+        getActivity().findViewById(R.id.qr_btn).setVisibility(View.GONE);
 
         getActivity().findViewById(R.id.group_by_btn).setVisibility(View.VISIBLE);
         getActivity().findViewById(R.id.sandwich_btn).setVisibility(View.VISIBLE);

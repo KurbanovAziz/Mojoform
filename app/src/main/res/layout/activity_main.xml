@@ -205,6 +205,20 @@
                     android:src="@drawable/download_icon" />
             </FrameLayout>
 
+            <FrameLayout
+                android:id="@+id/qr_btn"
+                android:layout_width="40dp"
+                android:layout_height="match_parent"
+                android:paddingBottom="12dp">
+
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_gravity="bottom|right"
+                    android:adjustViewBounds="true"
+                    android:src="@drawable/qr_button_icon" />
+            </FrameLayout>
+
             <android.support.v4.widget.Space
                 android:layout_width="20dp"
                 android:layout_height="wrap_content" />

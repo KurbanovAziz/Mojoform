@@ -54,11 +54,19 @@
                     android:scheme="https" />
             </intent-filter>
         </activity>
+
         <activity
             android:name=".activities.MainActivity"
             android:configChanges="orientation|keyboardHidden|keyboard"
             android:largeHeap="true"
             android:launchMode="singleTop"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.ActionBar.Transparent"
+            android:windowSoftInputMode="adjustPan" />
+
+        <activity
+            android:name=".activities.OpenLinkActivity"
+            android:configChanges="orientation|keyboardHidden|keyboard"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.ActionBar.Transparent"
             android:windowSoftInputMode="adjustPan" />

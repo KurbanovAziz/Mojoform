@@ -1,6 +1,7 @@
 package org.dev_alex.mojo_qa.mojo.fragments;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -13,11 +14,15 @@ import android.widget.Toast;
 import org.dev_alex.mojo_qa.mojo.R;
 import org.dev_alex.mojo_qa.mojo.activities.AuthActivity;
 import org.dev_alex.mojo_qa.mojo.activities.OnboardingActivity;
+import org.dev_alex.mojo_qa.mojo.activities.OpenLinkActivity;
 import org.dev_alex.mojo_qa.mojo.services.Utils;
+
+import static android.app.Activity.RESULT_OK;
 
 public class LoginFragment extends Fragment {
     private View rootView;
 
+    private final int SCAN_CODE_REQUEST_CODE = 5222;
 
     public static LoginFragment newInstance() {
         Bundle args = new Bundle();
@@ -37,6 +42,18 @@ public class LoginFragment extends Fragment {
         return rootView;
     }
 
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == SCAN_CODE_REQUEST_CODE) {
+            if (resultCode == RESULT_OK) {
+                String contents = data.getStringExtra("SCAN_RESULT");
+                String UUID = contents.substring(contents.lastIndexOf("/")).replace("/", "");
+
+                startActivity(OpenLinkActivity.getActivityIntent(getContext(), UUID));
+            }
+        }
+    }
 
     private void setListeners() {
         final EditText login = (EditText) rootView.findViewById(R.id.username);
@@ -49,6 +66,21 @@ public class LoginFragment extends Fragment {
                 else
                     ((AuthActivity) getActivity()).new LoginTask(login.getText().toString().trim(),
                             password.getText().toString()).execute();
+            }
+        });
+
+        rootView.findViewById(R.id.btScanQr).setOnClickListener(v -> {
+            try {
+                Intent intent = new Intent("com.google.zxing.client.android.SCAN");
+                intent.putExtra("SCAN_MODE", "QR_CODE_MODE"); // "PRODUCT_MODE for bar codes
+                intent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                startActivityForResult(intent, SCAN_CODE_REQUEST_CODE);
+            } catch (Exception e) {
+                Uri marketUri = Uri.parse("market://details?id=com.google.zxing.client.android");
+                Intent marketIntent = new Intent(Intent.ACTION_VIEW, marketUri);
+                startActivity(marketIntent);
             }
         });
 

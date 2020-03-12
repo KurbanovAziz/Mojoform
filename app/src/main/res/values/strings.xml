@@ -155,4 +155,5 @@
     <string name="result">Результат</string>
     <string name="points">баллы</string>
     <string name="percent">проценты</string>
+    <string name="scan">сканировать</string>
 </resources>

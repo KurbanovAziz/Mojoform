@@ -26,8 +26,8 @@
         android:layout_width="0dp"
         android:layout_height="50dp"
         android:layout_marginLeft="0dp"
-        android:layout_marginRight="0dp"
         android:layout_marginTop="16dp"
+        android:layout_marginRight="0dp"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintLeft_toLeftOf="@+id/left_guideline"
         app:layout_constraintRight_toLeftOf="@+id/right_guideline"
@@ -65,8 +65,8 @@
                 android:gravity="center_vertical"
                 android:hint="@string/password"
                 android:inputType="textPassword"
-                android:paddingBottom="3dp"
                 android:paddingLeft="5dp"
+                android:paddingBottom="3dp"
                 android:textColorHint="@android:color/white"
                 android:textCursorDrawable="@null" />
         </RelativeLayout>
@@ -86,8 +86,8 @@
         android:layout_width="0dp"
         android:layout_height="50dp"
         android:layout_marginLeft="0dp"
-        android:layout_marginRight="0dp"
         android:layout_marginTop="0dp"
+        android:layout_marginRight="0dp"
         app:layout_constraintLeft_toLeftOf="@+id/left_guideline"
         app:layout_constraintRight_toLeftOf="@+id/right_guideline"
         app:layout_constraintTop_toTopOf="@+id/horizontal_guideline">
@@ -124,8 +124,8 @@
                 android:gravity="center_vertical"
                 android:hint="@string/username"
                 android:inputType="textVisiblePassword"
-                android:paddingBottom="3dp"
                 android:paddingLeft="5dp"
+                android:paddingBottom="3dp"
                 android:textColorHint="@android:color/white"
                 android:textCursorDrawable="@null" />
         </RelativeLayout>
@@ -170,9 +170,9 @@
         android:id="@+id/login_btn"
         android:layout_width="0dp"
         android:layout_height="40dp"
-        android:layout_marginBottom="0dp"
         android:layout_marginLeft="0dp"
         android:layout_marginRight="0dp"
+        android:layout_marginBottom="0dp"
         android:background="@drawable/blue_button"
         android:gravity="center"
         android:text="@string/log_in"
@@ -196,5 +196,30 @@
         android:orientation="vertical"
         app:layout_constraintGuide_percent="0.75" />
 
+    <LinearLayout
+        android:id="@+id/btScanQr"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="15dp"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:paddingTop="5dp"
+        android:paddingBottom="5dp"
+        app:layout_constraintBottom_toTopOf="@+id/about_btn"
+        app:layout_constraintEnd_toStartOf="@+id/button_right_guideline"
+        app:layout_constraintStart_toStartOf="@+id/button_left_guideline">
 
+        <ImageView
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:src="@drawable/qr_button_icon" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="6dp"
+            android:text="@string/scan"
+            android:textColor="@android:color/white"
+            android:textSize="18sp" />
+    </LinearLayout>
 </android.support.constraint.ConstraintLayout>
