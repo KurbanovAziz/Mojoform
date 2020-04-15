@@ -44,10 +44,13 @@ import org.dev_alex.mojo_qa.mojo.fragments.PanelListFragment;
 import org.dev_alex.mojo_qa.mojo.fragments.TasksFragment;
 import org.dev_alex.mojo_qa.mojo.fragments.TemplateFragment;
 import org.dev_alex.mojo_qa.mojo.gcm.MyFirebaseMessagingService;
+import org.dev_alex.mojo_qa.mojo.models.Notification;
 import org.dev_alex.mojo_qa.mojo.models.User;
 import org.dev_alex.mojo_qa.mojo.services.LoginHistoryService;
 import org.dev_alex.mojo_qa.mojo.services.RequestService;
 import org.dev_alex.mojo_qa.mojo.services.TokenService;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.io.File;
 import java.io.IOException;
@@ -71,12 +74,34 @@ public class MainActivity extends AppCompatActivity {
             getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
 
         initDrawer();
-        if (drawer == null)
+        if (drawer == null) {
             return;
+        }
 
         drawer.setSelectionAtPosition(1, true);
-        //getSupportFragmentManager().beginTransaction().replace(R.id.container, TasksFragment.newInstance(), "tasks").commit();
         checkData(getIntent());
+
+        getSupportFragmentManager().addOnBackStackChangedListener(() -> updateNotificationsBadge());
+    }
+
+    public void updateNotificationsBadge() {
+        new UpdateNotificationsTask().execute();
+    }
+
+    public void setNotificationBadgeVisible(boolean visible) {
+        ((CustomDrawerItem) drawer.getDrawerItem(11)).isVisible = visible;
+        View badgeView = ((CustomDrawerItem) drawer.getDrawerItem(11)).badge;
+
+        if (badgeView != null) {
+            if (visible) {
+                badgeView.setVisibility(View.VISIBLE);
+            } else {
+                badgeView.setVisibility(View.GONE);
+            }
+        }
+
+        findViewById(R.id.vNotificationButtonBadge).setVisibility(visible ? View.VISIBLE : View.GONE);
+        findViewById(R.id.vDrawerBadge).setVisibility(visible ? View.VISIBLE : View.GONE);
     }
 
     void checkData(Intent intent) {
@@ -174,13 +199,15 @@ public class MainActivity extends AppCompatActivity {
         }
 
         builder.addDrawerItems(
-                new CustomDrawerItem(15, 0).withIdentifier(11).withName(R.string.notifications).withIcon(R.drawable.bell),
+                new CustomDrawerItem(15, 0)
+                        .withIdentifier(11)
+                        .withName(R.string.notifications)
+                        .withIcon(R.drawable.bell),
                 new CustomDrawerItem(15, 0).withIdentifier(3).withName(R.string.exit).withIcon(R.drawable.exit),
                 new DividerDrawerItem(),
                 new CustomDrawerItem(15, 0).withIdentifier(4).withName(R.string.about_app).withIcon(R.drawable.question),
                 new DividerDrawerItem(),
                 new CustomDrawerItem(15, 0).withIdentifier(6).withName(R.string.change_seq).withIcon(R.drawable.drag_icon)
-
         );
 
         drawer = builder.withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
@@ -290,6 +317,7 @@ public class MainActivity extends AppCompatActivity {
         } catch (Exception exc) {
             exc.printStackTrace();
         }
+        updateNotificationsBadge();
     }
 
     public static void trimCache(Context context) {
@@ -498,6 +526,62 @@ public class MainActivity extends AppCompatActivity {
             TokenService.deleteToken();
             startActivity(new Intent(MainActivity.this, AuthActivity.class));
             finish();
+        }
+    }
+
+    private class UpdateNotificationsTask extends AsyncTask<Void, Void, Integer> {
+        List<Notification> notifications = new ArrayList<>();
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        @Override
+        protected Integer doInBackground(Void... params) {
+            try {
+                Response response;
+                notifications = new ArrayList<>();
+                String url;
+
+                url = "/api/notifications";
+                response = RequestService.createGetRequest(url);
+                if (response.code() == 200) {
+                    JSONObject responseJson = new JSONObject(response.body().string());
+                    JSONArray notificationsJson = responseJson.getJSONArray("list");
+
+                    notifications = new ObjectMapper().readValue(notificationsJson.toString(), new TypeReference<ArrayList<Notification>>() {
+                    });
+                }
+                return response.code();
+            } catch (Exception exc) {
+                exc.printStackTrace();
+                return null;
+            }
+        }
+
+        @Override
+        protected void onPostExecute(Integer responseCode) {
+            super.onPostExecute(responseCode);
+            try {
+                if (responseCode == 401) {
+                    startActivity(new Intent(MainActivity.this, AuthActivity.class));
+                    finish();
+                } else if (responseCode == 200) {
+                    boolean needToShow = false;
+
+                    for (Notification notification : notifications) {
+                        if (!notification.is_readed) {
+                            needToShow = true;
+                            break;
+                        }
+                    }
+
+                    setNotificationBadgeVisible(needToShow);
+                }
+            } catch (Exception exc) {
+                exc.printStackTrace();
+            }
         }
     }
 

@@ -1,9 +1,12 @@
 package org.dev_alex.mojo_qa.mojo.custom_views;
 
+import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.Gravity;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -18,6 +21,9 @@ import java.util.List;
 public class CustomDrawerItem extends SecondaryDrawerItem {
     private int fontSizeSp;
     private int marginTopDp;
+
+    public View badge;
+    public boolean isVisible = false;
 
     public CustomDrawerItem(int fontSizeSp, int marginTopDp) {
         this.fontSizeSp = fontSizeSp;
@@ -54,5 +60,27 @@ public class CustomDrawerItem extends SecondaryDrawerItem {
         icon.setLayoutParams(iconParams);
         icon.setAdjustViewBounds(true);
         icon.setPadding(icon.getPaddingLeft(), icon.getPaddingTop(), imagePaddingRight, icon.getPaddingBottom());
+
+        ViewGroup parent = (ViewGroup) icon.getParent();
+
+        badge = new View(parent.getContext());
+        badge.setBackgroundResource(R.drawable.bg_red_circle);
+        parent.addView(badge, 1);
+
+        int size = convertToPx(parent.getContext(), 6);
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(size, size);
+        params.leftMargin = -convertToPx(parent.getContext(), 21);
+        params.topMargin = convertToPx(parent.getContext(), 17);
+        badge.setLayoutParams(params);
+
+        if (isVisible) {
+            badge.setVisibility(View.VISIBLE);
+        } else {
+            badge.setVisibility(View.GONE);
+        }
+    }
+
+    private int convertToPx(Context context, int dp) {
+        return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, context.getResources().getDisplayMetrics());
     }
 }

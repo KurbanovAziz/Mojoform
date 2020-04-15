@@ -28,6 +28,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.dev_alex.mojo_qa.mojo.R;
 import org.dev_alex.mojo_qa.mojo.activities.AuthActivity;
+import org.dev_alex.mojo_qa.mojo.activities.MainActivity;
 import org.dev_alex.mojo_qa.mojo.adapters.NotificationAdapter;
 import org.dev_alex.mojo_qa.mojo.custom_views.RelativeLayoutWithPopUp;
 import org.dev_alex.mojo_qa.mojo.models.Notification;
@@ -207,7 +208,7 @@ public class NotificationsFragment extends Fragment implements NotificationAdapt
     private void updateAdapter(NotificationAdapter adapter) {
         int pendingPos = -1;
 
-        Log.d("lambada","pending id = " + pendingNotificationId);
+        Log.d("lambada", "pending id = " + pendingNotificationId);
         if (pendingNotificationId != null) {
             for (int i = 0; i < notifications.size(); i++) {
                 Notification notification = notifications.get(i);
@@ -221,7 +222,7 @@ public class NotificationsFragment extends Fragment implements NotificationAdapt
 
         recyclerView.setAdapter(adapter);
 
-        Log.d("lambada","find pos = " + pendingPos);
+        Log.d("lambada", "find pos = " + pendingPos);
         if (pendingPos >= 0) {
             pendingNotificationId = null;
             recyclerView.scrollToPosition(pendingPos);
@@ -332,10 +333,9 @@ public class NotificationsFragment extends Fragment implements NotificationAdapt
                 break;
             }
         }
-
-        View badgeView = getActivity().findViewById(R.id.vNotificationButtonBadge);
-        if (badgeView != null) {
-            badgeView.setVisibility(needToShow ? View.VISIBLE : View.GONE);
+        
+        if (getActivity() instanceof MainActivity) {
+            ((MainActivity) getActivity()).setNotificationBadgeVisible(needToShow);
         }
     }
 
@@ -411,6 +411,8 @@ public class NotificationsFragment extends Fragment implements NotificationAdapt
             } catch (Exception exc) {
                 exc.printStackTrace();
             }
+
+            styleNotificationBadge();
         }
     }
 
@@ -457,6 +459,8 @@ public class NotificationsFragment extends Fragment implements NotificationAdapt
             } catch (Exception exc) {
                 exc.printStackTrace();
             }
+
+            styleNotificationBadge();
         }
     }
 

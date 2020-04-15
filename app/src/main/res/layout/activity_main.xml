@@ -120,6 +120,16 @@
                     android:layout_gravity="bottom|center_horizontal"
                     android:adjustViewBounds="true"
                     android:src="@drawable/sandwich_icon" />
+
+                <View
+                    android:id="@+id/vDrawerBadge"
+                    android:layout_width="6dp"
+                    android:layout_height="6dp"
+                    android:layout_gravity="right"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginRight="6dp"
+                    android:background="@drawable/bg_red_circle"
+                    android:visibility="gone" />
             </FrameLayout>
 
             <TextView
@@ -188,7 +198,8 @@
                     android:layout_height="6dp"
                     android:layout_gravity="right|center_vertical"
                     android:layout_marginBottom="3dp"
-                    android:background="@drawable/notification_unread_circle" />
+                    android:background="@drawable/notification_unread_circle"
+                    android:visibility="gone" />
             </FrameLayout>
 
             <FrameLayout

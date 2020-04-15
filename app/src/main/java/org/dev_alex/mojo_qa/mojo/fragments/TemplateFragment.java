@@ -869,6 +869,7 @@ public class TemplateFragment extends Fragment {
                     final LinearLayout moneyContainer = (LinearLayout) getActivity().getLayoutInflater().inflate(R.layout.text_plan, container, false);
                     ((ViewGroup) moneyContainer.getChildAt(0)).getChildAt(1).setVisibility((value.has("is_required") && !value.getBoolean("is_required")) ? View.GONE : View.VISIBLE);
                     final EditText etPlan = ((EditText) ((ViewGroup) ((ViewGroup) ((ViewGroup) moneyContainer.getChildAt(1)).getChildAt(0)).getChildAt(1)).getChildAt(0));
+                    final View tvPlanLabel = ((ViewGroup) ((ViewGroup) ((ViewGroup) moneyContainer.getChildAt(1)).getChildAt(0)).getChildAt(0)).getChildAt(0);
                     final EditText etFact = ((EditText) ((ViewGroup) ((ViewGroup) ((ViewGroup) moneyContainer.getChildAt(1)).getChildAt(0)).getChildAt(1)).getChildAt(1));
 
                     final View btQrCode = ((ViewGroup) moneyContainer.getChildAt(1)).getChildAt(1);
@@ -885,11 +886,11 @@ public class TemplateFragment extends Fragment {
                             captionLabel.setText(R.string.no_text);
                     }
 
-                    if (value.has("plan"))
-                        etPlan.setText(value.getString("plan"));
+                    if (value.has("_plan"))
+                        etPlan.setText(value.getString("_plan"));
 
-                    if (value.has("fact"))
-                        etFact.setText(value.getString("fact"));
+                    if (value.has("_fact"))
+                        etFact.setText(value.getString("_fact"));
 
                     if (isTaskFinished) {
                         etPlan.setEnabled(false);
@@ -912,11 +913,11 @@ public class TemplateFragment extends Fragment {
                             public void afterTextChanged(Editable s) {
                                 try {
                                     if (s.toString().trim().isEmpty())
-                                        value.remove("plan");
+                                        value.remove("_plan");
                                     else
-                                        value.put("plan", Double.parseDouble(s.toString().trim()));
+                                        value.put("_plan", Double.parseDouble(s.toString().trim()));
                                 } catch (Exception ignored) {
-                                    value.remove("plan");
+                                    value.remove("_plan");
                                 }
                             }
                         });
@@ -935,14 +936,24 @@ public class TemplateFragment extends Fragment {
                             public void afterTextChanged(Editable s) {
                                 try {
                                     if (s.toString().trim().isEmpty())
-                                        value.remove("fact");
+                                        value.remove("_fact");
                                     else
-                                        value.put("fact", Double.parseDouble(s.toString().trim()));
+                                        value.put("_fact", Double.parseDouble(s.toString().trim()));
                                 } catch (Exception ignored) {
-                                    value.remove("fact");
+                                    value.remove("_fact");
                                 }
                             }
                         });
+
+                        if (value.has("plan")) {
+                            etPlan.setText(value.getString("plan"));
+                            etPlan.setEnabled(false);
+
+                            if (value.has("hidePlan") && value.getBoolean("hidePlan")) {
+                                etPlan.setVisibility(View.INVISIBLE);
+                                tvPlanLabel.setVisibility(View.INVISIBLE);
+                            }
+                        }
 
                         btBarcode.setOnClickListener(view -> scanBarCode(captionLabel, value));
                         btQrCode.setOnClickListener(view -> scanQrCode(captionLabel, value));
@@ -2634,11 +2645,11 @@ public class TemplateFragment extends Fragment {
                         break;
 
                     case "plan":
-                        item.put("plan", value.getDouble("value"));
+                        item.put("_plan", value.getDouble("value"));
                         break;
 
                     case "fact":
-                        item.put("fact", value.getDouble("value"));
+                        item.put("_fact", value.getDouble("value"));
                         break;
 
                     case "media_id":
@@ -3757,7 +3768,7 @@ public class TemplateFragment extends Fragment {
                     break;
 
                 case "money":
-                    if (!value.has("plan") && !value.has("fact")) {
+                    if (!value.has("_plan") && !value.has("_fact")) {
                         totalResult = false;
                         setBlockMarkedAsRequired(value.getString("id"));
                     }
@@ -3878,18 +3889,18 @@ public class TemplateFragment extends Fragment {
                     break;
 
                 case "money":
-                    if (value.has("plan")) {
+                    if (value.has("_plan")) {
                         JSONObject objectValue = new JSONObject();
                         objectValue.put("id", value.getString("id"));
-                        objectValue.put("value", value.getDouble("plan"));
+                        objectValue.put("value", value.getDouble("_plan"));
                         objectValue.put("type", "plan");
                         containerValues.put(objectValue);
                     }
 
-                    if (value.has("fact")) {
+                    if (value.has("_fact")) {
                         JSONObject objectValue = new JSONObject();
                         objectValue.put("id", value.getString("id"));
-                        objectValue.put("value", value.getDouble("fact"));
+                        objectValue.put("value", value.getDouble("_fact"));
                         objectValue.put("type", "fact");
                         containerValues.put(objectValue);
                     }
