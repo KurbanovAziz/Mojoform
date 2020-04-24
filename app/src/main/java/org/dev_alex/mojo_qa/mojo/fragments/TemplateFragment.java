@@ -19,6 +19,7 @@ import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.LayerDrawable;
+import android.location.Location;
 import android.media.ExifInterface;
 import android.media.ThumbnailUtils;
 import android.net.Uri;
@@ -90,6 +91,8 @@ import com.github.mikephil.charting.renderer.XAxisRenderer;
 import com.github.mikephil.charting.utils.MPPointF;
 import com.github.mikephil.charting.utils.Transformer;
 import com.github.mikephil.charting.utils.ViewPortHandler;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
 import com.lalongooo.videocompressor.video.MediaController;
 
 import net.cachapa.expandablelayout.ExpandableLayout;
@@ -199,6 +202,8 @@ public class TemplateFragment extends Fragment {
 
     private boolean waiting = false;
 
+    private Location userLocation = null;
+
     public static TemplateFragment newInstance(long taskId, boolean isTaskFinished) {
         Bundle args = new Bundle();
         args.putLong("task_id", taskId);
@@ -290,6 +295,35 @@ public class TemplateFragment extends Fragment {
         return rootView;
     }
 
+    @Override
+    public void onViewCreated(@android.support.annotation.NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        if (checkLocationPermissions()) {
+            requestLocation();
+        } else {
+            requestLocationPermissions();
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @android.support.annotation.NonNull String[] permissions, @android.support.annotation.NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        if (checkLocationPermissions()) {
+            requestLocation();
+        }
+    }
+
+    private void requestLocation() {
+        if (checkLocationPermissions()) {
+            FusedLocationProviderClient fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireContext());
+            fusedLocationClient.getLastLocation().addOnSuccessListener(location -> {
+                if (location != null) {
+                    userLocation = location;
+                }
+            });
+        }
+    }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -452,6 +486,9 @@ public class TemplateFragment extends Fragment {
         rootView.findViewById(R.id.finish_btn).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if (userLocation == null) {
+                    requestLocation();
+                }
                 new WaitForMediaReadyTask().execute();
             }
         });
@@ -2157,6 +2194,12 @@ public class TemplateFragment extends Fragment {
             return String.format("%s", d);
     }
 
+    private boolean checkLocationPermissions() {
+        int permissionCoarse = ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION);
+        int permissionFine = ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION);
+        return (permissionCoarse == PackageManager.PERMISSION_GRANTED && permissionFine == PackageManager.PERMISSION_GRANTED);
+    }
+
     private boolean checkExternalPermissions() {
         int permissionCheckWrite = ContextCompat.checkSelfPermission(getContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE);
         int permissionCheckRead = ContextCompat.checkSelfPermission(getContext(), Manifest.permission.READ_EXTERNAL_STORAGE);
@@ -2171,6 +2214,11 @@ public class TemplateFragment extends Fragment {
     private boolean checkAudioPermissions() {
         return (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED)
                 && checkExternalPermissions();
+    }
+
+    private void requestLocationPermissions() {
+        ActivityCompat.requestPermissions(getActivity(),
+                new String[]{Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION}, 0);
     }
 
     private void requestExternalPermissions() {
@@ -3806,6 +3854,21 @@ public class TemplateFragment extends Fragment {
                     if (pageJson.has("items")) {
                         JSONArray pageValues = getContainerElementValues(pageJson.getJSONArray("items"));
                         resultValues = Utils.addAllItemsToJson(resultValues, pageValues);
+                    }
+
+                    if (userLocation != null) {
+                        JSONObject latValue = new JSONObject();
+                        latValue.put("id", "geo");
+                        latValue.put("type", "latitude");
+                        latValue.put("value", userLocation.getLatitude());
+
+                        JSONObject lngValue = new JSONObject();
+                        lngValue.put("id", "geo");
+                        lngValue.put("type", "longitude");
+                        lngValue.put("value", userLocation.getLongitude());
+
+                        resultValues.put(latValue);
+                        resultValues.put(lngValue);
                     }
                 }
             }
