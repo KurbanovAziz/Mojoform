@@ -8,6 +8,7 @@ import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -38,6 +39,8 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
         TextView notificationDate;
         TextView notificationDescription;
         ImageView moreBtn;
+        Button btDownloadPdf;
+        Button btDownloadDoc;
 
         ExpandableLayout expandableLayout;
         View btClose;
@@ -51,6 +54,8 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
             notificationDescription = itemView.findViewById(R.id.tvNotificationDesc);
             moreBtn = itemView.findViewById(R.id.more_btn);
             btClose = itemView.findViewById(R.id.btClose);
+            btDownloadPdf = itemView.findViewById(R.id.btDownloadPdf);
+            btDownloadDoc = itemView.findViewById(R.id.btDownloadDoc);
 
             expandableLayout = itemView.findViewById(R.id.vExpandable);
             mainNotificationView = itemView.findViewById(R.id.vMainNotificationBlock);
@@ -112,7 +117,8 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
             viewHolder.expandableLayout.collapse(false);
         }
 
-
+        viewHolder.btDownloadPdf.setOnClickListener(v -> listener.onDownloadPdfClick(notification));
+        viewHolder.btDownloadDoc.setOnClickListener(v -> listener.onDownloadDocClick(notification));
         viewHolder.notificationNewBorder.setVisibility(notification.is_readed ? View.GONE : View.VISIBLE);
     }
 
@@ -123,6 +129,9 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
 
     public interface NotificationClickListener {
         void onNotificationRead(Notification notification);
+
+        void onDownloadPdfClick(Notification notification);
+        void onDownloadDocClick(Notification notification);
     }
 }
 

@@ -155,4 +155,6 @@
     <string name="points">Бали</string>
     <string name="percent">Відсоток</string>
     <string name="scan">сканировать</string>
+    <string name="open_pdf">Відчинено PDF</string>
+    <string name="open_docs">Відчинено DOCX</string>
 </resources>

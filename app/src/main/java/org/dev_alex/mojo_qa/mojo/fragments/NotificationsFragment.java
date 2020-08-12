@@ -1,13 +1,20 @@
 package org.dev_alex.mojo_qa.mojo.fragments;
 
+import android.Manifest;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
+import android.support.v4.content.FileProvider;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -36,9 +43,13 @@ import org.dev_alex.mojo_qa.mojo.services.RequestService;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.io.File;
 import java.util.ArrayList;
+import java.util.UUID;
 
 import okhttp3.Response;
+import okio.BufferedSink;
+import okio.Okio;
 
 public class NotificationsFragment extends Fragment implements NotificationAdapter.NotificationClickListener {
     private static final String ARG_NOTIFICATION_ID = "ARG_NOTIF";
@@ -333,7 +344,7 @@ public class NotificationsFragment extends Fragment implements NotificationAdapt
                 break;
             }
         }
-        
+
         if (getActivity() instanceof MainActivity) {
             ((MainActivity) getActivity()).setNotificationBadgeVisible(needToShow);
         }
@@ -342,6 +353,24 @@ public class NotificationsFragment extends Fragment implements NotificationAdapt
     @Override
     public void onNotificationRead(Notification notification) {
         new ReadNotificationsTask(notification.id).execute();
+    }
+
+    @Override
+    public void onDownloadPdfClick(Notification notification) {
+        if (checkExternalPermissions()) {
+            new DownloadPdfTask(notification.id, UUID.randomUUID().toString()).execute();
+        } else {
+            requestExternalPermissions();
+        }
+    }
+
+    @Override
+    public void onDownloadDocClick(Notification notification) {
+        if (checkExternalPermissions()) {
+            new DownloadDocTask(notification.id, UUID.randomUUID().toString()).execute();
+        } else {
+            requestExternalPermissions();
+        }
     }
 
     private class GetNotificationsTask extends AsyncTask<Void, Void, Integer> {
@@ -464,4 +493,162 @@ public class NotificationsFragment extends Fragment implements NotificationAdapt
         }
     }
 
+    private class DownloadPdfTask extends AsyncTask<Void, Void, Integer> {
+        private java.io.File resultFile;
+        private long id;
+        private String name;
+
+        DownloadPdfTask(long id, String name) {
+            this.id = id;
+            this.name = name;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            File downloadsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+            resultFile = new File(downloadsDir, name + ".pdf");
+            loopDialog.show();
+        }
+
+        @Override
+        protected Integer doInBackground(Void... params) {
+            try {
+                if (resultFile.exists())
+                    return 200;
+
+                String url = "/api/notifications/" + id + "/pdf";
+                Response response = RequestService.createGetRequest(url);
+
+                if (response.code() == 200) {
+                    BufferedSink sink = Okio.buffer(Okio.sink(resultFile));
+                    sink.writeAll(response.body().source());
+                    sink.close();
+                }
+                response.body().close();
+
+                return response.code();
+            } catch (Exception exc) {
+                exc.printStackTrace();
+                return null;
+            }
+        }
+
+        @Override
+        protected void onPostExecute(Integer responseCode) {
+            super.onPostExecute(responseCode);
+            try {
+                if (loopDialog != null && loopDialog.isShowing())
+                    loopDialog.dismiss();
+
+                if (responseCode == null)
+                    Toast.makeText(getContext(), R.string.network_error, Toast.LENGTH_LONG).show();
+                else if (responseCode == 200) {
+                    try {
+                        Intent viewIntent = new Intent(Intent.ACTION_VIEW);
+                        Uri fileUri = FileProvider.getUriForFile(getContext(), getContext().getApplicationContext().getPackageName() + ".provider", resultFile);
+                        viewIntent.setDataAndType(fileUri, "application/pdf");
+                        viewIntent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                        startActivity(viewIntent);
+                    } catch (Exception exc) {
+                        exc.printStackTrace();
+                        Toast.makeText(getContext(), "Нет приложения, которое может открыть этот файл", Toast.LENGTH_LONG).show();
+                        try {
+                            resultFile.delete();
+                        } catch (Exception exc1) {
+                            exc1.printStackTrace();
+                        }
+                    }
+                } else
+                    Toast.makeText(getContext(), R.string.unknown_error, Toast.LENGTH_LONG).show();
+            } catch (Exception exc) {
+                exc.printStackTrace();
+            }
+        }
+    }
+
+    private class DownloadDocTask extends AsyncTask<Void, Void, Integer> {
+        private java.io.File resultFile;
+        private long id;
+        private String name;
+
+        DownloadDocTask(long id, String name) {
+            this.id = id;
+            this.name = name;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            File downloadsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+            resultFile = new File(downloadsDir, name + ".docx");
+            loopDialog.show();
+        }
+
+        @Override
+        protected Integer doInBackground(Void... params) {
+            try {
+                if (resultFile.exists())
+                    return 200;
+
+                String url = "/api/notifications/" + id + "/docx";
+                Response response = RequestService.createGetRequest(url);
+
+                if (response.code() == 200) {
+                    BufferedSink sink = Okio.buffer(Okio.sink(resultFile));
+                    sink.writeAll(response.body().source());
+                    sink.close();
+                }
+                response.body().close();
+
+                return response.code();
+            } catch (Exception exc) {
+                exc.printStackTrace();
+                return null;
+            }
+        }
+
+        @Override
+        protected void onPostExecute(Integer responseCode) {
+            super.onPostExecute(responseCode);
+            if (loopDialog != null && loopDialog.isShowing())
+                loopDialog.dismiss();
+
+            try {
+                if (responseCode == null)
+                    Toast.makeText(getContext(), R.string.network_error, Toast.LENGTH_LONG).show();
+                else if (responseCode == 200) {
+                    try {
+                        Intent viewIntent = new Intent(Intent.ACTION_VIEW);
+                        Uri fileUri = FileProvider.getUriForFile(getContext(), getContext().getApplicationContext().getPackageName() + ".provider", resultFile);
+                        viewIntent.setDataAndType(fileUri, "application/msword");
+                        viewIntent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                        startActivity(viewIntent);
+                    } catch (Exception exc) {
+                        exc.printStackTrace();
+                        Toast.makeText(getContext(), "Нет приложения, которое может открыть этот файл", Toast.LENGTH_LONG).show();
+                        try {
+                            resultFile.delete();
+                        } catch (Exception exc1) {
+                            exc1.printStackTrace();
+                        }
+                    }
+                } else
+                    Toast.makeText(getContext(), R.string.unknown_error, Toast.LENGTH_LONG).show();
+            } catch (Exception exc) {
+                exc.printStackTrace();
+            }
+        }
+    }
+
+    private boolean checkExternalPermissions() {
+        int permissionCheckWrite = ContextCompat.checkSelfPermission(getContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        int permissionCheckRead = ContextCompat.checkSelfPermission(getContext(), Manifest.permission.READ_EXTERNAL_STORAGE);
+        return (permissionCheckRead == PackageManager.PERMISSION_GRANTED && permissionCheckWrite == PackageManager.PERMISSION_GRANTED);
+    }
+
+    private void requestExternalPermissions() {
+        ActivityCompat.requestPermissions(getActivity(),
+                new String[]{Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE}, 0);
+    }
 }

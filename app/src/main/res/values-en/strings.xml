@@ -155,4 +155,6 @@
     <string name="points">Points</string>
     <string name="percent">Percent</string>
     <string name="scan">сканировать</string>
+    <string name="open_pdf">Open PDF</string>
+    <string name="open_docs">Open DOCX</string>
 </resources>
