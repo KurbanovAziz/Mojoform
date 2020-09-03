@@ -104,6 +104,7 @@ import org.dev_alex.mojo_qa.mojo.R;
 import org.dev_alex.mojo_qa.mojo.activities.AuthActivity;
 import org.dev_alex.mojo_qa.mojo.activities.ImageViewActivity;
 import org.dev_alex.mojo_qa.mojo.activities.MainActivity;
+import org.dev_alex.mojo_qa.mojo.activities.OpenLinkActivity;
 import org.dev_alex.mojo_qa.mojo.custom_views.CustomWebview;
 import org.dev_alex.mojo_qa.mojo.custom_views.camera.CustomCamera2Activity;
 import org.dev_alex.mojo_qa.mojo.custom_views.indicator.IndicatorLayout;
@@ -447,6 +448,10 @@ public class TemplateFragment extends Fragment {
                     if (rootView.findViewById(R.id.scroll_view).canScrollVertically(-1))
                         ((ScrollView) rootView.findViewById(R.id.scroll_view)).fullScroll(View.FOCUS_UP);
                     else if (getActivity() != null && getActivity().getSupportFragmentManager() != null) {
+                        if (getActivity() instanceof OpenLinkActivity) {
+                            getActivity().finish();
+                            return;
+                        }
                         getActivity().getSupportFragmentManager().popBackStack();
                         if (getActivity() instanceof MainActivity) {
                             ((MainActivity) getActivity()).drawer.getDrawerLayout().setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
@@ -2942,7 +2947,8 @@ public class TemplateFragment extends Fragment {
                         template = new JSONObject(templateJson);
                         return HttpURLConnection.HTTP_OK;
                     } else {
-                        String url = isOpenLink ? "/api/openlink/" + taskUUID : "/api/tasks/" + taskId;
+                        String linkPath = isReportOpenLink ? "closedlink" : "openlink";
+                        String url = isOpenLink ? "/api/" + linkPath + "/" + taskUUID : "/api/tasks/" + taskId;
                         Response response = RequestService.createGetRequest(url);
 
                         if (response.code() == 200) {
@@ -3108,7 +3114,8 @@ public class TemplateFragment extends Fragment {
                     }
                 }
 
-                String mediaUploadUrl = isOpenLink ? "/api/openlink/" + taskUUID + "/upload" : "/api/file/upload";
+                String linkPath = isReportOpenLink ? "closedlink" : "openlink";
+                String mediaUploadUrl = isOpenLink ? "/api/" + linkPath + "/" + taskUUID + "/upload" : "/api/file/upload";
 
                 successfullySentMediaCt = 0;
                 for (JSONObject jsonObject : mediaObjects)
@@ -3316,7 +3323,8 @@ public class TemplateFragment extends Fragment {
         @Override
         protected Integer doInBackground(Void... params) {
             try {
-                String url = isOpenLink ? "/api/openlink/" + taskUUID + "/complete" : "/api/tasks/" + taskId + "/complete";
+                String linkPath = isReportOpenLink ? "closedlink" : "openlink";
+                String url = isOpenLink ? "/api/" + linkPath + "/" + taskUUID + "/complete" : "/api/tasks/" + taskId + "/complete";
                 Response response = RequestService.createPostRequest(url, resultJson.toString());
                 return response.code();
 
