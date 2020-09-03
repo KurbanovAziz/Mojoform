@@ -158,4 +158,5 @@
     <string name="scan">сканировать</string>
     <string name="open_pdf">Открыть PDF</string>
     <string name="open_docs">Открыть DOCX</string>
+    <string name="log_in_to_execute_task">Войдите в систему для выполнения задачи</string>
 </resources>

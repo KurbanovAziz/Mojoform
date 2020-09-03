@@ -147,11 +147,18 @@ public class TasksFragment extends Fragment {
             if (resultCode == RESULT_OK) {
                 String contents = data.getStringExtra("SCAN_RESULT");
                 String UUID = contents.substring(contents.lastIndexOf("/")).replace("/", "");
+
+                boolean isReport = false;
+                if (contents.contains("reports")) {
+                    isReport = true;
+                }
+
                 getActivity().getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.container, TemplateFragment.newInstance(UUID)).addToBackStack(null).commit();
+                        .replace(R.id.container, TemplateFragment.newInstance(UUID, isReport)).addToBackStack(null).commit();
             }
         }
     }
+
     @Override
     public void onResume() {
         super.onResume();

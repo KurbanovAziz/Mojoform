@@ -7,6 +7,9 @@ public class Data {
     public static final String taskAuthPass = "p234235dfgdeg";
     public static Long currentTaskId = null;
 
+    public static String pendingOpenTaskUUID = null;
+    public static boolean isReportTaskMode = false;
+
     public static String getTaskAuthLogin() {
         return LoginHistoryService.getCurrentUser().username;
     }

@@ -11,6 +11,7 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import org.dev_alex.mojo_qa.mojo.Data;
 import org.dev_alex.mojo_qa.mojo.R;
 import org.dev_alex.mojo_qa.mojo.activities.AuthActivity;
 import org.dev_alex.mojo_qa.mojo.activities.OnboardingActivity;
@@ -50,7 +51,13 @@ public class LoginFragment extends Fragment {
                 String contents = data.getStringExtra("SCAN_RESULT");
                 String UUID = contents.substring(contents.lastIndexOf("/")).replace("/", "");
 
-                startActivity(OpenLinkActivity.getActivityIntent(getContext(), UUID));
+                if (contents.contains("reports")) {
+                    Data.pendingOpenTaskUUID = UUID;
+                    Data.isReportTaskMode = true;
+                    Toast.makeText(getContext(), R.string.log_in_to_execute_task, Toast.LENGTH_LONG).show();
+                } else {
+                    startActivity(OpenLinkActivity.getActivityIntent(getContext(), UUID, false));
+                }
             }
         }
     }

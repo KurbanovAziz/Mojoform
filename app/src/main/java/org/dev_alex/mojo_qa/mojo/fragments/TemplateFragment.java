@@ -176,6 +176,7 @@ public class TemplateFragment extends Fragment {
 
     public boolean isOpenLink = false;
     public String taskUUID = null;
+    public boolean isReportOpenLink = false;
 
     public long taskId;
     public long documentId;
@@ -214,10 +215,11 @@ public class TemplateFragment extends Fragment {
         return fragment;
     }
 
-    public static TemplateFragment newInstance(String taskUUID) {
+    public static TemplateFragment newInstance(String taskUUID, boolean isReportMode) {
         Bundle args = new Bundle();
         args.putString("task_uuid", taskUUID);
         args.putBoolean("is_finished", false);
+        args.putBoolean("is_report_open_link", isReportMode);
 
         TemplateFragment fragment = new TemplateFragment();
         fragment.setArguments(args);
@@ -237,6 +239,7 @@ public class TemplateFragment extends Fragment {
         } else {
             taskUUID = getArguments().getString("task_uuid");
             isOpenLink = true;
+            isReportOpenLink = getArguments().getBoolean("is_report_open_link", false);
         }
         isTaskFinished = getArguments().getBoolean("is_finished");
     }
@@ -2976,6 +2979,11 @@ public class TemplateFragment extends Fragment {
                 } else if (responseCode == 200) {
                     renderTemplate();
                 } else {
+                    if (isOpenLink) {
+                        Toast.makeText(getContext(), "Задача недоступна", Toast.LENGTH_SHORT).show();
+                        getActivity().getSupportFragmentManager().popBackStack();
+                        return;
+                    }
                     Toast.makeText(getContext(), R.string.unknown_error, Toast.LENGTH_LONG).show();
                     getActivity().getSupportFragmentManager().popBackStack();
                 }

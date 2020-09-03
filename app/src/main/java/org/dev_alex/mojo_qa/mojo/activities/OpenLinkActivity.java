@@ -15,14 +15,16 @@ public class OpenLinkActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         String stringUUID = getIntent().getStringExtra("uuid_arg");
+        boolean isReport = getIntent().getBooleanExtra("is_report", false);
 
         getSupportFragmentManager().beginTransaction()
-                .replace(R.id.container, TemplateFragment.newInstance(stringUUID)).addToBackStack(null).commit();
+                .replace(R.id.container, TemplateFragment.newInstance(stringUUID, isReport)).addToBackStack(null).commit();
     }
 
-    public static Intent getActivityIntent(Context context, String uuid) {
+    public static Intent getActivityIntent(Context context, String uuid, boolean isReportMode) {
         Intent intent = new Intent(context, OpenLinkActivity.class);
         intent.putExtra("uuid_arg", uuid);
+        intent.putExtra("is_report", isReportMode);
 
         return intent;
     }

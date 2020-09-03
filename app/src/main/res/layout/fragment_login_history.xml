@@ -72,8 +72,8 @@
         android:layout_width="0dp"
         android:layout_height="1dp"
         android:layout_marginLeft="24dp"
-        android:layout_marginRight="24dp"
         android:layout_marginTop="0dp"
+        android:layout_marginRight="24dp"
         android:background="#ffcdbbd7"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintLeft_toLeftOf="parent"
@@ -84,9 +84,9 @@
         android:id="@+id/bottom_line"
         android:layout_width="0dp"
         android:layout_height="1dp"
-        android:layout_marginBottom="0dp"
         android:layout_marginLeft="24dp"
         android:layout_marginRight="24dp"
+        android:layout_marginBottom="0dp"
         android:background="#ffcdbbd7"
         app:layout_constraintBottom_toTopOf="@+id/bottom_content_guideline"
         app:layout_constraintHorizontal_bias="0.0"
@@ -129,17 +129,43 @@
         android:id="@+id/recycler_view"
         android:layout_width="wrap_content"
         android:layout_height="0dp"
-        android:layout_marginBottom="0dp"
         android:layout_marginLeft="0dp"
-        android:layout_marginRight="0dp"
         android:layout_marginTop="0dp"
+        android:layout_marginRight="0dp"
+        android:layout_marginBottom="0dp"
         android:clipToPadding="false"
-        android:paddingBottom="8dp"
         android:paddingTop="8dp"
+        android:paddingBottom="8dp"
         app:layout_constraintBottom_toTopOf="@+id/bottom_line"
         app:layout_constraintLeft_toLeftOf="@+id/background"
         app:layout_constraintRight_toRightOf="@+id/background"
         app:layout_constraintTop_toBottomOf="@+id/top_line" />
 
+    <LinearLayout
+        android:id="@+id/btScanQr"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="15dp"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:paddingTop="5dp"
+        android:paddingBottom="5dp"
+        app:layout_constraintBottom_toTopOf="@+id/new_user_btn"
+        app:layout_constraintEnd_toStartOf="@+id/button_right_guideline"
+        app:layout_constraintStart_toStartOf="@+id/button_left_guideline">
+
+        <ImageView
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:src="@drawable/qr_button_icon" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="6dp"
+            android:text="@string/scan"
+            android:textColor="@android:color/white"
+            android:textSize="18sp" />
+    </LinearLayout>
 
 </android.support.constraint.ConstraintLayout>

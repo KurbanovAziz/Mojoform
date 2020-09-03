@@ -35,6 +35,7 @@ import com.mikepenz.materialdrawer.model.SecondaryDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import com.woxthebox.draglistview.DragListView;
 
+import org.dev_alex.mojo_qa.mojo.Data;
 import org.dev_alex.mojo_qa.mojo.R;
 import org.dev_alex.mojo_qa.mojo.adapters.DraggableItemAdapter;
 import org.dev_alex.mojo_qa.mojo.custom_views.CustomDrawerItem;
@@ -82,6 +83,11 @@ public class MainActivity extends AppCompatActivity {
         checkData(getIntent());
 
         getSupportFragmentManager().addOnBackStackChangedListener(() -> updateNotificationsBadge());
+
+        if (Data.pendingOpenTaskUUID != null) {
+            startActivity(OpenLinkActivity.getActivityIntent(this, Data.pendingOpenTaskUUID, Data.isReportTaskMode));
+            Data.pendingOpenTaskUUID = null;
+        }
     }
 
     public void updateNotificationsBadge() {
