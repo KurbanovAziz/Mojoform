@@ -159,4 +159,7 @@
     <string name="open_pdf">Abierta PDF</string>
     <string name="open_docs">Abierta DOCX</string>
     <string name="log_in_to_execute_task">Inicie sesión para completar la tarea</string>
+
+    <string name="attention">Atención</string>
+    <string name="need_download_app">Para que funcione correctamente, necesita una aplicación de terceros para escanear el código de barras. ¿Ir a Google Play para descargarlo?</string>
 </resources>

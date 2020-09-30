@@ -158,4 +158,8 @@
     <string name="open_pdf">Open PDF</string>
     <string name="open_docs">Open DOCX</string>
     <string name="log_in_to_execute_task">Log in to execute the task</string>
+
+    <string name="attention">Attention</string>
+    <string name="need_download_app">To work correctly, you need a third-party application to scan the barcode. Go to Google Play to download it?</string>
+
 </resources>

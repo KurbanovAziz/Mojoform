@@ -152,6 +152,9 @@
     <string name="finish_time">Время завершения</string>
     <string name="unknown">неизвестно</string>
 
+    <string name="attention">Внимание</string>
+    <string name="need_download_app">Для корректной работы, необходимо стороннее приложение, для сканирования штрик кода. Перейти в Google Play для его загрузки?</string>
+
     <string name="result">Результат</string>
     <string name="points">баллы</string>
     <string name="percent">проценты</string>
@@ -159,4 +162,5 @@
     <string name="open_pdf">Открыть PDF</string>
     <string name="open_docs">Открыть DOCX</string>
     <string name="log_in_to_execute_task">Войдите в систему для выполнения задачи</string>
+
 </resources>

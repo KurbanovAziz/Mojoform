@@ -11,6 +11,8 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.afollestad.materialdialogs.MaterialDialog;
+
 import org.dev_alex.mojo_qa.mojo.Data;
 import org.dev_alex.mojo_qa.mojo.R;
 import org.dev_alex.mojo_qa.mojo.activities.AuthActivity;
@@ -85,17 +87,26 @@ public class LoginFragment extends Fragment {
                 intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                 startActivityForResult(intent, SCAN_CODE_REQUEST_CODE);
             } catch (Exception e) {
-                Uri marketUri = Uri.parse("market://details?id=com.google.zxing.client.android");
-                Intent marketIntent = new Intent(Intent.ACTION_VIEW, marketUri);
-                startActivity(marketIntent);
+                showQrAppDownloadDialog();
             }
         });
 
-        rootView.findViewById(R.id.about_btn).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(getContext(), OnboardingActivity.class));
-            }
-        });
+        rootView.findViewById(R.id.about_btn).setOnClickListener(v -> startActivity(new Intent(getContext(), OnboardingActivity.class)));
+    }
+
+    private void showQrAppDownloadDialog() {
+        new MaterialDialog.Builder(getContext())
+                .title(R.string.attention)
+                .content(R.string.need_download_app)
+                .positiveText("Ok")
+                .negativeText(R.string.cancel_)
+                .autoDismiss(true)
+                .onPositive((dialog, which) -> {
+                    Uri marketUri = Uri.parse("market://details?id=com.google.zxing.client.android");
+                    Intent marketIntent = new Intent(Intent.ACTION_VIEW, marketUri);
+                    startActivity(marketIntent);
+                })
+                .show();
+
     }
 }
