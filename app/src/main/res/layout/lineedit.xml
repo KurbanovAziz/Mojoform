@@ -36,13 +36,13 @@
 
         <EditText
             android:layout_width="0dp"
-            android:layout_height="45dp"
+            android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
             android:layout_weight="1"
             android:background="@drawable/input_text_background_gray_border"
             android:ellipsize="end"
-            android:inputType="text"
-            android:maxLines="1"
+            android:inputType="text|textMultiLine"
+            android:paddingVertical="11dp"
             android:paddingLeft="10dp"
             android:paddingRight="10dp"
             android:scrollHorizontally="true" />
