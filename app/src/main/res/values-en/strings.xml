@@ -12,6 +12,7 @@
     <string name="network_error">Network error</string>
     <string name="invalid_username_or_password">Invalid username or password</string>
     <string name="tasks">Tasks</string>
+    <string name="task">Task</string>
     <string name="documents">Documents</string>
     <string name="exit">Exit</string>
     <string name="ended">Finished</string>
@@ -158,6 +159,7 @@
     <string name="open_pdf">Open PDF</string>
     <string name="open_docs">Open DOCX</string>
     <string name="log_in_to_execute_task">Log in to execute the task</string>
+    <string name="not_done_in_time">Not completed on time</string>
 
     <string name="attention">Attention</string>
     <string name="need_download_app">To work correctly, you need a third-party application to scan the barcode. Go to Google Play to download it?</string>

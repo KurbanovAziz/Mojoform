@@ -57,6 +57,7 @@ public class CustomDrawerItem extends SecondaryDrawerItem {
         iconParams.width = LinearLayout.LayoutParams.WRAP_CONTENT;
         iconParams.gravity = Gravity.LEFT | Gravity.CENTER_VERTICAL;
         iconParams.height = imageHeightDp;
+
         icon.setLayoutParams(iconParams);
         icon.setAdjustViewBounds(true);
         icon.setPadding(icon.getPaddingLeft(), icon.getPaddingTop(), imagePaddingRight, icon.getPaddingBottom());
@@ -70,13 +71,14 @@ public class CustomDrawerItem extends SecondaryDrawerItem {
         int size = convertToPx(parent.getContext(), 6);
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(size, size);
         params.leftMargin = -convertToPx(parent.getContext(), 21);
+        params.rightMargin = convertToPx(parent.getContext(), 21);
         params.topMargin = convertToPx(parent.getContext(), 17);
         badge.setLayoutParams(params);
 
         if (isVisible) {
             badge.setVisibility(View.VISIBLE);
         } else {
-            badge.setVisibility(View.GONE);
+            badge.setVisibility(View.INVISIBLE);
         }
     }
 

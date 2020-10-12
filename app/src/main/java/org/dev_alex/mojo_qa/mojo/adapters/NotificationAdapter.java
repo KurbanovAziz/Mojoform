@@ -2,6 +2,7 @@ package org.dev_alex.mojo_qa.mojo.adapters;
 
 
 import android.content.Context;
+import android.graphics.Color;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
@@ -41,6 +42,7 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
         ImageView moreBtn;
         Button btDownloadPdf;
         Button btDownloadDoc;
+        View vButtonsBlock;
 
         ExpandableLayout expandableLayout;
         View btClose;
@@ -56,6 +58,7 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
             btClose = itemView.findViewById(R.id.btClose);
             btDownloadPdf = itemView.findViewById(R.id.btDownloadPdf);
             btDownloadDoc = itemView.findViewById(R.id.btDownloadDoc);
+            vButtonsBlock = itemView.findViewById(R.id.vButtonsBlock);
 
             expandableLayout = itemView.findViewById(R.id.vExpandable);
             mainNotificationView = itemView.findViewById(R.id.vMainNotificationBlock);
@@ -87,12 +90,23 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
             executorPart = context.getString(R.string.executor) + "<br/><b>" + notification.task.executor.fullname + "</b> (" + notification.task.executor.username + ")<br/><br/>";
         }
 
-        String notificationDescription = context.getString(R.string.result) + "<br/>" +
-                context.getString(R.string.points) + ": <b>" + notification.task.value.val + "</b><br/>" + context.getString(R.string.percent) + ": <b>" + notification.task.value.prc + "%</b><br/><br/>" +
-                executorPart +
-                context.getString(R.string.finish_time) + ":<br/><b>" + finishTime + "</b>";
+        if (notification.type.equals("range")) {
+            String notificationDescription = context.getString(R.string.result) + "<br/>" +
+                    context.getString(R.string.points) + ": <b>" + notification.task.value.val + "</b><br/>" + context.getString(R.string.percent) + ": <b>" + notification.task.value.prc + "%</b><br/><br/>" +
+                    executorPart +
+                    context.getString(R.string.finish_time) + ":<br/><b>" + finishTime + "</b>";
 
-        viewHolder.notificationDescription.setText(Html.fromHtml(notificationDescription));
+            viewHolder.notificationDescription.setText(Html.fromHtml(notificationDescription));
+            viewHolder.vButtonsBlock.setVisibility(View.VISIBLE);
+        } else if (notification.type.equals("expire")) {
+            String notificationDescription = context.getString(R.string.result) + "<br/>" +
+                    context.getString(R.string.task) + ": <b>" + notification.task.ref.name + "</b><br/><br/>" +
+                    "<b>" + context.getString(R.string.not_done_in_time) + "</b><br/><br/>" +
+                    executorPart;
+
+            viewHolder.notificationDescription.setText(Html.fromHtml(notificationDescription));
+            viewHolder.vButtonsBlock.setVisibility(View.GONE);
+        }
 
         viewHolder.btClose.setOnClickListener(v -> viewHolder.expandableLayout.collapse(true));
         viewHolder.mainNotificationView.setOnClickListener(v -> {
@@ -131,6 +145,7 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
         void onNotificationRead(Notification notification);
 
         void onDownloadPdfClick(Notification notification);
+
         void onDownloadDocClick(Notification notification);
     }
 }

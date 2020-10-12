@@ -99,6 +99,7 @@ import net.cachapa.expandablelayout.ExpandableLayout;
 import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent;
 
 import org.dev_alex.mojo_qa.mojo.App;
+import org.dev_alex.mojo_qa.mojo.BuildConfig;
 import org.dev_alex.mojo_qa.mojo.Data;
 import org.dev_alex.mojo_qa.mojo.R;
 import org.dev_alex.mojo_qa.mojo.activities.AuthActivity;
@@ -3312,9 +3313,9 @@ public class TemplateFragment extends Fragment {
 
                 TimeZone timeZone = TimeZone.getDefault();
                 resultJson.put("timezone", timeZone.getID());
+                resultJson.put("client_id", "android v." + Build.VERSION.CODENAME + " app v. " + BuildConfig.VERSION_NAME);
 
                 Log.d("mojo-log", "result template: " + resultJson.toString());
-
             } catch (Exception exc) {
                 exc.printStackTrace();
             }

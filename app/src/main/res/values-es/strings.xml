@@ -12,6 +12,7 @@
     <string name="network_error">No hay conexión a Internet o el servidor no está disponible.</string>
     <string name="invalid_username_or_password">Nombre de usuario o contraseña inválidos</string>
     <string name="tasks">Tareas</string>
+    <string name="task">Tarea</string>
     <string name="documents">Documentos</string>
     <string name="exit">Salir</string>
     <string name="ended">Completado</string>
@@ -159,6 +160,7 @@
     <string name="open_pdf">Abierta PDF</string>
     <string name="open_docs">Abierta DOCX</string>
     <string name="log_in_to_execute_task">Inicie sesión para completar la tarea</string>
+    <string name="not_done_in_time">No completado a tiempo</string>
 
     <string name="attention">Atención</string>
     <string name="need_download_app">Para que funcione correctamente, necesita una aplicación de terceros para escanear el código de barras. ¿Ir a Google Play para descargarlo?</string>

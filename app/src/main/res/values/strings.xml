@@ -11,6 +11,7 @@
     <string name="loading_please_wait">Загрузка, пожалуйста подождите…</string>
     <string name="network_error">Отсутствует интернет соединение, либо сервер недоступен</string>
     <string name="invalid_username_or_password">Неверное имя пользователя или пароль</string>
+    <string name="task">Задача</string>
     <string name="tasks">Задачи</string>
     <string name="documents">Документы</string>
     <string name="exit">Выход</string>
@@ -151,6 +152,7 @@
     <string name="executor">Исполнитель</string>
     <string name="finish_time">Время завершения</string>
     <string name="unknown">неизвестно</string>
+    <string name="not_done_in_time">Не выполнена в срок</string>
 
     <string name="attention">Внимание</string>
     <string name="need_download_app">Для корректной работы, необходимо стороннее приложение, для сканирования штрик кода. Перейти в Google Play для его загрузки?</string>

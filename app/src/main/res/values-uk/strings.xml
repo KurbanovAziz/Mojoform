@@ -12,6 +12,7 @@
     <string name="network_error">Відсутня інтернет з\'єднання, або сервер недоступний</string>
     <string name="invalid_username_or_password">Невірне ім\'я користувача або пароль</string>
     <string name="tasks">Задачи</string>
+    <string name="task">Задача</string>
     <string name="documents">Документи</string>
     <string name="exit">Вихід</string>
     <string name="ended">Завершення</string>
@@ -158,6 +159,7 @@
     <string name="open_pdf">Відчинено PDF</string>
     <string name="open_docs">Відчинено DOCX</string>
     <string name="log_in_to_execute_task">Увійдіть в систему для виконання завдання</string>
+    <string name="not_done_in_time">Чи не виконана в строк</string>
 
     <string name="attention">Увага</string>
     <string name="need_download_app">Для коректної роботи, необхідно стороннє додаток, для сканування Штрик коду. Перейти в Google Play для його завантаження?</string>

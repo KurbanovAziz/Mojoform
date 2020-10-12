@@ -117,10 +117,11 @@
                     tools:text="16 марта 2017 | 17:00" />
 
                 <LinearLayout
+                    android:id="@+id/vButtonsBlock"
                     android:layout_width="match_parent"
-                    android:layout_marginTop="18dp"
-                    android:layout_marginLeft="40dp"
                     android:layout_height="wrap_content"
+                    android:layout_marginLeft="40dp"
+                    android:layout_marginTop="18dp"
                     android:orientation="horizontal">
 
                     <Button
@@ -139,9 +140,9 @@
                     <Button
                         android:id="@+id/btDownloadDoc"
                         android:layout_width="0dp"
-                        android:layout_marginLeft="5dp"
                         android:layout_height="40dp"
                         android:layout_gravity="center_horizontal"
+                        android:layout_marginLeft="5dp"
                         android:layout_weight="1"
                         android:background="@drawable/main_button_mojo"
                         android:gravity="center"
