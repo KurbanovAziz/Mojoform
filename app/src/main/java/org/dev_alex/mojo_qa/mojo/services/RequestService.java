@@ -30,6 +30,11 @@ public class RequestService {
         return createPostRequestWithCustomUrl(url, jsonStr);
     }
 
+    public static Response createPutRequest(String path, String jsonStr) throws Exception {
+        String url = App.getHost() + path;
+        return createPutRequestWithCustomUrl(url, jsonStr);
+    }
+
     public static Response createPostRequestWithCustomUrl(String url, String jsonStr) throws Exception {
         OkHttpClient client = createOkHttpClient();
         RequestBody body = RequestBody.create(JSON, jsonStr);
@@ -42,7 +47,19 @@ public class RequestService {
         return client.newCall(request).execute();
     }
 
-    public static Response createSendFileRequest(String path, MediaType mimeType, File file) throws Exception {
+    public static Response createPutRequestWithCustomUrl(String url, String jsonStr) throws Exception {
+        OkHttpClient client = createOkHttpClient();
+        RequestBody body = RequestBody.create(JSON, jsonStr);
+        Request.Builder requestBuilder = new Request.Builder().url(url).put(body)
+                .addHeader("Content-Type", "application/json");
+        //.addHeader("Authorization", Credentials.basic(Data.getTaskAuthLogin(), Data.taskAuthPass));
+
+        Request request = requestBuilder.build();
+        Log.d("mojo-log", "send file to server. request: " + request.toString());
+        return client.newCall(request).execute();
+    }
+
+    public static Response createSendFilePostRequest(String path, MediaType mimeType, File file) throws Exception {
         Log.d("mojo-log", "send file to server. file exists: " + String.valueOf(file.exists()));
         Log.d("mojo-log", "send file to server. file about " + file.toString());
 
@@ -54,6 +71,23 @@ public class RequestService {
                 .addFormDataPart("file", file.getName(), RequestBody.create(mimeType, file))
                 .build();
         Request.Builder requestBuilder = new Request.Builder().url(url).post(requestBody);
+        Request request = requestBuilder.build();
+        Log.d("mojo-log", "send file to server. request: " + request.toString());
+        return client.newCall(request).execute();
+    }
+
+    public static Response createSendFilePutRequest(String path, MediaType mimeType, File file) throws Exception {
+        Log.d("mojo-log", "send file to server. file exists: " + String.valueOf(file.exists()));
+        Log.d("mojo-log", "send file to server. file about " + file.toString());
+
+        OkHttpClient client = createOkHttpClient();
+
+        String url = App.getHost() + path;
+        RequestBody requestBody = new MultipartBody.Builder()
+                .setType(MultipartBody.FORM)
+                .addFormDataPart("file", file.getName(), RequestBody.create(mimeType, file))
+                .build();
+        Request.Builder requestBuilder = new Request.Builder().url(url).put(requestBody);
         Request request = requestBuilder.build();
         Log.d("mojo-log", "send file to server. request: " + request.toString());
         return client.newCall(request).execute();

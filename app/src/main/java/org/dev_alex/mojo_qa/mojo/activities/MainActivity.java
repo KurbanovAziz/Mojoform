@@ -40,6 +40,7 @@ import org.dev_alex.mojo_qa.mojo.R;
 import org.dev_alex.mojo_qa.mojo.adapters.DraggableItemAdapter;
 import org.dev_alex.mojo_qa.mojo.custom_views.CustomDrawerItem;
 import org.dev_alex.mojo_qa.mojo.fragments.DocumentsFragment;
+import org.dev_alex.mojo_qa.mojo.fragments.EditProfileFragment;
 import org.dev_alex.mojo_qa.mojo.fragments.NotificationsFragment;
 import org.dev_alex.mojo_qa.mojo.fragments.PanelListFragment;
 import org.dev_alex.mojo_qa.mojo.fragments.TasksFragment;
@@ -65,6 +66,7 @@ import okio.Okio;
 
 public class MainActivity extends AppCompatActivity {
     public Drawer drawer;
+    private boolean isFirstLaunch = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -164,7 +166,7 @@ public class MainActivity extends AppCompatActivity {
         super.onSaveInstanceState(outState, null);
     }
 
-    private void initDrawer() {
+    public void initDrawer() {
         View headerView = getLayoutInflater().inflate(R.layout.drawer_header, null);
         User currentUser = LoginHistoryService.getCurrentUser();
 
@@ -253,14 +255,11 @@ public class MainActivity extends AppCompatActivity {
         })
                 .build();
 
-        findViewById(R.id.sandwich_btn).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (drawer.isDrawerOpen())
-                    drawer.closeDrawer();
-                else
-                    drawer.openDrawer();
-            }
+        findViewById(R.id.sandwich_btn).setOnClickListener(v -> {
+            if (drawer.isDrawerOpen())
+                drawer.closeDrawer();
+            else
+                drawer.openDrawer();
         });
 
         if (currentUser.has_avatar)
@@ -278,6 +277,15 @@ public class MainActivity extends AppCompatActivity {
 
             ((TextView) headerView.findViewById(R.id.user_initials)).setText(userInitials);
         }
+
+        headerView.findViewById(R.id.btEdit).setOnClickListener(v -> {
+            drawer.closeDrawer();
+            getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.container, EditProfileFragment.newInstance())
+                    .addToBackStack(null)
+                    .commit();
+        });
     }
 
     private class DownloadUserAvatar extends AsyncTask<Void, Void, Void> {

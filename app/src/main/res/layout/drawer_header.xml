@@ -17,13 +17,14 @@
             android:src="@drawable/drawer_background" />
 
         <LinearLayout
-            android:layout_width="wrap_content"
+            android:layout_width="200dp"
             android:layout_height="wrap_content"
             android:layout_alignBottom="@+id/background"
-            android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
-            android:layout_marginBottom="55dp"
+            android:layout_alignParentLeft="true"
             android:layout_marginLeft="25dp"
+            android:layout_marginBottom="55dp"
+            android:gravity="center_horizontal"
             android:orientation="vertical">
 
             <RelativeLayout
@@ -72,6 +73,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
                 android:layout_marginTop="3dp"
+                android:gravity="center_horizontal"
                 android:maxLines="2"
                 android:text="Юрий Ельцов"
                 android:textColor="@android:color/white"
@@ -90,16 +92,20 @@
                 android:visibility="gone" />
 
             <TextView
-                android:id="@+id/account_type"
+                android:id="@+id/btEdit"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
-                android:layout_marginTop="10dp"
-                android:maxLines="2"
-                android:text="Исполнитель"
+                android:layout_marginTop="6dp"
+                android:drawableStart="@drawable/ic_edit_white"
+                android:drawablePadding="8dp"
+                android:gravity="center_horizontal"
+                android:paddingHorizontal="8dp"
+                android:paddingVertical="5dp"
+                android:text="@string/edit"
                 android:textColor="@android:color/white"
-                android:textSize="14sp"
-                android:visibility="invisible" />
+                android:textSize="16sp"
+                android:visibility="visible" />
 
             <TextView
                 android:id="@+id/email"

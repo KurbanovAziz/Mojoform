@@ -528,40 +528,11 @@ public class TemplateFragment extends Fragment {
                 .autoDismiss(true)
                 .positiveText(R.string.camera)
                 .negativeText(R.string.gallery)
-                .onPositive(new MaterialDialog.SingleButtonCallback() {
-                    @SuppressLint("CheckResult")
-                    @Override
-                    public void onClick(@android.support.annotation.NonNull MaterialDialog dialog, @android.support.annotation.NonNull DialogAction which) {
-                        CustomCamera2Activity.startForResult(TemplateFragment.this, PHOTO_REQUEST_CODE);
-                    }
-                })
-                .onNegative(new MaterialDialog.SingleButtonCallback() {
-                    @Override
-                    public void onClick(@android.support.annotation.NonNull MaterialDialog dialog, @android.support.annotation.NonNull DialogAction which) {
-                        /*RxImagePicker.with(getContext()).requestMultipleImages()
-                                .flatMap(new Function<List<Uri>, ObservableSource<Uri>>() {
-                                    @Override
-                                    public ObservableSource<Uri> apply(@NonNull List<Uri> uris) throws Exception {
-                                        return Observable.fromIterable(uris);
-                                    }
-                                })
-                                .flatMap(new Function<Uri, ObservableSource<File>>() {
-                                    @Override
-                                    public ObservableSource<File> apply(@NonNull Uri uri) throws Exception {
-                                        File cacheFile = new File(getContext().getCacheDir(), UUID.randomUUID().toString() + ".png");
-                                        return RxImageConverters.uriToFile(getContext(), uri, cacheFile);
-                                    }
-                                })
-                                .subscribe(new Consumer<File>() {
-                                    @Override
-                                    public void accept(@NonNull File file) throws Exception {
-                                        processImageFile(file, false);
-                                    }
-                                });*/
-                        Intent intent = new Intent(getContext(), AlbumSelectActivity.class);
-                        intent.putExtra(Constants.INTENT_EXTRA_LIMIT, 10);
-                        startActivityForResult(intent, Constants.REQUEST_CODE);
-                    }
+                .onPositive((dialog, which) -> CustomCamera2Activity.startForResult(TemplateFragment.this, PHOTO_REQUEST_CODE))
+                .onNegative((dialog, which) -> {
+                    Intent intent = new Intent(getContext(), AlbumSelectActivity.class);
+                    intent.putExtra(Constants.INTENT_EXTRA_LIMIT, 10);
+                    startActivityForResult(intent, Constants.REQUEST_CODE);
                 })
                 .build()
                 .show();
@@ -3130,7 +3101,7 @@ public class TemplateFragment extends Fragment {
                                 try {
                                     File mediaFile = new File(mediaPath);
 
-                                    final Response response = RequestService.createSendFileRequest(mediaUploadUrl, MediaType.parse(mimeType), mediaFile);
+                                    final Response response = RequestService.createSendFilePostRequest(mediaUploadUrl, MediaType.parse(mimeType), mediaFile);
 
                                     if (response.code() == 200) {
                                         String mediaId = "attach:" + new JSONObject(response.body().string()).getString("id");
@@ -3179,7 +3150,7 @@ public class TemplateFragment extends Fragment {
                         Bitmap bitmap = BitmapFactory.decodeByteArray(decodedByte, 0, decodedByte.length);
                         if (bitmap != null) {
                             File mediaFile = BitmapService.saveBitmapToFile(getContext(), bitmap);
-                            Response response = RequestService.createSendFileRequest(mediaUploadUrl, MediaType.parse("image/jpg"), mediaFile);
+                            Response response = RequestService.createSendFilePostRequest(mediaUploadUrl, MediaType.parse("image/jpg"), mediaFile);
                             if (response.code() == 200) {
                                 mediaFile.delete();
                                 String mediaId = "attach:" + new JSONObject(response.body().string()).getString("id");

@@ -163,5 +163,10 @@
 
     <string name="attention">Attention</string>
     <string name="need_download_app">To work correctly, you need a third-party application to scan the barcode. Go to Google Play to download it?</string>
+    <string name="edit">Edit</string>
+    <string name="profile">Profile</string>
+    <string name="name">Name</string>
+    <string name="last_name">Surname</string>
+    <string name="save">Save</string>
 
 </resources>
