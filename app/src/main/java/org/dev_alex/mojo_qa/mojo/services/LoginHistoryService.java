@@ -118,6 +118,28 @@ public class LoginHistoryService {
         }
     }
 
+    public static void onUserUpdated(User user) {
+        ArrayList<User> lastUsers = getLastLoggedUsers();
+        for(User lastUser : lastUsers){
+            if(lastUser.username.equals(user.username)){
+                lastUser.firstName = user.firstName;
+                lastUser.lastName = user.lastName;
+                lastUser.has_avatar = user.has_avatar;
+            }
+        }
+
+        try {
+            SharedPreferences mSettings;
+            mSettings = App.getContext().getSharedPreferences(LOGIN_PREFERENCES, Context.MODE_PRIVATE);
+            SharedPreferences.Editor editor = mSettings.edit();
+
+            editor.putString(USERS, new ObjectMapper().writeValueAsString(lastUsers));
+            editor.apply();
+        } catch (Exception exc) {
+            exc.printStackTrace();
+        }
+    }
+
     public static boolean lastLoginUsersExists() {
         return (getLastLoggedUsers() != null);
     }
