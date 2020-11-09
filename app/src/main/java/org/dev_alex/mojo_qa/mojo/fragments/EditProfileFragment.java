@@ -260,7 +260,7 @@ public class EditProfileFragment extends Fragment {
         @Override
         protected Void doInBackground(Void... params) {
             try {
-                Response thumbResponse = RequestService.createGetRequest("/api/user/" + LoginHistoryService.getCurrentUser().username + "/avatar.png");
+                Response thumbResponse = RequestService.createGetRequest("/api/profile/avatar.png");
                 byte[] imageBytes = thumbResponse.body().bytes();
                 avatar = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length);
             } catch (Exception exc) {
@@ -307,7 +307,7 @@ public class EditProfileFragment extends Fragment {
         @Override
         protected Integer doInBackground(Void... params) {
             try {
-                Response response = RequestService.createSendFilePutRequest("/api/user/" + username + "/avatar", MediaType.parse("image/jpg"), avatar);
+                Response response = RequestService.createSendFilePutRequest("/api/profile/avatar.png", MediaType.parse("image/jpg"), avatar);
                 return response.code();
             } catch (Exception exc) {
                 exc.printStackTrace();
@@ -361,7 +361,7 @@ public class EditProfileFragment extends Fragment {
                 requestJson.put("firstName", name);
                 requestJson.put("lastName", surname);
 
-                Response response = RequestService.createPutRequest("/api/user/" + username, requestJson.toString());
+                Response response = RequestService.createPutRequest("/api/profile", requestJson.toString());
 
                 if (response.code() == 202 || response.code() == 200) {
                     String userJson = response.body().string();
@@ -398,4 +398,5 @@ public class EditProfileFragment extends Fragment {
             }
         }
     }
+
 }

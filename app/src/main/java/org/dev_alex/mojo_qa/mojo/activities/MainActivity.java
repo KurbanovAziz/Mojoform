@@ -16,6 +16,7 @@ import android.support.annotation.NonNull;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.SwitchCompat;
 import android.text.TextUtils;
 import android.view.View;
 import android.view.WindowManager;
@@ -177,6 +178,11 @@ public class MainActivity extends AppCompatActivity {
                     "%s %s", TextUtils.isEmpty(currentUser.lastName) ? "" : currentUser.lastName,
                     TextUtils.isEmpty(currentUser.firstName) ? "" : currentUser.firstName));
 
+        ((SwitchCompat) headerView.findViewById(R.id.swPush)).setChecked(!currentUser.push_disabled);
+        ((SwitchCompat) headerView.findViewById(R.id.swPush)).setOnCheckedChangeListener((buttonView, isChecked) -> {
+            new UpdatePushInfoTask(!isChecked).execute();
+        });
+
 
         ArrayList<SecondaryDrawerItem> mainDraggableItems = new ArrayList<>();
         for (String str : getDrawerMenuSequence()) {
@@ -252,8 +258,7 @@ public class MainActivity extends AppCompatActivity {
                 }
                 return false;
             }
-        })
-                .build();
+        }).build();
 
         findViewById(R.id.sandwich_btn).setOnClickListener(v -> {
             if (drawer.isDrawerOpen())
@@ -299,7 +304,7 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected Void doInBackground(Void... params) {
             try {
-                Response thumbResponse = RequestService.createGetRequest("/api/user/" + LoginHistoryService.getCurrentUser().username + "/avatar.png");
+                Response thumbResponse = RequestService.createGetRequest("/api/profile/avatar.png");
                 byte[] imageBytes = thumbResponse.body().bytes();
                 avatar = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length);
             } catch (Exception exc) {
@@ -599,4 +604,50 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    private class UpdatePushInfoTask extends AsyncTask<Void, Void, Integer> {
+        private final boolean isEnabled;
+
+        private User user;
+
+        public UpdatePushInfoTask(boolean isEnabled) {
+            this.isEnabled = isEnabled;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        @Override
+        protected Integer doInBackground(Void... params) {
+            try {
+                JSONObject requestJson = new JSONObject();
+                requestJson.put("push_disabled", isEnabled);
+
+                Response response = RequestService.createPutRequest("/api/profile/pushpolicy", requestJson.toString());
+
+                if (response.code() == 202 || response.code() == 200) {
+                    String userJson = response.body().string();
+                    user = new ObjectMapper().readValue(userJson, User.class);
+                }
+                return response.code();
+            } catch (Exception exc) {
+                exc.printStackTrace();
+                return null;
+            }
+        }
+
+        @Override
+        protected void onPostExecute(Integer responseCode) {
+            super.onPostExecute(responseCode);
+            try {
+                if (user != null) {
+                    LoginHistoryService.setCurrentUser(user);
+                }
+
+            } catch (Exception exc) {
+                exc.printStackTrace();
+            }
+        }
+    }
 }

@@ -15,6 +15,8 @@ public class User implements Serializable {
     public Boolean is_orgowner = null;
     public Boolean is_manager = null;
 
+    public boolean push_disabled = false;
+
     public User() {
     }
 }
