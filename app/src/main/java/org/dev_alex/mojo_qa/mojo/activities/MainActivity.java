@@ -399,8 +399,8 @@ public class MainActivity extends AppCompatActivity {
 
             User user = LoginHistoryService.getCurrentUser();
             if (user != null && (user.is_manager == null || !user.is_manager) && (user.is_orgowner == null || !user.is_orgowner)) {
-                seqList.remove("docs");
-                seqList.remove("analytics");
+                //seqList.remove("docs");
+                //seqList.remove("analytics");
             }
 
             return seqList;
