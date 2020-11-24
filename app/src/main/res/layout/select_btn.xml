@@ -26,7 +26,6 @@
         android:layout_marginBottom="14dp"
         android:ellipsize="end"
         android:gravity="center"
-        android:maxLines="2"
         android:textColor="#4c3e60"
         android:textSize="15sp" />
 </FrameLayout>
