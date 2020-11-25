@@ -1,31 +1,43 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="62dp"
+    android:layout_height="wrap_content"
     android:layout_marginTop="-9dp">
 
     <CheckBox
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@id/tvButton"
+        android:layout_alignTop="@+id/tvButton"
+        android:layout_alignRight="@+id/tvButton"
+        android:layout_alignBottom="@+id/tvButton"
         android:background="@drawable/select_btn_only_shadow"
-        android:layout_height="match_parent"
         android:button="@null" />
 
     <View
-        android:layout_width="match_parent"
-        android:layout_height="40dp"
-        android:layout_marginLeft="10dp"
-        android:layout_marginRight="10dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@id/tvButton"
+        android:layout_alignTop="@+id/tvButton"
+        android:layout_alignRight="@+id/tvButton"
+        android:layout_alignBottom="@+id/tvButton"
+        android:layout_marginLeft="15dp"
         android:layout_marginTop="5.1dp"
-        android:background="@drawable/shape_white_oval" />
+        android:layout_marginRight="15dp"
+        android:layout_marginBottom="22dp"
+        android:background="@drawable/shape_white_oval"
+        android:visibility="visible" />
 
     <TextView
+        android:id="@+id/tvButton"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginLeft="14dp"
-        android:layout_marginRight="14dp"
+        android:layout_height="wrap_content"
         android:layout_marginBottom="14dp"
         android:ellipsize="end"
         android:gravity="center"
+        android:paddingHorizontal="16dp"
+        android:paddingTop="12dp"
+        android:paddingBottom="33dp"
         android:textColor="#4c3e60"
         android:textSize="15sp" />
-</FrameLayout>
+</RelativeLayout>

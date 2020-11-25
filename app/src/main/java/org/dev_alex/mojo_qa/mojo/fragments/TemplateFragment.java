@@ -319,6 +319,7 @@ public class TemplateFragment extends Fragment {
         }
     }
 
+    @SuppressLint("MissingPermission")
     private void requestLocation() {
         if (checkLocationPermissions()) {
             FusedLocationProviderClient fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireContext());
@@ -2001,7 +2002,7 @@ public class TemplateFragment extends Fragment {
             JSONArray options = value.getJSONArray("options");
             for (int j = 0; j < options.length(); j++) {
                 JSONObject option = options.getJSONObject(j);
-                FrameLayout selectBtnFrame = (FrameLayout) getActivity().getLayoutInflater().inflate(R.layout.select_btn, selectBtnContainer, false);
+                ViewGroup selectBtnFrame = (ViewGroup) getActivity().getLayoutInflater().inflate(R.layout.select_btn, selectBtnContainer, false);
 
                 final CheckBox selectBtn = (CheckBox) selectBtnFrame.getChildAt(0);
                 TextView selectBtnText = (TextView) selectBtnFrame.getChildAt(2);
@@ -2120,7 +2121,7 @@ public class TemplateFragment extends Fragment {
                 for (int i = 0; i < options.length(); i++) {
                     JSONObject option = options.getJSONObject(i);
                     if (Utils.containsValue(value.getJSONArray("values"), option.getString("id"))) {
-                        FrameLayout selectBtnFrame = (FrameLayout) getActivity().getLayoutInflater().inflate(R.layout.select_btn, answersContainer, false);
+                        ViewGroup selectBtnFrame = (ViewGroup) getActivity().getLayoutInflater().inflate(R.layout.select_btn, answersContainer, false);
                         CheckBox selectBtn = (CheckBox) selectBtnFrame.getChildAt(0);
                         TextView selectBtnText = (TextView) selectBtnFrame.getChildAt(2);
 
@@ -2149,7 +2150,7 @@ public class TemplateFragment extends Fragment {
             GradientDrawable bgShape = (GradientDrawable) ContextCompat.getDrawable(getContext(), R.drawable.shape_white_oval).mutate();
 
             if (isChecked) {
-                ((TextView) ((FrameLayout) checkButton.getParent()).getChildAt(2)).setTextColor(Color.WHITE);
+                ((TextView) ((ViewGroup) checkButton.getParent()).getChildAt(2)).setTextColor(Color.WHITE);
 
                 if (buttonJson.has("color"))
                     bgShape.setColor(Color.parseColor(buttonJson.getString("color")));
@@ -2157,11 +2158,11 @@ public class TemplateFragment extends Fragment {
                     bgShape.setColor(Color.parseColor("#c99fe3"));
             } else {
                 bgShape.setColor(Color.WHITE);
-                ((TextView) ((FrameLayout) checkButton.getParent()).getChildAt(2)).setTextColor(Color.parseColor("#4c3e60"));
+                ((TextView) ((ViewGroup) checkButton.getParent()).getChildAt(2)).setTextColor(Color.parseColor("#4c3e60"));
             }
 
 
-            ((FrameLayout) checkButton.getParent()).getChildAt(1).setBackground(bgShape);
+            ((ViewGroup) checkButton.getParent()).getChildAt(1).setBackground(bgShape);
         } catch (Exception exc) {
             exc.printStackTrace();
         }
@@ -2216,7 +2217,7 @@ public class TemplateFragment extends Fragment {
                 new String[]{Manifest.permission.RECORD_AUDIO, Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE}, 0);
     }
 
-    private FrameLayout boxInContainerWithId(ViewGroup content, String tag) {
+    private ViewGroup boxInContainerWithId(ViewGroup content, String tag) {
         int topAndBottomPaddings = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 5, getResources().getDisplayMetrics());
         FrameLayout boxLayout = new FrameLayout(getContext());
         boxLayout.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
@@ -2298,9 +2299,9 @@ public class TemplateFragment extends Fragment {
             container.setBackgroundColor(Color.TRANSPARENT);
     }
 
-    private FrameLayout createImgFrame(Bitmap photo) {
+    private ViewGroup createImgFrame(Bitmap photo) {
         LinearLayout imageContainer = (LinearLayout) ((HorizontalScrollView) currentMediaBlock.first.getChildAt(1)).getChildAt(0);
-        FrameLayout imageFrame = (FrameLayout) LayoutInflater.from(getContext()).inflate(R.layout.image_with_frame_layout, imageContainer, false);
+        ViewGroup imageFrame = (ViewGroup) LayoutInflater.from(getContext()).inflate(R.layout.image_with_frame_layout, imageContainer, false);
         ImageView imageView = (ImageView) imageFrame.getChildAt(0);
         imageView.setImageBitmap(photo);
 
@@ -3446,7 +3447,7 @@ public class TemplateFragment extends Fragment {
                         new Consumer<Pair<Bitmap, String>>() {
                             @Override
                             public void accept(@NonNull Pair<Bitmap, String> bitmapStringPair) throws Exception {
-                                FrameLayout imageContainer = createImgFrame(bitmapStringPair.first);
+                                ViewGroup imageContainer = createImgFrame(bitmapStringPair.first);
                                 imageContainer.setTag(bitmapStringPair.second);
 
                                 if (toBlock != null && toBlock.first != null) {
