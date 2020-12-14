@@ -147,51 +147,40 @@ public class FileAdapter extends RecyclerView.Adapter<FileAdapter.FileViewHolder
 
         if (selectionModeEnabled) {
             viewHolder.moreBtn.setOnClickListener(null);
-            viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if (selectedIds.contains(file.id))
-                        selectedIds.remove(file.id);
-                    else
-                        selectedIds.add(file.id);
+            viewHolder.itemView.setOnClickListener(v -> {
+                if (selectedIds.contains(file.id))
+                    selectedIds.remove(file.id);
+                else
+                    selectedIds.add(file.id);
 
-                    notifyDataSetChanged();
-                    parentFragment.checkIfSelectionModeFinished();
-                }
+                notifyDataSetChanged();
+                parentFragment.checkIfSelectionModeFinished();
             });
         } else {
-            viewHolder.moreBtn.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    parentFragment.showPopUpWindow(file);
-                }
-            });
+            viewHolder.moreBtn.setOnClickListener(v -> parentFragment.showPopUpWindow(file));
 
-            if (file.nodeType.equals("cm:content"))
-                viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        parentFragment.new OpenFileTask(file).execute();
-                    }
-                });
+            if (file.nodeType.equals("cm:content")) {
+                viewHolder.itemView.setOnClickListener(v -> parentFragment.new OpenFileTask(file).execute());
+            }
+
+            if (file.nodeType.equals("mojo:template")) {
+                viewHolder.itemView.setOnClickListener(v -> parentFragment.onTemplateClick(file));
+            }
         }
 
-        viewHolder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-                if (!selectionModeEnabled) {
-                    parentFragment.startSelectionMode();
-                    selectedIds.add(file.id);
-                    parentFragment.checkIfSelectionModeFinished();
-                }
-                return true;
+        viewHolder.itemView.setOnLongClickListener(v -> {
+            if (!selectionModeEnabled) {
+                parentFragment.startSelectionMode();
+                selectedIds.add(file.id);
+                parentFragment.checkIfSelectionModeFinished();
             }
+            return true;
         });
 
         viewHolder.moreBtn.setVisibility(View.VISIBLE);
-        if ((LoginHistoryService.getCurrentUser().is_manager == null || !LoginHistoryService.getCurrentUser().is_manager)
-                && (LoginHistoryService.getCurrentUser().is_orgowner == null || !LoginHistoryService.getCurrentUser().is_orgowner))
+        if ((LoginHistoryService.getCurrentUser().is_manager == null || !LoginHistoryService.getCurrentUser().is_manager) && (LoginHistoryService.getCurrentUser().is_orgowner == null || !LoginHistoryService.getCurrentUser().is_orgowner)) {
             viewHolder.moreBtn.setVisibility(View.INVISIBLE);
+        }
     }
 
     @Override

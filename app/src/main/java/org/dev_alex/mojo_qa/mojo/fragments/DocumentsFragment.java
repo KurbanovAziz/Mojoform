@@ -40,6 +40,7 @@ import org.dev_alex.mojo_qa.mojo.adapters.FileAdapter;
 import org.dev_alex.mojo_qa.mojo.adapters.FolderAdapter;
 import org.dev_alex.mojo_qa.mojo.custom_views.MaxHeightRecycleView;
 import org.dev_alex.mojo_qa.mojo.custom_views.RelativeLayoutWithPopUp;
+import org.dev_alex.mojo_qa.mojo.fragments.create_task.CreateTaskInfoFragment;
 import org.dev_alex.mojo_qa.mojo.models.File;
 import org.dev_alex.mojo_qa.mojo.models.FileSystemStackEntry;
 import org.dev_alex.mojo_qa.mojo.services.BitmapCacheService;
@@ -646,6 +647,14 @@ public class DocumentsFragment extends Fragment {
         }
     }
 
+    public void onTemplateClick(final File item) {
+        getActivity()
+                .getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.container, CreateTaskInfoFragment.newInstance(item))
+                .addToBackStack(null)
+                .commit();
+    }
 
     private class CreateDirTask extends AsyncTask<Void, Void, Integer> {
         private AlertDialog dialog;

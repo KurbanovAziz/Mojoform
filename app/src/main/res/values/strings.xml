@@ -170,4 +170,17 @@
     <string name="name">Имя</string>
     <string name="last_name">Фамилия</string>
 
+    <string name="select_executors">Выбрать исполнителей</string>
+    <string name="assignments">Назначения</string>
+    <string name="input_task_name">Впишите название задачи</string>
+    <string name="task_type_constant">Постоянная</string>
+    <string name="task_type_periodical">Периодическая</string>
+    <string name="task_type_oneshot">Разовая</string>
+    <string name="task_type_by_link">По ссылке</string>
+    <string name="task_type_open_poll">Открытый опрос</string>
+    <string name="set_rules">Задать правила</string>
+    <string name="set_task_due_date">Задай срок выполнения задачи</string>
+    <string name="exec_start">Начало выполнения</string>
+    <string name="exec_end">Конец выполнения</string>
+
 </resources>

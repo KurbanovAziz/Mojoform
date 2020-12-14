@@ -1,4 +1,7 @@
 apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
+apply plugin: 'kotlin-kapt'
 
 android {
     compileSdkVersion 29
@@ -131,7 +134,7 @@ dependencies {
     implementation 'com.github.gcacace:signature-pad:1.2.1'
 
     implementation 'frankiesardo:icepick:3.2.0'
-    annotationProcessor 'frankiesardo:icepick-processor:3.2.0'
+    kapt 'frankiesardo:icepick-processor:3.2.0'
     implementation 'com.mlsdev.rximagepicker:library:2.0.2'
     implementation 'com.afollestad.material-dialogs:core:0.9.6.0'
 
@@ -153,5 +156,6 @@ dependencies {
     implementation 'net.yslibrary.keyboardvisibilityevent:keyboardvisibilityevent:2.3.0'
 
     implementation 'org.jsoup:jsoup:1.11.3'
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 }
 apply plugin: 'com.google.gms.google-services'
