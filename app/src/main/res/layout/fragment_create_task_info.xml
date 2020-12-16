@@ -175,6 +175,127 @@
                         android:textSize="16sp" />
                 </LinearLayout>
             </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/vOpenPollBlock"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="13dp"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/poll_date_and_count"
+                    android:textColor="#726583"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="5dp"
+                    android:orientation="horizontal">
+
+                    <android.support.v7.widget.AppCompatSpinner
+                        android:id="@+id/spOpenPollCount"
+                        android:layout_width="114dp"
+                        android:layout_height="wrap_content"
+                        android:background="@null"
+                        android:minHeight="36dp"
+                        tools:background="@drawable/input_text_background_gray_border" />
+
+                    <Space
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1" />
+
+                    <TextView
+                        android:id="@+id/btOpenPollEndDate"
+                        android:layout_width="114dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="9dp"
+                        android:background="@drawable/input_text_background_gray_border"
+                        android:ellipsize="end"
+                        android:gravity="center"
+                        android:minHeight="36dp"
+                        android:paddingLeft="10dp"
+                        android:paddingTop="8dp"
+                        android:paddingRight="10dp"
+                        android:paddingBottom="8dp"
+                        android:singleLine="true"
+                        android:textColor="#726583"
+                        android:textSize="16sp" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/vPeriodicalBlock"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="13dp"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/set_task_execution_time"
+                    android:textColor="#726583"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="5dp"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="85dp"
+                        android:layout_height="wrap_content"
+                        android:background="@null"
+                        android:gravity="center_horizontal"
+                        android:text="@string/hours"
+                        android:textColor="#726583"
+                        android:textSize="16sp" />
+
+                    <TextView
+                        android:layout_width="85dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="9dp"
+                        android:background="@null"
+                        android:gravity="center_horizontal"
+                        android:text="@string/minutes"
+                        android:textColor="#726583"
+                        android:textSize="16sp" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="5dp"
+                    android:orientation="horizontal">
+
+                    <android.support.v7.widget.AppCompatSpinner
+                        android:id="@+id/spPeriodicalHour"
+                        android:layout_width="85dp"
+                        android:layout_height="wrap_content"
+                        android:background="@null"
+                        android:minHeight="36dp"
+                        tools:background="@drawable/input_text_background_gray_border" />
+
+                    <android.support.v7.widget.AppCompatSpinner
+                        android:id="@+id/spPeriodicalMinute"
+                        android:layout_width="85dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="9dp"
+                        android:background="@null"
+                        android:minHeight="36dp"
+                        tools:background="@drawable/input_text_background_gray_border" />
+                </LinearLayout>
+            </LinearLayout>
         </LinearLayout>
     </ScrollView>
 

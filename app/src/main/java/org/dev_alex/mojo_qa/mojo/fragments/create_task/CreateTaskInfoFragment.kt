@@ -1,5 +1,6 @@
 package org.dev_alex.mojo_qa.mojo.fragments.create_task
 
+import android.app.DatePickerDialog
 import android.app.ProgressDialog
 import android.os.Bundle
 import android.support.v4.app.Fragment
@@ -24,9 +25,14 @@ import org.dev_alex.mojo_qa.mojo.services.Utils
 import java.text.SimpleDateFormat
 import java.util.*
 
+
 @Suppress("DEPRECATION")
 class CreateTaskInfoFragment : Fragment() {
     private var loopDialog: ProgressDialog? = null
+
+    private val model: CreateTaskModel
+        get() = CreateTaskModel.instance!!
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val rootView = inflater.inflate(R.layout.fragment_create_task_info, container, false)
 
@@ -48,6 +54,8 @@ class CreateTaskInfoFragment : Fragment() {
         })
         initTaskTypeSpinner()
         initOneShotTaskViews()
+        initOpenPollTaskViews()
+        initPeriodicalTaskViews()
     }
 
     private fun initTaskTypeSpinner() {
@@ -63,6 +71,9 @@ class CreateTaskInfoFragment : Fragment() {
                 model.type = selectedType
 
                 vOneShotBlock.visibility = View.GONE
+                vOpenPollBlock.visibility = View.GONE
+                vPeriodicalBlock.visibility = View.GONE
+
                 btSelectExecutor.visibility = View.GONE
                 btSelectRules.visibility = View.GONE
                 when (selectedType) {
@@ -71,6 +82,7 @@ class CreateTaskInfoFragment : Fragment() {
                     }
                     TaskType.OPEN_POLL -> {
                         btSelectRules.visibility = View.VISIBLE
+                        vOpenPollBlock.visibility = View.VISIBLE
                     }
 
                     TaskType.CONSTANT -> {
@@ -78,6 +90,7 @@ class CreateTaskInfoFragment : Fragment() {
                     }
                     TaskType.PERIODICAL -> {
                         btSelectExecutor.visibility = View.VISIBLE
+                        vPeriodicalBlock.visibility = View.VISIBLE
                     }
                     TaskType.ONE_SHOT -> {
                         vOneShotBlock.visibility = View.VISIBLE
@@ -118,40 +131,6 @@ class CreateTaskInfoFragment : Fragment() {
             }
         }
 
-        val initHourSpinner = { spinner: AppCompatSpinner, callback: (Int) -> Unit ->
-            val hoursArray = (0..23).toList()
-            val hoursArrayStr = hoursArray.map { String.format("%02d", it) }
-            val adapter = ArrayAdapter(requireContext(), R.layout.spinner_task_type_item, hoursArrayStr)
-            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-
-            spinner.adapter = adapter
-            spinner.onItemSelectedListener = object : OnItemSelectedListener {
-                override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-                    callback(hoursArray[position])
-                }
-
-                override fun onNothingSelected(parent: AdapterView<*>?) {
-                }
-            }
-        }
-
-        val initMinuteSpinner = { spinner: AppCompatSpinner, callback: (Int) -> Unit ->
-            val minutesArray = (0..59).toList()
-            val hoursArrayStr = minutesArray.map { String.format("%02d", it) }
-            val adapter = ArrayAdapter(requireContext(), R.layout.spinner_task_type_item, hoursArrayStr)
-            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-
-            spinner.adapter = adapter
-            spinner.onItemSelectedListener = object : OnItemSelectedListener {
-                override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-                    callback(minutesArray[position])
-                }
-
-                override fun onNothingSelected(parent: AdapterView<*>?) {
-                }
-            }
-        }
-
         initHourSpinner(spOneShotStartHour) {
             model.updateStartOneShotHourPart(it)
         }
@@ -168,6 +147,104 @@ class CreateTaskInfoFragment : Fragment() {
 
         spOneShotStartHour.setSelection(9)
         spOneShotEndHour.setSelection(21)
+    }
+
+    private fun initPeriodicalTaskViews() {
+        initHourSpinner(spPeriodicalHour) {
+            model.periodicalTaskHour = it
+        }
+        initMinuteSpinner(spPeriodicalMinute) {
+            model.periodicalTaskMinutes = it
+        }
+        spPeriodicalHour.setSelection(12)
+        spPeriodicalMinute.setSelection(48)
+    }
+
+    private fun initOpenPollTaskViews() {
+        model.endOpenPollDate = Date()
+
+        val styleTextDateView = { tv: TextView, date: Date ->
+            val sdf = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault())
+            tv.text = sdf.format(date)
+        }
+
+        styleTextDateView(btOpenPollEndDate, model.endOpenPollDate ?: Date())
+
+        btOpenPollEndDate.setOnClickListener {
+            showDatePicker(model.endOpenPollDate ?: Date()) {
+                model.endOpenPollDate = it
+                styleTextDateView(btOpenPollEndDate, it)
+            }
+        }
+
+
+        val countArray = (1..1000).toList()
+        val countArrayStr = countArray.map { it.toString() }
+        val adapter = ArrayAdapter(requireContext(), R.layout.spinner_task_type_item, countArrayStr)
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+
+        spOpenPollCount.adapter = adapter
+        spOpenPollCount.onItemSelectedListener = object : OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                model.pollPersonsCount = countArray[position]
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>?) {
+            }
+        }
+
+        spOpenPollCount.setSelection(9)
+    }
+
+    private fun initHourSpinner(spinner: AppCompatSpinner, callback: (Int) -> Unit) {
+        val hoursArray = (0..23).toList()
+        val hoursArrayStr = hoursArray.map { String.format("%02d", it) }
+        val adapter = ArrayAdapter(requireContext(), R.layout.spinner_task_type_item, hoursArrayStr)
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+
+        spinner.adapter = adapter
+        spinner.onItemSelectedListener = object : OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                callback(hoursArray[position])
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>?) {
+            }
+        }
+    }
+
+    private fun initMinuteSpinner(spinner: AppCompatSpinner, callback: (Int) -> Unit) {
+        val minutesArray = (0..59).toList()
+        val hoursArrayStr = minutesArray.map { String.format("%02d", it) }
+        val adapter = ArrayAdapter(requireContext(), R.layout.spinner_task_type_item, hoursArrayStr)
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+
+        spinner.adapter = adapter
+        spinner.onItemSelectedListener = object : OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                callback(minutesArray[position])
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>?) {
+            }
+        }
+    }
+
+    private fun showDatePicker(preset: Date, callback: (Date) -> Unit) {
+        val cal = Calendar.getInstance().apply { time = preset }
+        val year = cal[Calendar.YEAR]
+        val month = cal[Calendar.MONTH]
+        val day = cal[Calendar.DAY_OF_MONTH]
+
+        val datePickerDialog = DatePickerDialog(requireContext(), { _, year, monthOfYear, dayOfMonth ->
+            val resCalendar = Calendar.getInstance()
+            resCalendar[Calendar.YEAR] = year
+            resCalendar[Calendar.MONTH] = monthOfYear
+            resCalendar[Calendar.DAY_OF_MONTH] = dayOfMonth
+
+            callback(resCalendar.time)
+        }, year, month, day)
+        datePickerDialog.show()
     }
 
     private fun setupHeader() {
@@ -189,7 +266,6 @@ class CreateTaskInfoFragment : Fragment() {
             setCanceledOnTouchOutside(false)
             setCancelable(false)
         }
-
     }
 
     private fun onPanelClick(panel: Panel) {
@@ -200,14 +276,6 @@ class CreateTaskInfoFragment : Fragment() {
                 ?.addToBackStack(null)
                 ?.commit()
     }
-
-    private fun showDatePicker(preset: Date, callback: (Date) -> Unit) {
-
-    }
-
-    private val model: CreateTaskModel
-        get() = CreateTaskModel.instance!!
-
 
     companion object {
         @JvmStatic

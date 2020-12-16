@@ -58,6 +58,14 @@ class CreateTaskModel private constructor() {
         endOneShotDate = calendar.time
     }
 
+    // OpenPoll
+    var endOpenPollDate: Date? = null
+    var pollPersonsCount: Int? = null
+
+    // Periodical
+    var periodicalTaskHour: Int? = null
+    var periodicalTaskMinutes: Int? = null
+
     enum class TaskType(val nameRes: Int) {
         CONSTANT(R.string.task_type_constant),
         PERIODICAL(R.string.task_type_periodical),

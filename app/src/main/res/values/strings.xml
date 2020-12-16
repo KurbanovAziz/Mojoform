@@ -182,5 +182,9 @@
     <string name="set_task_due_date">Задай срок выполнения задачи</string>
     <string name="exec_start">Начало выполнения</string>
     <string name="exec_end">Конец выполнения</string>
+    <string name="poll_date_and_count">Кол-во и дата завершения опросов</string>
+    <string name="set_task_execution_time">Задайте время на выполнение задачи</string>
+    <string name="hours">Часы</string>
+    <string name="minutes">Минуты</string>
 
 </resources>
