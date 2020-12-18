@@ -2,18 +2,19 @@ package org.dev_alex.mojo_qa.mojo.fragments.create_task
 
 import android.app.DatePickerDialog
 import android.app.ProgressDialog
+import android.graphics.Color
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v7.widget.AppCompatSpinner
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.TypedValue
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.AdapterView
+import android.widget.*
 import android.widget.AdapterView.OnItemSelectedListener
-import android.widget.ArrayAdapter
-import android.widget.TextView
 import kotlinx.android.synthetic.main.fragment_create_task_info.*
 import org.dev_alex.mojo_qa.mojo.CreateTaskModel
 import org.dev_alex.mojo_qa.mojo.CreateTaskModel.TaskType
@@ -24,6 +25,7 @@ import org.dev_alex.mojo_qa.mojo.models.Panel
 import org.dev_alex.mojo_qa.mojo.services.Utils
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.collections.ArrayList
 
 
 @Suppress("DEPRECATION")
@@ -56,6 +58,7 @@ class CreateTaskInfoFragment : Fragment() {
         initOneShotTaskViews()
         initOpenPollTaskViews()
         initPeriodicalTaskViews()
+        initConstantTaskViews()
     }
 
     private fun initTaskTypeSpinner() {
@@ -73,6 +76,7 @@ class CreateTaskInfoFragment : Fragment() {
                 vOneShotBlock.visibility = View.GONE
                 vOpenPollBlock.visibility = View.GONE
                 vPeriodicalBlock.visibility = View.GONE
+                vConstantBlock.visibility = View.GONE
 
                 btSelectExecutor.visibility = View.GONE
                 btSelectRules.visibility = View.GONE
@@ -87,6 +91,7 @@ class CreateTaskInfoFragment : Fragment() {
 
                     TaskType.CONSTANT -> {
                         btSelectExecutor.visibility = View.VISIBLE
+                        vConstantBlock.visibility = View.VISIBLE
                     }
                     TaskType.PERIODICAL -> {
                         btSelectExecutor.visibility = View.VISIBLE
@@ -194,6 +199,124 @@ class CreateTaskInfoFragment : Fragment() {
         }
 
         spOpenPollCount.setSelection(9)
+    }
+
+    private fun initConstantTaskViews() {
+        val clearContent = { vPeriodContent.removeAllViews() }
+        val renderRadioButton = { title: String ->
+            CheckBox(context).apply {
+                text = title
+                setTextColor(resources.getColorStateList(R.color.radiobutton_text_color))
+                setBackgroundResource(R.drawable.date_radiobutton_bg)
+                setButtonDrawable(android.R.color.transparent)
+                gravity = Gravity.CENTER
+                setTextSize(TypedValue.COMPLEX_UNIT_SP, 23f)
+
+                val size = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 35f, resources.displayMetrics).toInt()
+                layoutParams = ViewGroup.LayoutParams(size, size).apply {
+                    gravity = Gravity.CENTER
+                }
+                setPadding(0, 0, 0, TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 2f, resources.displayMetrics).toInt())
+            }
+        }
+        val renderTitle = { title: String ->
+            TextView(context).apply {
+                text = title
+                setTextColor(Color.parseColor("#726583"))
+                setTextSize(TypedValue.COMPLEX_UNIT_SP, 16f)
+            }
+        }
+
+
+        val renderDaysContent = {
+            clearContent()
+            vPeriodContent.addView(renderTitle(getString(R.string.every_day)))
+        }
+        val renderWeeksContent = {
+            clearContent()
+            vPeriodContent.addView(renderTitle(getString(R.string.every_week)))
+
+            val gridLayout = GridLayout(context).apply {
+                columnCount = 7
+                layoutParams = LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT).apply {
+                    topMargin = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 6f, resources.displayMetrics).toInt()
+                }
+            }
+
+            val weekDays = ArrayList<Int>()
+            (0..6).toList().forEach { dayPos ->
+                val dayName = resources.getStringArray(R.array.day_names)[dayPos]
+                val compoundButton = renderRadioButton(dayName)
+                compoundButton.setOnCheckedChangeListener { _, isChecked ->
+                    if (isChecked) {
+                        weekDays.add(dayPos)
+                    } else {
+                        weekDays.remove(dayPos)
+                    }
+                    model.selectedPeriod = CreateTaskModel.TaskPeriod.Weekly(weekDays)
+                }
+                val frame = FrameLayout(requireContext()).apply {
+                    layoutParams = GridLayout.LayoutParams().apply {
+                        columnSpec = GridLayout.spec(GridLayout.UNDEFINED, GridLayout.FILL, 1f)
+                        bottomMargin = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 5f, resources.displayMetrics).toInt()
+                    }
+                }
+                frame.addView(compoundButton)
+                gridLayout.addView(frame)
+            }
+            vPeriodContent.addView(gridLayout)
+        }
+        val renderMonthContent = {
+            clearContent()
+            vPeriodContent.addView(renderTitle(getString(R.string.every_month)))
+            val gridLayout = GridLayout(context).apply {
+                columnCount = 7
+                layoutParams = LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT).apply {
+                    topMargin = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 6f, resources.displayMetrics).toInt()
+                }
+            }
+
+            val daysList = ArrayList<Int>()
+            (1..31).toList().forEach { day ->
+                val compoundButton = renderRadioButton(day.toString())
+                compoundButton.setOnCheckedChangeListener { buttonView, isChecked ->
+                    if (isChecked) {
+                        daysList.add(day)
+                    } else {
+                        daysList.remove(day)
+                    }
+                    model.selectedPeriod = CreateTaskModel.TaskPeriod.Monthly(daysList)
+                }
+                val frame = FrameLayout(requireContext()).apply {
+                    layoutParams = GridLayout.LayoutParams().apply {
+                        columnSpec = GridLayout.spec(GridLayout.UNDEFINED, GridLayout.FILL, 1f)
+                        bottomMargin = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 5f, resources.displayMetrics).toInt()
+                    }
+                }
+                frame.addView(compoundButton)
+                gridLayout.addView(frame)
+            }
+            vPeriodContent.addView(gridLayout)
+        }
+
+        vPeriodGroup.setOnCheckedChangeListener { _, checkedId ->
+            when (checkedId) {
+                R.id.rbPeriodDays -> {
+                    renderDaysContent()
+                    model.selectedPeriod = CreateTaskModel.TaskPeriod.Daily
+                }
+                R.id.rbPeriodWeeks -> {
+                    renderWeeksContent()
+                    model.selectedPeriod = CreateTaskModel.TaskPeriod.Weekly(emptyList())
+                }
+                R.id.rbPeriodMonth -> {
+                    renderMonthContent()
+                    model.selectedPeriod = CreateTaskModel.TaskPeriod.Monthly(emptyList())
+                }
+            }
+        }
+
+        rbPeriodDays.isChecked = true
     }
 
     private fun initHourSpinner(spinner: AppCompatSpinner, callback: (Int) -> Unit) {

@@ -184,7 +184,24 @@
     <string name="exec_end">Конец выполнения</string>
     <string name="poll_date_and_count">Кол-во и дата завершения опросов</string>
     <string name="set_task_execution_time">Задайте время на выполнение задачи</string>
+    <string name="task_execution_period">Переодичность выполнения задачи</string>
     <string name="hours">Часы</string>
     <string name="minutes">Минуты</string>
+    <string name="days_short">Д</string>
+    <string name="weeks_short">Н</string>
+    <string name="month_short">М</string>
+    <string name="every_day">Ежедневно</string>
+    <string name="every_week">Еженедельно по следующим дням</string>
+    <string name="every_month">Ежемесячно по следующим числам</string>
+
+    <string-array name="day_names">
+        <item>вс</item>
+        <item>пн</item>
+        <item>вт</item>
+        <item>ср</item>
+        <item>чт</item>
+        <item>пт</item>
+        <item>сб</item>
+    </string-array>
 
 </resources>

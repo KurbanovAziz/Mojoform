@@ -66,12 +66,20 @@ class CreateTaskModel private constructor() {
     var periodicalTaskHour: Int? = null
     var periodicalTaskMinutes: Int? = null
 
+    var selectedPeriod: TaskPeriod? = null
+
     enum class TaskType(val nameRes: Int) {
         CONSTANT(R.string.task_type_constant),
         PERIODICAL(R.string.task_type_periodical),
         ONE_SHOT(R.string.task_type_oneshot),
         OPEN_LINK(R.string.task_type_by_link),
         OPEN_POLL(R.string.task_type_open_poll);
+    }
+
+    sealed class TaskPeriod {
+        object Daily : TaskPeriod()
+        data class Weekly(var days: List<Int>) : TaskPeriod()
+        data class Monthly(var days: List<Int>) : TaskPeriod()
     }
 
     companion object {

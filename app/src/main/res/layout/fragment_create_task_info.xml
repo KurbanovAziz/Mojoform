@@ -296,6 +296,87 @@
                         tools:background="@drawable/input_text_background_gray_border" />
                 </LinearLayout>
             </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/vConstantBlock"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="13dp"
+                android:orientation="vertical"
+                android:visibility="visible">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/task_execution_period"
+                    android:textColor="#726583"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+
+                <RadioGroup
+                    android:id="@+id/vPeriodGroup"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="7dp"
+                    android:orientation="horizontal"
+                    tools:ignore="HardcodedText">
+
+                    <RadioButton
+                        android:id="@+id/rbPeriodDays"
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        android:background="@drawable/date_radiobutton_bg"
+                        android:button="@android:color/transparent"
+                        android:gravity="center"
+                        android:paddingEnd="1dp"
+                        android:paddingBottom="1dp"
+                        android:text="@string/days_short"
+                        android:textColor="@color/radiobutton_text_color"
+                        android:textSize="23sp"
+                        android:textStyle="bold" />
+
+                    <RadioButton
+                        android:id="@+id/rbPeriodWeeks"
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        android:layout_marginStart="6dp"
+                        android:background="@drawable/date_radiobutton_bg"
+                        android:button="@android:color/transparent"
+                        android:gravity="center"
+                        android:text="@string/weeks_short"
+                        android:textColor="@color/radiobutton_text_color"
+                        android:textSize="23sp"
+                        android:textStyle="bold" />
+
+                    <RadioButton
+                        android:id="@+id/rbPeriodMonth"
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        android:layout_marginStart="6dp"
+                        android:background="@drawable/date_radiobutton_bg"
+                        android:button="@android:color/transparent"
+                        android:gravity="center"
+                        android:text="@string/month_short"
+                        android:textColor="@color/radiobutton_text_color"
+                        android:textSize="23sp"
+                        android:textStyle="bold" />
+                </RadioGroup>
+
+                <View
+                    android:layout_width="120dp"
+                    android:layout_height="1dp"
+                    android:layout_marginTop="4dp"
+                    android:layout_marginBottom="5dp"
+                    android:background="#726583" />
+
+                <LinearLayout
+                    android:id="@+id/vPeriodContent"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                </LinearLayout>
+            </LinearLayout>
         </LinearLayout>
     </ScrollView>
 
