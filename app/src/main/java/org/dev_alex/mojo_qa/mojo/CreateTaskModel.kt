@@ -1,12 +1,13 @@
 package org.dev_alex.mojo_qa.mojo
 
+import org.dev_alex.mojo_qa.mojo.CreateTaskModel.TaskType.*
 import org.dev_alex.mojo_qa.mojo.models.File
 import java.util.*
 
 class CreateTaskModel private constructor() {
     var file: File? = null
-    var name: String? = null
-    var type: TaskType? = null
+    var taskName: String? = null
+    var taskType: TaskType? = null
 
     // OneShot
     var startOneShotDate: Date? = null
@@ -65,15 +66,34 @@ class CreateTaskModel private constructor() {
     // Periodical
     var periodicalTaskHour: Int? = null
     var periodicalTaskMinutes: Int? = null
-
     var selectedPeriod: TaskPeriod? = null
 
     enum class TaskType(val nameRes: Int) {
         CONSTANT(R.string.task_type_constant),
         PERIODICAL(R.string.task_type_periodical),
         ONE_SHOT(R.string.task_type_oneshot),
-        OPEN_LINK(R.string.task_type_by_link),
+        PRIVATE_POLL(R.string.task_type_private_poll),
         OPEN_POLL(R.string.task_type_open_poll);
+    }
+
+    fun isValid(): Boolean {
+        if(taskName?.isBlank() == true) return false
+
+        return when (taskType) {
+            PERIODICAL -> {
+                periodicalTaskHour != null && periodicalTaskMinutes != null && selectedPeriod != null
+            }
+            ONE_SHOT -> {
+                startOneShotDate ?: return false
+                endOneShotDate?.after(startOneShotDate) == true
+
+            }
+            PRIVATE_POLL, OPEN_POLL -> {
+                endOpenPollDate?.after(Date()) == true
+            }
+            CONSTANT -> true
+            null -> false
+        }
     }
 
     sealed class TaskPeriod {

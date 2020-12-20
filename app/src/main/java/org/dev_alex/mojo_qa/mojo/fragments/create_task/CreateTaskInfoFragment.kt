@@ -19,9 +19,7 @@ import kotlinx.android.synthetic.main.fragment_create_task_info.*
 import org.dev_alex.mojo_qa.mojo.CreateTaskModel
 import org.dev_alex.mojo_qa.mojo.CreateTaskModel.TaskType
 import org.dev_alex.mojo_qa.mojo.R
-import org.dev_alex.mojo_qa.mojo.fragments.GraphListFragment
 import org.dev_alex.mojo_qa.mojo.models.File
-import org.dev_alex.mojo_qa.mojo.models.Panel
 import org.dev_alex.mojo_qa.mojo.services.Utils
 import java.text.SimpleDateFormat
 import java.util.*
@@ -51,7 +49,7 @@ class CreateTaskInfoFragment : Fragment() {
             override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {}
             override fun afterTextChanged(s: Editable) {
-                model.name = s.toString()
+                model.taskName = s.toString()
             }
         })
         initTaskTypeSpinner()
@@ -59,6 +57,22 @@ class CreateTaskInfoFragment : Fragment() {
         initOpenPollTaskViews()
         initPeriodicalTaskViews()
         initConstantTaskViews()
+
+        btSelectExecutor.setOnClickListener {
+            if (model.isValid()) {
+                showNextFragment(SelectTaskExecutorsFragment.newInstance())
+            } else {
+                Toast.makeText(context, R.string.not_all_fields_filled, Toast.LENGTH_SHORT).show()
+            }
+        }
+
+        btSelectRules.setOnClickListener {
+            if (model.isValid()) {
+
+            } else {
+                Toast.makeText(context, R.string.not_all_fields_filled, Toast.LENGTH_SHORT).show()
+            }
+        }
     }
 
     private fun initTaskTypeSpinner() {
@@ -71,22 +85,23 @@ class CreateTaskInfoFragment : Fragment() {
         spTaskType.onItemSelectedListener = object : OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>?, view: View, position: Int, id: Long) {
                 val selectedType = taskTypes[position]
-                model.type = selectedType
+                model.taskType = selectedType
 
                 vOneShotBlock.visibility = View.GONE
-                vOpenPollBlock.visibility = View.GONE
+                vPollTasksBlock.visibility = View.GONE
                 vPeriodicalBlock.visibility = View.GONE
                 vConstantBlock.visibility = View.GONE
 
                 btSelectExecutor.visibility = View.GONE
                 btSelectRules.visibility = View.GONE
                 when (selectedType) {
-                    TaskType.OPEN_LINK -> {
+                    TaskType.PRIVATE_POLL -> {
                         btSelectRules.visibility = View.VISIBLE
+                        vPollTasksBlock.visibility = View.VISIBLE
                     }
                     TaskType.OPEN_POLL -> {
                         btSelectRules.visibility = View.VISIBLE
-                        vOpenPollBlock.visibility = View.VISIBLE
+                        vPollTasksBlock.visibility = View.VISIBLE
                     }
 
                     TaskType.CONSTANT -> {
@@ -163,45 +178,7 @@ class CreateTaskInfoFragment : Fragment() {
         }
         spPeriodicalHour.setSelection(12)
         spPeriodicalMinute.setSelection(48)
-    }
 
-    private fun initOpenPollTaskViews() {
-        model.endOpenPollDate = Date()
-
-        val styleTextDateView = { tv: TextView, date: Date ->
-            val sdf = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault())
-            tv.text = sdf.format(date)
-        }
-
-        styleTextDateView(btOpenPollEndDate, model.endOpenPollDate ?: Date())
-
-        btOpenPollEndDate.setOnClickListener {
-            showDatePicker(model.endOpenPollDate ?: Date()) {
-                model.endOpenPollDate = it
-                styleTextDateView(btOpenPollEndDate, it)
-            }
-        }
-
-
-        val countArray = (1..1000).toList()
-        val countArrayStr = countArray.map { it.toString() }
-        val adapter = ArrayAdapter(requireContext(), R.layout.spinner_task_type_item, countArrayStr)
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-
-        spOpenPollCount.adapter = adapter
-        spOpenPollCount.onItemSelectedListener = object : OnItemSelectedListener {
-            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-                model.pollPersonsCount = countArray[position]
-            }
-
-            override fun onNothingSelected(parent: AdapterView<*>?) {
-            }
-        }
-
-        spOpenPollCount.setSelection(9)
-    }
-
-    private fun initConstantTaskViews() {
         val clearContent = { vPeriodContent.removeAllViews() }
         val renderRadioButton = { title: String ->
             CheckBox(context).apply {
@@ -226,7 +203,6 @@ class CreateTaskInfoFragment : Fragment() {
                 setTextSize(TypedValue.COMPLEX_UNIT_SP, 16f)
             }
         }
-
 
         val renderDaysContent = {
             clearContent()
@@ -319,6 +295,46 @@ class CreateTaskInfoFragment : Fragment() {
         rbPeriodDays.isChecked = true
     }
 
+    private fun initOpenPollTaskViews() {
+        model.endOpenPollDate = Date()
+
+        val styleTextDateView = { tv: TextView, date: Date ->
+            val sdf = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault())
+            tv.text = sdf.format(date)
+        }
+
+        styleTextDateView(btOpenPollEndDate, model.endOpenPollDate ?: Date())
+
+        btOpenPollEndDate.setOnClickListener {
+            showDatePicker(model.endOpenPollDate ?: Date()) {
+                model.endOpenPollDate = it
+                styleTextDateView(btOpenPollEndDate, it)
+            }
+        }
+
+
+        val countArray = (1..1000).toList()
+        val countArrayStr = countArray.map { it.toString() }
+        val adapter = ArrayAdapter(requireContext(), R.layout.spinner_task_type_item, countArrayStr)
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+
+        spOpenPollCount.adapter = adapter
+        spOpenPollCount.onItemSelectedListener = object : OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                model.pollPersonsCount = countArray[position]
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>?) {
+            }
+        }
+
+        spOpenPollCount.setSelection(9)
+    }
+
+    private fun initConstantTaskViews() {
+
+    }
+
     private fun initHourSpinner(spinner: AppCompatSpinner, callback: (Int) -> Unit) {
         val hoursArray = (0..23).toList()
         val hoursArrayStr = hoursArray.map { String.format("%02d", it) }
@@ -391,11 +407,11 @@ class CreateTaskInfoFragment : Fragment() {
         }
     }
 
-    private fun onPanelClick(panel: Panel) {
+    private fun showNextFragment(fragment: Fragment) {
         activity
                 ?.supportFragmentManager
                 ?.beginTransaction()
-                ?.replace(R.id.container, GraphListFragment.newInstance(panel))
+                ?.replace(R.id.container, fragment)
                 ?.addToBackStack(null)
                 ?.commit()
     }

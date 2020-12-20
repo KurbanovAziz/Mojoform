@@ -157,5 +157,11 @@ dependencies {
 
     implementation 'org.jsoup:jsoup:1.11.3'
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+
+    implementation "com.xwray:groupie:2.8.1"
+    implementation "com.xwray:groupie-kotlin-android-extensions:2.8.1"
+
+    implementation 'io.reactivex.rxjava3:rxandroid:3.0.0'
+    implementation 'io.reactivex.rxjava3:rxjava:3.0.6'
 }
 apply plugin: 'com.google.gms.google-services'
