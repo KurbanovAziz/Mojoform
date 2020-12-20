@@ -109,5 +109,4 @@
 
         <activity android:name=".activities.OnboardingActivity" />
     </application>
-
 </manifest>
