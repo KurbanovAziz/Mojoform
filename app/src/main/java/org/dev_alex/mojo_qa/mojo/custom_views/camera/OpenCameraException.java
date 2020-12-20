@@ -3,7 +3,7 @@ package org.dev_alex.mojo_qa.mojo.custom_views.camera;
 import android.annotation.TargetApi;
 import android.hardware.camera2.CameraDevice;
 import android.os.Build;
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 
 public class OpenCameraException extends Exception {
     @Nullable

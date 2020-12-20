@@ -2,7 +2,7 @@ package org.dev_alex.mojo_qa.mojo.custom_views.camera;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 /**
  * Extended presenter's lifecycle methods for more complex presenters

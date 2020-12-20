@@ -29,15 +29,15 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.provider.MediaStore;
-import android.support.annotation.Nullable;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.Fragment;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.content.FileProvider;
-import android.support.v4.util.Pair;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v4.widget.Space;
-import android.support.v7.widget.PopupMenu;
+import androidx.annotation.Nullable;
+import androidx.core.app.ActivityCompat;
+import androidx.fragment.app.Fragment;
+import androidx.core.content.ContextCompat;
+import androidx.core.content.FileProvider;
+import androidx.core.util.Pair;
+import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.legacy.widget.Space;
+import androidx.appcompat.widget.PopupMenu;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.TextUtils;
@@ -301,7 +301,7 @@ public class TemplateFragment extends Fragment {
     }
 
     @Override
-    public void onViewCreated(@android.support.annotation.NonNull View view, @Nullable Bundle savedInstanceState) {
+    public void onViewCreated(@androidx.annotation.NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         if (checkLocationPermissions()) {
             requestLocation();
@@ -311,7 +311,7 @@ public class TemplateFragment extends Fragment {
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, @android.support.annotation.NonNull String[] permissions, @android.support.annotation.NonNull int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, @androidx.annotation.NonNull String[] permissions, @androidx.annotation.NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 
         if (checkLocationPermissions()) {
@@ -1371,7 +1371,7 @@ public class TemplateFragment extends Fragment {
         Handler handler = new Handler();
         client.newCall(request).enqueue(new Callback() {
             @Override
-            public void onFailure(@android.support.annotation.NonNull Call call, @android.support.annotation.NonNull IOException e) {
+            public void onFailure(@androidx.annotation.NonNull Call call, @androidx.annotation.NonNull IOException e) {
                 if (loopDialog != null && loopDialog.isShowing()) {
                     loopDialog.dismiss();
                 }
@@ -1379,7 +1379,7 @@ public class TemplateFragment extends Fragment {
             }
 
             @Override
-            public void onResponse(@android.support.annotation.NonNull Call call, @android.support.annotation.NonNull Response response) {
+            public void onResponse(@androidx.annotation.NonNull Call call, @androidx.annotation.NonNull Response response) {
                 if (loopDialog != null && loopDialog.isShowing()) {
                     loopDialog.dismiss();
                 }
@@ -3064,7 +3064,7 @@ public class TemplateFragment extends Fragment {
                                         .autoDismiss(false)
                                         .input(getString(R.string.pass), "", new MaterialDialog.InputCallback() {
                                             @Override
-                                            public void onInput(@android.support.annotation.NonNull MaterialDialog dialog, CharSequence input) {
+                                            public void onInput(@androidx.annotation.NonNull MaterialDialog dialog, CharSequence input) {
                                                 if (input.length() > 0) {
                                                     new LoginTask(LoginHistoryService.getCurrentUser().username, input.toString()).execute();
                                                     dialog.dismiss();
@@ -3075,7 +3075,7 @@ public class TemplateFragment extends Fragment {
                                         .negativeText(R.string.cancel_)
                                         .onNegative(new MaterialDialog.SingleButtonCallback() {
                                             @Override
-                                            public void onClick(@android.support.annotation.NonNull MaterialDialog dialog, @android.support.annotation.NonNull DialogAction which) {
+                                            public void onClick(@androidx.annotation.NonNull MaterialDialog dialog, @androidx.annotation.NonNull DialogAction which) {
                                                 Toast.makeText(getContext(), "bbb", Toast.LENGTH_LONG).show();
                                                 dialog.dismiss();
                                             }

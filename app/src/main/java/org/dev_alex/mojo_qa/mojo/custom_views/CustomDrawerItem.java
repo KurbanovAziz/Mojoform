@@ -1,7 +1,7 @@
 package org.dev_alex.mojo_qa.mojo.custom_views;
 
 import android.content.Context;
-import android.support.v7.widget.RecyclerView;
+import androidx.recyclerview.widget.RecyclerView;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.Gravity;

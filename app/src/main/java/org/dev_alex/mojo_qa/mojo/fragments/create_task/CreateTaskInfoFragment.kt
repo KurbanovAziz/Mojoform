@@ -4,8 +4,8 @@ import android.app.DatePickerDialog
 import android.app.ProgressDialog
 import android.graphics.Color
 import android.os.Bundle
-import android.support.v4.app.Fragment
-import android.support.v7.widget.AppCompatSpinner
+import androidx.fragment.app.Fragment
+import androidx.appcompat.widget.AppCompatSpinner
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.TypedValue

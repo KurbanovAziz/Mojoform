@@ -2,7 +2,7 @@ package org.dev_alex.mojo_qa.mojo.custom_views.camera;
 
 import android.annotation.TargetApi;
 import android.hardware.camera2.CameraCharacteristics;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import android.util.Size;
 import android.util.SparseIntArray;
 import android.view.Display;

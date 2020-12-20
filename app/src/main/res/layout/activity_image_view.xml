@@ -6,7 +6,7 @@
     android:background="@android:color/black"
     tools:context="org.dev_alex.mojo_qa.mojo.activities.ImageViewActivity">
 
-    <android.support.v4.view.ViewPager xmlns:android="http://schemas.android.com/apk/res/android"
+    <androidx.viewpager.widget.ViewPager xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/pager"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />

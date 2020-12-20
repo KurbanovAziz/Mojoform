@@ -2,7 +2,7 @@ package org.dev_alex.mojo_qa.mojo.fragments.create_task
 
 import android.app.ProgressDialog
 import android.os.Bundle
-import android.support.v4.app.Fragment
+import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup

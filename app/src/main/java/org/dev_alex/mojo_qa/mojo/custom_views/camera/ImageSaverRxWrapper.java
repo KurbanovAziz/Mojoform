@@ -3,7 +3,7 @@ package org.dev_alex.mojo_qa.mojo.custom_views.camera;
 import android.annotation.TargetApi;
 import android.media.Image;
 import android.media.ImageReader;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import java.io.File;
 import java.io.FileOutputStream;

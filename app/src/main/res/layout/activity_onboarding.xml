@@ -6,7 +6,7 @@
     android:orientation="vertical"
     tools:context="org.dev_alex.mojo_qa.mojo.activities.OnboardingActivity">
 
-    <android.support.v4.view.ViewPager
+    <androidx.viewpager.widget.ViewPager
         android:id="@+id/view_pager"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />

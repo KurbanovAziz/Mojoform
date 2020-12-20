@@ -1,7 +1,7 @@
 package org.dev_alex.mojo_qa.mojo.services;
 
 import android.graphics.Bitmap;
-import android.support.v4.util.LruCache;
+import androidx.collection.LruCache;
 
 public class BitmapCacheService {
     private LruCache<String, Bitmap> mMemoryCache;
