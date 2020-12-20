@@ -107,10 +107,10 @@ dependencies {
     implementation 'androidx.legacy:legacy-support-core-utils:1.0.0'
 
     implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
-    implementation 'com.squareup.okhttp3:okhttp:3.9.0'
-    implementation 'com.fasterxml.jackson.core:jackson-databind:2.9.0.pr2'
+    implementation 'com.squareup.okhttp3:okhttp:4.5.0'
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.9.8'
     implementation 'net.cachapa.expandablelayout:expandablelayout:2.9.2'
-    implementation 'de.hdodenhof:circleimageview:2.2.0'
+    implementation 'de.hdodenhof:circleimageview:3.1.0'
     implementation 'com.github.gcacace:signature-pad:1.2.1'
 
     implementation 'frankiesardo:icepick:3.2.0'
@@ -125,13 +125,11 @@ dependencies {
     implementation 'com.github.woxthebox:draglistview:1.5.1'
 
     // Firebase
-
     implementation 'com.google.android.gms:play-services-base:11.8.0'
     implementation 'com.google.android.gms:play-services-gcm:11.8.0'
     implementation 'com.google.android.gms:play-services-location:11.8.0'
     implementation 'com.google.firebase:firebase-messaging:11.8.0'
     implementation 'com.google.firebase:firebase-core:11.8.0'
-    implementation("com.squareup.okhttp3:logging-interceptor:3.9.0")
 
     implementation 'net.yslibrary.keyboardvisibilityevent:keyboardvisibilityevent:2.3.0'
 
@@ -143,5 +141,8 @@ dependencies {
 
     implementation 'io.reactivex.rxjava3:rxandroid:3.0.0'
     implementation 'io.reactivex.rxjava3:rxjava:3.0.6'
+
+    debugImplementation 'com.readystatesoftware.chuck:library:1.1.0'
+    releaseImplementation 'com.readystatesoftware.chuck:library-no-op:1.1.0'
 }
 apply plugin: 'com.google.gms.google-services'

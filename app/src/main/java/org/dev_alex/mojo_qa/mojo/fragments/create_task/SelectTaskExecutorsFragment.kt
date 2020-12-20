@@ -76,8 +76,8 @@ class SelectTaskExecutorsFragment : Fragment() {
             val url = "/api/orgs/${model.file?.parentId}/users"
             val response = RequestService.createGetRequest(url)
 
-            if (response.code() == 200) {
-                val responseJson = JSONObject(response.body()?.string() ?: "{}")
+            if (response.code == 200) {
+                val responseJson = JSONObject(response.body?.string() ?: "{}")
                 print(responseJson)
             }
         }
