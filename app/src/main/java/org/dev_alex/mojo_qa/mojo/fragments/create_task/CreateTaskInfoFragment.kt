@@ -4,8 +4,6 @@ import android.app.DatePickerDialog
 import android.app.ProgressDialog
 import android.graphics.Color
 import android.os.Bundle
-import androidx.fragment.app.Fragment
-import androidx.appcompat.widget.AppCompatSpinner
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.TypedValue
@@ -15,6 +13,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import android.widget.AdapterView.OnItemSelectedListener
+import androidx.appcompat.widget.AppCompatSpinner
+import androidx.fragment.app.Fragment
 import kotlinx.android.synthetic.main.fragment_create_task_info.*
 import org.dev_alex.mojo_qa.mojo.CreateTaskModel
 import org.dev_alex.mojo_qa.mojo.CreateTaskModel.TaskType
@@ -83,7 +83,7 @@ class CreateTaskInfoFragment : Fragment() {
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         spTaskType.adapter = adapter
         spTaskType.onItemSelectedListener = object : OnItemSelectedListener {
-            override fun onItemSelected(parent: AdapterView<*>?, view: View, position: Int, id: Long) {
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
                 val selectedType = taskTypes[position]
                 model.taskType = selectedType
 
@@ -418,8 +418,10 @@ class CreateTaskInfoFragment : Fragment() {
 
     companion object {
         @JvmStatic
-        fun newInstance(file: File?): CreateTaskInfoFragment {
+        fun newInstance(file: File, orgId: String): CreateTaskInfoFragment {
+            CreateTaskModel.instance?.clear()
             CreateTaskModel.instance?.file = file
+            CreateTaskModel.instance?.orgId = orgId
             return CreateTaskInfoFragment()
         }
     }

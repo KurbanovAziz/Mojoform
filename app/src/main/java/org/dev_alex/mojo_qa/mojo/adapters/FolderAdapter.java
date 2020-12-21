@@ -1,7 +1,6 @@
 package org.dev_alex.mojo_qa.mojo.adapters;
 
 
-import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,6 +13,8 @@ import org.dev_alex.mojo_qa.mojo.models.File;
 import org.dev_alex.mojo_qa.mojo.services.LoginHistoryService;
 
 import java.util.ArrayList;
+
+import androidx.recyclerview.widget.RecyclerView;
 
 
 public class FolderAdapter extends RecyclerView.Adapter<FolderAdapter.FolderViewHolder> {
@@ -92,59 +93,48 @@ public class FolderAdapter extends RecyclerView.Adapter<FolderAdapter.FolderView
 
         if (selectionModeEnabled) {
             viewHolder.moreBtn.setOnClickListener(null);
-            viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if (selectedIds.contains(folder.id))
-                        selectedIds.remove(folder.id);
-                    else
-                        selectedIds.add(folder.id);
+            viewHolder.itemView.setOnClickListener(v -> {
+                if (selectedIds.contains(folder.id))
+                    selectedIds.remove(folder.id);
+                else
+                    selectedIds.add(folder.id);
 
-                    notifyDataSetChanged();
-                    parentFragment.checkIfSelectionModeFinished();
-                }
+                notifyDataSetChanged();
+                parentFragment.checkIfSelectionModeFinished();
             });
         } else {
-            viewHolder.moreBtn.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    parentFragment.showPopUpWindow(folder);
-                }
+            viewHolder.moreBtn.setOnClickListener(v -> {
+                parentFragment.showPopUpWindow(folder);
             });
-            viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    parentFragment.new GetFilesTask(folder.id, folder.name).execute();
-                }
+            viewHolder.itemView.setOnClickListener(v -> {
+                parentFragment.new GetFilesTask(folder.id, folder.name, folder.orgId).execute();
             });
         }
 
         if (!folder.nodeType.equals("cm:org"))
-            viewHolder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
-                @Override
-                public boolean onLongClick(View v) {
-                    if (!selectionModeEnabled) {
-                        parentFragment.startSelectionMode();
-                        selectedIds.add(folder.id);
-                        parentFragment.checkIfSelectionModeFinished();
-                    }
-                    return true;
+            viewHolder.itemView.setOnLongClickListener(v -> {
+                if (!selectionModeEnabled) {
+                    parentFragment.startSelectionMode();
+                    selectedIds.add(folder.id);
+                    parentFragment.checkIfSelectionModeFinished();
                 }
+                return true;
             });
 
 
-        viewHolder.folderIcon.setImageResource(folder.nodeType.equals("cm:org") ?
-                R.drawable.organization_icon : R.drawable.folder_icon);
+        viewHolder.folderIcon.setImageResource(folder.nodeType.equals("cm:org") ? R.drawable.organization_icon : R.drawable.folder_icon);
 
         viewHolder.moreBtn.setVisibility(folder.nodeType.equals("cm:org") ? View.INVISIBLE : View.VISIBLE);
 
         viewHolder.moreBtn.setVisibility(View.VISIBLE);
         if ((LoginHistoryService.getCurrentUser().is_manager == null || !LoginHistoryService.getCurrentUser().is_manager)
-                && (LoginHistoryService.getCurrentUser().is_orgowner == null || !LoginHistoryService.getCurrentUser().is_orgowner))
+                && (LoginHistoryService.getCurrentUser().is_orgowner == null || !LoginHistoryService.getCurrentUser().is_orgowner)) {
             viewHolder.moreBtn.setVisibility(View.INVISIBLE);
+        }
 
-        if (folder.nodeType.equals("cm:org"))
+        if (folder.nodeType.equals("cm:org")) {
             viewHolder.moreBtn.setVisibility(View.GONE);
+        }
     }
 
     @Override
@@ -176,4 +166,3 @@ public class FolderAdapter extends RecyclerView.Adapter<FolderAdapter.FolderView
         return selectedFolders;
     }
 }
-

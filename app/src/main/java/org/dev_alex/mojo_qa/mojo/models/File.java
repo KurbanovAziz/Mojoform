@@ -18,6 +18,7 @@ public class File {
 
     public String nodeType;
     public String id;
+    public String orgId;
     public String parentId;
 
     public SimpleUser createdByUser;

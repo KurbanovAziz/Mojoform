@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="24dp"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    android:paddingStart="26dp"
+    tools:ignore="RtlSymmetry">
+
+    <ImageView
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:src="@drawable/ic_org_group" />
+
+    <TextView
+        android:id="@+id/tvGroupName"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="6dp"
+        android:layout_weight="1"
+        android:textColor="#726583"
+        android:textSize="16sp" />
+
+    <ImageView
+        android:id="@+id/ivExpandableIcon"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_marginRight="10dp"
+        android:src="@drawable/ic_expand_arrow"
+        app:tint="#726583" />
+</LinearLayout>

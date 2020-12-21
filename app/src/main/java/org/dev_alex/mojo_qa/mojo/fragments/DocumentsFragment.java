@@ -1,5 +1,6 @@
 package org.dev_alex.mojo_qa.mojo.fragments;
 
+import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -10,19 +11,10 @@ import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-import androidx.core.content.FileProvider;
-import androidx.core.widget.NestedScrollView;
-import androidx.appcompat.app.AlertDialog;
-import androidx.recyclerview.widget.GridLayoutManager;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewTreeObserver;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.EditText;
@@ -56,10 +48,20 @@ import java.util.ArrayList;
 import java.util.Locale;
 import java.util.UUID;
 
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
+import androidx.core.content.FileProvider;
+import androidx.core.widget.NestedScrollView;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import okhttp3.Response;
 import okio.BufferedSink;
 import okio.Okio;
 
+@SuppressWarnings("deprecation")
+@SuppressLint("StaticFieldLeak")
 public class DocumentsFragment extends Fragment {
     private final int FILE_OPEN_REQUEST_CODE = 1;
     private final int SORT_BY_NAME = 1;
@@ -88,6 +90,7 @@ public class DocumentsFragment extends Fragment {
     private boolean selectModeEnabled = false;
 
     private java.io.File openingFile;
+    private String openedOrgId;
 
     public static DocumentsFragment newInstance() {
         Bundle args = new Bundle();
@@ -197,7 +200,7 @@ public class DocumentsFragment extends Fragment {
             setupHeader();
             initDialog();
             setListeners();
-            new GetFilesTask(null, null).execute();
+            new GetFilesTask(null, null, null).execute();
         } else {
             setupHeader();
             updateCurrentFolder();
@@ -209,9 +212,9 @@ public class DocumentsFragment extends Fragment {
         FileSystemStackEntry lastEntry = foldersStack.get(foldersStack.size() - 1);
         foldersStack.remove(foldersStack.size() - 1);
         if (foldersStack.size() == 0)
-            new GetFilesTask(null, null).execute();
+            new GetFilesTask(null, null, null).execute();
         else
-            new GetFilesTask(lastEntry.id, lastEntry.parentName).execute();
+            new GetFilesTask(lastEntry.id, lastEntry.parentName, null).execute();
     }
 
     private void setupHeader() {
@@ -277,131 +280,100 @@ public class DocumentsFragment extends Fragment {
     private void setListeners() {
         rootView.setFocusableInTouchMode(true);
         rootView.requestFocus();
-        rootView.setOnKeyListener(new View.OnKeyListener() {
-            @Override
-            public boolean onKey(View v, int keyCode, KeyEvent event) {
-                if (event.getAction() == KeyEvent.ACTION_UP)
-                    if (keyCode == KeyEvent.KEYCODE_BACK)
-                        if (selectModeEnabled) {
-                            stopSelectionMode();
-                            return true;
-                        } else
-                            return popFileStack();
+        rootView.setOnKeyListener((v, keyCode, event) -> {
+            if (event.getAction() == KeyEvent.ACTION_UP)
+                if (keyCode == KeyEvent.KEYCODE_BACK)
+                    if (selectModeEnabled) {
+                        stopSelectionMode();
+                        return true;
+                    } else
+                        return popFileStack();
 
-                return false;
-            }
+            return false;
         });
 
-        final NestedScrollView scrollView = (NestedScrollView) rootView.findViewById(R.id.scroll_view);
-        scrollView.getViewTreeObserver().addOnScrollChangedListener(new ViewTreeObserver.OnScrollChangedListener() {
-            @Override
-            public void onScrollChanged() {
-                filesRecyclerView.setNestedScrollingEnabled(!scrollView.canScrollVertically(1));
-                folderRecyclerView.setNestedScrollingEnabled(!scrollView.canScrollVertically(-1));
-            }
+        final NestedScrollView scrollView = rootView.findViewById(R.id.scroll_view);
+        scrollView.getViewTreeObserver().addOnScrollChangedListener(() -> {
+            filesRecyclerView.setNestedScrollingEnabled(!scrollView.canScrollVertically(1));
+            folderRecyclerView.setNestedScrollingEnabled(!scrollView.canScrollVertically(-1));
         });
 
-        rootView.findViewById(R.id.create_dir_btn).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showCreateDirDialog();
-            }
-        });
+        rootView.findViewById(R.id.create_dir_btn).setOnClickListener(v -> showCreateDirDialog());
 
-        selectionMenu.findViewById(R.id.selection_close_btn).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+        selectionMenu.findViewById(R.id.selection_close_btn).setOnClickListener(v -> stopSelectionMode());
+
+        selectionMenu.findViewById(R.id.selection_delete_btn).setOnClickListener(v -> {
+            ArrayList<File> selectedFiles = new ArrayList<>();
+            selectedFiles.addAll(fileAdapter.getSelectedFiles());
+            selectedFiles.addAll(folderAdapter.getSelectedFolders());
+
+            boolean isAnyoneFileLocked = false;
+            for (File file : selectedFiles) {
+                if (file.isLocked != null && file.isLocked) {
+                    isAnyoneFileLocked = true;
+                    break;
+                }
+            }
+            if (isAnyoneFileLocked)
+                Toast.makeText(getContext(), R.string.cannot_delete_some_files_or_folders, Toast.LENGTH_SHORT).show();
+            else {
+                new RemoveFileTask(selectedFiles).execute();
                 stopSelectionMode();
             }
         });
 
-        selectionMenu.findViewById(R.id.selection_delete_btn).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                ArrayList<File> selectedFiles = new ArrayList<>();
-                selectedFiles.addAll(fileAdapter.getSelectedFiles());
-                selectedFiles.addAll(folderAdapter.getSelectedFolders());
+        selectionMenu.findViewById(R.id.selection_move_btn).setOnClickListener(v -> {
+            ArrayList<File> selectedFiles = new ArrayList<>();
+            selectedFiles.addAll(fileAdapter.getSelectedFiles());
+            selectedFiles.addAll(folderAdapter.getSelectedFolders());
 
-                boolean isAnyoneFileLocked = false;
-                for (File file : selectedFiles) {
-                    if (file.isLocked != null && file.isLocked) {
-                        isAnyoneFileLocked = true;
-                        break;
-                    }
-                }
-                if (isAnyoneFileLocked)
-                    Toast.makeText(getContext(), R.string.cannot_delete_some_files_or_folders, Toast.LENGTH_SHORT).show();
-                else {
-                    new RemoveFileTask(selectedFiles).execute();
-                    stopSelectionMode();
+            boolean isAnyoneFileLocked = false;
+            for (File file : selectedFiles) {
+                if (file.isLocked != null && file.isLocked) {
+                    isAnyoneFileLocked = true;
+                    break;
                 }
             }
-        });
-
-        selectionMenu.findViewById(R.id.selection_move_btn).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                ArrayList<File> selectedFiles = new ArrayList<>();
-                selectedFiles.addAll(fileAdapter.getSelectedFiles());
-                selectedFiles.addAll(folderAdapter.getSelectedFolders());
-
-                boolean isAnyoneFileLocked = false;
-                for (File file : selectedFiles) {
-                    if (file.isLocked != null && file.isLocked) {
-                        isAnyoneFileLocked = true;
-                        break;
-                    }
-                }
-                if (isAnyoneFileLocked)
-                    Toast.makeText(getContext(), R.string.cannot_move_some_files_or_folders, Toast.LENGTH_SHORT).show();
-                else {
-                    getActivity().getSupportFragmentManager().beginTransaction()
-                            .replace(R.id.container, MoveFileFragment.newInstance(selectedFiles)).addToBackStack("documents").commit();
-                    stopSelectionMode();
-                }
+            if (isAnyoneFileLocked)
+                Toast.makeText(getContext(), R.string.cannot_move_some_files_or_folders, Toast.LENGTH_SHORT).show();
+            else {
+                getActivity().getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.container, MoveFileFragment.newInstance(selectedFiles)).addToBackStack("documents").commit();
+                stopSelectionMode();
             }
         });
 
 
-        sortTypePopupWindow.findViewById(R.id.sort_by_name).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                sortTypePopupWindow.findViewById(R.id.sort_by_create_time_tick).setVisibility(View.GONE);
-                sortTypePopupWindow.findViewById(R.id.sort_by_update_time_tick).setVisibility(View.GONE);
+        sortTypePopupWindow.findViewById(R.id.sort_by_name).setOnClickListener(v -> {
+            sortTypePopupWindow.findViewById(R.id.sort_by_create_time_tick).setVisibility(View.GONE);
+            sortTypePopupWindow.findViewById(R.id.sort_by_update_time_tick).setVisibility(View.GONE);
 
-                sortTypePopupWindow.findViewById(R.id.sort_by_name_tick).setVisibility(View.VISIBLE);
-                sortType = SORT_BY_NAME;
-                sortTypePopupWindow.setVisibility(View.GONE);
-                updateCurrentFolder();
-            }
+            sortTypePopupWindow.findViewById(R.id.sort_by_name_tick).setVisibility(View.VISIBLE);
+            sortType = SORT_BY_NAME;
+            sortTypePopupWindow.setVisibility(View.GONE);
+            updateCurrentFolder();
         });
 
-        sortTypePopupWindow.findViewById(R.id.sort_by_create_time).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                sortTypePopupWindow.findViewById(R.id.sort_by_name_tick).setVisibility(View.GONE);
-                sortTypePopupWindow.findViewById(R.id.sort_by_update_time_tick).setVisibility(View.GONE);
+        sortTypePopupWindow.findViewById(R.id.sort_by_create_time).setOnClickListener(v -> {
+            sortTypePopupWindow.findViewById(R.id.sort_by_name_tick).setVisibility(View.GONE);
+            sortTypePopupWindow.findViewById(R.id.sort_by_update_time_tick).setVisibility(View.GONE);
 
-                sortTypePopupWindow.findViewById(R.id.sort_by_create_time_tick).setVisibility(View.VISIBLE);
+            sortTypePopupWindow.findViewById(R.id.sort_by_create_time_tick).setVisibility(View.VISIBLE);
 
-                sortType = SORT_BY_CREATED_AT;
-                sortTypePopupWindow.setVisibility(View.GONE);
-                updateCurrentFolder();
-            }
+            sortType = SORT_BY_CREATED_AT;
+            sortTypePopupWindow.setVisibility(View.GONE);
+            updateCurrentFolder();
         });
 
-        sortTypePopupWindow.findViewById(R.id.sort_by_update_time).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                sortTypePopupWindow.findViewById(R.id.sort_by_create_time_tick).setVisibility(View.GONE);
-                sortTypePopupWindow.findViewById(R.id.sort_by_name_tick).setVisibility(View.GONE);
+        sortTypePopupWindow.findViewById(R.id.sort_by_update_time).setOnClickListener(v -> {
+            sortTypePopupWindow.findViewById(R.id.sort_by_create_time_tick).setVisibility(View.GONE);
+            sortTypePopupWindow.findViewById(R.id.sort_by_name_tick).setVisibility(View.GONE);
 
-                sortTypePopupWindow.findViewById(R.id.sort_by_update_time_tick).setVisibility(View.VISIBLE);
+            sortTypePopupWindow.findViewById(R.id.sort_by_update_time_tick).setVisibility(View.VISIBLE);
 
-                sortType = SORT_BY_UPDATED_AT;
-                sortTypePopupWindow.setVisibility(View.GONE);
-                updateCurrentFolder();
-            }
+            sortType = SORT_BY_UPDATED_AT;
+            sortTypePopupWindow.setVisibility(View.GONE);
+            updateCurrentFolder();
         });
     }
 
@@ -414,6 +386,7 @@ public class DocumentsFragment extends Fragment {
             orgFolder.nodeType = "cm:org";
             orgFolder.id = orgJson.getString("id");
             orgFolder.name = orgJson.getString("name");
+            orgFolder.orgId = orgJson.getString("organisation_id");
 
             return orgFolder;
         } catch (JSONException e) {
@@ -542,19 +515,14 @@ public class DocumentsFragment extends Fragment {
 
         final AlertDialog createDirDialog = createDialogWithBlur(dialogView);
 
-        dialogView.findViewById(R.id.left_btn).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                createDirDialog.dismiss();
-            }
+        dialogView.findViewById(R.id.left_btn).setOnClickListener(v -> {
+            createDirDialog.dismiss();
         });
-        dialogView.findViewById(R.id.right_btn).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (((EditText) dialogView.findViewById(R.id.text_input)).getText().toString().trim().isEmpty())
-                    Toast.makeText(getContext(), R.string.input_folder_name, Toast.LENGTH_LONG).show();
-                else
-                    new CreateDirTask(createDirDialog, ((EditText) dialogView.findViewById(R.id.text_input)).getText().toString().trim()).execute();
+        dialogView.findViewById(R.id.right_btn).setOnClickListener(v -> {
+            if (((EditText) dialogView.findViewById(R.id.text_input)).getText().toString().trim().isEmpty()) {
+                Toast.makeText(getContext(), R.string.input_folder_name, Toast.LENGTH_LONG).show();
+            } else {
+                new CreateDirTask(createDirDialog, ((EditText) dialogView.findViewById(R.id.text_input)).getText().toString().trim()).execute();
             }
         });
     }
@@ -615,34 +583,25 @@ public class DocumentsFragment extends Fragment {
             itemPopupWindow.findViewById(R.id.deselect_block).setVisibility(selectModeEnabled ? View.VISIBLE : View.GONE);
             itemPopupWindow.setVisibility(View.VISIBLE);
 
-            itemPopupWindow.findViewById(R.id.move_block).setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    ArrayList<File> fileArrayList = new ArrayList<>();
-                    fileArrayList.add(item);
+            itemPopupWindow.findViewById(R.id.move_block).setOnClickListener(v -> {
+                ArrayList<File> fileArrayList = new ArrayList<>();
+                fileArrayList.add(item);
 
-                    getActivity().getSupportFragmentManager().beginTransaction()
-                            .replace(R.id.container, MoveFileFragment.newInstance(fileArrayList)).addToBackStack("documents").commit();
-                    itemPopupWindow.setVisibility(View.GONE);
-                }
+                getActivity().getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.container, MoveFileFragment.newInstance(fileArrayList)).addToBackStack("documents").commit();
+                itemPopupWindow.setVisibility(View.GONE);
             });
 
-            itemPopupWindow.findViewById(R.id.delete_block).setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    itemPopupWindow.setVisibility(View.GONE);
-                    ArrayList<File> fileArrayList = new ArrayList<>();
-                    fileArrayList.add(item);
-                    new RemoveFileTask(fileArrayList).execute();
-                }
+            itemPopupWindow.findViewById(R.id.delete_block).setOnClickListener(v -> {
+                itemPopupWindow.setVisibility(View.GONE);
+                ArrayList<File> fileArrayList = new ArrayList<>();
+                fileArrayList.add(item);
+                new RemoveFileTask(fileArrayList).execute();
             });
 
-            itemPopupWindow.findViewById(R.id.edit_block).setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    itemPopupWindow.setVisibility(View.GONE);
-                    showRenameDialog(item);
-                }
+            itemPopupWindow.findViewById(R.id.edit_block).setOnClickListener(v -> {
+                itemPopupWindow.setVisibility(View.GONE);
+                showRenameDialog(item);
             });
         }
     }
@@ -651,7 +610,7 @@ public class DocumentsFragment extends Fragment {
         getActivity()
                 .getSupportFragmentManager()
                 .beginTransaction()
-                .replace(R.id.container, CreateTaskInfoFragment.newInstance(item))
+                .replace(R.id.container, CreateTaskInfoFragment.newInstance(item, openedOrgId))
                 .addToBackStack(null)
                 .commit();
     }
@@ -878,9 +837,13 @@ public class DocumentsFragment extends Fragment {
         private String fileId;
         private String fileName;
 
-        public GetFilesTask(String fileId, String fileName) {
+        public GetFilesTask(String fileId, String fileName, String orgId) {
             this.fileId = fileId;
             this.fileName = fileName;
+
+            if (orgId != null) {
+                DocumentsFragment.this.openedOrgId = orgId;
+            }
         }
 
         @Override

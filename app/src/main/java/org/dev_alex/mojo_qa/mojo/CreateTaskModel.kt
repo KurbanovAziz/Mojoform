@@ -2,9 +2,13 @@ package org.dev_alex.mojo_qa.mojo
 
 import org.dev_alex.mojo_qa.mojo.CreateTaskModel.TaskType.*
 import org.dev_alex.mojo_qa.mojo.models.File
+import org.dev_alex.mojo_qa.mojo.models.OrgUser
+import org.dev_alex.mojo_qa.mojo.models.response.OrgUsersResponse
 import java.util.*
+import kotlin.collections.ArrayList
 
 class CreateTaskModel private constructor() {
+    var orgId: String? = null
     var file: File? = null
     var taskName: String? = null
     var taskType: TaskType? = null
@@ -68,6 +72,23 @@ class CreateTaskModel private constructor() {
     var periodicalTaskMinutes: Int? = null
     var selectedPeriod: TaskPeriod? = null
 
+
+    // Users
+    var allUsers: MutableList<OrgUser> = ArrayList()
+    var selectedUsers: MutableList<OrgUser> = ArrayList()
+
+    fun saveUsers(response: OrgUsersResponse) {
+        val totalUsers = ArrayList(response.users)
+        response.groups.forEach { group ->
+            group.users.forEach {
+                if (!totalUsers.contains(it)) {
+                    totalUsers.add(it)
+                }
+            }
+        }
+        allUsers = totalUsers
+    }
+
     enum class TaskType(val nameRes: Int) {
         CONSTANT(R.string.task_type_constant),
         PERIODICAL(R.string.task_type_periodical),
@@ -77,7 +98,7 @@ class CreateTaskModel private constructor() {
     }
 
     fun isValid(): Boolean {
-        if(taskName?.isBlank() == true) return false
+        if (taskName == null || taskName?.isBlank() == true) return false
 
         return when (taskType) {
             PERIODICAL -> {
@@ -94,6 +115,25 @@ class CreateTaskModel private constructor() {
             CONSTANT -> true
             null -> false
         }
+    }
+
+    fun clear() {
+        orgId = null
+        file = null
+        taskName = null
+        taskType = null
+
+        startOneShotDate = null
+        endOneShotDate = null
+
+        endOpenPollDate = null
+        pollPersonsCount = null
+
+        periodicalTaskHour = null
+        periodicalTaskMinutes = null
+        selectedPeriod = null
+
+        selectedUsers = ArrayList()
     }
 
     sealed class TaskPeriod {
