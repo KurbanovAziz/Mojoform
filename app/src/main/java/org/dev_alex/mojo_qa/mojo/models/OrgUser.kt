@@ -21,4 +21,8 @@ data class OrgUser(
         @SerializedName("push_disabled")
         val pushDisabled: Boolean,
         val username: String
-)
+) {
+    override fun toString(): String {
+        return firstName.takeIf { it.isNotBlank() } ?: fullname
+    }
+}

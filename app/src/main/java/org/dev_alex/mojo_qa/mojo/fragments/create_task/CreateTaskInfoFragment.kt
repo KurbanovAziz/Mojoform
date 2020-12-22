@@ -68,7 +68,7 @@ class CreateTaskInfoFragment : Fragment() {
 
         btSelectRules.setOnClickListener {
             if (model.isValid()) {
-
+                showNextFragment(SelectTaskRulesFragment.newInstance())
             } else {
                 Toast.makeText(context, R.string.not_all_fields_filled, Toast.LENGTH_SHORT).show()
             }

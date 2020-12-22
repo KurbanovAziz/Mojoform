@@ -19,9 +19,7 @@ import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.android.synthetic.main.fragment_select_task_executors.*
 import org.dev_alex.mojo_qa.mojo.CreateTaskModel
 import org.dev_alex.mojo_qa.mojo.R
-import org.dev_alex.mojo_qa.mojo.fragments.GraphListFragment
 import org.dev_alex.mojo_qa.mojo.models.OrgUser
-import org.dev_alex.mojo_qa.mojo.models.Panel
 import org.dev_alex.mojo_qa.mojo.models.response.OrgUsersResponse
 import org.dev_alex.mojo_qa.mojo.services.RequestService
 import org.dev_alex.mojo_qa.mojo.services.Utils
@@ -48,6 +46,10 @@ class SelectTaskExecutorsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         loadUsers()
+
+        btSelectRules.setOnClickListener {
+            showNextFragment(SelectTaskRulesFragment.newInstance())
+        }
     }
 
     private fun setupHeader() {
@@ -132,11 +134,11 @@ class SelectTaskExecutorsFragment : Fragment() {
         adapter.addAll(response.users.map { UserItem(it, selectionListener, false) })
     }
 
-    private fun onPanelClick(panel: Panel) {
+    private fun showNextFragment(fragment: Fragment) {
         activity
                 ?.supportFragmentManager
                 ?.beginTransaction()
-                ?.replace(R.id.container, GraphListFragment.newInstance(panel))
+                ?.replace(R.id.container, fragment)
                 ?.addToBackStack(null)
                 ?.commit()
     }

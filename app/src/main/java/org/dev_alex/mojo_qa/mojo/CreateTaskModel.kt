@@ -6,6 +6,7 @@ import org.dev_alex.mojo_qa.mojo.models.OrgUser
 import org.dev_alex.mojo_qa.mojo.models.response.OrgUsersResponse
 import java.util.*
 import kotlin.collections.ArrayList
+import kotlin.collections.HashMap
 
 class CreateTaskModel private constructor() {
     var orgId: String? = null
@@ -72,6 +73,8 @@ class CreateTaskModel private constructor() {
     var periodicalTaskMinutes: Int? = null
     var selectedPeriod: TaskPeriod? = null
 
+    // Notify Ranges
+    var notifyRanges: MutableList<NotifyRange> = ArrayList()
 
     // Users
     var allUsers: MutableList<OrgUser> = ArrayList()
@@ -97,6 +100,11 @@ class CreateTaskModel private constructor() {
         OPEN_POLL(R.string.task_type_open_poll);
     }
 
+    enum class NotifyRangeType(val nameRes: Int) {
+        IN_RANGE(R.string.task_notify_in_range),
+        OUT_OF_RANGE(R.string.task_notify_out_of_range)
+    }
+
     fun isValid(): Boolean {
         if (taskName == null || taskName?.isBlank() == true) return false
 
@@ -107,10 +115,10 @@ class CreateTaskModel private constructor() {
             ONE_SHOT -> {
                 startOneShotDate ?: return false
                 endOneShotDate?.after(startOneShotDate) == true
-
             }
             PRIVATE_POLL, OPEN_POLL -> {
-                endOpenPollDate?.after(Date()) == true
+                //endOpenPollDate?.after(Date()) == true
+                true
             }
             CONSTANT -> true
             null -> false
@@ -133,13 +141,29 @@ class CreateTaskModel private constructor() {
         periodicalTaskMinutes = null
         selectedPeriod = null
 
+        allUsers = ArrayList()
         selectedUsers = ArrayList()
+        notifyRanges = ArrayList()
     }
 
     sealed class TaskPeriod {
         object Daily : TaskPeriod()
         data class Weekly(var days: List<Int>) : TaskPeriod()
         data class Monthly(var days: List<Int>) : TaskPeriod()
+    }
+
+    class NotifyRange {
+        var type: NotifyRangeType = NotifyRangeType.IN_RANGE
+        var isPercent: Boolean = false
+
+        var from: Int = 0
+        var to: Int = 0
+        var message: String = ""
+        var selectedUsersMap: MutableMap<String, OrgUser> = HashMap()
+        val selectedUsersList: List<OrgUser>
+            get() = selectedUsersMap.values.toList()
+
+        var emails: MutableList<String> = ArrayList()
     }
 
     companion object {

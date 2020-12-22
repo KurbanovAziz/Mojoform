@@ -194,6 +194,16 @@
     <string name="every_day">Ежедневно</string>
     <string name="every_week">Еженедельно по следующим дням</string>
     <string name="every_month">Ежемесячно по следующим числам</string>
+    <string name="set_result_control_rules">Задайте правила контроля результата</string>
+    <string name="from">От</string>
+    <string name="to">До</string>
+    <string name="user">Пользователь</string>
+    <string name="add_email">Добавить email</string>
+    <string name="input_message_text">Впишите текст сообщения</string>
+    <string name="add_one_more_range">Добавить ещё диапазон</string>
+    <string name="task_notify_in_range">Уведомлять, когда значение входит в диапазон</string>
+    <string name="task_notify_out_of_range">Уведомлять, когда значение не входит в диапазон</string>
+    <string name="no_available_for_add_users">Нет доступных для добавления пользователей</string>
 
     <string-array name="day_names">
         <item>вс</item>
