@@ -15,11 +15,18 @@ import android.widget.*
 import android.widget.AdapterView.OnItemSelectedListener
 import androidx.appcompat.widget.AppCompatSpinner
 import androidx.fragment.app.Fragment
+import com.google.gson.Gson
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import io.reactivex.rxjava3.core.Observable
+import io.reactivex.rxjava3.disposables.Disposable
+import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.android.synthetic.main.fragment_create_task_info.*
 import org.dev_alex.mojo_qa.mojo.CreateTaskModel
 import org.dev_alex.mojo_qa.mojo.CreateTaskModel.TaskType
 import org.dev_alex.mojo_qa.mojo.R
 import org.dev_alex.mojo_qa.mojo.models.File
+import org.dev_alex.mojo_qa.mojo.models.response.OrgUsersResponse
+import org.dev_alex.mojo_qa.mojo.services.RequestService
 import org.dev_alex.mojo_qa.mojo.services.Utils
 import java.text.SimpleDateFormat
 import java.util.*
@@ -29,6 +36,7 @@ import kotlin.collections.ArrayList
 @Suppress("DEPRECATION")
 class CreateTaskInfoFragment : Fragment() {
     private var loopDialog: ProgressDialog? = null
+    private var loadDisposable: Disposable? = null
 
     private val model: CreateTaskModel
         get() = CreateTaskModel.instance!!
@@ -68,7 +76,7 @@ class CreateTaskInfoFragment : Fragment() {
 
         btSelectRules.setOnClickListener {
             if (model.isValid()) {
-                showNextFragment(SelectTaskRulesFragment.newInstance())
+                loadUsersAndShowRules()
             } else {
                 Toast.makeText(context, R.string.not_all_fields_filled, Toast.LENGTH_SHORT).show()
             }
@@ -414,6 +422,38 @@ class CreateTaskInfoFragment : Fragment() {
                 ?.replace(R.id.container, fragment)
                 ?.addToBackStack(null)
                 ?.commit()
+    }
+
+    private fun loadUsersAndShowRules() {
+        loadDisposable?.dispose()
+
+        loopDialog?.show()
+        loadDisposable = Observable.create<OrgUsersResponse> {
+            val url = "/api/orgs/${model.orgId.orEmpty()}/users"
+            val response = RequestService.createGetRequest(url)
+
+            if (response.code == 200) {
+                val responseJson = response.body?.string() ?: "{}"
+                val responseData = Gson().fromJson(responseJson, OrgUsersResponse::class.java)
+                it.onNext(responseData)
+                it.onComplete()
+            }
+        }
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe({
+                    model.saveUsers(it)
+                    loopDialog?.dismiss()
+                    showNextFragment(SelectTaskRulesFragment.newInstance())
+                }, {
+                    loopDialog?.dismiss()
+                    it.printStackTrace()
+                })
+    }
+    override fun onDestroyView() {
+        loadDisposable?.dispose()
+        loopDialog?.dismiss()
+        super.onDestroyView()
     }
 
     companion object {

@@ -5,11 +5,7 @@ import android.app.ProgressDialog
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.TypedValue
-import android.view.LayoutInflater
-import android.view.MotionEvent
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.*
 import androidx.appcompat.widget.AppCompatSpinner
 import androidx.fragment.app.Fragment
@@ -19,6 +15,8 @@ import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.disposables.Disposable
 import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.android.synthetic.main.fragment_select_task_rules.*
+import kotlinx.android.synthetic.main.view_add_user_spinner.view.*
+import kotlinx.android.synthetic.main.view_task_control_range.*
 import kotlinx.android.synthetic.main.view_task_control_range.view.*
 import org.dev_alex.mojo_qa.mojo.CreateTaskModel
 import org.dev_alex.mojo_qa.mojo.R
@@ -126,8 +124,8 @@ class SelectTaskRulesFragment : Fragment() {
 
         rangeView.btAddUser.setOnClickListener {
             if (notifyRange.selectedUsersList.size < model.allUsers.size) {
-                val spinner = createPickUserSpinner(notifyRange)
-                rangeView.vAddedUsersBlock.addView(spinner)
+                val spinnerView = createPickUserSpinner(notifyRange)
+                rangeView.vAddedUsersBlock.addView(spinnerView)
             } else {
                 Toast.makeText(context, getString(R.string.no_available_for_add_users), Toast.LENGTH_SHORT).show()
             }
@@ -140,14 +138,11 @@ class SelectTaskRulesFragment : Fragment() {
     }
 
     @SuppressLint("ClickableViewAccessibility")
-    private fun createPickUserSpinner(range: CreateTaskModel.NotifyRange): AppCompatSpinner {
+    private fun createPickUserSpinner(range: CreateTaskModel.NotifyRange): View {
         val keyUUID = UUID.randomUUID().toString()
 
-        val spinner = AppCompatSpinner(requireContext())
-        spinner.background = null
-        spinner.layoutParams = LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT).apply {
-            bottomMargin = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 8f, resources.displayMetrics).toInt()
-        }
+        val spinnerView = layoutInflater.inflate(R.layout.view_add_user_spinner, vAddedUsersBlock, false)
+        val spinner = spinnerView.spinner
 
         val getAdapter = {
             var userList = model.allUsers - range.selectedUsersList
@@ -178,7 +173,7 @@ class SelectTaskRulesFragment : Fragment() {
             return@setOnTouchListener false
         }
 
-        return spinner
+        return spinnerView
     }
 
     private fun initRangeValueSpinner(spinner: AppCompatSpinner, callback: (Int) -> Unit) {
