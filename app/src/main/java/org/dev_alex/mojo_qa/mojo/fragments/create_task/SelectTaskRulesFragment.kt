@@ -15,15 +15,18 @@ import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.disposables.Disposable
 import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.android.synthetic.main.fragment_select_task_rules.*
+import kotlinx.android.synthetic.main.view_add_user_email.view.*
 import kotlinx.android.synthetic.main.view_add_user_spinner.view.*
 import kotlinx.android.synthetic.main.view_task_control_range.*
 import kotlinx.android.synthetic.main.view_task_control_range.view.*
 import org.dev_alex.mojo_qa.mojo.CreateTaskModel
+import org.dev_alex.mojo_qa.mojo.CreateTaskModel.TaskType.*
 import org.dev_alex.mojo_qa.mojo.R
 import org.dev_alex.mojo_qa.mojo.models.OrgUser
 import org.dev_alex.mojo_qa.mojo.models.response.OrgUsersResponse
 import org.dev_alex.mojo_qa.mojo.services.RequestService
 import org.dev_alex.mojo_qa.mojo.services.Utils
+import org.json.JSONObject
 import java.util.*
 
 
@@ -51,6 +54,10 @@ class SelectTaskRulesFragment : Fragment() {
 
         btAddRange.setOnClickListener {
             addNotifyRange()
+        }
+
+        btCreateAppointment.setOnClickListener {
+
         }
     }
 
@@ -94,6 +101,7 @@ class SelectTaskRulesFragment : Fragment() {
         initRangeValueSpinner(rangeView.spTo) {
             notifyRange.to = it
         }
+        rangeView.spTo.setSelection(80)
 
         val valueTypes = listOf(getString(R.string.percent), getString(R.string.points))
         val valueTypeAdapter = ArrayAdapter(requireContext(), R.layout.spinner_task_type_item, valueTypes)
@@ -129,6 +137,11 @@ class SelectTaskRulesFragment : Fragment() {
             } else {
                 Toast.makeText(context, getString(R.string.no_available_for_add_users), Toast.LENGTH_SHORT).show()
             }
+        }
+
+        rangeView.btAddEmail.setOnClickListener {
+            val inputView = createInputUserEmail(notifyRange)
+            rangeView.vAddedEmailsBlock.addView(inputView)
         }
 
         vRulesContainer.addView(rangeView)
@@ -176,6 +189,35 @@ class SelectTaskRulesFragment : Fragment() {
         return spinnerView
     }
 
+    @SuppressLint("ClickableViewAccessibility")
+    private fun createInputUserEmail(range: CreateTaskModel.NotifyRange): View {
+        val keyUUID = UUID.randomUUID().toString()
+
+        val inputView = layoutInflater.inflate(R.layout.view_add_user_email, vAddedUsersBlock, false)
+        val etEmail = inputView.etEmail
+
+        etEmail.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+
+            }
+
+            override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+
+            }
+
+            override fun afterTextChanged(p0: Editable?) {
+                val emailStr = p0?.toString().orEmpty()
+                if (emailStr.isEmail()) {
+                    range.emailsMap[keyUUID] = emailStr
+                } else {
+                    range.emailsMap.remove(keyUUID)
+                }
+            }
+        })
+
+        return inputView
+    }
+
     private fun initRangeValueSpinner(spinner: AppCompatSpinner, callback: (Int) -> Unit) {
         val minutesArray = (0..100).toList()
         val hoursArrayStr = minutesArray.map { it.toString() }
@@ -204,6 +246,64 @@ class SelectTaskRulesFragment : Fragment() {
     }
 
     private fun sendData() {
+        val jsonObject = JSONObject()
+        jsonObject.put("name", model.taskName)
+        jsonObject.put("documentFolderNode", model.file?.id)
+        jsonObject.put("executionPeriod", true)
+
+        val executorsJson = JSONObject().apply {
+            put("accounts", model.selectedUsers.map { it.id })
+        }
+        jsonObject.put("executors", executorsJson)
+
+
+        jsonObject.put("config", 1) // ToDo
+        when (model.taskType) {
+            CONSTANT -> {
+
+            }
+            PERIODICAL -> {
+
+            }
+            ONE_SHOT -> {
+
+            }
+            PRIVATE_POLL -> {
+
+            }
+            OPEN_POLL -> {
+
+            }
+        }
+
+        if (model.taskType == PRIVATE_POLL || model.taskType == OPEN_POLL) {
+            val pollJson = JSONObject().apply {
+                put("expire_date", model.endOpenPollDate?.time?.div(1000)?.or(0L))
+                put("execution_limit", model.pollPersonsCount ?: 0)
+                put("name", model.taskName)
+            }
+
+            jsonObject.put("links", listOf(pollJson))
+        }
+
+        model.notifyRanges.forEach {
+            jsonObject.put("from", it.from)
+            jsonObject.put("to", it.to)
+            jsonObject.put("type", if (it.type == CreateTaskModel.NotifyRangeType.IN_RANGE) "IN" else "OUT")
+            jsonObject.put("value", if (it.isPercent) "PERCENT" else "VALUE")
+            jsonObject.put("msg", it.message)
+            jsonObject.put("email", it.emailsList)
+
+            val usersJsonList = it.selectedUsersList.map {
+                JSONObject().apply {
+                    put("id", it.id)
+                    put("is_push", true)
+                    put("is_email", false)
+                }
+            }
+            jsonObject.put("accounts", usersJsonList)
+        }
+
         loadDisposable?.dispose()
 
         loopDialog?.show()
@@ -239,5 +339,10 @@ class SelectTaskRulesFragment : Fragment() {
         fun newInstance(): SelectTaskRulesFragment {
             return SelectTaskRulesFragment()
         }
+    }
+
+    fun String.isEmail(): Boolean {
+        val emailRegex = "^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$".toRegex(RegexOption.IGNORE_CASE)
+        return matches(emailRegex)
     }
 }

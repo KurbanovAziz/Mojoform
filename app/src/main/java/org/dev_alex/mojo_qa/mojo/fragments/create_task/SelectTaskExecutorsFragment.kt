@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import com.google.gson.Gson
 import com.xwray.groupie.ExpandableGroup
@@ -48,7 +49,11 @@ class SelectTaskExecutorsFragment : Fragment() {
         loadUsers()
 
         btSelectRules.setOnClickListener {
-            showNextFragment(SelectTaskRulesFragment.newInstance())
+            if (model.selectedUsers.isEmpty()) {
+                Toast.makeText(context, getString(R.string.need_to_select_at_least_one_executor), Toast.LENGTH_SHORT).show()
+            } else {
+                showNextFragment(SelectTaskRulesFragment.newInstance())
+            }
         }
     }
 

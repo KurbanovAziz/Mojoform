@@ -169,4 +169,49 @@
     <string name="last_name">Surname</string>
     <string name="save">Save</string>
 
+    <string name="select_executors">Choose executors</string>
+    <string name="pick_executors">Indicate executors</string>
+    <string name="assignments">Assignments</string>
+    <string name="input_task_name">Enter the name of the task</string>
+    <string name="task_type_constant">Constant</string>
+    <string name="task_type_periodical">Periodic</string>
+    <string name="task_type_oneshot">One-time</string>
+    <string name="task_type_private_poll">Closed Survey</string>
+    <string name="task_type_open_poll">Open Survey</string>
+    <string name="set_rules">Set Rules</string>
+    <string name="set_task_due_date">Set the due date for the task</string>
+    <string name="exec_start">Start of execution</string>
+    <string name="exec_end">End of execution</string>
+    <string name="poll_date_and_count">Number and date of survey completion</string>
+    <string name="set_task_execution_time">Set the time to complete the task</string>
+    <string name="task_execution_period">Task Execution Periods</string>
+    <string name="hours">Hours</string>
+    <string name="minutes">Minutes</string>
+    <string name="days_short">D</string>
+    <string name="weeks_short">W</string>
+    <string name="month_short">M</string>
+    <string name="every_day">Daily</string>
+    <string name="every_week">Weekly on these days</string>
+    <string name="every_month">Monthly on these dates</string>
+    <string name="set_result_control_rules">Set Result Control Rules</string>
+    <string name="from">From</string>
+    <string name="to">To</string>
+    <string name="user">User</string>
+    <string name="add_email">Add email</string>
+    <string name="input_message_text">Write the message of the text</string>
+    <string name="add_one_more_range">Add More Range</string>
+    <string name="task_notify_in_range">Notify when value is in range</string>
+    <string name="task_notify_out_of_range">Notify when value is out of range</string>
+    <string name="no_available_for_add_users">No users available to add</string>
+    <string name="need_to_select_at_least_one_executor">Need to select at least one executor</string>
+
+    <string-array name="day_names">
+        <item>Su</item>
+        <item>Mo</item>
+        <item>Tu</item>
+        <item>We</item>
+        <item>Th</item>
+        <item>Fr</item>
+        <item>Sa</item>
+    </string-array>
 </resources>

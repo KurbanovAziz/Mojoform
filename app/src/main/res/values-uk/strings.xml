@@ -168,4 +168,51 @@
     <string name="name">ім\'я</string>
     <string name="last_name">Прізвище</string>
     <string name="save">Зберігши</string>
+
+    <string name="select_executors">Вибір виконавців</string>
+    <string name="pick_executors">Вказати виконавців</string>
+    <string name="assignments">Цiлi</string>
+    <string name="input_task_name">Введіть назву завдання</string>
+    <string name="task_type_constant">Постійний</string>
+    <string name="task_type_periodical">Періодичний</string>
+    <string name="task_type_oneshot">Одноразовий</string>
+    <string name="task_type_private_poll">Закрите опитування</string>
+    <string name="task_type_open_poll">Відкрите обстеження</string>
+    <string name="set_rules">Встановити правила</string>
+    <string name="set_task_due_date">Встановлення терміну виконання завдання</string>
+    <string name="exec_start">Початок виконання</string>
+    <string name="exec_end">Закінчення виконання</string>
+    <string name="poll_date_and_count">Кількість і дата завершення обстеження</string>
+    <string name="set_task_execution_time">Встановлення часу для виконання завдання</string>
+    <string name="task_execution_period">Періоди виконання завдань</string>
+    <string name="hours">Години</string>
+    <string name="minutes">Хвилини</string>
+    <string name="days_short">Д</string>
+    <string name="weeks_short">Т</string>
+    <string name="month_short">М</string>
+    <string name="every_day">Щодня</string>
+    <string name="every_week">Щотижня в ці дні</string>
+    <string name="every_month">Щомісяця на ці дати</string>
+    <string name="set_result_control_rules">Встановлення правил керування результатами</string>
+    <string name="from">Від</string>
+    <string name="to">Кому</string>
+    <string name="user">Користувач</string>
+    <string name="add_email">Електронна пошта</string>
+    <string name="input_message_text">Написати текст повідомлення</string>
+    <string name="add_one_more_range">Додати додатковий діапазон</string>
+    <string name="task_notify_in_range">Сповіщати, коли значення знаходиться в діапазоні</string>
+    <string name="task_notify_out_of_range">Сповіщати, коли значення виходить за межі діапазону</string>
+    <string name="no_available_for_add_users">Немає користувачів, доступних для додавання</string>
+    <string name="need_to_select_at_least_one_executor">Необхідно вибрати хоча б 1 виконавця</string>
+
+    <string-array name="day_names">
+        <item>Нд</item>
+        <item>Пн</item>
+        <item>Вт</item>
+        <item>Ср</item>
+        <item>Чт</item>
+        <item>Пт</item>
+        <item>Сб</item>
+    </string-array>
+
 </resources>

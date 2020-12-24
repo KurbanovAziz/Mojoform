@@ -169,4 +169,51 @@
     <string name="name">Nombre</string>
     <string name="last_name">Apellido</string>
     <string name="save">Guardar</string>
+
+    <string name="select_executors">Elija a ejecutores</string>
+    <string name="pick_executors">Indique a ejecutores</string>
+    <string name="assignments">Asignaciones</string>
+    <string name="input_task_name">Escriba el nombre de la tarea</string>
+    <string name="task_type_constant">Constante</string>
+    <string name="task_type_periodical">Periódico</string>
+    <string name="task_type_oneshot">Antiguo</string>
+    <string name="task_type_private_poll">Revisión cerrada</string>
+    <string name="task_type_open_poll">Revisión abierta</string>
+    <string name="set_rules">Defina las reglas</string>
+    <string name="set_task_due_date">Establecer la fecha de vencimiento de la tarea</string>
+    <string name="exec_start">Inicio de la ejecución</string>
+    <string name="exec_end">Fin de la ejecución</string>
+    <string name="poll_date_and_count">Número y fecha de finalización de la encuesta</string>
+    <string name="set_task_execution_time">Establecer el tiempo para completar la tarea</string>
+    <string name="task_execution_period">Períodos de ejecución de tareas</string>
+    <string name="hours">Horas</string>
+    <string name="minutes">Minutos</string>
+    <string name="days_short">D</string>
+    <string name="weeks_short">S</string>
+    <string name="month_short">M</string>
+    <string name="every_day">Diariamente</string>
+    <string name="every_week">Semanalmente en estos días</string>
+    <string name="every_month">Mensualmente en estas fechas</string>
+    <string name="set_result_control_rules">Establecer reglas de control de resultados</string>
+    <string name="from">De</string>
+    <string name="to">A</string>
+    <string name="user">Usuario</string>
+    <string name="add_email">Añadir Correo electrónico</string>
+    <string name="input_message_text">Escribir el texto del mensaje</string>
+    <string name="add_one_more_range">Agregar más rango</string>
+    <string name="task_notify_in_range">Notificar cuando el valor está en el rango</string>
+    <string name="task_notify_out_of_range">Notificar cuando el valor está fuera de rango</string>
+    <string name="no_available_for_add_users">No hay usuarios disponibles para agregar</string>
+    <string name="need_to_select_at_least_one_executor">Debes seleccionar al menos 1 artistaor</string>
+
+    <string-array name="day_names">
+        <item>Do</item>
+        <item>Lu</item>
+        <item>Ma</item>
+        <item>Mi</item>
+        <item>Ju</item>
+        <item>Vi</item>
+        <item>Sá</item>
+    </string-array>
+
 </resources>

@@ -204,6 +204,8 @@
     <string name="task_notify_in_range">Уведомлять, когда значение входит в диапазон</string>
     <string name="task_notify_out_of_range">Уведомлять, когда значение не входит в диапазон</string>
     <string name="no_available_for_add_users">Нет доступных для добавления пользователей</string>
+    <string name="need_to_select_at_least_one_executor">Необходимо выбрать хотя бы 1 исполнителя</string>
+    <string name="e_mail" translatable="false">E-mail</string>
 
     <string-array name="day_names">
         <item>вс</item>

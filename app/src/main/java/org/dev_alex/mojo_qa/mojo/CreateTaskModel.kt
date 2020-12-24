@@ -163,7 +163,9 @@ class CreateTaskModel private constructor() {
         val selectedUsersList: List<OrgUser>
             get() = selectedUsersMap.values.toList()
 
-        var emails: MutableList<String> = ArrayList()
+        var emailsMap: MutableMap<String, String> = HashMap()
+        val emailsList: List<String>
+            get() = emailsMap.values.toList()
     }
 
     companion object {
