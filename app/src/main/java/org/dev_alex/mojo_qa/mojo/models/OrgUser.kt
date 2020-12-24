@@ -3,7 +3,7 @@ package org.dev_alex.mojo_qa.mojo.models
 
 import com.google.gson.annotations.SerializedName
 
-data class OrgUser(
+class OrgUser(
         val config: String,
         val description: String,
         val email: String,
@@ -24,5 +24,18 @@ data class OrgUser(
 ) {
     override fun toString(): String {
         return firstName.takeIf { it.isNotBlank() } ?: fullname
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is OrgUser) return false
+
+        if (id != other.id) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        return id
     }
 }
