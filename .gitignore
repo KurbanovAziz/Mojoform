@@ -5,3 +5,7 @@
 /build
 /captures
 .externalNativeBuild
+*.apk
+app/release_flavor/release/output-metadata.json
+*.apk
+app/debug_flavor/release/output-metadata.json
