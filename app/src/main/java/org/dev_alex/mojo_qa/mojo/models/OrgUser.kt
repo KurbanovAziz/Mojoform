@@ -1,25 +1,19 @@
 package org.dev_alex.mojo_qa.mojo.models
 
 
-import com.google.gson.annotations.SerializedName
-
 class OrgUser(
         val config: String,
         val description: String,
         val email: String,
         val firstName: String,
         val fullname: String,
-        @SerializedName("has_avatar")
-        val hasAvatar: Boolean,
+        val has_avatar: Boolean,
         val id: Int,
-        @SerializedName("is_deleted")
-        val isDeleted: Boolean,
-        @SerializedName("is_orgowner")
-        val isOrgowner: Boolean,
+        val is_deleted: Boolean,
+        val is_orgowner: Boolean,
         val langcode: String,
         val lastName: String,
-        @SerializedName("push_disabled")
-        val pushDisabled: Boolean,
+        val push_disabled: Boolean,
         val username: String
 ) {
     override fun toString(): String {
@@ -37,5 +31,5 @@ class OrgUser(
 
     override fun hashCode(): Int {
         return id
-    }
+    }и
 }
