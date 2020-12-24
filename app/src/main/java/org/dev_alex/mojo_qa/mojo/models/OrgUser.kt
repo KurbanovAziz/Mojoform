@@ -31,5 +31,5 @@ class OrgUser(
 
     override fun hashCode(): Int {
         return id
-    }и
+    }
 }
