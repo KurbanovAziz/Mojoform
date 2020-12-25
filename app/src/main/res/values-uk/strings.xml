@@ -204,6 +204,7 @@
     <string name="task_notify_out_of_range">Сповіщати, коли значення виходить за межі діапазону</string>
     <string name="no_available_for_add_users">Немає користувачів, доступних для додавання</string>
     <string name="need_to_select_at_least_one_executor">Необхідно вибрати хоча б 1 виконавця</string>
+    <string name="appointment_created_successfully">Папка успішно створена</string>
 
     <string-array name="day_names">
         <item>Нд</item>

@@ -437,6 +437,8 @@ class CreateTaskInfoFragment : Fragment() {
                 val responseData = Gson().fromJson(responseJson, OrgUsersResponse::class.java)
                 it.onNext(responseData)
                 it.onComplete()
+            } else {
+                it.onError(Exception("code = ${response.code}"))
             }
         }
                 .subscribeOn(Schedulers.io())

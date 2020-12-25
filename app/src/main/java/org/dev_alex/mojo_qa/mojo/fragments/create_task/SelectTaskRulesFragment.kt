@@ -22,12 +22,15 @@ import kotlinx.android.synthetic.main.view_task_control_range.view.*
 import org.dev_alex.mojo_qa.mojo.CreateTaskModel
 import org.dev_alex.mojo_qa.mojo.CreateTaskModel.TaskType.*
 import org.dev_alex.mojo_qa.mojo.R
+import org.dev_alex.mojo_qa.mojo.fragments.TasksFragment
 import org.dev_alex.mojo_qa.mojo.models.OrgUser
 import org.dev_alex.mojo_qa.mojo.models.response.OrgUsersResponse
 import org.dev_alex.mojo_qa.mojo.services.RequestService
 import org.dev_alex.mojo_qa.mojo.services.Utils
+import org.json.JSONArray
 import org.json.JSONObject
 import java.util.*
+import kotlin.collections.ArrayList
 
 
 @Suppress("DEPRECATION")
@@ -57,7 +60,12 @@ class SelectTaskRulesFragment : Fragment() {
         }
 
         btCreateAppointment.setOnClickListener {
+            sendData()
+        }
 
+        btSkip.setOnClickListener {
+            model.notifyRanges = ArrayList()
+            sendData()
         }
     }
 
@@ -252,33 +260,67 @@ class SelectTaskRulesFragment : Fragment() {
         jsonObject.put("executionPeriod", true)
 
         val executorsJson = JSONObject().apply {
-            put("accounts", model.selectedUsers.map { it.id })
+            put("accounts", JSONArray(model.selectedUsers.map { it.id }))
         }
         jsonObject.put("executors", executorsJson)
 
-
-        jsonObject.put("config", 1) // ToDo
+        val configJson = JSONObject()
+        configJson.put("documentFolder", model.file?.id)
         when (model.taskType) {
             CONSTANT -> {
-
+                configJson.put("constantly", true)
             }
             PERIODICAL -> {
+                val periodTime = String.format("%02d:%02d", model.periodicalTaskHour ?: 0, model.periodicalTaskMinutes ?: 0)
+                val selectedPeriod = model.selectedPeriod
 
+                val periodicalConfigJson = JSONObject().apply {
+                    when (selectedPeriod) {
+                        CreateTaskModel.TaskPeriod.Daily -> {
+                            put("daily", JSONObject().apply {
+                                put("times", JSONArray(listOf(periodTime)))
+                            })
+                        }
+                        is CreateTaskModel.TaskPeriod.Weekly -> {
+                            put("weekly", JSONObject().apply {
+                                put("times", JSONArray(listOf(periodTime)))
+                                put("weekDays", JSONArray(selectedPeriod.days))
+                            })
+                        }
+                        is CreateTaskModel.TaskPeriod.Monthly -> {
+                            put("monthly", JSONObject().apply {
+                                put("times", JSONArray(listOf(periodTime)))
+                                put("monthDays", JSONArray(selectedPeriod.days))
+                            })
+                        }
+                    }
+                    put("is_start", true)
+                }
+                configJson.put("periodic", periodicalConfigJson)
             }
             ONE_SHOT -> {
+                val oneShotConfigJson = JSONObject().apply {
+                    put("datetime", model.startOneShotDate?.time ?: 0L)
+                    put("is_start", true)
+                }
+                configJson.put("oneshot", oneShotConfigJson)
 
+                val period = (model.endOneShotDate?.time ?: 0L) - (model.startOneShotDate?.time ?: 0L)
+                jsonObject.put("execution_period", period)
             }
             PRIVATE_POLL -> {
-
+                configJson.put("closedlinks", true)
             }
             OPEN_POLL -> {
-
+                configJson.put("openlinks", true)
             }
         }
+        jsonObject.put("config", configJson)
+
 
         if (model.taskType == PRIVATE_POLL || model.taskType == OPEN_POLL) {
             val pollJson = JSONObject().apply {
-                put("expire_date", model.endOpenPollDate?.time?.div(1000)?.or(0L))
+                put("expire_date", model.endOpenPollDate?.time?.div(1000) ?: 0L)
                 put("execution_limit", model.pollPersonsCount ?: 0)
                 put("name", model.taskName)
             }
@@ -286,43 +328,56 @@ class SelectTaskRulesFragment : Fragment() {
             jsonObject.put("links", listOf(pollJson))
         }
 
-        model.notifyRanges.forEach {
-            jsonObject.put("from", it.from)
-            jsonObject.put("to", it.to)
-            jsonObject.put("type", if (it.type == CreateTaskModel.NotifyRangeType.IN_RANGE) "IN" else "OUT")
-            jsonObject.put("value", if (it.isPercent) "PERCENT" else "VALUE")
-            jsonObject.put("msg", it.message)
-            jsonObject.put("email", it.emailsList)
+        val rangesJsonList = model.notifyRanges.map {
+            JSONObject().apply {
+                put("from", it.from)
+                put("to", it.to)
+                put("type", if (it.type == CreateTaskModel.NotifyRangeType.IN_RANGE) "IN" else "OUT")
+                put("value", if (it.isPercent) "PERCENT" else "VALUE")
+                put("msg", it.message)
+                put("email", JSONArray(it.emailsList))
 
-            val usersJsonList = it.selectedUsersList.map {
-                JSONObject().apply {
-                    put("id", it.id)
-                    put("is_push", true)
-                    put("is_email", false)
+                val usersJsonList = it.selectedUsersList.map {
+                    JSONObject().apply {
+                        put("id", it.id)
+                        put("is_push", true)
+                        put("is_email", false)
+                    }
                 }
+
+                put("accounts", JSONArray(usersJsonList))
             }
-            jsonObject.put("accounts", usersJsonList)
         }
+        jsonObject.put("ranges", JSONArray(rangesJsonList))
 
         loadDisposable?.dispose()
-
         loopDialog?.show()
         loadDisposable = Observable.create<OrgUsersResponse> {
-            val url = "/api/orgs/${model.orgId.orEmpty()}/users"
-            val response = RequestService.createGetRequest(url)
+            val url = "/api/tasks/refs/${model.file?.id}"
+            val response = RequestService.createPostRequest(url, jsonObject.toString())
 
             if (response.code == 200) {
                 val responseJson = response.body?.string() ?: "{}"
                 val responseData = Gson().fromJson(responseJson, OrgUsersResponse::class.java)
                 it.onNext(responseData)
                 it.onComplete()
+            } else {
+                it.onError(Exception("code = ${response.code}"))
             }
         }
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
+                    activity?.supportFragmentManager?.popBackStack(null, 0)
+                    activity?.supportFragmentManager
+                            ?.beginTransaction()
+                            ?.replace(R.id.container, TasksFragment.newInstance(), "tasks")
+                            ?.commit()
+
                     loopDialog?.dismiss()
+                    Toast.makeText(context, R.string.appointment_created_successfully, Toast.LENGTH_SHORT).show()
                 }, {
+                    Toast.makeText(context, it.localizedMessage, Toast.LENGTH_SHORT).show()
                     loopDialog?.dismiss()
                     it.printStackTrace()
                 })

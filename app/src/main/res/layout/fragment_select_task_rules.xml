@@ -54,19 +54,43 @@
         </LinearLayout>
     </ScrollView>
 
-    <Button
-        android:id="@+id/btCreateAppointment"
-        android:layout_width="wrap_content"
-        android:layout_height="45dp"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginVertical="15dp"
-        android:layout_marginRight="5dp"
-        android:background="@drawable/blue_button"
-        android:gravity="center"
-        android:paddingHorizontal="20dp"
-        android:text="@string/finish"
-        android:textAllCaps="false"
-        android:textColor="@android:color/white"
-        android:textSize="16sp"
-        android:visibility="visible" />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal">
+
+        <Button
+            android:id="@+id/btSkip"
+            android:layout_width="wrap_content"
+            android:layout_height="45dp"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginVertical="15dp"
+            android:layout_marginEnd="6dp"
+            android:layout_marginRight="5dp"
+            android:background="@drawable/blue_button"
+            android:gravity="center"
+            android:paddingHorizontal="20dp"
+            android:text="@string/skip"
+            android:textAllCaps="false"
+            android:textColor="@android:color/white"
+            android:textSize="16sp"
+            android:visibility="visible" />
+
+        <Button
+            android:id="@+id/btCreateAppointment"
+            android:layout_width="wrap_content"
+            android:layout_height="45dp"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginVertical="15dp"
+            android:layout_marginStart="6dp"
+            android:layout_marginRight="5dp"
+            android:background="@drawable/blue_button"
+            android:gravity="center"
+            android:paddingHorizontal="20dp"
+            android:text="@string/finish"
+            android:textAllCaps="false"
+            android:textColor="@android:color/white"
+            android:textSize="16sp"
+            android:visibility="visible" />
+    </LinearLayout>
 </LinearLayout>

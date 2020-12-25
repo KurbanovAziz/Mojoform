@@ -205,6 +205,7 @@
     <string name="task_notify_out_of_range">Notificar cuando el valor está fuera de rango</string>
     <string name="no_available_for_add_users">No hay usuarios disponibles para agregar</string>
     <string name="need_to_select_at_least_one_executor">Debes seleccionar al menos 1 artistaor</string>
+    <string name="appointment_created_successfully">Carpeta creada con éxito</string>
 
     <string-array name="day_names">
         <item>Do</item>
