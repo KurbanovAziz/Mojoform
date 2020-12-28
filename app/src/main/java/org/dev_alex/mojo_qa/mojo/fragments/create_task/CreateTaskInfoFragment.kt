@@ -81,6 +81,10 @@ class CreateTaskInfoFragment : Fragment() {
                 Toast.makeText(context, R.string.not_all_fields_filled, Toast.LENGTH_SHORT).show()
             }
         }
+
+        btExit.setOnClickListener {
+            activity?.supportFragmentManager?.popBackStack()
+        }
     }
 
     private fun initTaskTypeSpinner() {
@@ -173,8 +177,12 @@ class CreateTaskInfoFragment : Fragment() {
             model.updateEndOneShotMinutePart(it)
         }
 
-        spOneShotStartHour.setSelection(9)
-        spOneShotEndHour.setSelection(21)
+        val currentDate = Calendar.getInstance().apply { time = Date() }
+        spOneShotStartHour.setSelection(currentDate.get(Calendar.HOUR_OF_DAY))
+        spOneShotEndHour.setSelection(currentDate.get(Calendar.HOUR_OF_DAY) + 1)
+
+        spOneShotStartMinute.setSelection(currentDate.get(Calendar.MINUTE))
+        spOneShotEndMinute.setSelection(currentDate.get(Calendar.MINUTE))
     }
 
     private fun initPeriodicalTaskViews() {
@@ -184,8 +192,10 @@ class CreateTaskInfoFragment : Fragment() {
         initMinuteSpinner(spPeriodicalMinute) {
             model.periodicalTaskMinutes = it
         }
-        spPeriodicalHour.setSelection(12)
-        spPeriodicalMinute.setSelection(48)
+
+        val currentDate = Calendar.getInstance().apply { time = Date() }
+        spPeriodicalHour.setSelection(currentDate.get(Calendar.HOUR_OF_DAY))
+        spPeriodicalMinute.setSelection(currentDate.get(Calendar.MINUTE))
 
         val clearContent = { vPeriodContent.removeAllViews() }
         val renderRadioButton = { title: String ->
@@ -452,6 +462,7 @@ class CreateTaskInfoFragment : Fragment() {
                     it.printStackTrace()
                 })
     }
+
     override fun onDestroyView() {
         loadDisposable?.dispose()
         loopDialog?.dismiss()

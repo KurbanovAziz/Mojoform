@@ -9,6 +9,7 @@ import android.view.*
 import android.widget.*
 import androidx.appcompat.widget.AppCompatSpinner
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
 import com.google.gson.Gson
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Observable
@@ -22,9 +23,8 @@ import kotlinx.android.synthetic.main.view_task_control_range.view.*
 import org.dev_alex.mojo_qa.mojo.CreateTaskModel
 import org.dev_alex.mojo_qa.mojo.CreateTaskModel.TaskType.*
 import org.dev_alex.mojo_qa.mojo.R
-import org.dev_alex.mojo_qa.mojo.fragments.TasksFragment
 import org.dev_alex.mojo_qa.mojo.models.OrgUser
-import org.dev_alex.mojo_qa.mojo.models.response.OrgUsersResponse
+import org.dev_alex.mojo_qa.mojo.models.response.appointment.CreateAppointmentResponse
 import org.dev_alex.mojo_qa.mojo.services.RequestService
 import org.dev_alex.mojo_qa.mojo.services.Utils
 import org.json.JSONArray
@@ -66,6 +66,10 @@ class SelectTaskRulesFragment : Fragment() {
         btSkip.setOnClickListener {
             model.notifyRanges = ArrayList()
             sendData()
+        }
+
+        btExit.setOnClickListener {
+            activity?.supportFragmentManager?.popBackStack("CreateTaskInfoFragment", FragmentManager.POP_BACK_STACK_INCLUSIVE)
         }
     }
 
@@ -325,7 +329,9 @@ class SelectTaskRulesFragment : Fragment() {
                 put("name", model.taskName)
             }
 
-            jsonObject.put("links", listOf(pollJson))
+            val pollJsonList = ArrayList<JSONObject>()
+            pollJsonList.add(pollJson)
+            jsonObject.put("links", JSONArray(pollJsonList))
         }
 
         val rangesJsonList = model.notifyRanges.map {
@@ -352,30 +358,37 @@ class SelectTaskRulesFragment : Fragment() {
 
         loadDisposable?.dispose()
         loopDialog?.show()
-        loadDisposable = Observable.create<OrgUsersResponse> {
+        loadDisposable = Observable.create<CreateAppointmentResponse> {
             val url = "/api/tasks/refs/${model.file?.id}"
             val response = RequestService.createPostRequest(url, jsonObject.toString())
 
             if (response.code == 200) {
                 val responseJson = response.body?.string() ?: "{}"
-                val responseData = Gson().fromJson(responseJson, OrgUsersResponse::class.java)
+                val responseData = Gson().fromJson(responseJson, CreateAppointmentResponse::class.java)
                 it.onNext(responseData)
                 it.onComplete()
             } else {
+                val errorJson = response.body?.string() ?: "{}"
                 it.onError(Exception("code = ${response.code}"))
             }
         }
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
-                    activity?.supportFragmentManager?.popBackStack(null, 0)
-                    activity?.supportFragmentManager
-                            ?.beginTransaction()
-                            ?.replace(R.id.container, TasksFragment.newInstance(), "tasks")
-                            ?.commit()
-
                     loopDialog?.dismiss()
                     Toast.makeText(context, R.string.appointment_created_successfully, Toast.LENGTH_SHORT).show()
+
+                    if (model.taskType == PRIVATE_POLL || model.taskType == OPEN_POLL) {
+                        model.createAppointmentResponse = it
+
+                        activity?.supportFragmentManager?.popBackStack("CreateTaskInfoFragment", FragmentManager.POP_BACK_STACK_INCLUSIVE)
+                        activity?.supportFragmentManager
+                                ?.beginTransaction()
+                                ?.replace(R.id.container, ShowPollDataFragment.newInstance(), null)
+                                ?.commit()
+                    } else {
+                        activity?.supportFragmentManager?.popBackStack("CreateTaskInfoFragment", FragmentManager.POP_BACK_STACK_INCLUSIVE)
+                    }
                 }, {
                     Toast.makeText(context, it.localizedMessage, Toast.LENGTH_SHORT).show()
                     loopDialog?.dismiss()

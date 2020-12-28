@@ -152,5 +152,7 @@ dependencies {
 
     debugImplementation 'com.readystatesoftware.chuck:library:1.1.0'
     releaseImplementation 'com.readystatesoftware.chuck:library-no-op:1.1.0'
+
+    implementation 'com.github.SumiMakito:AwesomeQRCode:1.2.0'
 }
 apply plugin: 'com.google.gms.google-services'

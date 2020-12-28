@@ -4,11 +4,15 @@ import org.dev_alex.mojo_qa.mojo.CreateTaskModel.TaskType.*
 import org.dev_alex.mojo_qa.mojo.models.File
 import org.dev_alex.mojo_qa.mojo.models.OrgUser
 import org.dev_alex.mojo_qa.mojo.models.response.OrgUsersResponse
+import org.dev_alex.mojo_qa.mojo.models.response.appointment.CreateAppointmentResponse
 import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 
 class CreateTaskModel private constructor() {
+    var createAppointmentResponse: CreateAppointmentResponse? = null
+
+
     var orgId: String? = null
     var file: File? = null
     var taskName: String? = null
@@ -144,6 +148,8 @@ class CreateTaskModel private constructor() {
         allUsers = ArrayList()
         selectedUsers = ArrayList()
         notifyRanges = ArrayList()
+
+        createAppointmentResponse = null
     }
 
     sealed class TaskPeriod {

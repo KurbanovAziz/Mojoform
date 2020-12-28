@@ -611,7 +611,7 @@ public class DocumentsFragment extends Fragment {
                 .getSupportFragmentManager()
                 .beginTransaction()
                 .replace(R.id.container, CreateTaskInfoFragment.newInstance(item, openedOrgId))
-                .addToBackStack(null)
+                .addToBackStack("CreateTaskInfoFragment")
                 .commit();
     }
 

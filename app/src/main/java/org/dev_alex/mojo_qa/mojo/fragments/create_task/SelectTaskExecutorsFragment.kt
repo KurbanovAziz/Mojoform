@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
 import com.google.gson.Gson
 import com.xwray.groupie.ExpandableGroup
 import com.xwray.groupie.GroupAdapter
@@ -20,6 +21,7 @@ import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.android.synthetic.main.fragment_select_task_executors.*
 import org.dev_alex.mojo_qa.mojo.CreateTaskModel
 import org.dev_alex.mojo_qa.mojo.R
+import org.dev_alex.mojo_qa.mojo.fragments.TasksFragment
 import org.dev_alex.mojo_qa.mojo.models.OrgUser
 import org.dev_alex.mojo_qa.mojo.models.response.OrgUsersResponse
 import org.dev_alex.mojo_qa.mojo.services.RequestService
@@ -54,6 +56,10 @@ class SelectTaskExecutorsFragment : Fragment() {
             } else {
                 showNextFragment(SelectTaskRulesFragment.newInstance())
             }
+        }
+
+        btExit.setOnClickListener {
+            activity?.supportFragmentManager?.popBackStack("CreateTaskInfoFragment", FragmentManager.POP_BACK_STACK_INCLUSIVE)
         }
     }
 

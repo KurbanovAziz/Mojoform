@@ -2,10 +2,12 @@ package org.dev_alex.mojo_qa.mojo;
 
 import android.app.Application;
 import android.content.Context;
-import androidx.multidex.MultiDex;
 import android.util.DisplayMetrics;
 
 import java.lang.ref.WeakReference;
+
+import androidx.multidex.MultiDex;
+import io.reactivex.plugins.RxJavaPlugins;
 
 public class App extends Application {
     private static WeakReference<Context> mContext;
@@ -21,7 +23,7 @@ public class App extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        
+
         mContext = new WeakReference<>(this);
         displayMetrics = getResources().getDisplayMetrics();
 
@@ -42,6 +44,9 @@ public class App extends Application {
                 host = "https://system.mojoform.com";
                 break;
         }
+
+        RxJavaPlugins.setErrorHandler(Throwable::printStackTrace);
+        io.reactivex.rxjava3.plugins.RxJavaPlugins.setErrorHandler(Throwable::printStackTrace);
     }
 
     public static Context getContext() {
