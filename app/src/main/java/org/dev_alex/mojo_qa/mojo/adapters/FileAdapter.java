@@ -3,7 +3,6 @@ package org.dev_alex.mojo_qa.mojo.adapters;
 
 import android.content.res.Resources;
 import android.graphics.Bitmap;
-import androidx.recyclerview.widget.RecyclerView;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,6 +20,8 @@ import org.dev_alex.mojo_qa.mojo.services.Utils;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Locale;
+
+import androidx.recyclerview.widget.RecyclerView;
 
 
 public class FileAdapter extends RecyclerView.Adapter<FileAdapter.FileViewHolder> {
@@ -161,10 +162,6 @@ public class FileAdapter extends RecyclerView.Adapter<FileAdapter.FileViewHolder
 
             if (file.nodeType.equals("cm:content")) {
                 viewHolder.itemView.setOnClickListener(v -> parentFragment.new OpenFileTask(file).execute());
-            }
-
-            if (file.nodeType.equals("mojo:template")) {
-                viewHolder.itemView.setOnClickListener(v -> parentFragment.onTemplateClick(file));
             }
         }
 

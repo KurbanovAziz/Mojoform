@@ -94,6 +94,28 @@
         </LinearLayout>
 
         <LinearLayout
+            android:id="@+id/assignment_block"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:layout_width="18dp"
+                android:layout_height="18dp"
+                android:layout_gravity="center_vertical"
+                android:src="@drawable/documents" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginLeft="11dp"
+                android:text="@string/create_assignment"
+                android:textColor="#4c3e60"
+                android:textSize="16sp" />
+        </LinearLayout>
+
+        <LinearLayout
             android:id="@+id/deselect_block"
             android:layout_width="match_parent"
             android:layout_height="48dp"

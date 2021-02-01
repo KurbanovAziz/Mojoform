@@ -206,6 +206,7 @@
     <string name="need_to_select_at_least_one_executor">Необхідно вибрати хоча б 1 виконавця</string>
     <string name="appointment_created_successfully">Папка успішно створена</string>
     <string name="copied_to_clipboard">Скопійовано в буфер обміну</string>
+    <string name="create_assignment">Призначити завдання</string>
 
     <string-array name="day_names">
         <item>Нд</item>

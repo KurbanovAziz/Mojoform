@@ -583,6 +583,7 @@ public class DocumentsFragment extends Fragment {
             itemPopupWindow.findViewById(R.id.deselect_block).setVisibility(selectModeEnabled ? View.VISIBLE : View.GONE);
             itemPopupWindow.setVisibility(View.VISIBLE);
 
+
             itemPopupWindow.findViewById(R.id.move_block).setOnClickListener(v -> {
                 ArrayList<File> fileArrayList = new ArrayList<>();
                 fileArrayList.add(item);
@@ -591,6 +592,12 @@ public class DocumentsFragment extends Fragment {
                         .replace(R.id.container, MoveFileFragment.newInstance(fileArrayList)).addToBackStack("documents").commit();
                 itemPopupWindow.setVisibility(View.GONE);
             });
+
+            itemPopupWindow.findViewById(R.id.assignment_block).setVisibility(View.GONE);
+            if (item.nodeType.equals("mojo:template")) {
+                itemPopupWindow.findViewById(R.id.assignment_block).setOnClickListener(view -> onTemplateClick(item));
+                itemPopupWindow.findViewById(R.id.assignment_block).setVisibility(View.VISIBLE);
+            }
 
             itemPopupWindow.findViewById(R.id.delete_block).setOnClickListener(v -> {
                 itemPopupWindow.setVisibility(View.GONE);
