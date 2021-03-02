@@ -52,6 +52,16 @@ class AppointmentAdapter(private val appointments: List<AppointmentData>, privat
                     else -> appointment.type
                 }
 
+                if (appointment.type == "openlinks") {
+                    ivAppointmentIcon.setImageResource(R.drawable.ic_open_link)
+                    ivAppointmentIcon.visibility = View.VISIBLE
+                } else if (appointment.type == "closedlinks") {
+                    ivAppointmentIcon.setImageResource(R.drawable.ic_close_link)
+                    ivAppointmentIcon.visibility = View.VISIBLE
+                } else {
+                    ivAppointmentIcon.visibility = View.GONE
+                }
+
                 btClose.setOnClickListener { v -> vExpandable.collapse(true) }
                 vMainAppointmentBlock.setOnClickListener { v ->
                     vExpandable.toggle(true)

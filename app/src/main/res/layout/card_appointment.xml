@@ -37,10 +37,11 @@
                 android:src="@drawable/file_icon" />
 
             <LinearLayout
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="15dp"
                 android:layout_marginTop="4dp"
+                android:layout_weight="1"
                 android:orientation="vertical">
 
                 <TextView
@@ -66,6 +67,16 @@
                     tools:text="16 марта 2017 | 17:00" />
 
             </LinearLayout>
+
+            <ImageView
+                android:id="@+id/ivAppointmentIcon"
+                android:layout_width="20dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginLeft="8dp"
+                android:adjustViewBounds="true"
+                android:src="@drawable/ic_close_link"
+                android:visibility="gone" />
         </LinearLayout>
 
         <net.cachapa.expandablelayout.ExpandableLayout
