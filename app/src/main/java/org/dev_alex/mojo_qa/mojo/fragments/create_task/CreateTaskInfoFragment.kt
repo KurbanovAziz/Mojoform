@@ -67,18 +67,21 @@ class CreateTaskInfoFragment : Fragment() {
         initConstantTaskViews()
 
         btSelectExecutor.setOnClickListener {
-            if (model.isValid()) {
+            val validationErrorRes = model.isValid()
+            if (validationErrorRes == null) {
                 showNextFragment(SelectTaskExecutorsFragment.newInstance())
             } else {
-                Toast.makeText(context, R.string.not_all_fields_filled, Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, validationErrorRes, Toast.LENGTH_SHORT).show()
             }
         }
 
         btSelectRules.setOnClickListener {
-            if (model.isValid()) {
+            val validationErrorRes = model.isValid()
+
+            if (validationErrorRes == null) {
                 loadUsersAndShowRules()
             } else {
-                Toast.makeText(context, R.string.not_all_fields_filled, Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, validationErrorRes, Toast.LENGTH_SHORT).show()
             }
         }
 

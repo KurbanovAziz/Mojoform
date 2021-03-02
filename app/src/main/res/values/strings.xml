@@ -209,6 +209,8 @@
     <string name="appointment_created_successfully">Назначение успешно создано</string>
     <string name="copied_to_clipboard">Скопировано в буфер обмена</string>
     <string name="create_assignment">Назначить задачу</string>
+    <string name="task_type">Тип задачи</string>
+    <string name="this_name_already_used">Такое имя уже используется</string>
 
     <string-array name="day_names">
         <item>вс</item>

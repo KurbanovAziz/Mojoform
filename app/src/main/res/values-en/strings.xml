@@ -207,6 +207,8 @@
     <string name="appointment_created_successfully">Appointment created successfully</string>
     <string name="copied_to_clipboard">Copied to clipboard</string>
     <string name="create_assignment">Assign a task</string>
+    <string name="task_type">Task type</string>
+    <string name="this_name_already_used">This name is already in use</string>
 
     <string-array name="day_names">
         <item>Su</item>

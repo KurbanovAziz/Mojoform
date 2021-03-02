@@ -31,6 +31,7 @@ import com.mikepenz.materialdrawer.model.SecondaryDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import com.woxthebox.draglistview.DragListView;
 
+import org.dev_alex.mojo_qa.mojo.AppointmentsModel;
 import org.dev_alex.mojo_qa.mojo.Data;
 import org.dev_alex.mojo_qa.mojo.R;
 import org.dev_alex.mojo_qa.mojo.adapters.DraggableItemAdapter;
@@ -41,6 +42,7 @@ import org.dev_alex.mojo_qa.mojo.fragments.NotificationsFragment;
 import org.dev_alex.mojo_qa.mojo.fragments.PanelListFragment;
 import org.dev_alex.mojo_qa.mojo.fragments.TasksFragment;
 import org.dev_alex.mojo_qa.mojo.fragments.TemplateFragment;
+import org.dev_alex.mojo_qa.mojo.fragments.appointment.AppointmentListFragment;
 import org.dev_alex.mojo_qa.mojo.gcm.MyFirebaseMessagingService;
 import org.dev_alex.mojo_qa.mojo.models.Notification;
 import org.dev_alex.mojo_qa.mojo.models.User;
@@ -184,20 +186,28 @@ public class MainActivity extends AppCompatActivity {
         });
 
 
+        int defaultFirstOffset = (currentUser.is_orgowner || currentUser.is_manager) ? 0 : -18;
         ArrayList<SecondaryDrawerItem> mainDraggableItems = new ArrayList<>();
         for (String str : getDrawerMenuSequence()) {
             if (str.equals("tasks"))
-                mainDraggableItems.add(new CustomDrawerItem(15, mainDraggableItems.isEmpty() ? -18 : 0).withIdentifier(1).withName(R.string.tasks).withIcon(R.drawable.tasks));
+                mainDraggableItems.add(new CustomDrawerItem(15, mainDraggableItems.isEmpty() ? defaultFirstOffset : 0).withIdentifier(1).withName(R.string.tasks).withIcon(R.drawable.tasks));
             if (str.equals("docs"))
-                mainDraggableItems.add(new CustomDrawerItem(15, mainDraggableItems.isEmpty() ? -18 : 0).withIdentifier(2).withName(R.string.documents).withIcon(R.drawable.documents));
+                mainDraggableItems.add(new CustomDrawerItem(15, mainDraggableItems.isEmpty() ? defaultFirstOffset : 0).withIdentifier(2).withName(R.string.documents).withIcon(R.drawable.documents));
             if (str.equals("analytics"))
-                mainDraggableItems.add(new CustomDrawerItem(15, mainDraggableItems.isEmpty() ? -18 : 0).withIdentifier(5).withName(R.string.analystics).withIcon(R.drawable.analystics_icon));
+                mainDraggableItems.add(new CustomDrawerItem(15, mainDraggableItems.isEmpty() ? defaultFirstOffset : 0).withIdentifier(5).withName(R.string.analystics).withIcon(R.drawable.analystics_icon));
         }
 
         DrawerBuilder builder = new DrawerBuilder()
                 .withActivity(this)
                 .withDrawerWidthDp(305)
                 .withHeader(headerView);
+
+        if (currentUser.is_orgowner || currentUser.is_manager) {
+            builder.addDrawerItems(
+                    new CustomDrawerItem(15, -18).withIdentifier(15).withName(R.string.assignments).withIcon(R.drawable.file_icon),
+                    new DividerDrawerItem()
+            );
+        }
 
         builder.addDrawerItems(
                 mainDraggableItems.get(0),
@@ -254,6 +264,10 @@ public class MainActivity extends AppCompatActivity {
                     case 11:
                         getSupportFragmentManager().popBackStack(null, 0);
                         getSupportFragmentManager().beginTransaction().replace(R.id.container, NotificationsFragment.newInstance(null)).commit();
+                        break;
+                    case 15:
+                        getSupportFragmentManager().popBackStack(null, 0);
+                        getSupportFragmentManager().beginTransaction().replace(R.id.container, AppointmentListFragment.newInstance(), "appointments").commit();
                         break;
                 }
                 return false;
@@ -550,6 +564,7 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(Integer responseCode) {
             super.onPostExecute(responseCode);
+            AppointmentsModel.INSTANCE.clear();
             TokenService.deleteToken();
             startActivity(new Intent(MainActivity.this, AuthActivity.class));
             finish();

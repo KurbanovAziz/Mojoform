@@ -207,6 +207,8 @@
     <string name="appointment_created_successfully">Папка успішно створена</string>
     <string name="copied_to_clipboard">Скопійовано в буфер обміну</string>
     <string name="create_assignment">Призначити завдання</string>
+    <string name="task_type">Тип завдання</string>
+    <string name="this_name_already_used">Таке ім\'я вже використовується</string>
 
     <string-array name="day_names">
         <item>Нд</item>

@@ -4,14 +4,13 @@ import org.dev_alex.mojo_qa.mojo.CreateTaskModel.TaskType.*
 import org.dev_alex.mojo_qa.mojo.models.File
 import org.dev_alex.mojo_qa.mojo.models.OrgUser
 import org.dev_alex.mojo_qa.mojo.models.response.OrgUsersResponse
-import org.dev_alex.mojo_qa.mojo.models.response.appointment.CreateAppointmentResponse
+import org.dev_alex.mojo_qa.mojo.models.response.appointment.AppointmentData
 import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 
 class CreateTaskModel private constructor() {
-    var createAppointmentResponse: CreateAppointmentResponse? = null
-
+    var createAppointmentResponse: AppointmentData? = null
 
     var orgId: String? = null
     var file: File? = null
@@ -109,23 +108,32 @@ class CreateTaskModel private constructor() {
         OUT_OF_RANGE(R.string.task_notify_out_of_range)
     }
 
-    fun isValid(): Boolean {
-        if (taskName == null || taskName?.isBlank() == true) return false
+    fun isValid(): Int? {
+        if (taskName == null || taskName?.isBlank() == true) return R.string.not_all_fields_filled
+        if (AppointmentsModel.appointments.find { it.name == taskName } != null) return R.string.this_name_already_used
 
         return when (taskType) {
             PERIODICAL -> {
-                periodicalTaskHour != null && periodicalTaskMinutes != null && selectedPeriod != null
+                if (periodicalTaskHour != null && periodicalTaskMinutes != null && selectedPeriod != null) {
+                    null
+                } else {
+                    R.string.not_all_fields_filled
+                }
             }
             ONE_SHOT -> {
-                startOneShotDate ?: return false
-                endOneShotDate?.after(startOneShotDate) == true
+                startOneShotDate ?: return R.string.not_all_fields_filled
+                if (endOneShotDate?.after(startOneShotDate) == true) {
+                    null
+                } else {
+                    R.string.not_all_fields_filled
+                }
             }
             PRIVATE_POLL, OPEN_POLL -> {
                 //endOpenPollDate?.after(Date()) == true
-                true
+                null
             }
-            CONSTANT -> true
-            null -> false
+            CONSTANT -> null
+            null -> R.string.not_all_fields_filled
         }
     }
 

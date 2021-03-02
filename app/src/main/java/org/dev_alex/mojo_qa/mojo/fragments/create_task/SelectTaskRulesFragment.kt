@@ -24,7 +24,7 @@ import org.dev_alex.mojo_qa.mojo.CreateTaskModel
 import org.dev_alex.mojo_qa.mojo.CreateTaskModel.TaskType.*
 import org.dev_alex.mojo_qa.mojo.R
 import org.dev_alex.mojo_qa.mojo.models.OrgUser
-import org.dev_alex.mojo_qa.mojo.models.response.appointment.CreateAppointmentResponse
+import org.dev_alex.mojo_qa.mojo.models.response.appointment.AppointmentData
 import org.dev_alex.mojo_qa.mojo.services.RequestService
 import org.dev_alex.mojo_qa.mojo.services.Utils
 import org.json.JSONArray
@@ -358,13 +358,13 @@ class SelectTaskRulesFragment : Fragment() {
 
         loadDisposable?.dispose()
         loopDialog?.show()
-        loadDisposable = Observable.create<CreateAppointmentResponse> {
+        loadDisposable = Observable.create<AppointmentData> {
             val url = "/api/tasks/refs/${model.file?.id}"
             val response = RequestService.createPostRequest(url, jsonObject.toString())
 
             if (response.code == 200) {
                 val responseJson = response.body?.string() ?: "{}"
-                val responseData = Gson().fromJson(responseJson, CreateAppointmentResponse::class.java)
+                val responseData = Gson().fromJson(responseJson, AppointmentData::class.java)
                 it.onNext(responseData)
                 it.onComplete()
             } else {
