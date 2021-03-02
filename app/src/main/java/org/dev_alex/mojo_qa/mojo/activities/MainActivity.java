@@ -93,6 +93,8 @@ public class MainActivity extends AppCompatActivity {
             startActivity(OpenLinkActivity.getActivityIntent(this, Data.pendingOpenTaskUUID, Data.isReportTaskMode));
             Data.pendingOpenTaskUUID = null;
         }
+
+        AppointmentsModel.INSTANCE.loadAppointments();
     }
 
     public void updateNotificationsBadge() {
@@ -186,28 +188,20 @@ public class MainActivity extends AppCompatActivity {
         });
 
 
-        int defaultFirstOffset = (currentUser.is_orgowner || currentUser.is_manager) ? 0 : -18;
         ArrayList<SecondaryDrawerItem> mainDraggableItems = new ArrayList<>();
         for (String str : getDrawerMenuSequence()) {
             if (str.equals("tasks"))
-                mainDraggableItems.add(new CustomDrawerItem(15, mainDraggableItems.isEmpty() ? defaultFirstOffset : 0).withIdentifier(1).withName(R.string.tasks).withIcon(R.drawable.tasks));
+                mainDraggableItems.add(new CustomDrawerItem(15, mainDraggableItems.isEmpty() ? -18 : 0).withIdentifier(1).withName(R.string.tasks).withIcon(R.drawable.tasks));
             if (str.equals("docs"))
-                mainDraggableItems.add(new CustomDrawerItem(15, mainDraggableItems.isEmpty() ? defaultFirstOffset : 0).withIdentifier(2).withName(R.string.documents).withIcon(R.drawable.documents));
+                mainDraggableItems.add(new CustomDrawerItem(15, mainDraggableItems.isEmpty() ? -18 : 0).withIdentifier(2).withName(R.string.documents).withIcon(R.drawable.documents));
             if (str.equals("analytics"))
-                mainDraggableItems.add(new CustomDrawerItem(15, mainDraggableItems.isEmpty() ? defaultFirstOffset : 0).withIdentifier(5).withName(R.string.analystics).withIcon(R.drawable.analystics_icon));
+                mainDraggableItems.add(new CustomDrawerItem(15, mainDraggableItems.isEmpty() ? -18 : 0).withIdentifier(5).withName(R.string.analystics).withIcon(R.drawable.analystics_icon));
         }
 
         DrawerBuilder builder = new DrawerBuilder()
                 .withActivity(this)
                 .withDrawerWidthDp(305)
                 .withHeader(headerView);
-
-        if (currentUser.is_orgowner || currentUser.is_manager) {
-            builder.addDrawerItems(
-                    new CustomDrawerItem(15, -18).withIdentifier(15).withName(R.string.assignments).withIcon(R.drawable.file_icon),
-                    new DividerDrawerItem()
-            );
-        }
 
         builder.addDrawerItems(
                 mainDraggableItems.get(0),
@@ -220,6 +214,12 @@ public class MainActivity extends AppCompatActivity {
 
         if (mainDraggableItems.size() > 2) {
             builder.addDrawerItems(mainDraggableItems.get(2));
+        }
+
+        if (currentUser.is_orgowner || currentUser.is_manager) {
+            builder.addDrawerItems(
+                    new CustomDrawerItem(15, 0).withIdentifier(15).withName(R.string.assignments).withIcon(R.drawable.file_icon)
+            );
         }
 
         builder.addDrawerItems(

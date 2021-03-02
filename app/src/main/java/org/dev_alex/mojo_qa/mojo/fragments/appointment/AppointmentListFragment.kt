@@ -8,12 +8,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
-import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.disposables.Disposable
-import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.android.synthetic.main.fragment_appointment_list.*
 import kotlinx.android.synthetic.main.fragment_appointment_list.view.*
 import org.dev_alex.mojo_qa.mojo.AppointmentsModel
@@ -21,7 +16,6 @@ import org.dev_alex.mojo_qa.mojo.R
 import org.dev_alex.mojo_qa.mojo.adapters.AppointmentAdapter
 import org.dev_alex.mojo_qa.mojo.adapters.AppointmentAdapter.AppointmentEventListener
 import org.dev_alex.mojo_qa.mojo.models.response.appointment.AppointmentData
-import org.dev_alex.mojo_qa.mojo.services.RequestService
 import org.dev_alex.mojo_qa.mojo.services.Utils
 
 @Suppress("DEPRECATION")
@@ -75,22 +69,7 @@ class AppointmentListFragment : Fragment() {
         loadDisposable?.dispose()
 
         loopDialog?.show()
-        loadDisposable = Observable.create<List<AppointmentData>> {
-            val url = "/api/tasks/refs/"
-            val response = RequestService.createGetRequest(url)
-
-            if (response.code == 200) {
-                val responseJson = response.body?.string() ?: "[]"
-                val itemType = object : TypeToken<List<AppointmentData>>() {}.type
-                val responseData: List<AppointmentData> = Gson().fromJson(responseJson, itemType)
-                it.onNext(responseData)
-                it.onComplete()
-            } else {
-                it.onError(Exception("code = ${response.code}"))
-            }
-        }
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
+        loadDisposable = AppointmentsModel.loadAppointments()
                 .subscribe({
                     AppointmentsModel.appointments = it.orEmpty()
                     loopDialog?.dismiss()
