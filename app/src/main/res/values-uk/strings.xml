@@ -209,6 +209,8 @@
     <string name="create_assignment">Призначити завдання</string>
     <string name="task_type">Тип завдання</string>
     <string name="this_name_already_used">Таке ім\'я вже використовується</string>
+    <string name="task_manager">Менеджер завдань</string>
+    <string name="first_launch_hint">Для использования мобильного приложения необходимо пройти регистрацию на платформе Mojoform.\nПройти регистрацию.</string>
 
     <string-array name="day_names">
         <item>Нд</item>

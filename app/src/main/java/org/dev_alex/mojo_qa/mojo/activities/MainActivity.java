@@ -218,7 +218,7 @@ public class MainActivity extends AppCompatActivity {
 
         if (currentUser.is_orgowner || currentUser.is_manager) {
             builder.addDrawerItems(
-                    new CustomDrawerItem(15, 0).withIdentifier(15).withName(R.string.assignments).withIcon(R.drawable.file_icon)
+                    new CustomDrawerItem(15, 0).withIdentifier(15).withName(R.string.task_manager).withIcon(R.drawable.file_icon)
             );
         }
 

@@ -7,6 +7,7 @@
     tools:context="org.dev_alex.mojo_qa.mojo.activities.AuthActivity">
 
     <ImageView
+        android:id="@+id/imageView2"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:scaleType="centerCrop"
@@ -23,11 +24,10 @@
         tools:layout_constraintTop_creator="1" />
 
     <FrameLayout
+        android:id="@+id/frameLayout"
         android:layout_width="0dp"
         android:layout_height="50dp"
-        android:layout_marginLeft="0dp"
         android:layout_marginTop="16dp"
-        android:layout_marginRight="0dp"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintLeft_toLeftOf="@+id/left_guideline"
         app:layout_constraintRight_toLeftOf="@+id/right_guideline"
@@ -222,4 +222,20 @@
             android:textColor="@android:color/white"
             android:textSize="18sp" />
     </LinearLayout>
+
+    <TextView
+        android:id="@+id/tvFirstLaunchHint"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="20dp"
+        android:layout_marginTop="16dp"
+        android:gravity="center_horizontal"
+        android:text="@string/first_launch_hint"
+        android:textColor="@android:color/white"
+        android:textSize="14sp"
+        android:textColorLink="@color/multiple_image_select_accent"
+        android:visibility="visible"
+        app:layout_constraintEnd_toStartOf="@+id/right_guideline"
+        app:layout_constraintStart_toStartOf="@+id/left_guideline"
+        app:layout_constraintTop_toBottomOf="@+id/frameLayout" />
 </androidx.constraintlayout.widget.ConstraintLayout>

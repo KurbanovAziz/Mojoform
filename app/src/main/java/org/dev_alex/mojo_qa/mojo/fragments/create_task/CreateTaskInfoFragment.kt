@@ -60,6 +60,8 @@ class CreateTaskInfoFragment : Fragment() {
                 model.taskName = s.toString()
             }
         })
+        etTaskName.setText(model.file?.name.orEmpty())
+
         initTaskTypeSpinner()
         initOneShotTaskViews()
         initOpenPollTaskViews()

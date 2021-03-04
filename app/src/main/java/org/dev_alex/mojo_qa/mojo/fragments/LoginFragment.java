@@ -1,14 +1,19 @@
 package org.dev_alex.mojo_qa.mojo.fragments;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
+import android.text.SpannableString;
+import android.text.Spanned;
+import android.text.TextPaint;
+import android.text.method.LinkMovementMethod;
+import android.text.style.ClickableSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
@@ -18,7 +23,11 @@ import org.dev_alex.mojo_qa.mojo.R;
 import org.dev_alex.mojo_qa.mojo.activities.AuthActivity;
 import org.dev_alex.mojo_qa.mojo.activities.OnboardingActivity;
 import org.dev_alex.mojo_qa.mojo.activities.OpenLinkActivity;
+import org.dev_alex.mojo_qa.mojo.services.LoginHistoryService;
 import org.dev_alex.mojo_qa.mojo.services.Utils;
+
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
 
 import static android.app.Activity.RESULT_OK;
 
@@ -41,6 +50,11 @@ public class LoginFragment extends Fragment {
             rootView = inflater.inflate(R.layout.fragment_login, container, false);
             setListeners();
             Utils.setupCloseKeyboardUI(getActivity(), rootView);
+
+            if (LoginHistoryService.isFirstLaunch()) {
+                showFirstLaunchHint();
+                LoginHistoryService.setFirstLaunch(false);
+            }
         }
         return rootView;
     }
@@ -62,6 +76,35 @@ public class LoginFragment extends Fragment {
                 }
             }
         }
+    }
+
+    private void showFirstLaunchHint() {
+        rootView.findViewById(R.id.tvFirstLaunchHint).setVisibility(View.VISIBLE);
+
+        String message = getString(R.string.first_launch_hint);
+        SpannableString ss = new SpannableString(message);
+        ClickableSpan clickableSpan = new ClickableSpan() {
+            @Override
+            public void onClick(View textView) {
+                String url = "https://mojoform.com/";
+                Intent i = new Intent(Intent.ACTION_VIEW);
+                i.setData(Uri.parse(url));
+                startActivity(i);
+            }
+
+            @Override
+            public void updateDrawState(TextPaint ds) {
+                super.updateDrawState(ds);
+                ds.setUnderlineText(false);
+            }
+        };
+
+        ss.setSpan(clickableSpan, message.lastIndexOf("\n"), message.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+        TextView textView = (TextView) rootView.findViewById(R.id.tvFirstLaunchHint);
+        textView.setText(ss);
+        textView.setMovementMethod(LinkMovementMethod.getInstance());
+        textView.setHighlightColor(Color.TRANSPARENT);
     }
 
     private void setListeners() {

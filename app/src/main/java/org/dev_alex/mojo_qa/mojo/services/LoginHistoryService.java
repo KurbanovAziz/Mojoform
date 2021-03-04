@@ -19,6 +19,23 @@ public class LoginHistoryService {
     private final static String LOGIN_PREFERENCES = "user_history";
     private final static String USERS = "users";
     private final static String CURRENT_USER = "current_user";
+    private final static String IS_FIRST_LAUNCH = "first_launch";
+
+    public static Boolean isFirstLaunch() {
+        SharedPreferences mSettings;
+        mSettings = App.getContext().getSharedPreferences(LOGIN_PREFERENCES, Context.MODE_PRIVATE);
+
+        return mSettings.getBoolean(IS_FIRST_LAUNCH, true);
+    }
+
+    public static void setFirstLaunch(Boolean value) {
+        SharedPreferences mSettings;
+        mSettings = App.getContext().getSharedPreferences(LOGIN_PREFERENCES, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = mSettings.edit();
+
+        editor.putBoolean(IS_FIRST_LAUNCH,value);
+        editor.apply();
+    }
 
     public static ArrayList<User> getLastLoggedUsers() {
         try {
@@ -120,8 +137,8 @@ public class LoginHistoryService {
 
     public static void onUserUpdated(User user) {
         ArrayList<User> lastUsers = getLastLoggedUsers();
-        for(User lastUser : lastUsers){
-            if(lastUser.username.equals(user.username)){
+        for (User lastUser : lastUsers) {
+            if (lastUser.username.equals(user.username)) {
                 lastUser.firstName = user.firstName;
                 lastUser.lastName = user.lastName;
                 lastUser.has_avatar = user.has_avatar;
