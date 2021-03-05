@@ -10,14 +10,6 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
-import androidx.annotation.Nullable;
-import androidx.core.app.ActivityCompat;
-import androidx.fragment.app.Fragment;
-import androidx.core.content.ContextCompat;
-import androidx.core.content.FileProvider;
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -34,6 +26,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.dev_alex.mojo_qa.mojo.R;
+import org.dev_alex.mojo_qa.mojo.SortUtil;
 import org.dev_alex.mojo_qa.mojo.activities.AuthActivity;
 import org.dev_alex.mojo_qa.mojo.activities.MainActivity;
 import org.dev_alex.mojo_qa.mojo.adapters.NotificationAdapter;
@@ -47,6 +40,14 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.UUID;
 
+import androidx.annotation.Nullable;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.core.content.FileProvider;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import okhttp3.Response;
 import okio.BufferedSink;
 import okio.Okio;
@@ -410,6 +411,9 @@ public class NotificationsFragment extends Fragment implements NotificationAdapt
 
                     notifications = new ObjectMapper().readValue(notificationsJson.toString(), new TypeReference<ArrayList<Notification>>() {
                     });
+
+                    notifications = new ArrayList(SortUtil.INSTANCE.sortNotifications(notifications));
+
                     for (Notification notification : notifications)
                         notification.fixTime();
                 }
