@@ -99,7 +99,7 @@ public class LoginFragment extends Fragment {
             }
         };
 
-        ss.setSpan(clickableSpan, message.lastIndexOf("\n"), message.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        ss.setSpan(clickableSpan, message.indexOf("Mojoform"), message.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
 
         TextView textView = (TextView) rootView.findViewById(R.id.tvFirstLaunchHint);
         textView.setText(ss);

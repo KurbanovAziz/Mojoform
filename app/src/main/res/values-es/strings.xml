@@ -211,7 +211,7 @@
     <string name="task_type">Tipo de tarea</string>
     <string name="this_name_already_used">Este nombre ya esta en uso</string>
     <string name="task_manager">Administrador de tareas</string>
-    <string name="first_launch_hint">Для использования мобильного приложения необходимо пройти регистрацию на платформе Mojoform.\nПройти регистрацию.</string>
+    <string name="first_launch_hint">Для использования мобильного приложения необходимо пройти регистрацию на платформе Mojoform.com</string>
 
     <string-array name="day_names">
         <item>Do</item>

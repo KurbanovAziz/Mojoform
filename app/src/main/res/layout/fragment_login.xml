@@ -227,7 +227,6 @@
         android:id="@+id/tvFirstLaunchHint"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginHorizontal="20dp"
         android:layout_marginTop="16dp"
         android:gravity="center_horizontal"
         android:text="@string/first_launch_hint"
