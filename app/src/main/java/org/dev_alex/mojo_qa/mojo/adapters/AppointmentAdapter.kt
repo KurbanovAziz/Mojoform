@@ -57,7 +57,7 @@ class AppointmentAdapter(private val appointments: List<AppointmentData>, privat
                 } else if (appointment.type == "closedlinks") {
                     ivAppointmentIcon.setImageResource(R.drawable.ic_close_link)
                 } else if (appointment.type == "constantly") {
-                    ivAppointmentIcon.setImageResource(R.drawable.file_icon)
+                    ivAppointmentIcon.setImageResource(R.drawable.ic_task_manager)
                 } else if (appointment.type == "periodic") {
                     ivAppointmentIcon.setImageResource(R.drawable.ic_periodical)
                 } else if (appointment.type == "oneshot") {

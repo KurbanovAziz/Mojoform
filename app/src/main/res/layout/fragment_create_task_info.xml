@@ -6,18 +6,6 @@
     android:background="@drawable/main_activity_background"
     android:orientation="vertical">
 
-    <TextView
-        android:id="@+id/btExit"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="4dp"
-        android:layout_marginTop="8dp"
-        android:padding="8dp"
-        android:text="@string/cancel"
-        android:textColor="#726583"
-        android:textSize="16sp"
-        android:textStyle="bold" />
-
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -33,11 +21,18 @@
             android:paddingHorizontal="28dp"
             android:paddingVertical="24dp">
 
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/input_task_name"
+                android:textColor="@color/colorAccent"
+                android:textSize="16sp" />
+
             <EditText
                 android:id="@+id/etTaskName"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
+                android:layout_marginTop="4dp"
                 android:background="@drawable/input_text_background_gray_border"
                 android:hint="@string/input_task_name"
                 android:inputType="text|textMultiLine"
@@ -49,27 +44,18 @@
                 android:textSize="16sp" />
 
             <TextView
-                android:id="@+id/tvFileName"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
-                android:background="@drawable/input_text_background_gray_border"
-                android:ellipsize="end"
-                android:gravity="center_vertical"
-                android:minHeight="36dp"
-                android:paddingLeft="10dp"
-                android:paddingTop="8dp"
-                android:paddingRight="10dp"
-                android:paddingBottom="8dp"
-                android:singleLine="true"
-                android:textColor="#726583"
+                android:text="@string/input_task_name"
+                android:textColor="@color/colorAccent"
                 android:textSize="16sp" />
 
             <androidx.appcompat.widget.AppCompatSpinner
                 android:id="@+id/spTaskType"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
+                android:layout_marginTop="4dp"
                 android:background="@null"
                 android:minHeight="36dp"
                 tools:background="@drawable/input_text_background_gray_border" />
@@ -394,34 +380,50 @@
         </LinearLayout>
     </ScrollView>
 
-    <Button
-        android:id="@+id/btSelectExecutor"
-        android:layout_width="wrap_content"
-        android:layout_height="45dp"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginVertical="15dp"
-        android:layout_marginRight="5dp"
-        android:background="@drawable/blue_button"
-        android:gravity="center"
-        android:paddingHorizontal="20dp"
-        android:text="@string/select_executors"
-        android:textAllCaps="false"
-        android:textColor="@android:color/white"
-        android:textSize="16sp" />
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginVertical="15dp">
 
-    <Button
-        android:id="@+id/btSelectRules"
-        android:layout_width="wrap_content"
-        android:layout_height="45dp"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginVertical="15dp"
-        android:layout_marginRight="5dp"
-        android:background="@drawable/blue_button"
-        android:gravity="center"
-        android:paddingHorizontal="20dp"
-        android:text="@string/set_rules"
-        android:textAllCaps="false"
-        android:textColor="@android:color/white"
-        android:textSize="16sp"
-        android:visibility="gone" />
+        <TextView
+            android:id="@+id/btExit"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginStart="4dp"
+            android:padding="8dp"
+            android:text="@string/cancel"
+            android:textColor="#726583"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <Button
+            android:id="@+id/btSelectExecutor"
+            android:layout_width="wrap_content"
+            android:layout_height="45dp"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginRight="5dp"
+            android:background="@drawable/blue_button"
+            android:gravity="center"
+            android:paddingHorizontal="20dp"
+            android:text="@string/select_executors"
+            android:textAllCaps="false"
+            android:textColor="@android:color/white"
+            android:textSize="16sp" />
+
+        <Button
+            android:id="@+id/btSelectRules"
+            android:layout_width="wrap_content"
+            android:layout_height="45dp"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginRight="5dp"
+            android:background="@drawable/blue_button"
+            android:gravity="center"
+            android:paddingHorizontal="20dp"
+            android:text="@string/set_rules"
+            android:textAllCaps="false"
+            android:textColor="@android:color/white"
+            android:textSize="16sp"
+            android:visibility="gone" />
+    </FrameLayout>
 </LinearLayout>

@@ -2,6 +2,7 @@ package org.dev_alex.mojo_qa.mojo.fragments.create_task
 
 import android.content.ClipData
 import android.content.ClipboardManager
+import android.content.Intent
 import android.content.res.Resources
 import android.graphics.Bitmap
 import android.graphics.Color
@@ -47,6 +48,17 @@ class ShowPollDataFragment : Fragment() {
 
         val link = model.createAppointmentResponse?.links?.firstOrNull()?.link.orEmpty()
         drawQr(link)
+
+        btShare.setOnClickListener {
+            val sendIntent = Intent().apply {
+                action = Intent.ACTION_SEND
+                putExtra(Intent.EXTRA_TEXT, link)
+                type = "text/plain"
+            }
+
+            val shareIntent = Intent.createChooser(sendIntent, null)
+            startActivity(shareIntent)
+        }
 
         tvQrLink.text = link
         tvQrLink.setOnClickListener {

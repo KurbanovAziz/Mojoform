@@ -212,7 +212,8 @@
     <string name="task_type">Тип задачи</string>
     <string name="this_name_already_used">Такое имя уже используется</string>
     <string name="task_manager">Менеджер задач</string>
-    <string name="first_launch_hint">Для использования мобильного приложения необходимо пройти регистрацию на платформе Mojoform.com</string>
+    <string name="first_launch_hint">Для использования приложения возьмите логин и пароль в вашей компании зарегестрированную на Mojoform.com</string>
+    <string name="share">Поделиться</string>
 
     <string-array name="day_names">
         <item>вс</item>
