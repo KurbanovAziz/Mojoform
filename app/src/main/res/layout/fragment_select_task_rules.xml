@@ -1,21 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/main_activity_background"
     android:orientation="vertical">
-
-    <TextView
-        android:id="@+id/btExit"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="4dp"
-        android:layout_marginTop="8dp"
-        android:padding="8dp"
-        android:text="@string/cancel"
-        android:textColor="#726583"
-        android:textSize="16sp"
-        android:textStyle="bold" />
 
     <ScrollView
         android:id="@+id/scrollView"
@@ -28,42 +17,57 @@
         android:paddingTop="2dp"
         android:scrollbars="none">
 
-        <LinearLayout
+        <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:paddingHorizontal="24dp"
-            android:paddingVertical="16dp">
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/set_result_control_rules"
-                android:textColor="#726583"
-                android:textSize="16sp"
-                android:textStyle="bold" />
+            android:layout_height="wrap_content">
 
             <LinearLayout
-                android:id="@+id/vRulesContainer"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical" />
+                android:orientation="vertical"
+                android:paddingHorizontal="24dp"
+                android:paddingVertical="16dp">
 
-            <Button
-                android:id="@+id/btAddRange"
-                android:layout_width="210dp"
-                android:layout_height="45dp"
-                android:layout_gravity="center_horizontal"
-                android:layout_marginTop="12dp"
-                android:background="@drawable/blue_button_inverted"
-                android:gravity="center"
-                android:text="@string/add_one_more_range"
-                android:textAllCaps="false"
-                android:textColor="#726583"
-                android:textSize="16sp"
-                android:textStyle="normal"
-                android:visibility="visible" />
-        </LinearLayout>
+                <TextView
+                    android:layout_width="349dp"
+                    android:layout_height="wrap_content"
+                    android:text="@string/set_result_control_rules"
+                    android:textColor="#726583"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+
+                <LinearLayout
+                    android:id="@+id/vRulesContainer"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical" />
+
+                <Button
+                    android:id="@+id/btAddRange"
+                    android:layout_width="210dp"
+                    android:layout_height="45dp"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginTop="12dp"
+                    android:background="@drawable/blue_button_inverted"
+                    android:gravity="center"
+                    android:text="@string/add_one_more_range"
+                    android:textAllCaps="false"
+                    android:textColor="#726583"
+                    android:textSize="16sp"
+                    android:textStyle="normal"
+                    android:visibility="visible" />
+            </LinearLayout>
+
+            <ImageView
+                android:id="@+id/btExit"
+                android:layout_width="35dp"
+                android:layout_height="35dp"
+                android:layout_gravity="right"
+                android:layout_margin="8dp"
+                android:padding="8dp"
+                android:src="@drawable/delete_icon"
+                app:tint="#726583" />
+        </FrameLayout>
     </ScrollView>
 
     <LinearLayout

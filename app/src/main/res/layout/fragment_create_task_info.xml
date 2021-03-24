@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -14,388 +15,391 @@
         android:background="@drawable/create_task_panel_bg"
         android:paddingTop="5dp">
 
-        <LinearLayout
+        <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:paddingHorizontal="28dp"
-            android:paddingVertical="24dp">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/input_task_name"
-                android:textColor="@color/colorAccent"
-                android:textSize="16sp" />
-
-            <EditText
-                android:id="@+id/etTaskName"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:background="@drawable/input_text_background_gray_border"
-                android:hint="@string/input_task_name"
-                android:inputType="text|textMultiLine"
-                android:minHeight="36dp"
-                android:paddingLeft="10dp"
-                android:paddingTop="8dp"
-                android:paddingRight="10dp"
-                android:paddingBottom="8dp"
-                android:textSize="16sp" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:text="@string/input_task_name"
-                android:textColor="@color/colorAccent"
-                android:textSize="16sp" />
-
-            <androidx.appcompat.widget.AppCompatSpinner
-                android:id="@+id/spTaskType"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:background="@null"
-                android:minHeight="36dp"
-                tools:background="@drawable/input_text_background_gray_border" />
+            android:layout_height="wrap_content">
 
             <LinearLayout
-                android:id="@+id/vOneShotBlock"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="13dp"
                 android:orientation="vertical"
-                android:visibility="gone">
+                android:paddingHorizontal="28dp"
+                android:paddingVertical="24dp">
 
                 <TextView
-                    android:layout_width="match_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/set_task_due_date"
-                    android:textColor="#726583"
-                    android:textSize="16sp"
-                    android:textStyle="bold" />
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:text="@string/exec_start"
-                    android:textColor="#726583"
+                    android:text="@string/input_task_name"
+                    android:textColor="@color/colorAccent"
                     android:textSize="16sp" />
 
-                <LinearLayout
+                <EditText
+                    android:id="@+id/etTaskName"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="5dp"
-                    android:orientation="horizontal">
-
-                    <androidx.appcompat.widget.AppCompatSpinner
-                        android:id="@+id/spOneShotStartHour"
-                        android:layout_width="85dp"
-                        android:layout_height="wrap_content"
-                        android:background="@null"
-                        android:minHeight="36dp"
-                        tools:background="@drawable/input_text_background_gray_border" />
-
-                    <androidx.appcompat.widget.AppCompatSpinner
-                        android:id="@+id/spOneShotStartMinute"
-                        android:layout_width="85dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="9dp"
-                        android:background="@null"
-                        android:minHeight="36dp"
-                        tools:background="@drawable/input_text_background_gray_border" />
-
-                    <TextView
-                        android:id="@+id/btOneShotStartDate"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="9dp"
-                        android:background="@drawable/input_text_background_gray_border"
-                        android:ellipsize="end"
-                        android:gravity="center"
-                        android:minHeight="36dp"
-                        android:paddingLeft="10dp"
-                        android:paddingTop="8dp"
-                        android:paddingRight="10dp"
-                        android:paddingBottom="8dp"
-                        android:singleLine="true"
-                        android:textColor="#726583"
-                        android:textSize="16sp" />
-                </LinearLayout>
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:text="@string/exec_end"
-                    android:textColor="#726583"
-                    android:textSize="16sp" />
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="5dp"
-                    android:orientation="horizontal">
-
-                    <androidx.appcompat.widget.AppCompatSpinner
-                        android:id="@+id/spOneShotEndHour"
-                        android:layout_width="85dp"
-                        android:layout_height="wrap_content"
-                        android:background="@null"
-                        android:minHeight="36dp"
-                        tools:background="@drawable/input_text_background_gray_border" />
-
-                    <androidx.appcompat.widget.AppCompatSpinner
-                        android:id="@+id/spOneShotEndMinute"
-                        android:layout_width="85dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="9dp"
-                        android:background="@null"
-                        android:minHeight="36dp"
-                        tools:background="@drawable/input_text_background_gray_border" />
-
-                    <TextView
-                        android:id="@+id/btOneShotEndDate"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="9dp"
-                        android:background="@drawable/input_text_background_gray_border"
-                        android:ellipsize="end"
-                        android:gravity="center"
-                        android:minHeight="36dp"
-                        android:paddingLeft="10dp"
-                        android:paddingTop="8dp"
-                        android:paddingRight="10dp"
-                        android:paddingBottom="8dp"
-                        android:singleLine="true"
-                        android:textColor="#726583"
-                        android:textSize="16sp" />
-                </LinearLayout>
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/vPollTasksBlock"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="13dp"
-                android:orientation="vertical"
-                android:visibility="gone">
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="@string/poll_date_and_count"
-                    android:textColor="#726583"
-                    android:textSize="16sp"
-                    android:textStyle="bold" />
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="5dp"
-                    android:orientation="horizontal">
-
-                    <androidx.appcompat.widget.AppCompatSpinner
-                        android:id="@+id/spOpenPollCount"
-                        android:layout_width="114dp"
-                        android:layout_height="wrap_content"
-                        android:background="@null"
-                        android:minHeight="36dp"
-                        tools:background="@drawable/input_text_background_gray_border" />
-
-                    <Space
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1" />
-
-                    <TextView
-                        android:id="@+id/btOpenPollEndDate"
-                        android:layout_width="114dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="9dp"
-                        android:background="@drawable/input_text_background_gray_border"
-                        android:ellipsize="end"
-                        android:gravity="center"
-                        android:minHeight="36dp"
-                        android:paddingLeft="10dp"
-                        android:paddingTop="8dp"
-                        android:paddingRight="10dp"
-                        android:paddingBottom="8dp"
-                        android:singleLine="true"
-                        android:textColor="#726583"
-                        android:textSize="16sp" />
-                </LinearLayout>
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/vPeriodicalBlock"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="13dp"
-                android:orientation="vertical"
-                android:visibility="gone">
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="@string/set_task_execution_time"
-                    android:textColor="#726583"
-                    android:textSize="16sp"
-                    android:textStyle="bold" />
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="5dp"
-                    android:orientation="horizontal">
-
-                    <TextView
-                        android:layout_width="85dp"
-                        android:layout_height="wrap_content"
-                        android:background="@null"
-                        android:gravity="center_horizontal"
-                        android:text="@string/hours"
-                        android:textColor="#726583"
-                        android:textSize="16sp" />
-
-                    <TextView
-                        android:layout_width="85dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="9dp"
-                        android:background="@null"
-                        android:gravity="center_horizontal"
-                        android:text="@string/minutes"
-                        android:textColor="#726583"
-                        android:textSize="16sp" />
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="5dp"
-                    android:orientation="horizontal">
-
-                    <androidx.appcompat.widget.AppCompatSpinner
-                        android:id="@+id/spPeriodicalHour"
-                        android:layout_width="85dp"
-                        android:layout_height="wrap_content"
-                        android:background="@null"
-                        android:minHeight="36dp"
-                        tools:background="@drawable/input_text_background_gray_border" />
-
-                    <androidx.appcompat.widget.AppCompatSpinner
-                        android:id="@+id/spPeriodicalMinute"
-                        android:layout_width="85dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="9dp"
-                        android:background="@null"
-                        android:minHeight="36dp"
-                        tools:background="@drawable/input_text_background_gray_border" />
-                </LinearLayout>
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="15dp"
-                    android:text="@string/task_execution_period"
-                    android:textColor="#726583"
-                    android:textSize="16sp"
-                    android:textStyle="bold" />
-
-                <RadioGroup
-                    android:id="@+id/vPeriodGroup"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="7dp"
-                    android:orientation="horizontal"
-                    tools:ignore="HardcodedText">
-
-                    <RadioButton
-                        android:id="@+id/rbPeriodDays"
-                        android:layout_width="36dp"
-                        android:layout_height="36dp"
-                        android:background="@drawable/date_radiobutton_bg"
-                        android:button="@android:color/transparent"
-                        android:gravity="center"
-                        android:paddingEnd="1dp"
-                        android:paddingBottom="1dp"
-                        android:text="@string/days_short"
-                        android:textColor="@color/radiobutton_text_color"
-                        android:textSize="23sp"
-                        android:textStyle="bold" />
-
-                    <RadioButton
-                        android:id="@+id/rbPeriodWeeks"
-                        android:layout_width="36dp"
-                        android:layout_height="36dp"
-                        android:layout_marginStart="6dp"
-                        android:background="@drawable/date_radiobutton_bg"
-                        android:button="@android:color/transparent"
-                        android:gravity="center"
-                        android:text="@string/weeks_short"
-                        android:textColor="@color/radiobutton_text_color"
-                        android:textSize="23sp"
-                        android:textStyle="bold" />
-
-                    <RadioButton
-                        android:id="@+id/rbPeriodMonth"
-                        android:layout_width="36dp"
-                        android:layout_height="36dp"
-                        android:layout_marginStart="6dp"
-                        android:background="@drawable/date_radiobutton_bg"
-                        android:button="@android:color/transparent"
-                        android:gravity="center"
-                        android:text="@string/month_short"
-                        android:textColor="@color/radiobutton_text_color"
-                        android:textSize="23sp"
-                        android:textStyle="bold" />
-                </RadioGroup>
-
-                <View
-                    android:layout_width="120dp"
-                    android:layout_height="1dp"
                     android:layout_marginTop="4dp"
-                    android:layout_marginBottom="5dp"
-                    android:background="#726583" />
+                    android:background="@drawable/input_text_background_gray_border"
+                    android:hint="@string/input_task_name"
+                    android:inputType="text|textMultiLine"
+                    android:minHeight="36dp"
+                    android:paddingLeft="10dp"
+                    android:paddingTop="8dp"
+                    android:paddingRight="10dp"
+                    android:paddingBottom="8dp"
+                    android:textSize="16sp" />
 
-                <LinearLayout
-                    android:id="@+id/vPeriodContent"
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:text="@string/task_type"
+                    android:textColor="@color/colorAccent"
+                    android:textSize="16sp" />
+
+                <androidx.appcompat.widget.AppCompatSpinner
+                    android:id="@+id/spTaskType"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical" />
+                    android:layout_marginTop="4dp"
+                    android:background="@null"
+                    android:minHeight="36dp"
+                    tools:background="@drawable/input_text_background_gray_border" />
+
+                <LinearLayout
+                    android:id="@+id/vOneShotBlock"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="13dp"
+                    android:orientation="vertical"
+                    android:visibility="gone">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/set_task_due_date"
+                        android:textColor="#726583"
+                        android:textSize="16sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:text="@string/exec_start"
+                        android:textColor="#726583"
+                        android:textSize="16sp" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="5dp"
+                        android:orientation="horizontal">
+
+                        <androidx.appcompat.widget.AppCompatSpinner
+                            android:id="@+id/spOneShotStartHour"
+                            android:layout_width="85dp"
+                            android:layout_height="wrap_content"
+                            android:background="@null"
+                            android:minHeight="36dp"
+                            tools:background="@drawable/input_text_background_gray_border" />
+
+                        <androidx.appcompat.widget.AppCompatSpinner
+                            android:id="@+id/spOneShotStartMinute"
+                            android:layout_width="85dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="9dp"
+                            android:background="@null"
+                            android:minHeight="36dp"
+                            tools:background="@drawable/input_text_background_gray_border" />
+
+                        <TextView
+                            android:id="@+id/btOneShotStartDate"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="9dp"
+                            android:background="@drawable/input_text_background_gray_border"
+                            android:ellipsize="end"
+                            android:gravity="center"
+                            android:minHeight="36dp"
+                            android:paddingLeft="10dp"
+                            android:paddingTop="8dp"
+                            android:paddingRight="10dp"
+                            android:paddingBottom="8dp"
+                            android:singleLine="true"
+                            android:textColor="#726583"
+                            android:textSize="16sp" />
+                    </LinearLayout>
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:text="@string/exec_end"
+                        android:textColor="#726583"
+                        android:textSize="16sp" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="5dp"
+                        android:orientation="horizontal">
+
+                        <androidx.appcompat.widget.AppCompatSpinner
+                            android:id="@+id/spOneShotEndHour"
+                            android:layout_width="85dp"
+                            android:layout_height="wrap_content"
+                            android:background="@null"
+                            android:minHeight="36dp"
+                            tools:background="@drawable/input_text_background_gray_border" />
+
+                        <androidx.appcompat.widget.AppCompatSpinner
+                            android:id="@+id/spOneShotEndMinute"
+                            android:layout_width="85dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="9dp"
+                            android:background="@null"
+                            android:minHeight="36dp"
+                            tools:background="@drawable/input_text_background_gray_border" />
+
+                        <TextView
+                            android:id="@+id/btOneShotEndDate"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="9dp"
+                            android:background="@drawable/input_text_background_gray_border"
+                            android:ellipsize="end"
+                            android:gravity="center"
+                            android:minHeight="36dp"
+                            android:paddingLeft="10dp"
+                            android:paddingTop="8dp"
+                            android:paddingRight="10dp"
+                            android:paddingBottom="8dp"
+                            android:singleLine="true"
+                            android:textColor="#726583"
+                            android:textSize="16sp" />
+                    </LinearLayout>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/vPollTasksBlock"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="13dp"
+                    android:orientation="vertical"
+                    android:visibility="gone">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/poll_date_and_count"
+                        android:textColor="#726583"
+                        android:textSize="16sp"
+                        android:textStyle="bold" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="5dp"
+                        android:orientation="horizontal">
+
+                        <androidx.appcompat.widget.AppCompatSpinner
+                            android:id="@+id/spOpenPollCount"
+                            android:layout_width="114dp"
+                            android:layout_height="wrap_content"
+                            android:background="@null"
+                            android:minHeight="36dp"
+                            tools:background="@drawable/input_text_background_gray_border" />
+
+                        <Space
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1" />
+
+                        <TextView
+                            android:id="@+id/btOpenPollEndDate"
+                            android:layout_width="114dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="9dp"
+                            android:background="@drawable/input_text_background_gray_border"
+                            android:ellipsize="end"
+                            android:gravity="center"
+                            android:minHeight="36dp"
+                            android:paddingLeft="10dp"
+                            android:paddingTop="8dp"
+                            android:paddingRight="10dp"
+                            android:paddingBottom="8dp"
+                            android:singleLine="true"
+                            android:textColor="#726583"
+                            android:textSize="16sp" />
+                    </LinearLayout>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/vPeriodicalBlock"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="13dp"
+                    android:orientation="vertical"
+                    android:visibility="gone">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/set_task_execution_time"
+                        android:textColor="#726583"
+                        android:textSize="16sp"
+                        android:textStyle="bold" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="5dp"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:layout_width="85dp"
+                            android:layout_height="wrap_content"
+                            android:background="@null"
+                            android:gravity="center_horizontal"
+                            android:text="@string/hours"
+                            android:textColor="#726583"
+                            android:textSize="16sp" />
+
+                        <TextView
+                            android:layout_width="85dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="9dp"
+                            android:background="@null"
+                            android:gravity="center_horizontal"
+                            android:text="@string/minutes"
+                            android:textColor="#726583"
+                            android:textSize="16sp" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="5dp"
+                        android:orientation="horizontal">
+
+                        <androidx.appcompat.widget.AppCompatSpinner
+                            android:id="@+id/spPeriodicalHour"
+                            android:layout_width="85dp"
+                            android:layout_height="wrap_content"
+                            android:background="@null"
+                            android:minHeight="36dp"
+                            tools:background="@drawable/input_text_background_gray_border" />
+
+                        <androidx.appcompat.widget.AppCompatSpinner
+                            android:id="@+id/spPeriodicalMinute"
+                            android:layout_width="85dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="9dp"
+                            android:background="@null"
+                            android:minHeight="36dp"
+                            tools:background="@drawable/input_text_background_gray_border" />
+                    </LinearLayout>
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="15dp"
+                        android:text="@string/task_execution_period"
+                        android:textColor="#726583"
+                        android:textSize="16sp"
+                        android:textStyle="bold" />
+
+                    <RadioGroup
+                        android:id="@+id/vPeriodGroup"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="7dp"
+                        android:orientation="horizontal"
+                        tools:ignore="HardcodedText">
+
+                        <RadioButton
+                            android:id="@+id/rbPeriodDays"
+                            android:layout_width="36dp"
+                            android:layout_height="36dp"
+                            android:background="@drawable/date_radiobutton_bg"
+                            android:button="@android:color/transparent"
+                            android:gravity="center"
+                            android:paddingEnd="1dp"
+                            android:paddingBottom="1dp"
+                            android:text="@string/days_short"
+                            android:textColor="@color/radiobutton_text_color"
+                            android:textSize="23sp"
+                            android:textStyle="bold" />
+
+                        <RadioButton
+                            android:id="@+id/rbPeriodWeeks"
+                            android:layout_width="36dp"
+                            android:layout_height="36dp"
+                            android:layout_marginStart="6dp"
+                            android:background="@drawable/date_radiobutton_bg"
+                            android:button="@android:color/transparent"
+                            android:gravity="center"
+                            android:text="@string/weeks_short"
+                            android:textColor="@color/radiobutton_text_color"
+                            android:textSize="23sp"
+                            android:textStyle="bold" />
+
+                        <RadioButton
+                            android:id="@+id/rbPeriodMonth"
+                            android:layout_width="36dp"
+                            android:layout_height="36dp"
+                            android:layout_marginStart="6dp"
+                            android:background="@drawable/date_radiobutton_bg"
+                            android:button="@android:color/transparent"
+                            android:gravity="center"
+                            android:text="@string/month_short"
+                            android:textColor="@color/radiobutton_text_color"
+                            android:textSize="23sp"
+                            android:textStyle="bold" />
+                    </RadioGroup>
+
+                    <View
+                        android:layout_width="120dp"
+                        android:layout_height="1dp"
+                        android:layout_marginTop="4dp"
+                        android:layout_marginBottom="5dp"
+                        android:background="#726583" />
+
+                    <LinearLayout
+                        android:id="@+id/vPeriodContent"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/vConstantBlock"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="13dp"
+                    android:orientation="vertical"
+                    android:visibility="visible">
+
+
+                </LinearLayout>
             </LinearLayout>
 
-            <LinearLayout
-                android:id="@+id/vConstantBlock"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="13dp"
-                android:orientation="vertical"
-                android:visibility="visible">
-
-
-            </LinearLayout>
-        </LinearLayout>
+            <ImageView
+                android:id="@+id/btExit"
+                android:layout_width="35dp"
+                android:layout_height="35dp"
+                android:layout_gravity="right"
+                android:layout_margin="8dp"
+                android:padding="8dp"
+                android:src="@drawable/delete_icon"
+                app:tint="#726583" />
+        </FrameLayout>
     </ScrollView>
 
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginVertical="15dp">
-
-        <TextView
-            android:id="@+id/btExit"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:layout_marginStart="4dp"
-            android:padding="8dp"
-            android:text="@string/cancel"
-            android:textColor="#726583"
-            android:textSize="16sp"
-            android:textStyle="bold" />
 
         <Button
             android:id="@+id/btSelectExecutor"

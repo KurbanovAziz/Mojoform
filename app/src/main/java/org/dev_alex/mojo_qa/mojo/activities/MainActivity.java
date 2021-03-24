@@ -94,7 +94,7 @@ public class MainActivity extends AppCompatActivity {
             Data.pendingOpenTaskUUID = null;
         }
 
-        AppointmentsModel.INSTANCE.loadAppointments();
+        AppointmentsModel.INSTANCE.selfUpdate();
     }
 
     public void updateNotificationsBadge() {
