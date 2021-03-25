@@ -216,7 +216,7 @@ public class MainActivity extends AppCompatActivity {
             builder.addDrawerItems(mainDraggableItems.get(2));
         }
 
-        if (currentUser.is_orgowner || currentUser.is_manager) {
+        if ((currentUser.is_orgowner != null && currentUser.is_orgowner) || (currentUser.is_manager != null && currentUser.is_manager)) {
             builder.addDrawerItems(
                     new CustomDrawerItem(15, 0).withIdentifier(15).withName(R.string.task_manager).withIcon(R.drawable.ic_task_manager)
             );
