@@ -150,6 +150,5 @@ public class LoginFragment extends Fragment {
                     startActivity(marketIntent);
                 })
                 .show();
-
     }
 }

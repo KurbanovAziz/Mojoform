@@ -204,7 +204,7 @@
 
                         <androidx.appcompat.widget.AppCompatSpinner
                             android:id="@+id/spOpenPollCount"
-                            android:layout_width="114dp"
+                            android:layout_width="145dp"
                             android:layout_height="wrap_content"
                             android:background="@null"
                             android:minHeight="36dp"
@@ -217,7 +217,7 @@
 
                         <TextView
                             android:id="@+id/btOpenPollEndDate"
-                            android:layout_width="114dp"
+                            android:layout_width="145dp"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="9dp"
                             android:background="@drawable/input_text_background_gray_border"

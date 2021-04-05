@@ -6,6 +6,8 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -182,10 +184,18 @@ public class MainActivity extends AppCompatActivity {
                     "%s %s", TextUtils.isEmpty(currentUser.lastName) ? "" : currentUser.lastName,
                     TextUtils.isEmpty(currentUser.firstName) ? "" : currentUser.firstName));
 
-        ((SwitchCompat) headerView.findViewById(R.id.swPush)).setChecked(!currentUser.push_disabled);
-        ((SwitchCompat) headerView.findViewById(R.id.swPush)).setOnCheckedChangeListener((buttonView, isChecked) -> {
+        SwitchCompat swPush = headerView.findViewById(R.id.swPush);
+        swPush.getTrackDrawable().setColorFilter(Color.parseColor("#D14A3F"), PorterDuff.Mode.SRC_IN);
+        swPush.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if (isChecked) {
+                swPush.getTrackDrawable().setColorFilter(Color.parseColor("#49A04D"), PorterDuff.Mode.SRC_IN);
+            } else {
+                swPush.getTrackDrawable().setColorFilter(Color.parseColor("#D14A3F"), PorterDuff.Mode.SRC_IN);
+            }
+
             new UpdatePushInfoTask(!isChecked).execute();
         });
+        swPush.setChecked(!currentUser.push_disabled);
 
 
         ArrayList<SecondaryDrawerItem> mainDraggableItems = new ArrayList<>();

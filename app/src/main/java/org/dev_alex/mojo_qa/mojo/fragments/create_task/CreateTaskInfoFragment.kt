@@ -318,14 +318,16 @@ class CreateTaskInfoFragment : Fragment() {
     }
 
     private fun initOpenPollTaskViews() {
-        model.endOpenPollDate = Date()
-
-        val styleTextDateView = { tv: TextView, date: Date ->
-            val sdf = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault())
-            tv.text = sdf.format(date)
+        val styleTextDateView = { tv: TextView, date: Date? ->
+            if (date == null) {
+                tv.text = "-"
+            } else {
+                val sdf = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault())
+                tv.text = sdf.format(date)
+            }
         }
 
-        styleTextDateView(btOpenPollEndDate, model.endOpenPollDate ?: Date())
+        styleTextDateView(btOpenPollEndDate, model.endOpenPollDate)
 
         btOpenPollEndDate.setOnClickListener {
             showDatePicker(model.endOpenPollDate ?: Date()) {
@@ -335,22 +337,28 @@ class CreateTaskInfoFragment : Fragment() {
         }
 
 
-        val countArray = (1..1000).toList()
-        val countArrayStr = countArray.map { it.toString() }
+        val countArray = (100..100000 step 100).toList()
+        val countArrayStr = countArray.map { it.toString() }.toMutableList()
+        countArrayStr.add(0, "Неограничено")
+
         val adapter = ArrayAdapter(requireContext(), R.layout.spinner_task_type_item, countArrayStr)
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
 
         spOpenPollCount.adapter = adapter
         spOpenPollCount.onItemSelectedListener = object : OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-                model.pollPersonsCount = countArray[position]
+                if (position > 0) {
+                    model.pollPersonsCount = countArray[position]
+                } else {
+                    model.pollPersonsCount = null
+                }
             }
 
             override fun onNothingSelected(parent: AdapterView<*>?) {
             }
         }
 
-        spOpenPollCount.setSelection(9)
+        spOpenPollCount.setSelection(0)
     }
 
     private fun initConstantTaskViews() {
