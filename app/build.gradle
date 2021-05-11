@@ -4,15 +4,15 @@ apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
 
 android {
-    compileSdkVersion 30
-    buildToolsVersion "30.0.3"
+    compileSdkVersion 29
     defaultConfig {
         applicationId "org.dev_alex.mojo_qa.mojo"
         minSdkVersion 21
-        targetSdkVersion 30
+        //noinspection OldTargetApi
+        targetSdkVersion 29
         multiDexEnabled true
-        versionCode 57
-        versionName "1.8.7"
+        versionCode 58
+        versionName "1.8.8"
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
     }
     buildTypes {
