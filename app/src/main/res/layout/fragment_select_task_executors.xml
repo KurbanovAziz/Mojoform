@@ -30,11 +30,47 @@
                 android:textSize="16sp"
                 android:textStyle="bold" />
 
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="12dp"
+                android:layout_marginTop="8dp"
+                android:background="@drawable/bg_spinner_border"
+                android:padding="1dp">
+
+                <com.jaredrummler.materialspinner.MaterialSpinner
+                    android:id="@+id/spOrg"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:ms_padding_left="10dp"
+                    app:ms_padding_right="10dp"
+                    app:ms_popup_padding_left="10dp" />
+            </FrameLayout>
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="12dp"
+                android:layout_marginTop="8dp"
+                android:background="@drawable/bg_spinner_border"
+                android:padding="1dp">
+
+                <com.jaredrummler.materialspinner.MaterialSpinner
+                    android:id="@+id/spGroup"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:ms_padding_left="10dp"
+                    app:ms_padding_right="10dp"
+                    app:ms_popup_padding_left="10dp" />
+            </FrameLayout>
+
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/rvExecutors"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_marginTop="10dp"
+                android:clipToPadding="false"
+                android:paddingVertical="8dp"
+                android:scrollbars="none"
                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
         </LinearLayout>
 

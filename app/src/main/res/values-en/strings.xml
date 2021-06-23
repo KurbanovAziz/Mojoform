@@ -212,6 +212,7 @@
     <string name="task_manager">Task manager</string>
     <string name="first_launch_hint">To use the application, take a username and password in your company registered on Mojoform.com</string>
     <string name="share">Share</string>
+    <string name="groups">Groups</string>
 
     <string-array name="day_names">
         <item>Su</item>

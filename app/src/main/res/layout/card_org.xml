@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/vOrgContainer"
+    android:layout_width="match_parent"
+    android:layout_height="24dp"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    tools:ignore="RtlSymmetry">
+
+    <ImageView
+        android:id="@+id/ivSelectedTick"
+        android:layout_width="16dp"
+        android:layout_height="16dp"
+        android:layout_marginStart="8dp"
+        android:src="@drawable/ic_user_selected_tick" />
+
+    <ImageView
+        android:id="@+id/ivOrgIcon"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_marginStart="2dp"
+        android:src="@drawable/ic_org_group" />
+
+    <TextView
+        android:id="@+id/tvOrgName"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="6dp"
+        android:layout_weight="1"
+        android:textColor="#726583"
+        android:textSize="16sp" />
+</LinearLayout>

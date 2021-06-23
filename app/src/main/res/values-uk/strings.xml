@@ -212,6 +212,7 @@
     <string name="task_manager">Менеджер завдань</string>
     <string name="first_launch_hint">Щоб використати візьміть логін і пароль у вашій компанії зареєстрованої на Mojoform.com</string>
     <string name="share">Поделиться</string>
+    <string name="groups">Группы</string>
 
     <string-array name="day_names">
         <item>Нд</item>

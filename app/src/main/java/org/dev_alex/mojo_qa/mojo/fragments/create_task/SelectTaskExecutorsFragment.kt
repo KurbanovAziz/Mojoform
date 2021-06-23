@@ -10,9 +10,7 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import com.google.gson.Gson
-import com.xwray.groupie.ExpandableGroup
 import com.xwray.groupie.GroupAdapter
-import com.xwray.groupie.Section
 import com.xwray.groupie.kotlinandroidextensions.GroupieViewHolder
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Observable
@@ -21,8 +19,10 @@ import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.android.synthetic.main.fragment_select_task_executors.*
 import org.dev_alex.mojo_qa.mojo.CreateTaskModel
 import org.dev_alex.mojo_qa.mojo.R
-import org.dev_alex.mojo_qa.mojo.fragments.TasksFragment
+import org.dev_alex.mojo_qa.mojo.models.Org
 import org.dev_alex.mojo_qa.mojo.models.OrgUser
+import org.dev_alex.mojo_qa.mojo.models.OrgUserGroup
+import org.dev_alex.mojo_qa.mojo.models.response.OrgUsersAvailable
 import org.dev_alex.mojo_qa.mojo.models.response.OrgUsersResponse
 import org.dev_alex.mojo_qa.mojo.services.RequestService
 import org.dev_alex.mojo_qa.mojo.services.Utils
@@ -36,6 +36,9 @@ class SelectTaskExecutorsFragment : Fragment() {
         get() = CreateTaskModel.instance!!
 
     private var loadDisposable: Disposable? = null
+
+    private var selectedFilterOrgId: Int? = null
+    private var selectedFilterGroupId: Int? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val rootView = inflater.inflate(R.layout.fragment_select_task_executors, container, false)
@@ -51,7 +54,7 @@ class SelectTaskExecutorsFragment : Fragment() {
         loadUsers()
 
         btSelectRules.setOnClickListener {
-            if (model.selectedUsers.isEmpty()) {
+            if (model.selectedUsers.isEmpty() || model.selectedGroups.isEmpty()) {
                 Toast.makeText(context, getString(R.string.need_to_select_at_least_one_executor), Toast.LENGTH_SHORT).show()
             } else {
                 showNextFragment(SelectTaskRulesFragment.newInstance())
@@ -93,35 +96,67 @@ class SelectTaskExecutorsFragment : Fragment() {
 
         loopDialog?.show()
         loadDisposable = Observable.create<OrgUsersResponse> {
-            val url = "/api/orgs/${model.orgId.orEmpty()}/users"
-            val response = RequestService.createGetRequest(url)
+            val url = "/api/users"
 
-            if (response.code == 200) {
-                val responseJson = response.body?.string() ?: "{}"
-                val responseData = Gson().fromJson(responseJson, OrgUsersResponse::class.java)
-                it.onNext(responseData)
-                it.onComplete()
-            } else {
-                it.onError(Exception("code = ${response.code}"))
+            var needStop = false
+            val totalUsers = ArrayList<OrgUser>()
+            val totalGroups = ArrayList<OrgUserGroup>()
+            val orgs = ArrayList<Org>()
+
+            while (!needStop) {
+                var finalUrl = url + "?size=50&offset=${totalUsers.size}"
+                if (selectedFilterOrgId != null) {
+                    finalUrl += "&orgID=$selectedFilterOrgId"
+                }
+                if (selectedFilterGroupId != null) {
+                    finalUrl += "&groupID=$selectedFilterGroupId"
+                }
+
+                val response = RequestService.createGetRequest(finalUrl)
+
+                if (response.code == 200) {
+                    val responseJson = response.body?.string() ?: "{}"
+                    val responseData = Gson().fromJson(responseJson, OrgUsersResponse::class.java)
+
+                    totalUsers.addAll(responseData?.users.orEmpty())
+                    totalGroups.addAll(responseData?.groups.orEmpty())
+                    totalGroups.addAll(responseData?.available?.group.orEmpty())
+
+                    orgs.addAll(responseData?.available?.organisation.orEmpty())
+
+                    if (responseData?.users.isNullOrEmpty()) {
+                        needStop = true
+                    }
+                } else {
+                    it.onError(Exception("code = ${response.code}"))
+                    needStop = true
+                }
             }
+            it.onNext(
+                OrgUsersResponse(
+                    OrgUsersAvailable(orgs.distinctBy { it.id }, totalGroups.distinctBy { it.id }),
+                    totalGroups.distinctBy { it.id },
+                    totalUsers.distinctBy { it.id })
+            )
+            it.onComplete()
         }
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe({
-                    showUsers(it)
-                    model.saveUsers(it)
-                    loopDialog?.dismiss()
-                }, {
-                    loopDialog?.dismiss()
-                    it.printStackTrace()
-                })
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe({
+                showUsers(it)
+                model.saveUsers(it)
+                loopDialog?.dismiss()
+            }, {
+                loopDialog?.dismiss()
+                it.printStackTrace()
+            })
     }
 
     private fun showUsers(response: OrgUsersResponse) {
         val adapter = GroupAdapter<GroupieViewHolder>()
         rvExecutors.adapter = adapter
 
-        val selectionListener = object : UserItem.OrgUserDelegate {
+        val selectionUserListener = object : UserItem.OrgUserDelegate {
             override fun onUserClick(user: OrgUser) {
                 if (model.selectedUsers.contains(user)) {
                     model.selectedUsers.remove(user)
@@ -136,24 +171,70 @@ class SelectTaskExecutorsFragment : Fragment() {
             }
         }
 
-        response.groups.forEach { group ->
-            val expandableGroup = ExpandableGroup(UserGroupItem(group), false).apply {
-                val childrenItems = group.users.map { UserItem(it, selectionListener, true) }
-                add(Section(childrenItems))
+        val selectionGroupListener = object : UserGroupItem.UserGroupDelegate {
+            override fun onGroupClick(group: OrgUserGroup) {
+                if (model.selectedGroups.contains(group)) {
+                    model.selectedGroups.remove(group)
+                } else {
+                    model.selectedGroups.add(group)
+                }
+                adapter.notifyDataSetChanged()
             }
-            adapter.add(expandableGroup)
+
+            override fun isGroupSelected(group: OrgUserGroup): Boolean {
+                return model.selectedGroups.contains(group)
+            }
         }
 
-        adapter.addAll(response.users.map { UserItem(it, selectionListener, false) })
+        adapter.addAll(response.groups?.map { UserGroupItem(it, selectionGroupListener) }.orEmpty())
+        adapter.addAll(response.users.map { UserItem(it, selectionUserListener, false) })
+
+        if (spOrg.getItems<Any>().isNullOrEmpty()) {
+            showOrgsFilter(response.available?.organisation.orEmpty())
+        }
+        showGroupsFilter(response.available?.group.orEmpty())
+    }
+
+    fun showOrgsFilter(orgs: List<Org>) {
+        val orgList = orgs.map { it.name }.toMutableList()
+        orgList.add(0, getString(R.string.organizations))
+
+        spOrg.setItems(orgList)
+        spOrg.setOnItemSelectedListener { _, position, _, org ->
+            if (position > 0) {
+                selectedFilterOrgId = orgs[position - 1].id
+                selectedFilterGroupId = null
+            } else {
+                selectedFilterOrgId = null
+                selectedFilterGroupId = null
+            }
+            loadUsers()
+        }
+    }
+
+    fun showGroupsFilter(groups: List<OrgUserGroup>) {
+        val groupList = groups.map { it.name }.toMutableList()
+        groupList.add(0, getString(R.string.groups))
+
+        spGroup.setItems(groupList)
+        spGroup.setOnItemSelectedListener { _, position, _, org ->
+            if (position > 0) {
+                selectedFilterGroupId = groups[position - 1].id
+            } else {
+                selectedFilterGroupId = null
+            }
+            loadUsers()
+        }
+        spGroup.selectedIndex = groups.indexOfFirst { it.id == selectedFilterGroupId } + 1
     }
 
     private fun showNextFragment(fragment: Fragment) {
         activity
-                ?.supportFragmentManager
-                ?.beginTransaction()
-                ?.replace(R.id.container, fragment)
-                ?.addToBackStack(null)
-                ?.commit()
+            ?.supportFragmentManager
+            ?.beginTransaction()
+            ?.replace(R.id.container, fragment)
+            ?.addToBackStack(null)
+            ?.commit()
     }
 
     override fun onDestroyView() {

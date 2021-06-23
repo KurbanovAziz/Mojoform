@@ -3,6 +3,7 @@ package org.dev_alex.mojo_qa.mojo
 import org.dev_alex.mojo_qa.mojo.CreateTaskModel.TaskType.*
 import org.dev_alex.mojo_qa.mojo.models.File
 import org.dev_alex.mojo_qa.mojo.models.OrgUser
+import org.dev_alex.mojo_qa.mojo.models.OrgUserGroup
 import org.dev_alex.mojo_qa.mojo.models.response.OrgUsersResponse
 import org.dev_alex.mojo_qa.mojo.models.response.appointment.AppointmentData
 import java.util.*
@@ -82,11 +83,12 @@ class CreateTaskModel private constructor() {
     // Users
     var allUsers: MutableList<OrgUser> = ArrayList()
     var selectedUsers: MutableList<OrgUser> = ArrayList()
+    var selectedGroups: MutableList<OrgUserGroup> = ArrayList()
 
     fun saveUsers(response: OrgUsersResponse) {
         val totalUsers = ArrayList(response.users)
-        response.groups.forEach { group ->
-            group.users.forEach {
+        response.groups?.forEach { group ->
+            group.users?.forEach {
                 if (!totalUsers.contains(it)) {
                     totalUsers.add(it)
                 }
@@ -155,6 +157,7 @@ class CreateTaskModel private constructor() {
 
         allUsers = ArrayList()
         selectedUsers = ArrayList()
+        selectedGroups = ArrayList()
         notifyRanges = ArrayList()
 
         createAppointmentResponse = null

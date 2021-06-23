@@ -265,6 +265,7 @@ class SelectTaskRulesFragment : Fragment() {
 
         val executorsJson = JSONObject().apply {
             put("accounts", JSONArray(model.selectedUsers.map { it.id }))
+            put("groups", JSONArray(model.selectedGroups.map { it.id }))
         }
         jsonObject.put("executors", executorsJson)
 

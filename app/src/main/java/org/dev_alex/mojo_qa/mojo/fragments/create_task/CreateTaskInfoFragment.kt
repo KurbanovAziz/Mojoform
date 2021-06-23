@@ -25,6 +25,8 @@ import org.dev_alex.mojo_qa.mojo.CreateTaskModel
 import org.dev_alex.mojo_qa.mojo.CreateTaskModel.TaskType
 import org.dev_alex.mojo_qa.mojo.R
 import org.dev_alex.mojo_qa.mojo.models.File
+import org.dev_alex.mojo_qa.mojo.models.OrgUser
+import org.dev_alex.mojo_qa.mojo.models.OrgUserGroup
 import org.dev_alex.mojo_qa.mojo.models.response.OrgUsersResponse
 import org.dev_alex.mojo_qa.mojo.services.RequestService
 import org.dev_alex.mojo_qa.mojo.services.Utils
@@ -451,17 +453,31 @@ class CreateTaskInfoFragment : Fragment() {
 
         loopDialog?.show()
         loadDisposable = Observable.create<OrgUsersResponse> {
-            val url = "/api/orgs/${model.orgId.orEmpty()}/users"
-            val response = RequestService.createGetRequest(url)
+            val url = "/api/users"
 
-            if (response.code == 200) {
-                val responseJson = response.body?.string() ?: "{}"
-                val responseData = Gson().fromJson(responseJson, OrgUsersResponse::class.java)
-                it.onNext(responseData)
-                it.onComplete()
-            } else {
-                it.onError(Exception("code = ${response.code}"))
+            var needStop = false
+            val totalUsers = ArrayList<OrgUser>()
+            val totalGroups = ArrayList<OrgUserGroup>()
+            while (!needStop) {
+                val response = RequestService.createGetRequest(url + "?size=50&offset=${totalUsers.size}")
+
+                if (response.code == 200) {
+                    val responseJson = response.body?.string() ?: "{}"
+                    val responseData = Gson().fromJson(responseJson, OrgUsersResponse::class.java)
+
+                    totalUsers.addAll(responseData?.users.orEmpty())
+                    totalGroups.addAll(responseData?.groups.orEmpty())
+
+                    if (responseData?.users.isNullOrEmpty()) {
+                        needStop = true
+                    }
+                } else {
+                    it.onError(Exception("code = ${response.code}"))
+                    needStop = true
+                }
             }
+            it.onNext(OrgUsersResponse(null, totalGroups, totalUsers))
+            it.onComplete()
         }
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())

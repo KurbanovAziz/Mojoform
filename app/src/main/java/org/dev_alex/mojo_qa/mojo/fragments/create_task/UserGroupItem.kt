@@ -1,42 +1,31 @@
 package org.dev_alex.mojo_qa.mojo.fragments.create_task
 
-import android.animation.ObjectAnimator
 import android.view.View
-import com.xwray.groupie.ExpandableGroup
-import com.xwray.groupie.ExpandableItem
 import com.xwray.groupie.kotlinandroidextensions.GroupieViewHolder
 import com.xwray.groupie.kotlinandroidextensions.Item
-import kotlinx.android.synthetic.main.card_org_view.view.*
+import kotlinx.android.synthetic.main.card_org.view.*
 import org.dev_alex.mojo_qa.mojo.R
 import org.dev_alex.mojo_qa.mojo.models.OrgUserGroup
 
-
-open class UserGroupItem(val group: OrgUserGroup) : Item(), ExpandableItem {
-    private var expandableGroup: ExpandableGroup? = null
+open class UserGroupItem(val group: OrgUserGroup, private val delegate: UserGroupDelegate) : Item() {
 
     override fun bind(viewHolder: GroupieViewHolder, position: Int) {
-        viewHolder.itemView.tvGroupName.text = group.name
-        rotateExpandableItemIfNeeded(viewHolder.itemView.ivExpandableIcon)
+        viewHolder.itemView.tvOrgName.text = group.name
+        viewHolder.itemView.vOrgContainer.setOnClickListener { delegate.onGroupClick(group) }
 
-        viewHolder.itemView.setOnClickListener {
-            expandableGroup?.onToggleExpanded()
-            rotateExpandableItemIfNeeded(viewHolder.itemView.ivExpandableIcon)
+        if (delegate.isGroupSelected(group)) {
+            viewHolder.itemView.ivSelectedTick.visibility = View.VISIBLE
+            viewHolder.itemView.vOrgContainer.setBackgroundResource(R.drawable.bg_org_user_selected)
+        } else {
+            viewHolder.itemView.ivSelectedTick.visibility = View.INVISIBLE
+            viewHolder.itemView.vOrgContainer.background = null
         }
     }
 
-    private fun rotateExpandableItemIfNeeded(item: View) {
-        val destAngle = if (expandableGroup?.isExpanded == true) 90f else 0f
-        if (item.rotation != destAngle) {
-            ObjectAnimator.ofFloat(item, View.ROTATION, destAngle).apply {
-                setAutoCancel(true)
-                duration = 400
-            }.start()
-        }
-    }
+    override fun getLayout(): Int = R.layout.card_org
 
-    override fun setExpandableGroup(onToggleListener: ExpandableGroup) {
-        expandableGroup = onToggleListener
+    interface UserGroupDelegate {
+        fun onGroupClick(group: OrgUserGroup)
+        fun isGroupSelected(group: OrgUserGroup): Boolean
     }
-
-    override fun getLayout(): Int = R.layout.card_org_view
 }

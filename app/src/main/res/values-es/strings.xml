@@ -212,7 +212,8 @@
     <string name="this_name_already_used">Este nombre ya esta en uso</string>
     <string name="task_manager">Administrador de tareas</string>
     <string name="first_launch_hint">Para usar la aplicación, tome un nombre de usuario y contraseña en su empresa registrada en Mojoform.com</string>
-    <string name="share">Поделиться</string>
+    <string name="share">Share</string>
+    <string name="groups">Groups</string>
 
     <string-array name="day_names">
         <item>Do</item>
