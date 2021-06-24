@@ -54,7 +54,7 @@ class SelectTaskExecutorsFragment : Fragment() {
         loadUsers()
 
         btSelectRules.setOnClickListener {
-            if (model.selectedUsers.isEmpty() || model.selectedGroups.isEmpty()) {
+            if (model.selectedUsers.isEmpty() && model.selectedGroups.isEmpty()) {
                 Toast.makeText(context, getString(R.string.need_to_select_at_least_one_executor), Toast.LENGTH_SHORT).show()
             } else {
                 showNextFragment(SelectTaskRulesFragment.newInstance())
