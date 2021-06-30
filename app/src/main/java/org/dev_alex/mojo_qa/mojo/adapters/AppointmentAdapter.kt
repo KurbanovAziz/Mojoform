@@ -11,7 +11,8 @@ import org.dev_alex.mojo_qa.mojo.models.response.appointment.AppointmentData
 import java.text.SimpleDateFormat
 import java.util.*
 
-class AppointmentAdapter(private val appointments: List<AppointmentData>, private val listener: AppointmentEventListener) : RecyclerView.Adapter<AppointmentViewHolder>() {
+class AppointmentAdapter(private val appointments: List<AppointmentData>, private val listener: AppointmentEventListener) :
+    RecyclerView.Adapter<AppointmentViewHolder>() {
     override fun onCreateViewHolder(viewGroup: ViewGroup, i: Int): AppointmentViewHolder {
         val v = LayoutInflater.from(viewGroup.context).inflate(R.layout.card_appointment, viewGroup, false)
         return AppointmentViewHolder(v)
@@ -19,7 +20,7 @@ class AppointmentAdapter(private val appointments: List<AppointmentData>, privat
 
     override fun onBindViewHolder(viewHolder: AppointmentViewHolder, i: Int) {
         val appointment = appointments[i]
-        viewHolder.bind(appointment)
+        viewHolder.bind(appointment, listener)
     }
 
     override fun getItemCount(): Int {
@@ -27,13 +28,13 @@ class AppointmentAdapter(private val appointments: List<AppointmentData>, privat
     }
 
     interface AppointmentEventListener {
-
+        fun onAppointmentClick(appointment: AppointmentData)
     }
 
     class AppointmentViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val sdf = SimpleDateFormat("dd MMMM yyyy | HH:mm", Locale.getDefault())
 
-        fun bind(appointment: AppointmentData) {
+        fun bind(appointment: AppointmentData, listener: AppointmentEventListener) {
             with(itemView) {
                 if (appointment.createDate != null) {
                     appointmentDate.visibility = View.VISIBLE
@@ -66,7 +67,8 @@ class AppointmentAdapter(private val appointments: List<AppointmentData>, privat
 
                 btClose.setOnClickListener { v -> vExpandable.collapse(true) }
                 vMainAppointmentBlock.setOnClickListener { v ->
-                    vExpandable.toggle(true)
+                    listener.onAppointmentClick(appointment)
+                    //vExpandable.toggle(true)
                 }
 
                 vExpandable.collapse(false)

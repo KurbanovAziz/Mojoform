@@ -2,33 +2,31 @@ package org.dev_alex.mojo_qa.mojo.fragments.appointment
 
 import android.app.ProgressDialog
 import android.os.Bundle
+import android.text.Html
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.fragment.app.Fragment
-import androidx.recyclerview.widget.LinearLayoutManager
 import io.reactivex.rxjava3.disposables.Disposable
-import kotlinx.android.synthetic.main.fragment_appointment_list.*
-import kotlinx.android.synthetic.main.fragment_appointment_list.view.*
+import kotlinx.android.synthetic.main.fragment_appointment_detailed.*
 import org.dev_alex.mojo_qa.mojo.AppointmentsModel
 import org.dev_alex.mojo_qa.mojo.R
-import org.dev_alex.mojo_qa.mojo.adapters.AppointmentAdapter
 import org.dev_alex.mojo_qa.mojo.models.response.appointment.AppointmentData
 import org.dev_alex.mojo_qa.mojo.services.Utils
 
+
 @Suppress("DEPRECATION")
-class AppointmentListFragment : Fragment(), AppointmentAdapter.AppointmentEventListener {
+class AppointmentDetailedFragment : Fragment() {
     private var loopDialog: ProgressDialog? = null
     private var loadDisposable: Disposable? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val rootView = inflater.inflate(R.layout.fragment_appointment_list, container, false)
-        rootView.recyclerView.layoutManager = LinearLayoutManager(context)
+        val rootView = inflater.inflate(R.layout.fragment_appointment_detailed, container, false)
         Utils.setupCloseKeyboardUI(activity, rootView)
         initDialog()
 
-        loadAppointments()
+        loadAppointment(arguments?.getLong(ARG_APPOINTMENT_ID) ?: 0L)
         setupHeader()
         return rootView
     }
@@ -53,20 +51,23 @@ class AppointmentListFragment : Fragment(), AppointmentAdapter.AppointmentEventL
         loopDialog?.setCancelable(false)
     }
 
-    override fun onAppointmentClick(appointment: AppointmentData) {
-        activity?.supportFragmentManager
-            ?.beginTransaction()
-            ?.replace(
-                R.id.container, AppointmentDetailedFragment.newInstance(
-                    appointmentId = appointment.id.toLong()
-                )
-            )
-            ?.addToBackStack(null)
-            ?.commit()
-    }
+    private fun showAppointment(appointment: AppointmentData) {
+        val executorsText = (appointment.executors?.accounts?.map { if (it.fullname.isBlank()) it.username else it.username }.orEmpty() +
+                appointment.executors?.groups?.map { it.name }.orEmpty()).joinToString(", ")
 
-    private fun showAppointments(appointments: List<AppointmentData>) {
-        recyclerView.adapter = AppointmentAdapter(appointments, this)
+        val taskType = when (appointment.type) {
+            "openlinks" -> requireContext().getString(R.string.task_type_open_poll)
+            "closedlinks" -> requireContext().getString(R.string.task_type_private_poll)
+            "constantly" -> requireContext().getString(R.string.task_type_constant)
+            "periodic" -> requireContext().getString(R.string.task_type_periodical)
+            "oneshot" -> requireContext().getString(R.string.task_type_oneshot)
+            else -> appointment.type
+        }
+
+        styleKeyValueTextView("Организация", appointment.name, tvOrganization)
+        styleKeyValueTextView("Форма", appointment.templateNode.orEmpty(), tvForm)
+        styleKeyValueTextView("Тип задачи", taskType, tvType)
+        styleKeyValueTextView("Исполнители", executorsText, tvExecutors)
     }
 
     override fun onDestroyView() {
@@ -74,25 +75,36 @@ class AppointmentListFragment : Fragment(), AppointmentAdapter.AppointmentEventL
         super.onDestroyView()
     }
 
-    private fun loadAppointments() {
+    private fun loadAppointment(id: Long) {
         loadDisposable?.dispose()
 
         loopDialog?.show()
-        loadDisposable = AppointmentsModel.loadAppointments()
+        loadDisposable = AppointmentsModel.loadAppointmentDetails(id)
             .subscribe({
-                AppointmentsModel.appointments = it.orEmpty()
                 loopDialog?.dismiss()
-                showAppointments(it.orEmpty())
+                showAppointment(it)
             }, {
                 loopDialog?.dismiss()
                 it.printStackTrace()
             })
     }
 
+    private fun styleKeyValueTextView(key: String, value: String, textView: TextView) {
+        val resValue = if (value.isBlank()) "-" else value
+        val sourceString = "<b>$key:</b>   $resValue"
+        textView.text = Html.fromHtml(sourceString)
+    }
+
     companion object {
+        private const val ARG_APPOINTMENT_ID = "arg_appointment_id"
+
         @JvmStatic
-        fun newInstance(): AppointmentListFragment {
-            return AppointmentListFragment()
+        fun newInstance(appointmentId: Long): AppointmentDetailedFragment {
+            return AppointmentDetailedFragment().apply {
+                arguments = Bundle().apply {
+                    putLong(ARG_APPOINTMENT_ID, appointmentId)
+                }
+            }
         }
     }
 }
