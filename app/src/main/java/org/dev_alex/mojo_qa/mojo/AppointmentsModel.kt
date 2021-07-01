@@ -5,6 +5,7 @@ import com.google.gson.reflect.TypeToken
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.schedulers.Schedulers
+import org.dev_alex.mojo_qa.mojo.models.file.FileDetails
 import org.dev_alex.mojo_qa.mojo.models.response.appointment.AppointmentData
 import org.dev_alex.mojo_qa.mojo.services.RequestService
 
@@ -39,6 +40,11 @@ object AppointmentsModel {
             } else {
                 it.onError(Exception("code = ${response.code}"))
             }
+        }.concatMap { appointment ->
+            return@concatMap loadFileDetails(appointment.templateNode.orEmpty()).map {
+                appointment.templateName = it.title
+                return@map appointment
+            }
         }.subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
     }
 
@@ -51,6 +57,22 @@ object AppointmentsModel {
                 val responseJson = response.body?.string() ?: "[]"
                 val itemType = object : TypeToken<List<AppointmentData>>() {}.type
                 val responseData: List<AppointmentData> = Gson().fromJson(responseJson, itemType)
+                it.onNext(responseData)
+                it.onComplete()
+            } else {
+                it.onError(Exception("code = ${response.code}"))
+            }
+        }.subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
+    }
+
+    private fun loadFileDetails(id: String): Observable<FileDetails> {
+        return Observable.create<FileDetails> {
+            val url = "/api/fs/info/$id"
+            val response = RequestService.createGetRequest(url)
+
+            if (response.code == 200) {
+                val responseJson = response.body?.string() ?: "{}"
+                val responseData: FileDetails = Gson().fromJson(responseJson, FileDetails::class.java)
                 it.onNext(responseData)
                 it.onComplete()
             } else {

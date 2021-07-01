@@ -33,13 +33,17 @@ class AppointmentDetailedFragment : Fragment() {
 
     private fun setupHeader() {
         (activity?.findViewById<View>(R.id.title) as TextView).text = getString(R.string.assignments)
-        activity?.findViewById<View>(R.id.back_btn)?.visibility = View.GONE
+        activity?.findViewById<View>(R.id.back_btn)?.visibility = View.VISIBLE
         activity?.findViewById<View>(R.id.grid_btn)?.visibility = View.GONE
-        activity?.findViewById<View>(R.id.sandwich_btn)?.visibility = View.VISIBLE
+        activity?.findViewById<View>(R.id.sandwich_btn)?.visibility = View.GONE
         activity?.findViewById<View>(R.id.group_by_btn)?.visibility = View.GONE
         activity?.findViewById<View>(R.id.search_btn)?.visibility = View.GONE
         activity?.findViewById<View>(R.id.notification_btn)?.visibility = View.GONE
         activity?.findViewById<View>(R.id.qr_btn)?.visibility = View.GONE
+
+        activity?.findViewById<View>(R.id.back_btn)?.setOnClickListener {
+            activity?.supportFragmentManager?.popBackStack()
+        }
     }
 
     private fun initDialog() {
@@ -52,7 +56,7 @@ class AppointmentDetailedFragment : Fragment() {
     }
 
     private fun showAppointment(appointment: AppointmentData) {
-        val executorsText = (appointment.executors?.accounts?.map { if (it.fullname.isBlank()) it.username else it.username }.orEmpty() +
+        val executorsText = (appointment.executors?.accounts?.map { if (it.fullname.isBlank()) it.username else it.fullname }.orEmpty() +
                 appointment.executors?.groups?.map { it.name }.orEmpty()).joinToString(", ")
 
         val taskType = when (appointment.type) {
@@ -65,7 +69,7 @@ class AppointmentDetailedFragment : Fragment() {
         }
 
         styleKeyValueTextView("Организация", appointment.name, tvOrganization)
-        styleKeyValueTextView("Форма", appointment.templateNode.orEmpty(), tvForm)
+        styleKeyValueTextView("Форма", appointment.templateName.orEmpty(), tvForm)
         styleKeyValueTextView("Тип задачи", taskType, tvType)
         styleKeyValueTextView("Исполнители", executorsText, tvExecutors)
     }

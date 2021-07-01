@@ -25,6 +25,8 @@ data class AppointmentData(
         @SerializedName("template_node")
         val templateNode: String?
 ) {
+    var templateName: String? = null
+
     fun fixDate() {
         createDate = if (createDate != null) {
             (createDate ?: 0L) * 1000
