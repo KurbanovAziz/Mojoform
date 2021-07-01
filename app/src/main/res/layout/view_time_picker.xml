@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="5dp"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="85dp"
+            android:layout_height="wrap_content"
+            android:background="@null"
+            android:gravity="center_horizontal"
+            android:text="@string/hours"
+            android:textColor="#726583"
+            android:textSize="16sp" />
+
+        <TextView
+            android:layout_width="85dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="9dp"
+            android:background="@null"
+            android:gravity="center_horizontal"
+            android:text="@string/minutes"
+            android:textColor="#726583"
+            android:textSize="16sp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:orientation="horizontal">
+
+        <androidx.appcompat.widget.AppCompatSpinner
+            android:id="@+id/spHour"
+            android:layout_width="85dp"
+            android:layout_height="wrap_content"
+            android:background="@null"
+            android:minHeight="36dp"
+            tools:background="@drawable/input_text_background_gray_border" />
+
+        <androidx.appcompat.widget.AppCompatSpinner
+            android:id="@+id/spMinute"
+            android:layout_width="85dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="9dp"
+            android:background="@null"
+            android:minHeight="36dp"
+            tools:background="@drawable/input_text_background_gray_border" />
+    </LinearLayout>
+</LinearLayout>

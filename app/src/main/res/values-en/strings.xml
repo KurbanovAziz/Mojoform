@@ -198,6 +198,7 @@
     <string name="to">To</string>
     <string name="user">User</string>
     <string name="add_email">Add email</string>
+    <string name="add">Add</string>
     <string name="input_message_text">Write the message of the text</string>
     <string name="add_one_more_range">Add More Range</string>
     <string name="task_notify_in_range">Notify when value is in range</string>

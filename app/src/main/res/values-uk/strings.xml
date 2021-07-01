@@ -198,6 +198,7 @@
     <string name="to">Кому</string>
     <string name="user">Користувач</string>
     <string name="add_email">Електронна пошта</string>
+    <string name="add">Добавiть</string>
     <string name="input_message_text">Написати текст повідомлення</string>
     <string name="add_one_more_range">Додати додатковий діапазон</string>
     <string name="task_notify_in_range">Сповіщати, коли значення знаходиться в діапазоні</string>

@@ -199,6 +199,7 @@
     <string name="to">До</string>
     <string name="user">Пользователь</string>
     <string name="add_email">Добавить email</string>
+    <string name="add">Добавить</string>
     <string name="input_message_text">Впишите текст сообщения</string>
     <string name="add_one_more_range">Добавить ещё диапазон</string>
     <string name="task_notify_in_range">Уведомлять, когда значение входит в диапазон</string>

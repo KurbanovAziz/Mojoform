@@ -13,7 +13,7 @@ import org.dev_alex.mojo_qa.mojo.models.OrgUser
 open class UserItem(val user: OrgUser, private val delegate: OrgUserDelegate, private val fromGroup: Boolean) : Item() {
 
     override fun bind(viewHolder: GroupieViewHolder, position: Int) {
-        viewHolder.itemView.tvUserName.text = user.firstName.takeIf { it.isNotBlank() } ?: user.fullname
+        viewHolder.itemView.tvUserName.text = user.fullname.takeIf { it.isNotBlank() } ?: user.username
         viewHolder.itemView.vUserContainer.setOnClickListener { delegate.onUserClick(user) }
 
         viewHolder.itemView.ivUserIcon.layoutParams?.apply {

@@ -21,6 +21,7 @@ import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.disposables.Disposable
 import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.android.synthetic.main.fragment_create_task_info.*
+import kotlinx.android.synthetic.main.view_time_picker.view.*
 import org.dev_alex.mojo_qa.mojo.CreateTaskModel
 import org.dev_alex.mojo_qa.mojo.CreateTaskModel.TaskType
 import org.dev_alex.mojo_qa.mojo.R
@@ -33,6 +34,7 @@ import org.dev_alex.mojo_qa.mojo.services.Utils
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
+import kotlin.collections.HashMap
 
 
 @Suppress("DEPRECATION")
@@ -82,7 +84,7 @@ class CreateTaskInfoFragment : Fragment() {
             val validationErrorRes = model.isValid()
 
             if (validationErrorRes == null) {
-                loadUsersAndShowRules()
+                showNextFragment(SelectTaskRulesFragment.newInstance())
             } else {
                 Toast.makeText(context, validationErrorRes, Toast.LENGTH_SHORT).show()
             }
@@ -202,6 +204,27 @@ class CreateTaskInfoFragment : Fragment() {
         val currentDate = Calendar.getInstance().apply { time = Date() }
         spPeriodicalHour.setSelection(currentDate.get(Calendar.HOUR_OF_DAY))
         spPeriodicalMinute.setSelection(currentDate.get(Calendar.MINUTE))
+
+        val timesMap: MutableMap<String, String> = HashMap()
+        btAddTime.setOnClickListener {
+            val uuid = UUID.randomUUID().toString()
+            val view = layoutInflater.inflate(R.layout.view_time_picker, vTimeContainer, false)
+
+            initHourSpinner(view.spHour) {
+                timesMap[uuid] = "%02d:%s".format(it, view.spMinute.selectedItem as String)
+                model.periodicalTimes = timesMap.values.toList()
+            }
+            initMinuteSpinner(view.spMinute) {
+                timesMap[uuid] = "%s:%02d".format(view.spHour.selectedItem as String, it)
+                model.periodicalTimes = timesMap.values.toList()
+            }
+
+            val currentTime = Calendar.getInstance().apply { time = Date() }
+            view.spHour.setSelection(currentTime.get(Calendar.HOUR_OF_DAY))
+            view.spMinute.setSelection(currentTime.get(Calendar.MINUTE))
+
+            vTimeContainer.addView(view)
+        }
 
         val clearContent = { vPeriodContent.removeAllViews() }
         val renderRadioButton = { title: String ->
@@ -441,54 +464,11 @@ class CreateTaskInfoFragment : Fragment() {
 
     private fun showNextFragment(fragment: Fragment) {
         activity
-                ?.supportFragmentManager
-                ?.beginTransaction()
-                ?.replace(R.id.container, fragment)
-                ?.addToBackStack(null)
-                ?.commit()
-    }
-
-    private fun loadUsersAndShowRules() {
-        loadDisposable?.dispose()
-
-        loopDialog?.show()
-        loadDisposable = Observable.create<OrgUsersResponse> {
-            val url = "/api/users"
-
-            var needStop = false
-            val totalUsers = ArrayList<OrgUser>()
-            val totalGroups = ArrayList<OrgUserGroup>()
-            while (!needStop) {
-                val response = RequestService.createGetRequest(url + "?size=50&offset=${totalUsers.size}")
-
-                if (response.code == 200) {
-                    val responseJson = response.body?.string() ?: "{}"
-                    val responseData = Gson().fromJson(responseJson, OrgUsersResponse::class.java)
-
-                    totalUsers.addAll(responseData?.users.orEmpty())
-                    totalGroups.addAll(responseData?.groups.orEmpty())
-
-                    if (responseData?.users.isNullOrEmpty()) {
-                        needStop = true
-                    }
-                } else {
-                    it.onError(Exception("code = ${response.code}"))
-                    needStop = true
-                }
-            }
-            it.onNext(OrgUsersResponse(null, totalGroups, totalUsers))
-            it.onComplete()
-        }
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe({
-                    model.saveUsers(it)
-                    loopDialog?.dismiss()
-                    showNextFragment(SelectTaskRulesFragment.newInstance())
-                }, {
-                    loopDialog?.dismiss()
-                    it.printStackTrace()
-                })
+            ?.supportFragmentManager
+            ?.beginTransaction()
+            ?.replace(R.id.container, fragment)
+            ?.addToBackStack(null)
+            ?.commit()
     }
 
     override fun onDestroyView() {

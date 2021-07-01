@@ -75,27 +75,15 @@ class CreateTaskModel private constructor() {
     // Periodical
     var periodicalTaskHour: Int? = null
     var periodicalTaskMinutes: Int? = null
+    var periodicalTimes: List<String>? = null
     var selectedPeriod: TaskPeriod? = null
 
     // Notify Ranges
     var notifyRanges: MutableList<NotifyRange> = ArrayList()
 
     // Users
-    var allUsers: MutableList<OrgUser> = ArrayList()
     var selectedUsers: MutableList<OrgUser> = ArrayList()
     var selectedGroups: MutableList<OrgUserGroup> = ArrayList()
-
-    fun saveUsers(response: OrgUsersResponse) {
-        val totalUsers = ArrayList(response.users)
-        response.groups?.forEach { group ->
-            group.users?.forEach {
-                if (!totalUsers.contains(it)) {
-                    totalUsers.add(it)
-                }
-            }
-        }
-        allUsers = totalUsers
-    }
 
     enum class TaskType(val nameRes: Int) {
         CONSTANT(R.string.task_type_constant),
@@ -154,8 +142,8 @@ class CreateTaskModel private constructor() {
         periodicalTaskHour = null
         periodicalTaskMinutes = null
         selectedPeriod = null
+        periodicalTimes = null
 
-        allUsers = ArrayList()
         selectedUsers = ArrayList()
         selectedGroups = ArrayList()
         notifyRanges = ArrayList()
@@ -176,9 +164,7 @@ class CreateTaskModel private constructor() {
         var from: Int = 0
         var to: Int = 0
         var message: String = ""
-        var selectedUsersMap: MutableMap<String, OrgUser> = HashMap()
-        val selectedUsersList: List<OrgUser>
-            get() = selectedUsersMap.values.toList()
+        var selectedUsersList: MutableList<OrgUser> = ArrayList()
 
         var emailsMap: MutableMap<String, String> = HashMap()
         val emailsList: List<String>

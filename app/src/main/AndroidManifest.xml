@@ -75,6 +75,13 @@
             android:theme="@style/AppTheme.ActionBar.Transparent"
             android:windowSoftInputMode="adjustPan" />
 
+        <activity
+            android:name=".activities.PickExecutorsActivity"
+            android:configChanges="orientation|keyboardHidden|keyboard"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.ActionBar.Transparent"
+            android:windowSoftInputMode="adjustPan" />
+
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.provider"
@@ -93,6 +100,9 @@
 
         <activity android:name=".custom_views.camera.CustomCamera2Activity" />
 
+        <activity android:name=".activities.OnboardingActivity" />
+
+
         <service android:name=".gcm.MyFirebaseMessagingService">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
@@ -108,6 +118,5 @@
             android:name="com.google.firebase.messaging.default_notification_icon"
             android:resource="@drawable/watermark_logo" />
 
-        <activity android:name=".activities.OnboardingActivity" />
     </application>
 </manifest>

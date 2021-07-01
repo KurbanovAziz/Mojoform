@@ -199,6 +199,7 @@
     <string name="to">A</string>
     <string name="user">Usuario</string>
     <string name="add_email">Añadir Correo electrónico</string>
+    <string name="add">Añadir</string>
     <string name="input_message_text">Escribir el texto del mensaje</string>
     <string name="add_one_more_range">Agregar más rango</string>
     <string name="task_notify_in_range">Notificar cuando el valor está en el rango</string>

@@ -8,7 +8,6 @@ import android.view.ViewGroup
 import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentManager
 import com.google.gson.Gson
 import com.xwray.groupie.GroupAdapter
 import com.xwray.groupie.kotlinandroidextensions.GroupieViewHolder
@@ -16,9 +15,9 @@ import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.disposables.Disposable
 import io.reactivex.rxjava3.schedulers.Schedulers
-import kotlinx.android.synthetic.main.fragment_select_task_executors.*
-import org.dev_alex.mojo_qa.mojo.CreateTaskModel
+import kotlinx.android.synthetic.main.fragment_pick_executors.*
 import org.dev_alex.mojo_qa.mojo.R
+import org.dev_alex.mojo_qa.mojo.event.ExecutorsPickedEvent
 import org.dev_alex.mojo_qa.mojo.models.Org
 import org.dev_alex.mojo_qa.mojo.models.OrgUser
 import org.dev_alex.mojo_qa.mojo.models.OrgUserGroup
@@ -26,22 +25,24 @@ import org.dev_alex.mojo_qa.mojo.models.response.OrgUsersAvailable
 import org.dev_alex.mojo_qa.mojo.models.response.OrgUsersResponse
 import org.dev_alex.mojo_qa.mojo.services.RequestService
 import org.dev_alex.mojo_qa.mojo.services.Utils
+import org.greenrobot.eventbus.EventBus
+import java.io.Serializable
 
 
 @Suppress("DEPRECATION")
-class SelectTaskExecutorsFragment : Fragment() {
+class PickExecutorsFragment : Fragment() {
     private var loopDialog: ProgressDialog? = null
-
-    private val model: CreateTaskModel
-        get() = CreateTaskModel.instance!!
 
     private var loadDisposable: Disposable? = null
 
     private var selectedFilterOrgId: Int? = null
     private var selectedFilterGroupId: Int? = null
 
+    val selectedUsers: MutableList<OrgUser> = ArrayList()
+    val selectedGroups: MutableList<OrgUserGroup> = ArrayList()
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val rootView = inflater.inflate(R.layout.fragment_select_task_executors, container, false)
+        val rootView = inflater.inflate(R.layout.fragment_pick_executors, container, false)
 
         Utils.setupCloseKeyboardUI(activity, rootView)
         initDialog()
@@ -51,18 +52,28 @@ class SelectTaskExecutorsFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        (arguments?.getSerializable(ARG_PRESET_DATA) as? PreSetData)?.let {
+            selectedUsers.clear()
+            selectedUsers.addAll(it.selectedUsers)
+
+            selectedGroups.clear()
+            selectedGroups.addAll(it.selectedGroups)
+        }
+
         loadUsers()
 
-        btSelectRules.setOnClickListener {
-            if (model.selectedUsers.isEmpty() && model.selectedGroups.isEmpty()) {
+        btSelect.setOnClickListener {
+            if (selectedUsers.isEmpty()) {
                 Toast.makeText(context, getString(R.string.need_to_select_at_least_one_executor), Toast.LENGTH_SHORT).show()
             } else {
-                showNextFragment(SelectTaskRulesFragment.newInstance())
+                activity?.finish()
+                EventBus.getDefault().post(ExecutorsPickedEvent(selectedUsers, selectedGroups))
             }
         }
 
         btExit.setOnClickListener {
-            activity?.supportFragmentManager?.popBackStack("CreateTaskInfoFragment", FragmentManager.POP_BACK_STACK_INCLUSIVE)
+            activity?.finish()
         }
     }
 
@@ -77,7 +88,7 @@ class SelectTaskExecutorsFragment : Fragment() {
         activity?.findViewById<View>(R.id.qr_btn)?.visibility = View.GONE
 
         activity?.findViewById<View>(R.id.back_btn)?.setOnClickListener {
-            activity?.supportFragmentManager?.popBackStack()
+            activity?.finish()
         }
     }
 
@@ -157,35 +168,35 @@ class SelectTaskExecutorsFragment : Fragment() {
 
         val selectionUserListener = object : UserItem.OrgUserDelegate {
             override fun onUserClick(user: OrgUser) {
-                if (model.selectedUsers.contains(user)) {
-                    model.selectedUsers.remove(user)
+                if (selectedUsers.contains(user)) {
+                    selectedUsers.remove(user)
                 } else {
-                    model.selectedUsers.add(user)
+                    selectedUsers.add(user)
                 }
                 adapter.notifyDataSetChanged()
             }
 
             override fun isUserSelected(user: OrgUser): Boolean {
-                return model.selectedUsers.contains(user)
+                return selectedUsers.contains(user)
             }
         }
 
         val selectionGroupListener = object : UserGroupItem.UserGroupDelegate {
             override fun onGroupClick(group: OrgUserGroup) {
-                if (model.selectedGroups.contains(group)) {
-                    model.selectedGroups.remove(group)
+                if (selectedGroups.contains(group)) {
+                    selectedGroups.remove(group)
                 } else {
-                    model.selectedGroups.add(group)
+                    selectedGroups.add(group)
                 }
                 adapter.notifyDataSetChanged()
             }
 
             override fun isGroupSelected(group: OrgUserGroup): Boolean {
-                return model.selectedGroups.contains(group)
+                return selectedGroups.contains(group)
             }
         }
 
-        adapter.addAll(response.groups?.map { UserGroupItem(it, selectionGroupListener) }.orEmpty())
+        //adapter.addAll(response.groups?.map { UserGroupItem(it, selectionGroupListener) }.orEmpty())
         adapter.addAll(response.users.map { UserItem(it, selectionUserListener, false) })
 
         if (spOrg.getItems<Any>().isNullOrEmpty()) {
@@ -217,23 +228,14 @@ class SelectTaskExecutorsFragment : Fragment() {
 
         spGroup.setItems(groupList)
         spGroup.setOnItemSelectedListener { _, position, _, org ->
-            if (position > 0) {
-                selectedFilterGroupId = groups[position - 1].id
+            selectedFilterGroupId = if (position > 0) {
+                groups[position - 1].id
             } else {
-                selectedFilterGroupId = null
+                null
             }
             loadUsers()
         }
         spGroup.selectedIndex = groups.indexOfFirst { it.id == selectedFilterGroupId } + 1
-    }
-
-    private fun showNextFragment(fragment: Fragment) {
-        activity
-            ?.supportFragmentManager
-            ?.beginTransaction()
-            ?.replace(R.id.container, fragment)
-            ?.addToBackStack(null)
-            ?.commit()
     }
 
     override fun onDestroyView() {
@@ -243,9 +245,21 @@ class SelectTaskExecutorsFragment : Fragment() {
     }
 
     companion object {
+        private const val ARG_PRESET_DATA = "arg preset data"
+
         @JvmStatic
-        fun newInstance(): SelectTaskExecutorsFragment {
-            return SelectTaskExecutorsFragment()
+        fun newInstance(selectedUsers: List<OrgUser>, selectedGroups: List<OrgUserGroup>): PickExecutorsFragment {
+            val data = PreSetData(selectedUsers, selectedGroups)
+            return PickExecutorsFragment().apply {
+                arguments = Bundle().apply {
+                    putSerializable(ARG_PRESET_DATA, data)
+                }
+            }
         }
     }
+
+    class PreSetData(
+        val selectedUsers: List<OrgUser>,
+        val selectedGroups: List<OrgUserGroup>
+    ) : Serializable
 }

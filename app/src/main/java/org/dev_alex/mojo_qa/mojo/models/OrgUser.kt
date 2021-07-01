@@ -1,21 +1,23 @@
 package org.dev_alex.mojo_qa.mojo.models
 
+import java.io.Serializable
+
 
 class OrgUser(
-        val config: String,
-        val description: String,
-        val email: String,
-        val firstName: String,
-        val fullname: String,
-        val has_avatar: Boolean,
-        val id: Int,
-        val is_deleted: Boolean,
-        val is_orgowner: Boolean,
-        val langcode: String,
-        val lastName: String,
-        val push_disabled: Boolean,
-        val username: String
-) {
+    val config: String,
+    val description: String,
+    val email: String,
+    val firstName: String,
+    val fullname: String,
+    val has_avatar: Boolean,
+    val id: Int,
+    val is_deleted: Boolean,
+    val is_orgowner: Boolean,
+    val langcode: String,
+    val lastName: String,
+    val push_disabled: Boolean,
+    val username: String
+) : Serializable {
     override fun toString(): String {
         return firstName.takeIf { it.isNotBlank() } ?: fullname
     }

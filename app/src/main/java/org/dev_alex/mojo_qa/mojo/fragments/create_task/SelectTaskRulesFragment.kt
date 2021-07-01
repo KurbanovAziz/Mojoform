@@ -5,7 +5,9 @@ import android.app.ProgressDialog
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
-import android.view.*
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import android.widget.*
 import androidx.appcompat.widget.AppCompatSpinner
 import androidx.fragment.app.Fragment
@@ -17,16 +19,20 @@ import io.reactivex.rxjava3.disposables.Disposable
 import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.android.synthetic.main.fragment_select_task_rules.*
 import kotlinx.android.synthetic.main.view_add_user_email.view.*
-import kotlinx.android.synthetic.main.view_add_user_spinner.view.*
+import kotlinx.android.synthetic.main.view_selected_executor.view.*
 import kotlinx.android.synthetic.main.view_task_control_range.*
 import kotlinx.android.synthetic.main.view_task_control_range.view.*
 import org.dev_alex.mojo_qa.mojo.CreateTaskModel
 import org.dev_alex.mojo_qa.mojo.CreateTaskModel.TaskType.*
 import org.dev_alex.mojo_qa.mojo.R
-import org.dev_alex.mojo_qa.mojo.models.OrgUser
+import org.dev_alex.mojo_qa.mojo.activities.PickExecutorsActivity
+import org.dev_alex.mojo_qa.mojo.event.ExecutorsPickedEvent
 import org.dev_alex.mojo_qa.mojo.models.response.appointment.AppointmentData
 import org.dev_alex.mojo_qa.mojo.services.RequestService
 import org.dev_alex.mojo_qa.mojo.services.Utils
+import org.greenrobot.eventbus.EventBus
+import org.greenrobot.eventbus.Subscribe
+import org.greenrobot.eventbus.ThreadMode
 import org.json.JSONArray
 import org.json.JSONObject
 import java.util.*
@@ -42,6 +48,9 @@ class SelectTaskRulesFragment : Fragment() {
 
     private var loadDisposable: Disposable? = null
 
+    private var selectedRange: CreateTaskModel.NotifyRange? = null
+    private var selectedUsersBlock: LinearLayout? = null
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val rootView = inflater.inflate(R.layout.fragment_select_task_rules, container, false)
 
@@ -49,6 +58,11 @@ class SelectTaskRulesFragment : Fragment() {
         initDialog()
         setupHeader()
         return rootView
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        EventBus.getDefault().register(this)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -71,6 +85,8 @@ class SelectTaskRulesFragment : Fragment() {
         btExit.setOnClickListener {
             activity?.supportFragmentManager?.popBackStack("CreateTaskInfoFragment", FragmentManager.POP_BACK_STACK_INCLUSIVE)
         }
+
+        retainInstance = true
     }
 
     private fun setupHeader() {
@@ -85,6 +101,16 @@ class SelectTaskRulesFragment : Fragment() {
 
         activity?.findViewById<View>(R.id.back_btn)?.setOnClickListener {
             activity?.supportFragmentManager?.popBackStack()
+        }
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    fun onExecutorsPicked(event: ExecutorsPickedEvent) {
+        selectedRange?.let { range ->
+            range.selectedUsersList = event.users.toMutableList()
+            selectedUsersBlock?.let {
+                showPickedUsers(range, it)
+            }
         }
     }
 
@@ -143,12 +169,10 @@ class SelectTaskRulesFragment : Fragment() {
         })
 
         rangeView.btAddUser.setOnClickListener {
-            if (notifyRange.selectedUsersList.size < model.allUsers.size) {
-                val spinnerView = createPickUserSpinner(notifyRange)
-                rangeView.vAddedUsersBlock.addView(spinnerView)
-            } else {
-                Toast.makeText(context, getString(R.string.no_available_for_add_users), Toast.LENGTH_SHORT).show()
-            }
+            selectedRange = notifyRange
+            selectedUsersBlock = rangeView.vAddedUsersBlock
+
+            startActivity(PickExecutorsActivity.getActivityIntent(context, notifyRange.selectedUsersList, emptyList()))
         }
 
         rangeView.btAddEmail.setOnClickListener {
@@ -162,43 +186,19 @@ class SelectTaskRulesFragment : Fragment() {
         scrollView.post { scrollView?.fullScroll(ScrollView.FOCUS_DOWN) }
     }
 
-    @SuppressLint("ClickableViewAccessibility")
-    private fun createPickUserSpinner(range: CreateTaskModel.NotifyRange): View {
-        val keyUUID = UUID.randomUUID().toString()
+    private fun showPickedUsers(range: CreateTaskModel.NotifyRange, selectedUsersBlock: LinearLayout) {
+        selectedUsersBlock.removeAllViews()
 
-        val spinnerView = layoutInflater.inflate(R.layout.view_add_user_spinner, vAddedUsersBlock, false)
-        val spinner = spinnerView.spinner
-
-        val getAdapter = {
-            var userList = model.allUsers - range.selectedUsersList
-            (spinner.selectedItem as? OrgUser)?.let { userList = listOf(it) + userList }
-
-            val adapter = ArrayAdapter(requireContext(), R.layout.spinner_task_type_item, userList)
-            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-
-            adapter
-        }
-
-        spinner.adapter = getAdapter()
-        spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-                (spinner.adapter?.getItem(position) as? OrgUser)?.let {
-                    range.selectedUsersMap[keyUUID] = it
-                }
+        range.selectedUsersList.forEach { user ->
+            val view = layoutInflater.inflate(R.layout.view_selected_executor, selectedUsersBlock, false)
+            view.tvExecutor.text = user.fullname.takeIf { it.isNotBlank() } ?: user.username
+            view.btDelete.setOnClickListener {
+                range.selectedUsersList.remove(user)
+                selectedUsersBlock.removeView(view)
             }
 
-            override fun onNothingSelected(parent: AdapterView<*>?) {
-            }
+            selectedUsersBlock.addView(view)
         }
-
-        spinner.setOnTouchListener { _, motionEvent ->
-            if (motionEvent.action == MotionEvent.ACTION_DOWN) {
-                spinner.adapter = getAdapter()
-            }
-            return@setOnTouchListener false
-        }
-
-        return spinnerView
     }
 
     @SuppressLint("ClickableViewAccessibility")
@@ -283,25 +283,27 @@ class SelectTaskRulesFragment : Fragment() {
                     when (selectedPeriod) {
                         CreateTaskModel.TaskPeriod.Daily -> {
                             put("daily", JSONObject().apply {
-                                put("times", JSONArray(listOf(periodTime)))
+                                put("times", JSONArray(model.periodicalTimes.orEmpty()))
                             })
                         }
                         is CreateTaskModel.TaskPeriod.Weekly -> {
                             put("weekly", JSONObject().apply {
                                 put("times", JSONArray(listOf(periodTime)))
-                                put("weekDays", JSONArray(selectedPeriod.days))
+                                put("weekDays", JSONArray(model.periodicalTimes.orEmpty()))
                             })
                         }
                         is CreateTaskModel.TaskPeriod.Monthly -> {
                             put("monthly", JSONObject().apply {
                                 put("times", JSONArray(listOf(periodTime)))
-                                put("monthDays", JSONArray(selectedPeriod.days))
+                                put("monthDays", JSONArray(model.periodicalTimes.orEmpty()))
                             })
                         }
                     }
                     put("is_start", true)
                 }
                 configJson.put("periodic", periodicalConfigJson)
+                val period = ((model.periodicalTaskHour ?: 0) * 60 + (model.periodicalTaskMinutes ?: 0)) * 60
+                jsonObject.put("execution_period", period)
             }
             ONE_SHOT -> {
                 val oneShotConfigJson = JSONObject().apply {
@@ -373,34 +375,39 @@ class SelectTaskRulesFragment : Fragment() {
                 it.onError(Exception("code = ${response.code}"))
             }
         }
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe({
-                    loopDialog?.dismiss()
-                    Toast.makeText(context, R.string.appointment_created_successfully, Toast.LENGTH_SHORT).show()
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe({
+                loopDialog?.dismiss()
+                Toast.makeText(context, R.string.appointment_created_successfully, Toast.LENGTH_SHORT).show()
 
-                    if (model.taskType == PRIVATE_POLL || model.taskType == OPEN_POLL) {
-                        model.createAppointmentResponse = it
+                if (model.taskType == PRIVATE_POLL || model.taskType == OPEN_POLL) {
+                    model.createAppointmentResponse = it
 
-                        activity?.supportFragmentManager?.popBackStack("CreateTaskInfoFragment", FragmentManager.POP_BACK_STACK_INCLUSIVE)
-                        activity?.supportFragmentManager
-                                ?.beginTransaction()
-                                ?.replace(R.id.container, ShowPollDataFragment.newInstance(), null)
-                                ?.commit()
-                    } else {
-                        activity?.supportFragmentManager?.popBackStack("CreateTaskInfoFragment", FragmentManager.POP_BACK_STACK_INCLUSIVE)
-                    }
-                }, {
-                    Toast.makeText(context, it.localizedMessage, Toast.LENGTH_SHORT).show()
-                    loopDialog?.dismiss()
-                    it.printStackTrace()
-                })
+                    activity?.supportFragmentManager?.popBackStack("CreateTaskInfoFragment", FragmentManager.POP_BACK_STACK_INCLUSIVE)
+                    activity?.supportFragmentManager
+                        ?.beginTransaction()
+                        ?.replace(R.id.container, ShowPollDataFragment.newInstance(), null)
+                        ?.commit()
+                } else {
+                    activity?.supportFragmentManager?.popBackStack("CreateTaskInfoFragment", FragmentManager.POP_BACK_STACK_INCLUSIVE)
+                }
+            }, {
+                Toast.makeText(context, it.localizedMessage, Toast.LENGTH_SHORT).show()
+                loopDialog?.dismiss()
+                it.printStackTrace()
+            })
     }
 
     override fun onDestroyView() {
         loadDisposable?.dispose()
         loopDialog?.dismiss()
         super.onDestroyView()
+    }
+
+    override fun onDestroy() {
+        EventBus.getDefault().unregister(this)
+        super.onDestroy()
     }
 
     companion object {
