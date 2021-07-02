@@ -288,14 +288,14 @@ class SelectTaskRulesFragment : Fragment() {
                         }
                         is CreateTaskModel.TaskPeriod.Weekly -> {
                             put("weekly", JSONObject().apply {
-                                put("times", JSONArray(listOf(periodTime)))
-                                put("weekDays", JSONArray(model.periodicalTimes.orEmpty()))
+                                put("times", JSONArray(model.periodicalTimes.orEmpty()))
+                                put("weekDays", JSONArray(selectedPeriod.days))
                             })
                         }
                         is CreateTaskModel.TaskPeriod.Monthly -> {
                             put("monthly", JSONObject().apply {
-                                put("times", JSONArray(listOf(periodTime)))
-                                put("monthDays", JSONArray(model.periodicalTimes.orEmpty()))
+                                put("times", JSONArray(model.periodicalTimes.orEmpty()))
+                                put("monthDays", JSONArray(selectedPeriod.days))
                             })
                         }
                     }
