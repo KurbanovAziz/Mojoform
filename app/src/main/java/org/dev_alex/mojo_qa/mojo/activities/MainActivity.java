@@ -675,7 +675,10 @@ public class MainActivity extends AppCompatActivity {
             super.onPostExecute(responseCode);
             try {
                 if (user != null) {
-                    LoginHistoryService.setCurrentUser(user);
+                    User oldUser = LoginHistoryService.getCurrentUser();
+                    oldUser.push_disabled = user.push_disabled;
+
+                    LoginHistoryService.setCurrentUser(oldUser);
                 }
 
             } catch (Exception exc) {

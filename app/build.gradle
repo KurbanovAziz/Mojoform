@@ -11,8 +11,8 @@ android {
         //noinspection OldTargetApi
         targetSdkVersion 29
         multiDexEnabled true
-        versionCode 59
-        versionName "1.8.9"
+        versionCode 60
+        versionName "1.9.0"
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
     }
     buildTypes {

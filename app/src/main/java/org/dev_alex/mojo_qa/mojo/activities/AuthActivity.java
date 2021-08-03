@@ -7,7 +7,6 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
-import androidx.appcompat.app.AppCompatActivity;
 import android.widget.Toast;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -22,6 +21,7 @@ import org.dev_alex.mojo_qa.mojo.services.RequestService;
 import org.dev_alex.mojo_qa.mojo.services.TokenService;
 import org.json.JSONObject;
 
+import androidx.appcompat.app.AppCompatActivity;
 import okhttp3.Response;
 
 public class AuthActivity extends AppCompatActivity {
@@ -109,8 +109,9 @@ public class AuthActivity extends AppCompatActivity {
                 requestJson.put("app", "android");
 
                 if (loginWithinToken) {
-                    requestJson.put("username", LoginHistoryService.getCurrentUser().username);
-                    requestJson.put("refresh_token", LoginHistoryService.getCurrentUser().refresh_token);
+                    User user = LoginHistoryService.getCurrentUser();
+                    requestJson.put("username", user.username);
+                    requestJson.put("refresh_token", user.refresh_token);
                     requestJson.put("device_id", TokenService.getFirebaseToken());
                 } else {
                     requestJson.put("username", username);
