@@ -2,6 +2,7 @@ package com.lalongooo.videocompressor.video;
 
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
+import android.content.Context;
 import android.media.MediaCodec;
 import android.media.MediaCodecInfo;
 import android.media.MediaCodecList;
@@ -9,16 +10,14 @@ import android.media.MediaExtractor;
 import android.media.MediaFormat;
 import android.media.MediaMetadataRetriever;
 import android.os.Build;
-import android.os.Environment;
 import android.util.Log;
-
-import com.lalongooo.videocompressor.Config;
 
 import java.io.File;
 import java.nio.ByteBuffer;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Locale;
+
+import nl.bravobit.ffmpeg.ExecuteBinaryResponseHandler;
+import nl.bravobit.ffmpeg.FFmpeg;
+
 
 @SuppressLint("NewApi")
 public class MediaController {
@@ -32,6 +31,41 @@ public class MediaController {
     private final static int PROCESSOR_TYPE_TI = 5;
     private static volatile MediaController Instance = null;
     private boolean videoConvertFirstWrite = true;
+    FFmpeg fFmpeg;
+
+    public void loadFFMpegLibrary(Context context)  {
+        if (FFmpeg.getInstance(context).isSupported()) {
+            fFmpeg = FFmpeg.getInstance(context);
+            Log.e("ff", "зарузка норм");}
+        else {
+            fFmpeg = FFmpeg.getInstance(context);
+            Log.e("ff", "зарузка провалилась");
+        }
+    }
+
+    public void enterFFMpegCommand (final String[] command) {
+        fFmpeg.execute(command, new ExecuteBinaryResponseHandler() {
+            @Override
+            public void onStart() {}
+
+            @Override
+            public void onProgress(String message) {}
+
+            @Override
+            public void onFailure(String message) {
+                Log.d("ff", "сжать не вышло");
+            }
+
+            @Override
+            public void onSuccess(String message) {
+                Log.d("ff", "сжать получилось");
+            }
+
+            @Override
+            public void onFinish() {
+            }
+        });
+    }
 
     public static MediaController getInstance() {
         MediaController localInstance = Instance;
@@ -219,8 +253,23 @@ public class MediaController {
         }
         return -5;
     }
-
     @TargetApi(16)
+    public boolean convertVideo2(final String path, String newFilePath, Context context){ //новый кодек ffmpeg
+        try{
+            loadFFMpegLibrary(context);
+            String[] command = {"-y", "-i", path, "-s", "160x120", "-r", "25", "-vcodec", "mpeg4", "-b:v", "150k", "-b:a", "48000", "-ac", "2", "-ar", "22050", newFilePath};
+            enterFFMpegCommand(command);
+             return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+
+
+
+    @TargetApi(16) //старый кодек
     public boolean convertVideo(final String path, String newFilePath) {
 
         MediaMetadataRetriever retriever = new MediaMetadataRetriever();
