@@ -2547,7 +2547,7 @@ public class TemplateFragment extends Fragment {
         @Override
         protected Boolean doInBackground(Void... voids) {
             newFilePath = getContext().getExternalCacheDir() + "/" + UUID.randomUUID().toString() + ".mp4";
-            return MediaController.getInstance().convertVideo2(filePath, newFilePath, getContext());
+            return MediaController.getInstance().convertVideo(filePath, newFilePath);
         }
 
         @Override
