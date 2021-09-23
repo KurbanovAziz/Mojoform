@@ -2,6 +2,7 @@ package com.lalongooo.videocompressor.video;
 
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
+import android.content.Context;
 import android.media.MediaCodec;
 import android.media.MediaCodecInfo;
 import android.media.MediaCodecList;
@@ -9,16 +10,18 @@ import android.media.MediaExtractor;
 import android.media.MediaFormat;
 import android.media.MediaMetadataRetriever;
 import android.os.Build;
-import android.os.Environment;
+import android.text.format.Formatter;
 import android.util.Log;
 
-import com.lalongooo.videocompressor.Config;
+
+//import com.iceteck.silicompressorr.SiliCompressor;
+
+
+import com.netcompss.loader.LoadJNI;
 
 import java.io.File;
 import java.nio.ByteBuffer;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Locale;
+
 
 @SuppressLint("NewApi")
 public class MediaController {
@@ -219,8 +222,27 @@ public class MediaController {
         }
         return -5;
     }
-
     @TargetApi(16)
+    public boolean convertVideo2(final String path, String newFilePath, Context context){ //новый кодек ffmpeg
+        try {
+            LoadJNI vk = new LoadJNI();
+            String workFolder = context.getApplicationContext().getFilesDir().getAbsolutePath();
+            String[] complexCommand = {"ffmpeg", "-y", "-i", path, "-strict", "experimental", "-vcodec", "libx264", "-preset", "ultrafast", "-crf", "24", "-acodec" , "aac", "-ar", "44100", "-ac", "2", "-b:a", "96k", newFilePath};
+            vk.run(complexCommand , workFolder , context.getApplicationContext());
+       return true;
+        }
+        catch (Exception e){
+            Log.e("codec", e.toString());
+            return false;
+        }
+    }
+
+
+
+
+
+
+    @TargetApi(16) //старый кодек
     public boolean convertVideo(final String path, String newFilePath) {
 
         MediaMetadataRetriever retriever = new MediaMetadataRetriever();
