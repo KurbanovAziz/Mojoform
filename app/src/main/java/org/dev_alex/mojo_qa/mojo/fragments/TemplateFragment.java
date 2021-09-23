@@ -126,6 +126,7 @@ import org.jsoup.nodes.Document;
 import java.io.File;
 import java.io.IOException;
 import java.net.HttpURLConnection;
+import java.net.URISyntaxException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -2547,7 +2548,10 @@ public class TemplateFragment extends Fragment {
         @Override
         protected Boolean doInBackground(Void... voids) {
             newFilePath = getContext().getExternalCacheDir() + "/" + UUID.randomUUID().toString() + ".mp4";
-            return MediaController.getInstance().convertVideo(filePath, newFilePath);
+            return MediaController.getInstance().convertVideo2(filePath, newFilePath, getContext());
+
+
+            //   return true;
         }
 
         @Override
