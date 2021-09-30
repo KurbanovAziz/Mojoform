@@ -2,5 +2,7 @@
 <resources>
 
     <item name="mcv_pager" type="id" />
+    <item name="back_card" type="id"/>
+
 
 </resources>
