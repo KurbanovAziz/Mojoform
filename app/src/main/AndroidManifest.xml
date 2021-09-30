@@ -10,7 +10,6 @@
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.GET_TASKS" />
-    <uses-permission android:name="android.permission.REAL_GET_TASKS" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
@@ -57,6 +56,24 @@
                     android:host="system.mojoform.com"
                     android:scheme="https" />
             </intent-filter>
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+                <data
+                    android:scheme="https"
+                    android:host="system.mojoform.com"
+                    android:pathPrefix="/attachment"/>
+            </intent-filter>
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+                <data
+                    android:scheme="https"
+                    android:host="mojo-qa.dev-alex.org"
+                    android:pathPrefix="/attachment"/>
+            </intent-filter>
         </activity>
 
         <activity
@@ -66,7 +83,9 @@
             android:launchMode="singleTop"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.ActionBar.Transparent"
-            android:windowSoftInputMode="adjustPan" />
+            android:windowSoftInputMode="adjustPan">
+
+        </activity>
 
         <activity
             android:name=".activities.OpenLinkActivity"
@@ -74,6 +93,11 @@
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.ActionBar.Transparent"
             android:windowSoftInputMode="adjustPan" />
+
+        <activity
+            android:name=".activities.PlayerActivity"
+            android:configChanges="keyboard|keyboardHidden|orientation|screenSize|screenLayout|smallestScreenSize|uiMode">
+        </activity>
 
         <activity
             android:name=".activities.PickExecutorsActivity"
