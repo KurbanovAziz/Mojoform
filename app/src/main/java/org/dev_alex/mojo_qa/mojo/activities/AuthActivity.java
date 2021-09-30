@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -32,6 +33,7 @@ public class AuthActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_auth);
         initDialog();
+       // startActivity(new Intent(AuthActivity.this, MainActivity.class));
 
         if (!OnboardingActivity.isOnboardingFinished())
             startActivity(new Intent(this, OnboardingActivity.class));
@@ -148,12 +150,21 @@ public class AuthActivity extends AppCompatActivity {
                         }
                         LoginHistoryService.setCurrentUser(user);
                         TokenService.updateToken(user.token, user.username);
+                        Intent intentData = getIntent();
+                        String data = intentData.getDataString();
+                        if(data != null){
+                            Intent intentP = new Intent(AuthActivity.this, PlayerActivity.class);
+                            intentP.putExtra("video", data);
+                            startActivity(intentP);
+                            finish();
+                        }
+                        else {
                         Intent intent = new Intent(AuthActivity.this, MainActivity.class);
                         intent.putExtras(getIntent());
                         intent.setData(getIntent().getData());
                         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                         startActivity(intent);
-                        finish();
+                        finish();}
                     } else {
                         TokenService.deleteToken();
                         replaceWithLoginFragment();
@@ -171,12 +182,21 @@ public class AuthActivity extends AppCompatActivity {
                         LoginHistoryService.setCurrentUser(user);
                         LoginHistoryService.addUser(user);
                         TokenService.updateToken(user.token, user.username);
+                        Intent intentData = getIntent();
+                        String data = intentData.getDataString();
+                        if(data != null){
+                            Intent intentP = new Intent(AuthActivity.this, PlayerActivity.class);
+                            intentP.putExtra("video", data);
+                            startActivity(intentP);
+                            finish();
+                        }
+                        else {
                         Intent intent = new Intent(AuthActivity.this, MainActivity.class);
                         intent.putExtras(getIntent());
                         intent.setData(getIntent().getData());
                         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                         startActivity(intent);
-                        finish();
+                        finish();}
                     } else
                         Toast.makeText(AuthActivity.this, getString(R.string.unknown_error) + "  code: " + responseCode, Toast.LENGTH_LONG).show();
                 }
