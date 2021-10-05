@@ -1,165 +1,167 @@
-package org.dev_alex.mojo_qa.mojo.fragments;
 
-import android.Manifest;
-import android.annotation.SuppressLint;
-import android.app.ProgressDialog;
-import android.content.Context;
-import android.content.Intent;
-import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
-import android.content.res.Resources;
-import android.graphics.Bitmap;
-import android.graphics.Bitmap.Config;
-import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
-import android.graphics.PorterDuff;
-import android.graphics.Rect;
-import android.graphics.drawable.Drawable;
-import android.graphics.drawable.GradientDrawable;
-import android.graphics.drawable.LayerDrawable;
-import android.location.Location;
-import android.media.ExifInterface;
-import android.media.ThumbnailUtils;
-import android.net.Uri;
-import android.os.AsyncTask;
-import android.os.Build;
-import android.os.Bundle;
-import android.os.Environment;
-import android.os.Handler;
-import android.provider.MediaStore;
-import androidx.annotation.Nullable;
-import androidx.core.app.ActivityCompat;
-import androidx.fragment.app.Fragment;
-import androidx.core.content.ContextCompat;
-import androidx.core.content.FileProvider;
-import androidx.core.util.Pair;
-import androidx.drawerlayout.widget.DrawerLayout;
-import androidx.legacy.widget.Space;
-import androidx.appcompat.widget.PopupMenu;
-import android.text.Editable;
-import android.text.InputType;
-import android.text.TextUtils;
-import android.text.TextWatcher;
-import android.text.method.DigitsKeyListener;
-import android.util.Base64;
-import android.util.Log;
-import android.util.TypedValue;
-import android.view.Gravity;
-import android.view.LayoutInflater;
-import android.view.MenuItem;
-import android.view.MotionEvent;
-import android.view.View;
-import android.view.ViewGroup;
-import android.webkit.CookieManager;
-import android.widget.CheckBox;
-import android.widget.CompoundButton;
-import android.widget.EditText;
-import android.widget.FrameLayout;
-import android.widget.HorizontalScrollView;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
-import android.widget.ScrollView;
-import android.widget.SeekBar;
-import android.widget.TextView;
-import android.widget.Toast;
 
-import com.afollestad.materialdialogs.DialogAction;
-import com.afollestad.materialdialogs.GravityEnum;
-import com.afollestad.materialdialogs.MaterialDialog;
-import com.darsh.multipleimageselect.activities.AlbumSelectActivity;
-import com.darsh.multipleimageselect.helpers.Constants;
-import com.darsh.multipleimageselect.models.Image;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.gcacace.signaturepad.views.SignaturePad;
-import com.github.mikephil.charting.charts.BarChart;
-import com.github.mikephil.charting.charts.LineChart;
-import com.github.mikephil.charting.components.AxisBase;
-import com.github.mikephil.charting.components.XAxis;
-import com.github.mikephil.charting.components.YAxis;
-import com.github.mikephil.charting.data.BarData;
-import com.github.mikephil.charting.data.BarDataSet;
-import com.github.mikephil.charting.data.BarEntry;
-import com.github.mikephil.charting.data.Entry;
-import com.github.mikephil.charting.data.LineData;
-import com.github.mikephil.charting.data.LineDataSet;
-import com.github.mikephil.charting.formatter.IAxisValueFormatter;
-import com.github.mikephil.charting.renderer.XAxisRenderer;
-import com.github.mikephil.charting.utils.MPPointF;
-import com.github.mikephil.charting.utils.Transformer;
-import com.github.mikephil.charting.utils.ViewPortHandler;
-import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.location.LocationServices;
-import com.lalongooo.videocompressor.video.MediaController;
+        package org.dev_alex.mojo_qa.mojo.fragments;
 
-import net.cachapa.expandablelayout.ExpandableLayout;
-import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent;
+        import android.Manifest;
+        import android.annotation.SuppressLint;
+        import android.app.ProgressDialog;
+        import android.content.Context;
+        import android.content.Intent;
+        import android.content.SharedPreferences;
+        import android.content.pm.PackageManager;
+        import android.content.res.Resources;
+        import android.graphics.Bitmap;
+        import android.graphics.Bitmap.Config;
+        import android.graphics.BitmapFactory;
+        import android.graphics.Canvas;
+        import android.graphics.Color;
+        import android.graphics.Paint;
+        import android.graphics.PorterDuff;
+        import android.graphics.Rect;
+        import android.graphics.drawable.Drawable;
+        import android.graphics.drawable.GradientDrawable;
+        import android.graphics.drawable.LayerDrawable;
+        import android.location.Location;
+        import android.media.ExifInterface;
+        import android.media.ThumbnailUtils;
+        import android.net.Uri;
+        import android.os.AsyncTask;
+        import android.os.Build;
+        import android.os.Bundle;
+        import android.os.Environment;
+        import android.os.Handler;
+        import android.provider.MediaStore;
+        import androidx.annotation.Nullable;
+        import androidx.core.app.ActivityCompat;
+        import androidx.fragment.app.Fragment;
+        import androidx.core.content.ContextCompat;
+        import androidx.core.content.FileProvider;
+        import androidx.core.util.Pair;
+        import androidx.drawerlayout.widget.DrawerLayout;
+        import androidx.legacy.widget.Space;
+        import androidx.appcompat.widget.PopupMenu;
+        import android.text.Editable;
+        import android.text.InputType;
+        import android.text.TextUtils;
+        import android.text.TextWatcher;
+        import android.text.method.DigitsKeyListener;
+        import android.util.Base64;
+        import android.util.Log;
+        import android.util.TypedValue;
+        import android.view.Gravity;
+        import android.view.LayoutInflater;
+        import android.view.MenuItem;
+        import android.view.MotionEvent;
+        import android.view.View;
+        import android.view.ViewGroup;
+        import android.webkit.CookieManager;
+        import android.widget.CheckBox;
+        import android.widget.CompoundButton;
+        import android.widget.EditText;
+        import android.widget.FrameLayout;
+        import android.widget.HorizontalScrollView;
+        import android.widget.ImageView;
+        import android.widget.LinearLayout;
+        import android.widget.RelativeLayout;
+        import android.widget.ScrollView;
+        import android.widget.SeekBar;
+        import android.widget.TextView;
+        import android.widget.Toast;
 
-import org.dev_alex.mojo_qa.mojo.App;
-import org.dev_alex.mojo_qa.mojo.BuildConfig;
-import org.dev_alex.mojo_qa.mojo.Data;
-import org.dev_alex.mojo_qa.mojo.R;
-import org.dev_alex.mojo_qa.mojo.activities.AuthActivity;
-import org.dev_alex.mojo_qa.mojo.activities.ImageViewActivity;
-import org.dev_alex.mojo_qa.mojo.activities.MainActivity;
-import org.dev_alex.mojo_qa.mojo.activities.OpenLinkActivity;
-import org.dev_alex.mojo_qa.mojo.custom_views.CustomWebview;
-import org.dev_alex.mojo_qa.mojo.custom_views.camera.CustomCamera2Activity;
-import org.dev_alex.mojo_qa.mojo.custom_views.indicator.IndicatorLayout;
-import org.dev_alex.mojo_qa.mojo.models.IndicatorModel;
-import org.dev_alex.mojo_qa.mojo.models.Page;
-import org.dev_alex.mojo_qa.mojo.models.User;
-import org.dev_alex.mojo_qa.mojo.services.BitmapService;
-import org.dev_alex.mojo_qa.mojo.services.LoginHistoryService;
-import org.dev_alex.mojo_qa.mojo.services.RequestService;
-import org.dev_alex.mojo_qa.mojo.services.TokenService;
-import org.dev_alex.mojo_qa.mojo.services.Utils;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
+        import com.afollestad.materialdialogs.DialogAction;
+        import com.afollestad.materialdialogs.GravityEnum;
+        import com.afollestad.materialdialogs.MaterialDialog;
+        import com.darsh.multipleimageselect.activities.AlbumSelectActivity;
+        import com.darsh.multipleimageselect.helpers.Constants;
+        import com.darsh.multipleimageselect.models.Image;
+        import com.fasterxml.jackson.core.type.TypeReference;
+        import com.fasterxml.jackson.databind.ObjectMapper;
+        import com.github.gcacace.signaturepad.views.SignaturePad;
+        import com.github.mikephil.charting.charts.BarChart;
+        import com.github.mikephil.charting.charts.LineChart;
+        import com.github.mikephil.charting.components.AxisBase;
+        import com.github.mikephil.charting.components.XAxis;
+        import com.github.mikephil.charting.components.YAxis;
+        import com.github.mikephil.charting.data.BarData;
+        import com.github.mikephil.charting.data.BarDataSet;
+        import com.github.mikephil.charting.data.BarEntry;
+        import com.github.mikephil.charting.data.Entry;
+        import com.github.mikephil.charting.data.LineData;
+        import com.github.mikephil.charting.data.LineDataSet;
+        import com.github.mikephil.charting.formatter.IAxisValueFormatter;
+        import com.github.mikephil.charting.renderer.XAxisRenderer;
+        import com.github.mikephil.charting.utils.MPPointF;
+        import com.github.mikephil.charting.utils.Transformer;
+        import com.github.mikephil.charting.utils.ViewPortHandler;
+        import com.google.android.gms.location.FusedLocationProviderClient;
+        import com.google.android.gms.location.LocationServices;
+        import com.lalongooo.videocompressor.video.MediaController;
 
-import java.io.File;
-import java.io.IOException;
-import java.net.HttpURLConnection;
-import java.net.URISyntaxException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Locale;
-import java.util.TimeZone;
-import java.util.UUID;
+        import net.cachapa.expandablelayout.ExpandableLayout;
+        import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent;
 
-import icepick.Icepick;
-import icepick.State;
-import io.reactivex.Observable;
-import io.reactivex.ObservableSource;
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.annotations.NonNull;
-import io.reactivex.functions.Consumer;
-import io.reactivex.functions.Function;
-import io.reactivex.schedulers.Schedulers;
-import okhttp3.Call;
-import okhttp3.Callback;
-import okhttp3.FormBody;
-import okhttp3.MediaType;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.RequestBody;
-import okhttp3.Response;
-import okhttp3.ResponseBody;
-import okio.BufferedSink;
-import okio.Okio;
+        import org.dev_alex.mojo_qa.mojo.App;
+        import org.dev_alex.mojo_qa.mojo.BuildConfig;
+        import org.dev_alex.mojo_qa.mojo.Data;
+        import org.dev_alex.mojo_qa.mojo.R;
+        import org.dev_alex.mojo_qa.mojo.activities.AuthActivity;
+        import org.dev_alex.mojo_qa.mojo.activities.ImageViewActivity;
+        import org.dev_alex.mojo_qa.mojo.activities.MainActivity;
+        import org.dev_alex.mojo_qa.mojo.activities.OpenLinkActivity;
+        import org.dev_alex.mojo_qa.mojo.custom_views.CustomWebview;
+        import org.dev_alex.mojo_qa.mojo.custom_views.camera.CustomCamera2Activity;
+        import org.dev_alex.mojo_qa.mojo.custom_views.indicator.IndicatorLayout;
+        import org.dev_alex.mojo_qa.mojo.models.IndicatorModel;
+        import org.dev_alex.mojo_qa.mojo.models.Page;
+        import org.dev_alex.mojo_qa.mojo.models.User;
+        import org.dev_alex.mojo_qa.mojo.services.BitmapService;
+        import org.dev_alex.mojo_qa.mojo.services.LoginHistoryService;
+        import org.dev_alex.mojo_qa.mojo.services.RequestService;
+        import org.dev_alex.mojo_qa.mojo.services.TokenService;
+        import org.dev_alex.mojo_qa.mojo.services.Utils;
+        import org.json.JSONArray;
+        import org.json.JSONException;
+        import org.json.JSONObject;
+        import org.jsoup.Jsoup;
+        import org.jsoup.nodes.Document;
 
-import static android.app.Activity.RESULT_OK;
-import static org.dev_alex.mojo_qa.mojo.services.Utils.setupCloseKeyboardUI;
+        import java.io.File;
+        import java.io.IOException;
+        import java.net.HttpURLConnection;
+        import java.net.URISyntaxException;
+        import java.text.ParseException;
+        import java.text.SimpleDateFormat;
+        import java.util.ArrayList;
+        import java.util.Date;
+        import java.util.Iterator;
+        import java.util.List;
+        import java.util.Locale;
+        import java.util.TimeZone;
+        import java.util.UUID;
+
+        import icepick.Icepick;
+        import icepick.State;
+        import io.reactivex.Observable;
+        import io.reactivex.ObservableSource;
+        import io.reactivex.android.schedulers.AndroidSchedulers;
+        import io.reactivex.annotations.NonNull;
+        import io.reactivex.functions.Consumer;
+        import io.reactivex.functions.Function;
+        import io.reactivex.schedulers.Schedulers;
+        import okhttp3.Call;
+        import okhttp3.Callback;
+        import okhttp3.FormBody;
+        import okhttp3.MediaType;
+        import okhttp3.OkHttpClient;
+        import okhttp3.Request;
+        import okhttp3.RequestBody;
+        import okhttp3.Response;
+        import okhttp3.ResponseBody;
+        import okio.BufferedSink;
+        import okio.Okio;
+
+        import static android.app.Activity.RESULT_OK;
+        import static org.dev_alex.mojo_qa.mojo.services.Utils.setupCloseKeyboardUI;
 
 public class TemplateFragment extends Fragment {
     private static String NODE_FOR_TASKS = "229ed0ec-3592-4788-87f0-6b0616599166";
@@ -205,6 +207,8 @@ public class TemplateFragment extends Fragment {
     private Handler handler;
 
     private boolean waiting = false;
+
+    View seporator;
 
     private Location userLocation = null;
 
@@ -761,18 +765,22 @@ public class TemplateFragment extends Fragment {
         for (int i = 0; i < fields.size(); i++) {
             int paddings = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 10, getResources().getDisplayMetrics());
             final JSONObject value = dataJson.getJSONObject(i).getJSONObject(fields.get(i));
+            seporator = getActivity().getLayoutInflater().inflate(R.layout.separator, container, false);
 
             switch (fields.get(i)) {
                 case "category":
                     createCategory(value, container, offset);
+                    container.addView(seporator);
                     break;
 
                 case "question":
                     createSelectBtnContainer(value, container, offset);
+                    container.addView(seporator);
                     break;
 
                 case "lineedit":
                     final LinearLayout editTextSingleLineContainer = (LinearLayout) getActivity().getLayoutInflater().inflate(R.layout.lineedit, container, false);
+                    container.addView(seporator);
                     ((ViewGroup) editTextSingleLineContainer.getChildAt(0)).getChildAt(1).setVisibility((value.has("is_required") && !value.getBoolean("is_required")) ? View.GONE : View.VISIBLE);
 
                     if (value.has("caption"))
@@ -830,6 +838,8 @@ public class TemplateFragment extends Fragment {
 
                 case "textarea":
                     final LinearLayout editTextMultiLineContainer = (LinearLayout) getActivity().getLayoutInflater().inflate(R.layout.textarea, container, false);
+                    container.addView(seporator);
+
                     ((ViewGroup) editTextMultiLineContainer.getChildAt(0)).getChildAt(1).setVisibility((value.has("is_required") && !value.getBoolean("is_required")) ? View.GONE : View.VISIBLE);
 
                     if (value.has("caption"))
@@ -886,6 +896,8 @@ public class TemplateFragment extends Fragment {
 
                 case "money":
                     final LinearLayout moneyContainer = (LinearLayout) getActivity().getLayoutInflater().inflate(R.layout.text_plan, container, false);
+                    container.addView(seporator);
+
                     ((ViewGroup) moneyContainer.getChildAt(0)).getChildAt(1).setVisibility((value.has("is_required") && !value.getBoolean("is_required")) ? View.GONE : View.VISIBLE);
                     final EditText etPlan = ((EditText) ((ViewGroup) ((ViewGroup) ((ViewGroup) moneyContainer.getChildAt(1)).getChildAt(0)).getChildAt(1)).getChildAt(0));
                     final View tvPlanLabel = ((ViewGroup) ((ViewGroup) ((ViewGroup) moneyContainer.getChildAt(1)).getChildAt(0)).getChildAt(0)).getChildAt(0);
@@ -1011,14 +1023,20 @@ public class TemplateFragment extends Fragment {
                     }
 
                     container.addView(boxInContainerWithId(checkBoxContainer, value.getString("id")));
+                    container.addView(seporator);
+
                     break;
 
                 case "slider":
                     createSeekBar(value, container);
+                    container.addView(seporator);
+
                     break;
 
                 case "photo":
                     createMediaBlock(value, container);
+                    container.addView(seporator);
+
                     break;
 
                 case "richedit":
@@ -1035,6 +1053,7 @@ public class TemplateFragment extends Fragment {
                         CustomWebview richEdit = new CustomWebview(getContext());
                         LinearLayout.LayoutParams richEditLayoutParams = new LinearLayout.LayoutParams
                                 (ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                        container.addView(seporator);
 
                         richEdit.getSettings().setBuiltInZoomControls(true);
                         richEdit.getSettings().setSupportZoom(true);
@@ -1073,6 +1092,8 @@ public class TemplateFragment extends Fragment {
 
                 case "signature":
                     createSignature(value, container);
+                    container.addView(seporator);
+
                     break;
 
                 case "indicator":
@@ -1094,7 +1115,10 @@ public class TemplateFragment extends Fragment {
                                 break;
 
                         }
+                        container.addView(seporator);
+
                         container.addView(indicator);
+
 
                         LinearLayout.LayoutParams layoutParams = (LinearLayout.LayoutParams) indicator.getLayoutParams();
                         layoutParams.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 180, resources.getDisplayMetrics());
@@ -2236,6 +2260,7 @@ public class TemplateFragment extends Fragment {
 
         if (container != null)
             container.setBackgroundColor(Color.parseColor("#FEDADA"));
+
     }
 
     private void setCategoryMarkedAsRequired(String tag) {
@@ -2243,6 +2268,7 @@ public class TemplateFragment extends Fragment {
             requiredCategoriesTags.add(tag);
 
         ViewGroup categoryHeader = getCategoryByTag(tag + "_head");
+
         ViewGroup categoryContainer = getCategoryByTag(tag + "_cont");
 
         if (categoryHeader != null)
@@ -3719,12 +3745,10 @@ public class TemplateFragment extends Fragment {
                 fields.add(currentKey);
             }
         }
-
         for (int i = 0; i < fields.size(); i++) {
             final JSONObject value = dataJson.getJSONObject(i).getJSONObject(fields.get(i));
             resetRequiredBlock(value.getString("id"));
             resetCategoryColor(value.getString("id"), offset);
-
             switch (fields.get(i)) {
                 case "category":
                     Pair<Boolean, ArrayList<JSONObject>> result = checkIfContainerIsFilled(value.getJSONArray("items"), offset + 1);
