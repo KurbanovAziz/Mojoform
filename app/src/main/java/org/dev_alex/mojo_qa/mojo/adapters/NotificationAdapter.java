@@ -4,7 +4,13 @@ package org.dev_alex.mojo_qa.mojo.adapters;
 import android.content.Context;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.content.res.AppCompatResources;
+import androidx.core.graphics.drawable.DrawableCompat;
 import androidx.recyclerview.widget.RecyclerView;
+
+import android.graphics.Color;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.GradientDrawable;
 import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -40,9 +46,11 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
         TextView notificationDate;
         TextView notificationDescription;
         ImageView moreBtn;
+        ImageView notification_bell;
         Button btDownloadPdf;
         Button btDownloadDoc;
         View vButtonsBlock;
+        View unread_line;
 
         ExpandableLayout expandableLayout;
         View btClose;
@@ -63,6 +71,7 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
             expandableLayout = itemView.findViewById(R.id.vExpandable);
             mainNotificationView = itemView.findViewById(R.id.vMainNotificationBlock);
             notificationNewBorder = itemView.findViewById(R.id.vNotificationUnread);
+            notification_bell = itemView.findViewById(R.id.notification_bell);
         }
     }
 
@@ -82,6 +91,8 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
         Context context = viewHolder.itemView.getContext();
         String finishTime = notification.task.complete_time == null ? context.getString(R.string.unknown) :
                 sdf.format(new Date(notification.task.complete_time));
+        if(notification.color != null){
+            viewHolder.notification_bell.setColorFilter(Color.parseColor(notification.color));}
 
         String executorPart;
         if (notification.task.executor == null) {
@@ -113,6 +124,13 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
             viewHolder.expandableLayout.toggle(true);
 
             if (!notification.is_readed) {
+                if(notification.color != null){
+                    viewHolder.notificationNewBorder.setBackgroundColor(Color.parseColor(notification.color));
+                    GradientDrawable gd = new GradientDrawable();
+                    gd.setColor(Color.parseColor("#00000000"));
+                    gd.setCornerRadius(8);
+                    gd.setStroke(4, Color.parseColor(notification.color));
+                    viewHolder.notificationNewBorder.setBackgroundDrawable(gd);}
                 viewHolder.notificationNewBorder.setVisibility(View.GONE);
                 notification.is_readed = true;
 
@@ -121,6 +139,15 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
         });
 
         if (notification.needExpand) {
+            if(notification.color != null){
+                viewHolder.notificationNewBorder.setBackgroundColor(Color.parseColor(notification.color));
+                GradientDrawable gd = new GradientDrawable();
+                gd.setShape(GradientDrawable.RECTANGLE);
+                gd.setColor(Color.parseColor("#00000000"));
+                gd.setCornerRadius(10);
+                gd.setStroke(3, Color.parseColor(notification.color));
+                gd.setSize(450, 150);
+                viewHolder.notificationNewBorder.setBackgroundDrawable(gd);}
             notification.needExpand = false;
             viewHolder.expandableLayout.expand(false);
             viewHolder.notificationNewBorder.setVisibility(View.GONE);
@@ -133,6 +160,13 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
 
         viewHolder.btDownloadPdf.setOnClickListener(v -> listener.onDownloadPdfClick(notification));
         viewHolder.btDownloadDoc.setOnClickListener(v -> listener.onDownloadDocClick(notification));
+        if(notification.color != null){
+            viewHolder.notificationNewBorder.setBackgroundColor(Color.parseColor(notification.color));
+            GradientDrawable gd = new GradientDrawable();
+            gd.setColor(Color.parseColor("#00000000"));
+            gd.setCornerRadius(12);
+            gd.setStroke(7, Color.parseColor(notification.color));
+            viewHolder.notificationNewBorder.setBackgroundDrawable(gd);}
         viewHolder.notificationNewBorder.setVisibility(notification.is_readed ? View.GONE : View.VISIBLE);
     }
 
