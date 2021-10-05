@@ -8,7 +8,9 @@ public class Notification {
     public NotificationTask task;
     public String type;
     public boolean is_readed;
+    public String color;
     public Long create_date;
+
 
     public boolean needExpand = false;
 
