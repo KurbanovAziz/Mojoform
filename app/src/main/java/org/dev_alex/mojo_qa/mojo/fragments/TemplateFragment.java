@@ -781,8 +781,9 @@ public class TemplateFragment extends Fragment {
                     if(container.getParent() != null) {
                         ((ViewGroup)container.getParent()).removeView(container); // <- fix
                     }
-                    createSelectBtnContainer(value, container, offset);
                     container.addView(seporator);
+
+                    createSelectBtnContainer(value, container, offset);
                     break;
 
                 case "lineedit":
@@ -790,6 +791,8 @@ public class TemplateFragment extends Fragment {
                     if(container.getParent() != null) {
                         ((ViewGroup)container.getParent()).removeView(container); // <- fix
                     }
+                    container.addView(seporator);
+
                     ((ViewGroup) editTextSingleLineContainer.getChildAt(0)).getChildAt(1).setVisibility((value.has("is_required") && !value.getBoolean("is_required")) ? View.GONE : View.VISIBLE);
 
                     if (value.has("caption"))
@@ -847,9 +850,12 @@ public class TemplateFragment extends Fragment {
 
                 case "textarea":
                     final LinearLayout editTextMultiLineContainer = (LinearLayout) getActivity().getLayoutInflater().inflate(R.layout.textarea, container, false);
+
                     if(container.getParent() != null) {
                         ((ViewGroup)container.getParent()).removeView(container); // <- fix
                     }
+                    container.addView(seporator);
+
 
                     ((ViewGroup) editTextMultiLineContainer.getChildAt(0)).getChildAt(1).setVisibility((value.has("is_required") && !value.getBoolean("is_required")) ? View.GONE : View.VISIBLE);
 
@@ -910,6 +916,8 @@ public class TemplateFragment extends Fragment {
                     if(container.getParent() != null) {
                         ((ViewGroup)container.getParent()).removeView(container); // <- fix
                     }
+                    container.addView(seporator);
+
 
                     ((ViewGroup) moneyContainer.getChildAt(0)).getChildAt(1).setVisibility((value.has("is_required") && !value.getBoolean("is_required")) ? View.GONE : View.VISIBLE);
                     final EditText etPlan = ((EditText) ((ViewGroup) ((ViewGroup) ((ViewGroup) moneyContainer.getChildAt(1)).getChildAt(0)).getChildAt(1)).getChildAt(0));
@@ -1008,6 +1016,7 @@ public class TemplateFragment extends Fragment {
 
                 case "checkbox":
                     LinearLayout checkBoxContainer = (LinearLayout) getActivity().getLayoutInflater().inflate(R.layout.checkbox, container, false);
+                    container.addView(seporator);
 
                     if (value.has("caption"))
                         ((TextView) checkBoxContainer.getChildAt(1)).setText(value.getString("caption"));
@@ -1035,8 +1044,8 @@ public class TemplateFragment extends Fragment {
                         ((CheckBox) checkBoxContainer.getChildAt(0)).setChecked(false);
                     }
 
+
                     container.addView(boxInContainerWithId(checkBoxContainer, value.getString("id")));
-                    container.addView(seporator);
 
                     break;
 
@@ -1044,8 +1053,9 @@ public class TemplateFragment extends Fragment {
                     if(container.getParent() != null) {
                         ((ViewGroup)container.getParent()).removeView(container); // <- fix
                     }
-                    createSeekBar(value, container);
                     container.addView(seporator);
+
+                    createSeekBar(value, container);
 
                     break;
 
@@ -1053,9 +1063,9 @@ public class TemplateFragment extends Fragment {
                     if(container.getParent() != null) {
                         ((ViewGroup)container.getParent()).removeView(container); // <- fix
                     }
+                    container.addView(seporator);
 
                     createMediaBlock(value, container);
-                    container.addView(seporator);
 
                     break;
 
@@ -1063,6 +1073,8 @@ public class TemplateFragment extends Fragment {
                     if(container.getParent() != null) {
                         ((ViewGroup)container.getParent()).removeView(container); // <- fix
                     }
+                    container.addView(seporator);
+
                     if (value.has("caption")) {
                         TextView caption = new TextView(getContext());
                         caption.setText(value.getString("caption"));
@@ -1116,8 +1128,9 @@ public class TemplateFragment extends Fragment {
                     if(container.getParent() != null) {
                         ((ViewGroup)container.getParent()).removeView(container); // <- fix
                     }
-                    createSignature(value, container);
                     container.addView(seporator);
+
+                    createSignature(value, container);
 
                     break;
 
