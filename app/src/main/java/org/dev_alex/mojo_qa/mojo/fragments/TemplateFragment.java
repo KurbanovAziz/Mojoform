@@ -769,18 +769,27 @@ public class TemplateFragment extends Fragment {
 
             switch (fields.get(i)) {
                 case "category":
-                    createCategory(value, container, offset);
+                    if(container.getParent() != null) {
+                        ((ViewGroup)container.getParent()).removeView(container); // <- fix
+                    }
                     container.addView(seporator);
+
+                    createCategory(value, container, offset);
                     break;
 
                 case "question":
+                    if(container.getParent() != null) {
+                        ((ViewGroup)container.getParent()).removeView(container); // <- fix
+                    }
                     createSelectBtnContainer(value, container, offset);
                     container.addView(seporator);
                     break;
 
                 case "lineedit":
                     final LinearLayout editTextSingleLineContainer = (LinearLayout) getActivity().getLayoutInflater().inflate(R.layout.lineedit, container, false);
-                    container.addView(seporator);
+                    if(container.getParent() != null) {
+                        ((ViewGroup)container.getParent()).removeView(container); // <- fix
+                    }
                     ((ViewGroup) editTextSingleLineContainer.getChildAt(0)).getChildAt(1).setVisibility((value.has("is_required") && !value.getBoolean("is_required")) ? View.GONE : View.VISIBLE);
 
                     if (value.has("caption"))
@@ -838,7 +847,9 @@ public class TemplateFragment extends Fragment {
 
                 case "textarea":
                     final LinearLayout editTextMultiLineContainer = (LinearLayout) getActivity().getLayoutInflater().inflate(R.layout.textarea, container, false);
-                    container.addView(seporator);
+                    if(container.getParent() != null) {
+                        ((ViewGroup)container.getParent()).removeView(container); // <- fix
+                    }
 
                     ((ViewGroup) editTextMultiLineContainer.getChildAt(0)).getChildAt(1).setVisibility((value.has("is_required") && !value.getBoolean("is_required")) ? View.GONE : View.VISIBLE);
 
@@ -896,7 +907,9 @@ public class TemplateFragment extends Fragment {
 
                 case "money":
                     final LinearLayout moneyContainer = (LinearLayout) getActivity().getLayoutInflater().inflate(R.layout.text_plan, container, false);
-                    container.addView(seporator);
+                    if(container.getParent() != null) {
+                        ((ViewGroup)container.getParent()).removeView(container); // <- fix
+                    }
 
                     ((ViewGroup) moneyContainer.getChildAt(0)).getChildAt(1).setVisibility((value.has("is_required") && !value.getBoolean("is_required")) ? View.GONE : View.VISIBLE);
                     final EditText etPlan = ((EditText) ((ViewGroup) ((ViewGroup) ((ViewGroup) moneyContainer.getChildAt(1)).getChildAt(0)).getChildAt(1)).getChildAt(0));
@@ -1028,18 +1041,28 @@ public class TemplateFragment extends Fragment {
                     break;
 
                 case "slider":
+                    if(container.getParent() != null) {
+                        ((ViewGroup)container.getParent()).removeView(container); // <- fix
+                    }
                     createSeekBar(value, container);
                     container.addView(seporator);
 
                     break;
 
                 case "photo":
+                    if(container.getParent() != null) {
+                        ((ViewGroup)container.getParent()).removeView(container); // <- fix
+                    }
+
                     createMediaBlock(value, container);
                     container.addView(seporator);
 
                     break;
 
                 case "richedit":
+                    if(container.getParent() != null) {
+                        ((ViewGroup)container.getParent()).removeView(container); // <- fix
+                    }
                     if (value.has("caption")) {
                         TextView caption = new TextView(getContext());
                         caption.setText(value.getString("caption"));
@@ -1053,7 +1076,6 @@ public class TemplateFragment extends Fragment {
                         CustomWebview richEdit = new CustomWebview(getContext());
                         LinearLayout.LayoutParams richEditLayoutParams = new LinearLayout.LayoutParams
                                 (ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-                        container.addView(seporator);
 
                         richEdit.getSettings().setBuiltInZoomControls(true);
                         richEdit.getSettings().setSupportZoom(true);
@@ -1091,6 +1113,9 @@ public class TemplateFragment extends Fragment {
                     break;
 
                 case "signature":
+                    if(container.getParent() != null) {
+                        ((ViewGroup)container.getParent()).removeView(container); // <- fix
+                    }
                     createSignature(value, container);
                     container.addView(seporator);
 
@@ -1115,9 +1140,12 @@ public class TemplateFragment extends Fragment {
                                 break;
 
                         }
-                        container.addView(seporator);
+                        if(container.getParent() != null) {
+                            ((ViewGroup)container.getParent()).removeView(container); // <- fix
+                        }
 
                         container.addView(indicator);
+
 
 
                         LinearLayout.LayoutParams layoutParams = (LinearLayout.LayoutParams) indicator.getLayoutParams();
