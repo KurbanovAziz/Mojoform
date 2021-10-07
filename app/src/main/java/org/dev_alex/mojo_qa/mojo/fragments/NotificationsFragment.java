@@ -67,6 +67,8 @@ public class NotificationsFragment extends Fragment implements NotificationAdapt
     private RecyclerView recyclerView;
     private RelativeLayout sortTypePopupWindow;
 
+    private static boolean needUpdate = true;
+
     private ArrayList<Notification> notifications;
 
     private String searchText = null;
@@ -275,6 +277,7 @@ public class NotificationsFragment extends Fragment implements NotificationAdapt
                 sortTypePopupWindow.findViewById(R.id.sort_by_name_tick).setVisibility(View.VISIBLE);
                 sortType = SORT_BY_NAME;
                 sortTypePopupWindow.setVisibility(View.GONE);
+                needUpdate = true;
                 updateNotifications();
             }
         });
@@ -289,6 +292,8 @@ public class NotificationsFragment extends Fragment implements NotificationAdapt
 
                 sortType = SORT_BY_NAME_DESC;
                 sortTypePopupWindow.setVisibility(View.GONE);
+                needUpdate = true;
+
                 updateNotifications();
             }
         });
@@ -304,6 +309,7 @@ public class NotificationsFragment extends Fragment implements NotificationAdapt
 
                 sortType = SORT_BY_CREATED_AT;
                 sortTypePopupWindow.setVisibility(View.GONE);
+                needUpdate = true;
                 updateNotifications();
             }
         });
@@ -319,6 +325,8 @@ public class NotificationsFragment extends Fragment implements NotificationAdapt
 
                 sortType = SORT_BY_CREATED_AT_DESC;
                 sortTypePopupWindow.setVisibility(View.GONE);
+                needUpdate = true;
+
                 updateNotifications();
             }
         });
@@ -335,7 +343,8 @@ public class NotificationsFragment extends Fragment implements NotificationAdapt
 
 
     private void updateNotifications() {
-        new GetNotificationsTask().execute();
+        if(needUpdate){
+        new GetNotificationsTask().execute();}
     }
 
     private void styleNotificationBadge() {
@@ -507,7 +516,7 @@ public class NotificationsFragment extends Fragment implements NotificationAdapt
         DownloadPdfTask(long id, String name) {
             this.id = id;
             this.name = name;
-        }
+            needUpdate = false;       }
 
         @Override
         protected void onPreExecute() {
@@ -581,6 +590,7 @@ public class NotificationsFragment extends Fragment implements NotificationAdapt
         DownloadDocTask(long id, String name) {
             this.id = id;
             this.name = name;
+            needUpdate = false;
         }
 
         @Override
