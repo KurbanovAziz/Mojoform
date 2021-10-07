@@ -24,7 +24,7 @@
                 android:layout_marginRight="5dp"
                 android:layout_toLeftOf="@+id/select_layout_close"
                 android:textColor="@color/accent"
-                android:textSize="16sp" />
+                android:textSize="18sp"/>
 
             <ImageView
                 android:id="@+id/select_layout_close"
