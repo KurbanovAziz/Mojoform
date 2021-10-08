@@ -21,7 +21,7 @@
         android:layout_marginRight="5dp"
         android:gravity="center"
         android:textAlignment="center"
-        android:textSize="18sp" />
+        android:textSize="19sp" />
 
     <SeekBar
         android:id="@+id/seekBar"

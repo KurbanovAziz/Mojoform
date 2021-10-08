@@ -33,7 +33,7 @@ public class AuthActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_auth);
         initDialog();
-        startActivity(new Intent(AuthActivity.this, MainActivity.class));
+       // startActivity(new Intent(AuthActivity.this, MainActivity.class));
 
         if (!OnboardingActivity.isOnboardingFinished())
             startActivity(new Intent(this, OnboardingActivity.class));
