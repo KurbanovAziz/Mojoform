@@ -12,14 +12,14 @@
         android:id="@+id/checkBox"
         android:layout_width="50dp"
         android:layout_height="50dp"
+        android:gravity="center"
         android:button="@drawable/custom_check_box" />
 
     <TextView
         android:layout_width="match_parent"
-        android:layout_height="109dp"
-        android:layout_marginTop="-9dp"
+        android:layout_gravity="center"
+        android:layout_height="wrap_content"
         android:textSize="18sp"
-        android:layout_marginBottom="10dp"
         tools:text="11" />
 
 </LinearLayout>

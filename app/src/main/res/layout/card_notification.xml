@@ -47,12 +47,11 @@
                 <ImageView
                     android:id="@+id/notification_bell"
 
-                    android:layout_width="20dp"
+                    android:layout_width="14dp"
                     android:layout_height="20dp"
                     android:layout_marginLeft="8dp"
                     android:layout_marginTop="6dp"
-                    android:adjustViewBounds="true"
-                    android:src="@drawable/bell_image" />
+                    android:adjustViewBounds="true" />
 
                 <LinearLayout
                     android:layout_width="wrap_content"

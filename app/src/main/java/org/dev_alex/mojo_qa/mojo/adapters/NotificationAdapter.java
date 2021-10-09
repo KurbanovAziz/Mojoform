@@ -91,8 +91,16 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
         Context context = viewHolder.itemView.getContext();
         String finishTime = notification.task.complete_time == null ? context.getString(R.string.unknown) :
                 sdf.format(new Date(notification.task.complete_time));
+
+
         if(notification.color != null){
-            viewHolder.notification_bell.setColorFilter(Color.parseColor(notification.color));}
+            viewHolder.notification_bell.setImageResource(R.drawable.bell_image);
+
+            viewHolder.notification_bell.setColorFilter(Color.parseColor(notification.color));
+            }
+        else {viewHolder.notification_bell.setImageResource(R.drawable.bell_task);
+        }
+
 
         String executorPart;
         if (notification.task.executor == null) {

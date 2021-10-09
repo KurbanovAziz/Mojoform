@@ -20,7 +20,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="8dp"
                 android:layout_marginRight="8dp"
-                android:layout_marginTop="7dp">
+                android:layout_marginTop="0dp">
 
                 <HorizontalScrollView
                     android:layout_width="wrap_content"
