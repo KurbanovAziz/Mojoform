@@ -769,7 +769,10 @@ public class TemplateFragment extends Fragment {
                 case "category":
 
                     createCategory(value, container, offset);
-                    container.addView(separator);
+                    if(container.getParent() != null) {
+                        ((ViewGroup)container.getParent()).removeView(container); // <- fix
+                    }
+                    //container.addView(separator);
 
                     break;
 
