@@ -768,20 +768,18 @@ public class TemplateFragment extends Fragment {
             switch (fields.get(i)) {
                 case "category":
 
-                    createCategory(value, container, offset);
-                    if(container.getParent() != null) {
-                        ((ViewGroup)container.getParent()).removeView(container); // <- fix
-                    }
+
                     //container.addView(separator);
+                    createCategory(value, container, offset);
+
 
                     break;
 
                 case "question":
-                    if(container.getParent() != null) {
-                        ((ViewGroup)container.getParent()).removeView(container); // <- fix
-                    }
-                    createSelectBtnContainer(value, container, offset);
                     container.addView(separator);
+
+
+                    createSelectBtnContainer(value, container, offset);
 
 
 
@@ -840,9 +838,9 @@ public class TemplateFragment extends Fragment {
                             }
                         });
                     }
+                    container.addView(separator);
 
                     container.addView(boxInContainerWithId(editTextSingleLineContainer, value.getString("id")));
-                    container.addView(separator);
 
                     break;
 
@@ -898,9 +896,9 @@ public class TemplateFragment extends Fragment {
                             }
                         });
                     }
+                    container.addView(separator);
 
                     container.addView(boxInContainerWithId(editTextMultiLineContainer, value.getString("id")));
-                    container.addView(separator);
 
                     break;
 
@@ -997,16 +995,15 @@ public class TemplateFragment extends Fragment {
                         btBarcode.setOnClickListener(view -> scanBarCode(captionLabel, value));
                         btQrCode.setOnClickListener(view -> scanQrCode(captionLabel, value));
                     }
+                    container.addView(separator);
 
                     container.addView(boxInContainerWithId(moneyContainer, value.getString("id")));
-                    container.addView(separator);
 
                     break;
 
                 case "checkbox":
                     LinearLayout checkBoxContainer = (LinearLayout) getActivity().getLayoutInflater().inflate(R.layout.checkbox, container, false);
 
-                   // checkBoxContainer.addView(separator);
                     if (value.has("caption"))
                         ((TextView) checkBoxContainer.getChildAt(1)).setText(value.getString("caption"));
                     else
@@ -1032,20 +1029,22 @@ public class TemplateFragment extends Fragment {
                         ((CheckBox) checkBoxContainer.getChildAt(0)).setChecked(true);
                         ((CheckBox) checkBoxContainer.getChildAt(0)).setChecked(false);
                     }
+                    container.addView(separator);
 
                     container.addView(boxInContainerWithId(checkBoxContainer, value.getString("id")));
-                    container.addView(separator);
 
                     break;
 
                 case "slider":
-                    createSeekBar(value, container);
                     container.addView(separator);
+
+                    createSeekBar(value, container);
 
 
                     break;
 
                 case "photo":
+                    container.addView(separator);
 
                     createMediaBlock(value, container);
 
@@ -1097,15 +1096,17 @@ public class TemplateFragment extends Fragment {
                             CookieManager.getInstance().setAcceptThirdPartyCookies(richEdit, true);
 
                         richEdit.loadDataWithBaseURL("", html, mime, encoding, null);
-                        container.addView(richEdit);
                         container.addView(separator);
+
+                        container.addView(richEdit);
 
                     }
                     break;
 
                 case "signature":
-                    createSignature(value, container);
                     container.addView(separator);
+
+                    createSignature(value, container);
 
                     break;
 
@@ -1504,9 +1505,9 @@ public class TemplateFragment extends Fragment {
         }
 
         LinearLayout categoryHeader = (LinearLayout) getActivity().getLayoutInflater().inflate(R.layout.category_header, container, false);
+
         categoryHeader.setTag(value.getString("id") + "_head");
         ((LayerDrawable) categoryHeader.getBackground()).findDrawableByLayerId(R.id.background).setColorFilter(color, PorterDuff.Mode.SRC_IN);
-
         if (value.has("name"))
             ((TextView) categoryHeader.getChildAt(1)).setText(value.getString("name"));
         else
@@ -1533,6 +1534,7 @@ public class TemplateFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 expandableLayout.toggle();
+
             }
         });
 
