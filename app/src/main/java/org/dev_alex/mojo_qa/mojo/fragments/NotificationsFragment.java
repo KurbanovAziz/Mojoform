@@ -120,8 +120,6 @@ public class NotificationsFragment extends Fragment implements NotificationAdapt
             }, 500);
         }
         sortType = SORT_BY_CREATED_AT_DESC;
-        updateNotifications();
-
         return rootView;
     }
 

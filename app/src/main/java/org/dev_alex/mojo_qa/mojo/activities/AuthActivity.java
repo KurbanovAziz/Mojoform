@@ -153,10 +153,28 @@ public class AuthActivity extends AppCompatActivity {
                         Intent intentData = getIntent();
                         String data = intentData.getDataString();
                         if(data != null){
+                            Toast.makeText(AuthActivity.this, "выпAuth" + data, Toast.LENGTH_LONG).show();
+
+                            if(data.contains("task")){
+
+                                String taskId = data.substring(data.lastIndexOf("/") + 1);
+                                Intent intentP = new Intent(AuthActivity.this, MainActivity.class);
+                                intentP.putExtra("task", taskId);
+                                startActivity(intentP);
+                                finish();
+                            }
+                            else if(data.contains("reports")){
+                                String taskId = data.substring(data.lastIndexOf("/") + 1);
+                                Intent intentP = new Intent(AuthActivity.this, MainActivity.class);
+                                intentP.putExtra("task", "e26906f0fb101f7d8eb1b6269f5ab3ef32152f69");
+                                startActivity(intentP);
+                                finish();
+                            }
+                            else{
                             Intent intentP = new Intent(AuthActivity.this, PlayerActivity.class);
                             intentP.putExtra("video", data);
                             startActivity(intentP);
-                            finish();
+                            finish();}
                         }
                         else {
                         Intent intent = new Intent(AuthActivity.this, MainActivity.class);

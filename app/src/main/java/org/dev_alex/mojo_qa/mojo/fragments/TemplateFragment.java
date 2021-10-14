@@ -218,7 +218,7 @@ public class TemplateFragment extends Fragment {
         fragment.setArguments(args);
         return fragment;
     }
-
+//
     public static TemplateFragment newInstance(String taskUUID, boolean isReportMode) {
         Bundle args = new Bundle();
         args.putString("task_uuid", taskUUID);
@@ -543,6 +543,7 @@ public class TemplateFragment extends Fragment {
 
     private void setPage(Page page) {
         try {
+            Toast.makeText(getContext(), page.name + " ! " + page.id, Toast.LENGTH_LONG).show();
             FrameLayout rootTemplateContainer = rootView.findViewById(R.id.root_container);
             rootTemplateContainer.removeAllViewsInLayout();
 

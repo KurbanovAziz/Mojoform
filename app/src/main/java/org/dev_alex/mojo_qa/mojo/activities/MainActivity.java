@@ -78,6 +78,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(null);
         setContentView(R.layout.activity_main);
 
+
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
             getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
 
@@ -97,6 +99,18 @@ public class MainActivity extends AppCompatActivity {
         }
 
         AppointmentsModel.INSTANCE.selfUpdate();
+        if (getIntent().hasExtra("task") ) {
+            String taskIdStr = getIntent().getStringExtra("task");
+            if (taskIdStr != null && !taskIdStr.isEmpty()) {
+                getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.container, TemplateFragment.newInstance(
+                                taskIdStr, false))
+                        .addToBackStack(null).commit();
+            }
+            return;
+        }
+
+
     }
 
     public void updateNotificationsBadge() {
@@ -132,7 +146,7 @@ public class MainActivity extends AppCompatActivity {
                 return;
             }
 
-            if (getIntent().hasExtra(MyFirebaseMessagingService.TASK_ID)) {
+            if (getIntent().hasExtra(MyFirebaseMessagingService.TASK_ID) ) {
                 String taskIdStr = getIntent().getStringExtra(MyFirebaseMessagingService.TASK_ID);
                 if (taskIdStr != null && !taskIdStr.isEmpty()) {
                     getSupportFragmentManager().beginTransaction()
@@ -141,8 +155,7 @@ public class MainActivity extends AppCompatActivity {
                             ))
                             .addToBackStack(null).commit();
                 }
-                return;
-            }
+
         }
 
         Uri data = intent.getData();
@@ -160,7 +173,7 @@ public class MainActivity extends AppCompatActivity {
                                 taskId, true)).addToBackStack(null).commit();
             }
         }
-    }
+    }}
 
     @Override
     protected void onNewIntent(Intent intent) {

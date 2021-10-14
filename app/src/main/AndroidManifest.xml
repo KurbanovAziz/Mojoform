@@ -74,6 +74,26 @@
                     android:host="mojo-qa.dev-alex.org"
                     android:pathPrefix="/attachment"/>
             </intent-filter>
+
+
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+                <data
+                    android:scheme="https"
+                    android:host="tasks.mojoform.com"
+                    android:pathPrefix="/tasks"/>
+            </intent-filter>
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+                <data
+                    android:scheme="https"
+                    android:host="tasks.mojoform.com"
+                    android:pathPrefix="/reports"/>
+            </intent-filter>
         </activity>
 
         <activity
