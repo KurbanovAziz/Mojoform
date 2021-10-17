@@ -77,40 +77,34 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(null);
         setContentView(R.layout.activity_main);
-
-
-
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
             getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-
         initDrawer();
         if (drawer == null) {
             return;
         }
-
         drawer.setSelectionAtPosition(1, true);
         checkData(getIntent());
-
         getSupportFragmentManager().addOnBackStackChangedListener(() -> updateNotificationsBadge());
-
         if (Data.pendingOpenTaskUUID != null) {
             startActivity(OpenLinkActivity.getActivityIntent(this, Data.pendingOpenTaskUUID, Data.isReportTaskMode));
             Data.pendingOpenTaskUUID = null;
         }
-
         AppointmentsModel.INSTANCE.selfUpdate();
+        checkLinkTask();
+    }
+
+    private void checkLinkTask() {
         if (getIntent().hasExtra("task") ) {
             String taskIdStr = getIntent().getStringExtra("task");
             if (taskIdStr != null && !taskIdStr.isEmpty()) {
                 getSupportFragmentManager().beginTransaction()
                         .replace(R.id.container, TemplateFragment.newInstance(
-                                taskIdStr, false))
+                                taskIdStr,  getIntent().getBooleanExtra("isReport", true)))
                         .addToBackStack(null).commit();
             }
             return;
         }
-
-
     }
 
     public void updateNotificationsBadge() {

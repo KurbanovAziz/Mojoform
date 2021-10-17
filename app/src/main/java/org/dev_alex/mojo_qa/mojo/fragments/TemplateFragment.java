@@ -543,7 +543,6 @@ public class TemplateFragment extends Fragment {
 
     private void setPage(Page page) {
         try {
-            Toast.makeText(getContext(), page.name + " ! " + page.id, Toast.LENGTH_LONG).show();
             FrameLayout rootTemplateContainer = rootView.findViewById(R.id.root_container);
             rootTemplateContainer.removeAllViewsInLayout();
 
