@@ -4085,4 +4085,12 @@ public class TemplateFragment extends Fragment {
                 com.github.mikephil.charting.utils.Utils.drawXAxisValue(c, line[1], x, y + mAxisLabelPaint.getTextSize(), mAxisLabelPaint, anchor, angleDegrees);
             }
         }
-    }}
+
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        saveTemplateState();
+    }
+}
