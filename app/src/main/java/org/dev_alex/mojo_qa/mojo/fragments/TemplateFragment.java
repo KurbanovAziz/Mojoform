@@ -383,8 +383,14 @@ public class TemplateFragment extends Fragment {
 
             if (new File(data.getData().getPath()).exists())
                 documentPath = data.getData().getPath();
-            else
-                documentPath = Utils.getPathFromUri(getContext(), data.getData());
+            else {
+                String uriStr;
+                if(!data.getData().toString().contains("0@media")){
+                uriStr = "content://0@media/external/file/" + data.getData().toString().substring(data.getData().toString().lastIndexOf("3A") + 2);}
+                else{uriStr = data.getData().toString();}
+                Log.e("aaa", uriStr);
+                documentPath = Utils.getPathFromUri(getContext(), Uri.parse(uriStr));
+            }
 
             if (documentPath == null)
                 Toast.makeText(getContext(), R.string.something_wrong, Toast.LENGTH_SHORT).show();
