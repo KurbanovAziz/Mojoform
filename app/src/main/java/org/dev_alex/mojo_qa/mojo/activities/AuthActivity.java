@@ -12,6 +12,7 @@ import android.widget.Toast;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import org.dev_alex.mojo_qa.mojo.App;
 import org.dev_alex.mojo_qa.mojo.R;
 import org.dev_alex.mojo_qa.mojo.fragments.LoginFragment;
 import org.dev_alex.mojo_qa.mojo.fragments.LoginHistoryFragment;
@@ -20,6 +21,7 @@ import org.dev_alex.mojo_qa.mojo.models.User;
 import org.dev_alex.mojo_qa.mojo.services.LoginHistoryService;
 import org.dev_alex.mojo_qa.mojo.services.RequestService;
 import org.dev_alex.mojo_qa.mojo.services.TokenService;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -172,11 +174,41 @@ public class AuthActivity extends AppCompatActivity {
                                 startActivity(intentP);
                                 finish();
                             }
-                            else{
-                            Intent intentP = new Intent(AuthActivity.this, PlayerActivity.class);
-                            intentP.putExtra("video", data);
-                            startActivity(intentP);
-                            finish();}
+                            else {
+                                Thread thread = new Thread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        try  {
+                                            String attachmentId = data.substring(data.lastIndexOf("/") + 1);
+                                            String info = "/api/file/info/"+attachmentId + "?auth_token=" + TokenService.getToken();
+                                            Response response = RequestService.createGetRequest(info);
+                                            JSONObject tasksJson = new JSONObject(response.body().string());
+
+                                            Log.d("aaa", tasksJson.toString());
+                                            String type = tasksJson.getString("mimeType");
+                                            if(type.equals("video/mp4")){
+                                            Intent intentP = new Intent(AuthActivity.this, PlayerActivity.class);
+                                            intentP.putExtra("video", data);
+                                            startActivity(intentP);
+                                            finish();}
+                                            else {
+                                                Intent intent = new Intent(AuthActivity.this, MainActivity.class);
+                                                intent.putExtras(getIntent());
+                                                intent.setData(getIntent().getData());
+                                                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                                showToast("Данный тип файла пока не поддерживается приложением");
+                                                startActivity(intent);
+                                                finish();
+                                            }
+                                        } catch (Exception e) {
+                                            e.printStackTrace();
+                                        }
+                                    }
+                                });
+
+                                thread.start();
+
+                          }
                         }
                         else {
                         Intent intent = new Intent(AuthActivity.this, MainActivity.class);
@@ -202,21 +234,13 @@ public class AuthActivity extends AppCompatActivity {
                         LoginHistoryService.setCurrentUser(user);
                         LoginHistoryService.addUser(user);
                         TokenService.updateToken(user.token, user.username);
-                        Intent intentData = getIntent();
-                        String data = intentData.getDataString();
-                        if(data != null){
-                            Intent intentP = new Intent(AuthActivity.this, PlayerActivity.class);
-                            intentP.putExtra("video", data);
-                            startActivity(intentP);
-                            finish();
-                        }
-                        else {
+
                         Intent intent = new Intent(AuthActivity.this, MainActivity.class);
                         intent.putExtras(getIntent());
                         intent.setData(getIntent().getData());
                         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                         startActivity(intent);
-                        finish();}
+                        finish();
                     } else
                         Toast.makeText(AuthActivity.this, getString(R.string.unknown_error) + "  code: " + responseCode, Toast.LENGTH_LONG).show();
                 }
@@ -224,5 +248,9 @@ public class AuthActivity extends AppCompatActivity {
                 exc.printStackTrace();
             }
         }
+    }
+    public void showToast(final String toast)
+    {
+        runOnUiThread(() -> Toast.makeText(getApplicationContext(), toast, Toast.LENGTH_SHORT).show());
     }
 }
