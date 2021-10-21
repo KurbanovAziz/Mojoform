@@ -3,6 +3,8 @@ package org.dev_alex.mojo_qa.mojo.fragments;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -158,6 +160,7 @@ import okio.BufferedSink;
 import okio.Okio;
 
 import static android.app.Activity.RESULT_OK;
+import static android.content.Context.CLIPBOARD_SERVICE;
 import static org.dev_alex.mojo_qa.mojo.services.Utils.setupCloseKeyboardUI;
 
 public class TemplateFragment extends Fragment {
@@ -409,10 +412,15 @@ public class TemplateFragment extends Fragment {
 
         if (requestCode == AUDIO_REQUEST_CODE && resultCode == RESULT_OK) {
             String audioPath = Utils.getRealPathFromIntentData(getContext(), data.getData());
+            File file = new File(audioPath );
+            if (!file.exists()) {
+                file.mkdirs();
+            }
+
             if (audioPath == null)
                 Toast.makeText(getContext(), getString(R.string.something_wrong) + " " + data.getDataString(), Toast.LENGTH_SHORT).show();
             else
-                createAudioPreview(audioPath, true);
+                createAudioPreview(file.getAbsolutePath(), true);
         }
 
         if (requestCode == SCAN_CODE_REQUEST_CODE) {
