@@ -2,13 +2,16 @@ package org.dev_alex.mojo_qa.mojo.fragments;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.ClipData;
 import android.content.ClipboardManager;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.Config;
@@ -40,6 +43,8 @@ import androidx.core.util.Pair;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.legacy.widget.Space;
 import androidx.appcompat.widget.PopupMenu;
+
+import android.provider.Settings;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.TextUtils;
@@ -119,6 +124,7 @@ import org.dev_alex.mojo_qa.mojo.services.LoginHistoryService;
 import org.dev_alex.mojo_qa.mojo.services.RequestService;
 import org.dev_alex.mojo_qa.mojo.services.TokenService;
 import org.dev_alex.mojo_qa.mojo.services.Utils;
+import org.dev_alex.mojo_qa.mojo.utils.RomUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -179,6 +185,9 @@ public class TemplateFragment extends Fragment {
     private final int IMAGE_SHOW_REQUEST_CODE = 110;
     private final int SCAN_CODE_REQUEST_CODE = 120;
 
+    private static final String TAG = "MiuiUtils";
+
+
     public boolean isOpenLink = false;
     public String taskUUID = null;
     public boolean isReportOpenLink = false;
@@ -212,6 +221,12 @@ public class TemplateFragment extends Fragment {
 
     private Location userLocation = null;
 
+    private static final int REQUEST_EXTERNAL_STORAGE = 1;
+    private static String[] PERMISSIONS_STORAGE = {
+            Manifest.permission.READ_EXTERNAL_STORAGE,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE
+    };
+
     public static TemplateFragment newInstance(long taskId, boolean isTaskFinished) {
         Bundle args = new Bundle();
         args.putLong("task_id", taskId);
@@ -238,6 +253,7 @@ public class TemplateFragment extends Fragment {
         super.onCreate(null);
         Icepick.restoreInstanceState(this, savedInstanceState);
         setRetainInstance(true);
+        addAutoStartup();
         handler = new Handler();
 
         if (getArguments().containsKey("task_id")) {
@@ -260,6 +276,8 @@ public class TemplateFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        addAutoStartup();
+
         if (rootView == null) {
             isoDateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
 
@@ -322,6 +340,114 @@ public class TemplateFragment extends Fragment {
         if (checkLocationPermissions()) {
             requestLocation();
         }
+    }
+    private void addAutoStartup() {
+
+        try {
+            Intent intent = new Intent();
+            String manufacturer = android.os.Build.MANUFACTURER;
+            if ("xiaomi".equalsIgnoreCase(manufacturer)) {
+                intent.setComponent(new ComponentName("com.miui.securitycenter", "com.miui.permcenter.autostart.AutoStartManagementActivity"));
+            } else if ("oppo".equalsIgnoreCase(manufacturer)) {
+                intent.setComponent(new ComponentName("com.coloros.safecenter", "com.coloros.safecenter.permission.startup.StartupAppListActivity"));
+            } else if ("vivo".equalsIgnoreCase(manufacturer)) {
+                intent.setComponent(new ComponentName("com.vivo.permissionmanager", "com.vivo.permissionmanager.activity.BgStartUpManagerActivity"));
+            } else if ("Letv".equalsIgnoreCase(manufacturer)) {
+                intent.setComponent(new ComponentName("com.letv.android.letvsafe", "com.letv.android.letvsafe.AutobootManageActivity"));
+            } else if ("Honor".equalsIgnoreCase(manufacturer)) {
+                intent.setComponent(new ComponentName("com.huawei.systemmanager", "com.huawei.systemmanager.optimize.process.ProtectActivity"));
+            }
+
+
+            List<ResolveInfo> list = getActivity().getPackageManager().queryIntentActivities(intent, PackageManager.MATCH_DEFAULT_ONLY);
+            if  (list.size() > 0) {
+                startActivity(intent);
+            }
+        } catch (Exception e) {
+            Log.e("exc" , String.valueOf(e));
+        }
+    }
+    public static void verifyStoragePermissions(Activity activity) {
+        // Check if we have write permission
+        int permission = ActivityCompat.checkSelfPermission(activity, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        int permission2 = ActivityCompat.checkSelfPermission(activity, Manifest.permission.READ_EXTERNAL_STORAGE);
+
+
+        if (permission != PackageManager.PERMISSION_GRANTED) {
+            // We don't have permission so prompt the user
+            ActivityCompat.requestPermissions(
+                    activity,
+                    PERMISSIONS_STORAGE,
+                    REQUEST_EXTERNAL_STORAGE
+            );
+        }
+        if (permission2 != PackageManager.PERMISSION_GRANTED) {
+            // We don't have permission so prompt the user
+            ActivityCompat.requestPermissions(
+                    activity,
+                    PERMISSIONS_STORAGE,
+                    REQUEST_EXTERNAL_STORAGE
+            );
+        }
+    }
+
+    public static void applyMiuiPermission(Context context) {
+        int versionCode = getMiuiVersion();
+        if (versionCode == 5) {
+            goToMiuiPermissionActivity_V5(context);
+        } else if (versionCode == 6) {
+            goToMiuiPermissionActivity_V6(context);
+        } else if (versionCode == 7) {
+            goToMiuiPermissionActivity_V7(context);
+        } else {
+            Log.e(TAG, "this is a special MIUI rom version, its version code " + versionCode);
+        }
+    }
+
+
+    public static int getMiuiVersion() {
+        String version = RomUtils.getSystemProperty("ro.miui.ui.version.name");
+        if (version != null) {
+            try {
+                return Integer.parseInt(version.substring(1));
+            } catch (Exception e) {
+                Log.e(TAG, "get miui version code error, version : " + version);
+            }
+        }
+        return -1;
+    }
+
+    public static void goToMiuiPermissionActivity_V5(Context context) {
+        Intent intent = null;
+        String packageName = context.getPackageName();
+        intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+        Uri uri = Uri.fromParts("package" , packageName, null);
+        intent.setData(uri);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        context.startActivity(intent);
+    }
+
+
+    public static void goToMiuiPermissionActivity_V6(Context context) {
+        Intent intent = new Intent("miui.intent.action.APP_PERM_EDITOR");
+        intent.setClassName("com.miui.securitycenter", "com.miui.permcenter.permissions.AppPermissionsEditorActivity");
+        intent.putExtra("extra_pkgname", context.getPackageName());
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+            context.startActivity(intent);
+            Log.e(TAG, "Intent is not available!");
+
+    }
+
+
+    public static void goToMiuiPermissionActivity_V7(Context context) {
+        Intent intent = new Intent("miui.intent.action.APP_PERM_EDITOR");
+        intent.setClassName("com.miui.securitycenter", "com.miui.permcenter.permissions.AppPermissionsEditorActivity");
+        intent.putExtra("extra_pkgname", context.getPackageName());
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+            context.startActivity(intent);
+
     }
 
     @SuppressLint("MissingPermission")
