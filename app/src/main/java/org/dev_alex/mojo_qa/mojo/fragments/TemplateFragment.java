@@ -164,6 +164,7 @@ import okhttp3.Response;
 import okhttp3.ResponseBody;
 import okio.BufferedSink;
 import okio.Okio;
+import timber.log.Timber;
 
 import static android.app.Activity.RESULT_OK;
 import static android.content.Context.CLIPBOARD_SERVICE;
@@ -253,7 +254,6 @@ public class TemplateFragment extends Fragment {
         super.onCreate(null);
         Icepick.restoreInstanceState(this, savedInstanceState);
         setRetainInstance(true);
-        addAutoStartup();
         handler = new Handler();
 
         if (getArguments().containsKey("task_id")) {
@@ -276,7 +276,7 @@ public class TemplateFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        addAutoStartup();
+        Timber.d("test");
 
         if (rootView == null) {
             isoDateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
@@ -341,32 +341,7 @@ public class TemplateFragment extends Fragment {
             requestLocation();
         }
     }
-    private void addAutoStartup() {
 
-        try {
-            Intent intent = new Intent();
-            String manufacturer = android.os.Build.MANUFACTURER;
-            if ("xiaomi".equalsIgnoreCase(manufacturer)) {
-                intent.setComponent(new ComponentName("com.miui.securitycenter", "com.miui.permcenter.autostart.AutoStartManagementActivity"));
-            } else if ("oppo".equalsIgnoreCase(manufacturer)) {
-                intent.setComponent(new ComponentName("com.coloros.safecenter", "com.coloros.safecenter.permission.startup.StartupAppListActivity"));
-            } else if ("vivo".equalsIgnoreCase(manufacturer)) {
-                intent.setComponent(new ComponentName("com.vivo.permissionmanager", "com.vivo.permissionmanager.activity.BgStartUpManagerActivity"));
-            } else if ("Letv".equalsIgnoreCase(manufacturer)) {
-                intent.setComponent(new ComponentName("com.letv.android.letvsafe", "com.letv.android.letvsafe.AutobootManageActivity"));
-            } else if ("Honor".equalsIgnoreCase(manufacturer)) {
-                intent.setComponent(new ComponentName("com.huawei.systemmanager", "com.huawei.systemmanager.optimize.process.ProtectActivity"));
-            }
-
-
-            List<ResolveInfo> list = getActivity().getPackageManager().queryIntentActivities(intent, PackageManager.MATCH_DEFAULT_ONLY);
-            if  (list.size() > 0) {
-                startActivity(intent);
-            }
-        } catch (Exception e) {
-            Log.e("exc" , String.valueOf(e));
-        }
-    }
     public static void verifyStoragePermissions(Activity activity) {
         // Check if we have write permission
         int permission = ActivityCompat.checkSelfPermission(activity, Manifest.permission.WRITE_EXTERNAL_STORAGE);
