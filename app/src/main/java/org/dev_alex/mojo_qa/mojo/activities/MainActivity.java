@@ -31,6 +31,7 @@ import com.mikepenz.materialdrawer.DrawerBuilder;
 import com.mikepenz.materialdrawer.model.DividerDrawerItem;
 import com.mikepenz.materialdrawer.model.SecondaryDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
+import com.rollbar.android.Rollbar;
 import com.woxthebox.draglistview.DragListView;
 
 import org.dev_alex.mojo_qa.mojo.AppointmentsModel;
@@ -75,8 +76,11 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(null);
         setContentView(R.layout.activity_main);
+        Rollbar.init(MainActivity.this);
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
             getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
         initDrawer();

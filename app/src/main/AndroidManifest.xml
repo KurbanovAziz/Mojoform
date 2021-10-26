@@ -161,6 +161,8 @@
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_icon"
             android:resource="@drawable/watermark_logo" />
+        <meta-data android:name="com.rollbar.android.ACCESS_TOKEN"
+            android:value="3401a27630db49dea6bf34559d77c45d" />
 
     </application>
 </manifest>

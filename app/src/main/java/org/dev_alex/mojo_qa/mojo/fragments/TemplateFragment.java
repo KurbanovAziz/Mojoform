@@ -101,6 +101,8 @@ import com.github.mikephil.charting.utils.ViewPortHandler;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.lalongooo.videocompressor.video.MediaController;
+import com.rollbar.android.Rollbar;
+import com.rollbar.api.payload.data.Level;
 
 import net.cachapa.expandablelayout.ExpandableLayout;
 import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent;
@@ -130,6 +132,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -252,6 +256,7 @@ public class TemplateFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(null);
+
         Icepick.restoreInstanceState(this, savedInstanceState);
         setRetainInstance(true);
         handler = new Handler();
@@ -276,7 +281,7 @@ public class TemplateFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        Timber.d("test");
+        Rollbar.init(getContext());
 
         if (rootView == null) {
             isoDateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
@@ -513,11 +518,14 @@ public class TemplateFragment extends Fragment {
 
         if (requestCode == AUDIO_REQUEST_CODE && resultCode == RESULT_OK) {
             String audioPath = Utils.getRealPathFromIntentData(getContext(), data.getData());
+            Rollbar.reportMessage("audioPath = " + audioPath, "debug"); // default level is "info"
+
+
             File file = new File(audioPath );
             if (!file.exists()) {
                 file.mkdirs();
             }
-
+            Rollbar.reportMessage("file.getAbsolutePath() = " + file.getAbsolutePath(), "debug"); // default level is "info"
             if (audioPath == null)
                 Toast.makeText(getContext(), getString(R.string.something_wrong) + " " + data.getDataString(), Toast.LENGTH_SHORT).show();
             else
