@@ -17,11 +17,16 @@ android {
         versionCode 64
         versionName "1.9.4"
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
-
         ndk {
-            abiFilters "x64"
-
+            abiFilters "armeabi", "armeabi-v7a", "x86", "mips"
         }
+        sourceSets {
+            main {
+                jniLibs.srcDirs = ['libs']
+            }
+        }
+
+
     }
     buildTypes {
         sourceSets.main {
