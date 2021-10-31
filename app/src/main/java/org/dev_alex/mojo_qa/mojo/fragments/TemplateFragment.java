@@ -19,6 +19,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Path;
 import android.graphics.PorterDuff;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
@@ -466,7 +467,17 @@ public class TemplateFragment extends Fragment {
                 if (videoPath == null)
                     Toast.makeText(getContext(), R.string.something_wrong, Toast.LENGTH_SHORT).show();
                 else
-                    createVideoPreview(videoPath, true);
+                    try {
+                        File file = new File(videoPath );
+                        if (!file.exists()) {
+                            file.mkdirs();
+                        }
+                        createVideoPreview(file.getAbsolutePath(), true);
+
+                    }
+                    catch (Exception e){
+                        Log.e("video", e.toString());
+                    }
             }
         }
 
