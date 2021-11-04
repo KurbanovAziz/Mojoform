@@ -77,8 +77,11 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
+
         super.onCreate(null);
         setContentView(R.layout.activity_main);
+
+        Toast.makeText(MainActivity.this, "Процессор " + System.getProperty("os.arch"), Toast.LENGTH_LONG).show();
         Rollbar.init(MainActivity.this);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
