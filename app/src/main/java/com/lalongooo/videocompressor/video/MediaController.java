@@ -225,6 +225,9 @@ public class MediaController {
     }
     @TargetApi(16)
     public boolean convertVideo2(final String path, String newFilePath, Context context){ //новый кодек ffmpeg
+        if(true) {
+            return false;
+        }
         GetSizeVideo getSizeVideo = new GetSizeVideo(path);
         int height = getSizeVideo.height();
         int width = getSizeVideo.width();
