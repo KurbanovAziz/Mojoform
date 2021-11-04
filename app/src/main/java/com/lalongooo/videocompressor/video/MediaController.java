@@ -241,6 +241,9 @@ public class MediaController {
                 height = 320;
                 width =180;
             }
+            android.content.ClipboardManager clipboard = (android.content.ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
+            android.content.ClipData clip = android.content.ClipData.newPlainText("TAG","процессор: " + System.getProperty("os.arch") + " шв- " + width+"/"+ height);
+            clipboard.setPrimaryClip(clip);
             String[] complexCommand = {"ffmpeg", "-y", "-i", path,  "-s", width + "x" + height, "-strict", "experimental", "-vcodec", "libx264","-crf", "18", "-acodec" , "aac", "-ar", "44100", "-ac", "2", newFilePath};
             vk.run(complexCommand , workFolder , context.getApplicationContext());
        return true;
