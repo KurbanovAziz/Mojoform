@@ -17,6 +17,7 @@ import android.util.Log;
 //import com.iceteck.silicompressorr.SiliCompressor;
 
 
+import com.netcompss.ffmpeg4android.CommandValidationException;
 import com.netcompss.loader.LoadJNI;
 
 import java.io.File;
@@ -224,15 +225,20 @@ public class MediaController {
     }
     @TargetApi(16)
     public boolean convertVideo2(final String path, String newFilePath, Context context){ //новый кодек ffmpeg
-        try {
+        GetSizeVideo getSizeVideo = new GetSizeVideo(path);
+        int height = getSizeVideo.height();
+        int width = getSizeVideo.width();
+        android.content.ClipboardManager clipboard = (android.content.ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
+        android.content.ClipData clip = android.content.ClipData.newPlainText("TAG","процессор: " + System.getProperty("os.arch") + " шв- " + width+"/"+ height);
+        clipboard.setPrimaryClip(clip);
             if(System.getProperty("os.arch").equals("i686")){
                 return false;
             }
             LoadJNI vk = new LoadJNI();
             String workFolder = context.getApplicationContext().getFilesDir().getAbsolutePath();
-            GetSizeVideo getSizeVideo = new GetSizeVideo(path);
-            int height = getSizeVideo.height();
-            int width = getSizeVideo.width();
+             getSizeVideo = new GetSizeVideo(path);
+             height = getSizeVideo.height();
+             width = getSizeVideo.width();
             try {
                 height /= 4;
                 width /= 4;
@@ -241,17 +247,14 @@ public class MediaController {
                 height = 320;
                 width =180;
             }
-            android.content.ClipboardManager clipboard = (android.content.ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
-            android.content.ClipData clip = android.content.ClipData.newPlainText("TAG","процессор: " + System.getProperty("os.arch") + " шв- " + width+"/"+ height);
-            clipboard.setPrimaryClip(clip);
             String[] complexCommand = {"ffmpeg", "-y", "-i", path,  "-s", width + "x" + height, "-strict", "experimental", "-vcodec", "libx264","-crf", "18", "-acodec" , "aac", "-ar", "44100", "-ac", "2", newFilePath};
+        try {
             vk.run(complexCommand , workFolder , context.getApplicationContext());
-       return true;
+        } catch (CommandValidationException e) {
+            e.printStackTrace();
         }
-        catch (Exception e){
-            Log.e("codec", e.toString());
-            return false;
-        }
+        return true;
+
     }
 
 
