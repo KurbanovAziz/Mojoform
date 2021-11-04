@@ -231,7 +231,7 @@ public class MediaController {
         android.content.ClipboardManager clipboard = (android.content.ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
         android.content.ClipData clip = android.content.ClipData.newPlainText("TAG","процессор: " + System.getProperty("os.arch") + " шв- " + width+"/"+ height);
         clipboard.setPrimaryClip(clip);
-            if(System.getProperty("os.arch").equals("i686")){
+            if(System.getProperty("os.arch").equals("i686") || System.getProperty("os.arch").equals("armv7l")){
                 return false;
             }
             LoadJNI vk = new LoadJNI();
