@@ -22,7 +22,7 @@
         android:allowClearUserData="true"
         android:configChanges="orientation|keyboardHidden|keyboard"
         android:extractNativeLibs="true"
-        android:hardwareAccelerated="false"
+        android:hardwareAccelerated="true"
         android:icon="${appIcon}"
         android:label="@string/app_name"
         android:largeHeap="true"

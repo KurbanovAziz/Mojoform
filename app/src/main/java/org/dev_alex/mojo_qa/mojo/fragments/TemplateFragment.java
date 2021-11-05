@@ -4,7 +4,6 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.ProgressDialog;
-import android.content.ActivityNotFoundException;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.ComponentName;
@@ -103,8 +102,7 @@ import com.github.mikephil.charting.utils.ViewPortHandler;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.lalongooo.videocompressor.video.MediaController;
-import com.rollbar.android.Rollbar;
-import com.rollbar.api.payload.data.Level;
+
 
 import net.cachapa.expandablelayout.ExpandableLayout;
 import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent;
@@ -134,8 +132,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
 
 import java.io.File;
 import java.io.IOException;
@@ -170,9 +167,7 @@ import okhttp3.Response;
 import okhttp3.ResponseBody;
 import okio.BufferedSink;
 import okio.Okio;
-import timber.log.Timber;
 
-import static android.app.Activity.RESULT_CANCELED;
 import static android.app.Activity.RESULT_OK;
 import static android.content.Context.CLIPBOARD_SERVICE;
 import static org.dev_alex.mojo_qa.mojo.services.Utils.setupCloseKeyboardUI;
@@ -192,8 +187,6 @@ public class TemplateFragment extends Fragment {
     private final int DOCUMENT_REQUEST_CODE = 13;
     private final int IMAGE_SHOW_REQUEST_CODE = 110;
     private final int SCAN_CODE_REQUEST_CODE = 120;
-    private static final int REQUEST_TAKE_PHOTO = 1;
-
 
     private static final String TAG = "MiuiUtils";
 
@@ -286,7 +279,6 @@ public class TemplateFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        Rollbar.init(getContext());
 
         if (rootView == null) {
             isoDateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
@@ -458,10 +450,9 @@ public class TemplateFragment extends Fragment {
             }
         }
 
-        if (requestCode == REQUEST_TAKE_PHOTO  && resultCode == RESULT_OK && data != null) {
-            if(resultCode != RESULT_CANCELED){
-String videoPath = data.getData().getPath();
-            processImageFile(new File(videoPath), false, null, false);}
+        if (requestCode == PHOTO_REQUEST_CODE && resultCode == RESULT_OK && data != null) {
+            String photoPath = data.getStringExtra("photo_path");
+            processImageFile(new File(photoPath), false, null, false);
         }
 
         if (requestCode == VIDEO_REQUEST_CODE && resultCode == RESULT_OK) {
@@ -534,14 +525,12 @@ String videoPath = data.getData().getPath();
 
         if (requestCode == AUDIO_REQUEST_CODE && resultCode == RESULT_OK) {
             String audioPath = Utils.getRealPathFromIntentData(getContext(), data.getData());
-            Rollbar.reportMessage("audioPath = " + audioPath, "debug"); // default level is "info"
 
 
             File file = new File(audioPath );
             if (!file.exists()) {
                 file.mkdirs();
             }
-            Rollbar.reportMessage("file.getAbsolutePath() = " + file.getAbsolutePath(), "debug"); // default level is "info"
             if (audioPath == null)
                 Toast.makeText(getContext(), getString(R.string.something_wrong) + " " + data.getDataString(), Toast.LENGTH_SHORT).show();
             else
@@ -670,14 +659,7 @@ String videoPath = data.getData().getPath();
                 .autoDismiss(true)
                 .positiveText(R.string.camera)
                 .negativeText(R.string.gallery)
-                .onPositive((dialog, which) -> {
-                    Intent takePhotoIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                    try{
-                        startActivityForResult(takePhotoIntent, REQUEST_TAKE_PHOTO);
-                    }catch (ActivityNotFoundException e){
-                        e.printStackTrace();
-                    }
-                })
+                .onPositive((dialog, which) -> CustomCamera2Activity.startForResult(TemplateFragment.this, PHOTO_REQUEST_CODE))
                 .onNegative((dialog, which) -> {
                     Intent intent = new Intent(getContext(), AlbumSelectActivity.class);
                     intent.putExtra(Constants.INTENT_EXTRA_LIMIT, 10);
@@ -4232,19 +4214,11 @@ String videoPath = data.getData().getPath();
             }
         }
 
-
     }
 
     @Override
     public void onStop() {
         super.onStop();
         saveTemplateState();
-        String filePath = Environment.getExternalStorageDirectory() + "/logcat.txt";
-        try {
-            Runtime.getRuntime().exec(new String[]{"logcat", "-f", filePath, "MyAppTAG:V", "*:S"});
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
     }
 }

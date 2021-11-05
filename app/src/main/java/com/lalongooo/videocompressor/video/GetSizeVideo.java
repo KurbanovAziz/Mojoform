@@ -14,7 +14,7 @@ public class GetSizeVideo {
     }
 
     public int width() {
-         MediaMetadataRetriever retriever = new MediaMetadataRetriever();
+        MediaMetadataRetriever retriever = new MediaMetadataRetriever();
         retriever.setDataSource(filePath);
         return
                 Integer.valueOf(
