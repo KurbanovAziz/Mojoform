@@ -1,32 +1,107 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_gravity="center"
+    android:background="@drawable/dialog_background"
+
+    android:gravity="center"
     android:layout_height="match_parent">
-
-
     <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:orientation="vertical">
-
-        <Button
-            android:id="@+id/button_start"
-            android:layout_width="match_parent"
+        <TextView
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Запись" />
+            android:gravity="center"
+            android:text="Записать аудио"
+            android:textSize="20dp"
+            android:textColor="#F8F8F8"
+            android:layout_gravity="center"/>
+    <FrameLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
 
-        <Button
-            android:id="@+id/button_stop"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Стоп" />
+    <ImageView
+        android:id="@+id/btnRecord"
+        android:layout_marginBottom="-20dp"
+        android:layout_width="170dp"
+        android:layout_height="170dp"
+        android:visibility="visible"
+        android:clickable="true"
+        android:focusable="true"
+        style="?android:borderlessButtonStyle"
 
-        <Button
-            android:id="@+id/button6"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Сохранить" />
+        android:src="@drawable/ic_start_record"/>
+        <ImageView
+            android:id="@+id/btnStop"
+            android:layout_width="150dp"
+            android:layout_height="150dp"
+            android:visibility="visible"
+            android:clickable="true"
+            android:focusable="true"
+            style="?android:borderlessButtonStyle"
+
+            android:src="@drawable/ic_stop_record"/>
+
+    </FrameLayout>
+
     </LinearLayout>
-</androidx.constraintlayout.widget.ConstraintLayout>
+    <LinearLayout
+        android:id="@+id/linear"
+
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="invisible"
+        android:orientation="vertical">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="Проиграть аудио"
+            android:textSize="20dp"
+            android:textColor="#F8F8F8"
+            android:layout_gravity="center"/>
+        <FrameLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+            <ImageView
+                android:id="@+id/btnPlay"
+                android:layout_marginBottom="-20dp"
+                android:layout_width="150dp"
+                android:layout_height="150dp"
+                android:visibility="invisible"
+                android:clickable="true"
+                android:focusable="true"
+                style="?android:borderlessButtonStyle"
+
+                android:src="@drawable/ic_play_record"/>
+            <ImageView
+                android:id="@+id/btnStopPlay"
+                android:layout_width="150dp"
+                android:layout_height="150dp"
+                android:visibility="invisible"
+                android:clickable="true"
+                android:focusable="true"
+                style="?android:borderlessButtonStyle"
+
+                android:src="@drawable/ic_stop_play"/>
+
+        </FrameLayout>
+
+    </LinearLayout>
+
+
+
+    <Button
+        android:id="@+id/btnSave"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="invisible"
+        android:textColor="#EBFFFFFF"
+        android:background="#60800AA1"
+        android:text="Сохранить" />
+
+</LinearLayout>

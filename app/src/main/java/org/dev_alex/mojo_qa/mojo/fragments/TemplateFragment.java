@@ -115,6 +115,8 @@ import org.dev_alex.mojo_qa.mojo.activities.AuthActivity;
 import org.dev_alex.mojo_qa.mojo.activities.ImageViewActivity;
 import org.dev_alex.mojo_qa.mojo.activities.MainActivity;
 import org.dev_alex.mojo_qa.mojo.activities.OpenLinkActivity;
+import org.dev_alex.mojo_qa.mojo.activities.PlayerActivity;
+import org.dev_alex.mojo_qa.mojo.activities.RecordAudio;
 import org.dev_alex.mojo_qa.mojo.custom_views.CustomWebview;
 import org.dev_alex.mojo_qa.mojo.custom_views.camera.CustomCamera2Activity;
 import org.dev_alex.mojo_qa.mojo.custom_views.indicator.IndicatorLayout;
@@ -524,14 +526,13 @@ public class TemplateFragment extends Fragment {
         }
 
         if (requestCode == AUDIO_REQUEST_CODE && resultCode == RESULT_OK) {
-            String audioPath = Utils.getRealPathFromIntentData(getContext(), data.getData());
+           String mFileName = data.getStringExtra("name");
 
-
-            File file = new File(audioPath );
+            File file = new File(mFileName );
             if (!file.exists()) {
                 file.mkdirs();
             }
-            if (audioPath == null)
+            if (mFileName == null)
                 Toast.makeText(getContext(), getString(R.string.something_wrong) + " " + data.getDataString(), Toast.LENGTH_SHORT).show();
             else
                 createAudioPreview(file.getAbsolutePath(), true);
@@ -1983,7 +1984,10 @@ public class TemplateFragment extends Fragment {
                             intent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
                             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                             intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                            startActivityForResult(intent, AUDIO_REQUEST_CODE);
+                            //startActivityForResult(intent, AUDIO_REQUEST_CODE);
+                            Intent intent1 = new Intent(getContext(), RecordAudio.class);
+                            startActivityForResult(intent1, AUDIO_REQUEST_CODE);
+
                         } catch (Exception exc) {
                             exc.printStackTrace();
                             Toast.makeText(getContext(), R.string.no_audio_recorder_app, Toast.LENGTH_SHORT).show();

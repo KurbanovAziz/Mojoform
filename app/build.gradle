@@ -125,6 +125,7 @@ dependencies {
     implementation 'org.greenrobot:eventbus:3.2.0'
 
     implementation 'com.github.woxthebox:draglistview:1.5.1'
+    implementation 'com.github.AsynctaskCoffee:VoiceRecorder:beta-0.5'
 
     // Firebase
     implementation 'com.google.android.gms:play-services-base:11.8.0'

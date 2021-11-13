@@ -18,7 +18,6 @@
     <application
         android:name=".App"
         android:allowBackup="false"
-
         android:allowClearUserData="true"
         android:configChanges="orientation|keyboardHidden|keyboard"
         android:extractNativeLibs="true"
@@ -32,20 +31,18 @@
         android:usesCleartextTraffic="true"
         tools:replace="android:allowBackup,android:icon"
         tools:targetApi="q">
-
+        <activity android:name=".activities.RecordAudio"></activity>
         <activity
             android:name=".activities.AuthActivity"
             android:configChanges="orientation|keyboardHidden|keyboard"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar.FullScreen">
-
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-
             <intent-filter>
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
@@ -58,45 +55,50 @@
                     android:scheme="https" />
             </intent-filter>
             <intent-filter android:autoVerify="true">
-                <action android:name="android.intent.action.VIEW"/>
-                <category android:name="android.intent.category.DEFAULT"/>
-                <category android:name="android.intent.category.BROWSABLE"/>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
                 <data
-                    android:scheme="https"
                     android:host="system.mojoform.com"
-                    android:pathPrefix="/attachment"/>
+                    android:pathPrefix="/attachment"
+                    android:scheme="https" />
             </intent-filter>
             <intent-filter android:autoVerify="true">
-                <action android:name="android.intent.action.VIEW"/>
-                <category android:name="android.intent.category.DEFAULT"/>
-                <category android:name="android.intent.category.BROWSABLE"/>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
                 <data
-                    android:scheme="https"
                     android:host="mojo-qa.dev-alex.org"
-                    android:pathPrefix="/attachment"/>
-            </intent-filter>
-
-
-            <intent-filter android:autoVerify="true">
-                <action android:name="android.intent.action.VIEW"/>
-                <category android:name="android.intent.category.DEFAULT"/>
-                <category android:name="android.intent.category.BROWSABLE"/>
-                <data
-                    android:scheme="https"
-                    android:host="tasks.mojoform.com"
-                    android:pathPrefix="/tasks"/>
+                    android:pathPrefix="/attachment"
+                    android:scheme="https" />
             </intent-filter>
             <intent-filter android:autoVerify="true">
-                <action android:name="android.intent.action.VIEW"/>
-                <category android:name="android.intent.category.DEFAULT"/>
-                <category android:name="android.intent.category.BROWSABLE"/>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
                 <data
-                    android:scheme="https"
                     android:host="tasks.mojoform.com"
-                    android:pathPrefix="/reports"/>
+                    android:pathPrefix="/tasks"
+                    android:scheme="https" />
+            </intent-filter>
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:host="tasks.mojoform.com"
+                    android:pathPrefix="/reports"
+                    android:scheme="https" />
             </intent-filter>
         </activity>
-
         <activity
             android:name=".activities.MainActivity"
             android:configChanges="orientation|keyboardHidden|keyboard"
@@ -104,22 +106,16 @@
             android:launchMode="singleTop"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.ActionBar.Transparent"
-            android:windowSoftInputMode="adjustPan">
-
-        </activity>
-
+            android:windowSoftInputMode="adjustPan"></activity>
         <activity
             android:name=".activities.OpenLinkActivity"
             android:configChanges="orientation|keyboardHidden|keyboard"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.ActionBar.Transparent"
             android:windowSoftInputMode="adjustPan" />
-
         <activity
             android:name=".activities.PlayerActivity"
-            android:configChanges="keyboard|keyboardHidden|orientation|screenSize|screenLayout|smallestScreenSize|uiMode">
-        </activity>
-
+            android:configChanges="keyboard|keyboardHidden|orientation|screenSize|screenLayout|smallestScreenSize|uiMode"></activity>
         <activity
             android:name=".activities.PickExecutorsActivity"
             android:configChanges="orientation|keyboardHidden|keyboard"
@@ -142,11 +138,8 @@
             android:configChanges="orientation|keyboardHidden|keyboard"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar.FullScreen" />
-
         <activity android:name=".custom_views.camera.CustomCamera2Activity" />
-
         <activity android:name=".activities.OnboardingActivity" />
-
 
         <service android:name=".gcm.MyFirebaseMessagingService">
             <intent-filter>
@@ -162,8 +155,9 @@
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_icon"
             android:resource="@drawable/watermark_logo" />
-        <meta-data android:name="com.rollbar.android.ACCESS_TOKEN"
+        <meta-data
+            android:name="com.rollbar.android.ACCESS_TOKEN"
             android:value="3401a27630db49dea6bf34559d77c45d" />
-
     </application>
+
 </manifest>
