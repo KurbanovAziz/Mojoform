@@ -80,7 +80,7 @@ public class RecordAudio extends AppCompatActivity {
                         Log.e(LOG_TAG, "prepare() failed");
                     }
                     mRecorder.start();
-                    Toast.makeText(getApplicationContext(), "Идёт запись...", Toast.LENGTH_LONG).show();
+                    Toast.makeText(getApplicationContext(), "Идёт запись...", Toast.LENGTH_SHORT).show();
                 }
                 else
                 {
@@ -106,7 +106,7 @@ public class RecordAudio extends AppCompatActivity {
                 mRecorder.stop();
                 mRecorder.release();
                 mRecorder = null;
-                Toast.makeText(getApplicationContext(), "Записано", Toast.LENGTH_LONG).show();
+                Toast.makeText(getApplicationContext(), "Записано", Toast.LENGTH_SHORT).show();
             }
         });
         save.setOnClickListener(new View.OnClickListener() {
@@ -133,7 +133,7 @@ public class RecordAudio extends AppCompatActivity {
                     mPlayer.setDataSource(mFileName);
                     mPlayer.prepare();
                     mPlayer.start();
-                    Toast.makeText(getApplicationContext(), "Проигрываем", Toast.LENGTH_LONG).show();
+                    Toast.makeText(getApplicationContext(), "Проигрываем", Toast.LENGTH_SHORT).show();
                 } catch (IOException e) {
                     Log.e(LOG_TAG, "prepare() failed");
                 }
@@ -163,9 +163,9 @@ public class RecordAudio extends AppCompatActivity {
                     boolean permissionToRecord = grantResults[0] == PackageManager.PERMISSION_GRANTED;
                     boolean permissionToStore = grantResults[1] ==  PackageManager.PERMISSION_GRANTED;
                     if (permissionToRecord && permissionToStore) {
-                        Toast.makeText(getApplicationContext(), "Permission Granted", Toast.LENGTH_LONG).show();
+                        Toast.makeText(getApplicationContext(), "Permission Granted", Toast.LENGTH_SHORT).show();
                     } else {
-                        Toast.makeText(getApplicationContext(),"Permission Denied",Toast.LENGTH_LONG).show();
+                        Toast.makeText(getApplicationContext(),"Permission Denied",Toast.LENGTH_SHORT).show();
                     }
                 }
                 break;
