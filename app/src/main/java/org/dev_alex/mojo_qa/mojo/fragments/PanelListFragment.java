@@ -54,6 +54,7 @@ public class PanelListFragment extends Fragment {
 
     private GetPanelsTask getPanelsTask = null;
     public static boolean wasCreated = false;
+    //
 
 
     public static PanelListFragment newInstance() {
