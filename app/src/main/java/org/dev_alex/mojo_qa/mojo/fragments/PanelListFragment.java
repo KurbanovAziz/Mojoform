@@ -168,10 +168,14 @@ public class PanelListFragment extends Fragment {
 
     }
     public void onItemsSelected(boolean[] selected) {
+        tags.clear();
         for(int i = 0; i < selected.length; i++){
             if(selected[i]){
                 tags.add(organisations.get(i).getId());
             }
+        }
+        if(tags.size() == 0){
+            Toast.makeText(getContext(), "Вы ничего не выбрали", Toast.LENGTH_SHORT).show();
         }
         updateNotifications();
 }
@@ -197,7 +201,8 @@ public class PanelListFragment extends Fragment {
             try {
                 Response response;
                 String filter = "";
-                if(organisations.size() == 0 || tags.size() == 0){
+
+                if(organisations.size() == 0){
 
                     response = RequestService.createGetRequest("/api/analytic2");}
                 else {
@@ -235,6 +240,7 @@ public class PanelListFragment extends Fragment {
             super.onPostExecute(responseCode);
             try {
                 if(!wasCreated){
+
                 JSONArray organizationsJson = jsonObject.getJSONObject("available").getJSONArray("tags");
                 organisations = new ObjectMapper().readValue(organizationsJson.toString(), new TypeReference<ArrayList<Organisation>>() {});
                 ArrayList<String> organisationNames = new ArrayList<>();
