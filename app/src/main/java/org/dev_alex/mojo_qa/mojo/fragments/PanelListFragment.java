@@ -7,22 +7,33 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import android.util.JsonReader;
+import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.CompoundButton;
+import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.dev_alex.mojo_qa.mojo.R;
 import org.dev_alex.mojo_qa.mojo.adapters.PanelAdapter;
+import org.dev_alex.mojo_qa.mojo.custom_views.MultiSpinner;
+import org.dev_alex.mojo_qa.mojo.models.Organisation;
 import org.dev_alex.mojo_qa.mojo.models.Panel;
 import org.dev_alex.mojo_qa.mojo.services.RequestService;
 import org.dev_alex.mojo_qa.mojo.services.Utils;
 import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -35,8 +46,15 @@ public class PanelListFragment extends Fragment {
     private ProgressDialog loopDialog;
     private RecyclerView recyclerView;
     private Switch allAnalyticsSwitch;
+    JSONObject jsonObject;
+    public List<Panel> panels;
+    public List<Organisation> organisations = new ArrayList<>();
+    ArrayList<String> tags = new ArrayList<>();
+    public MultiSpinner multiSpinner;
 
     private GetPanelsTask getPanelsTask = null;
+    public static boolean wasCreated = false;
+
 
     public static PanelListFragment newInstance() {
         return new PanelListFragment();
@@ -45,6 +63,7 @@ public class PanelListFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+
         if (rootView == null) {
             rootView = inflater.inflate(R.layout.fragment_panel_list, container, false);
 
@@ -56,6 +75,7 @@ public class PanelListFragment extends Fragment {
 
             initDialog();
 
+
             getPanelsTask = new GetPanelsTask();
             getPanelsTask.execute();
 
@@ -63,8 +83,9 @@ public class PanelListFragment extends Fragment {
             allAnalyticsSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                 @Override
                 public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                    if (getPanelsTask != null && getPanelsTask.getStatus() != AsyncTask.Status.FINISHED)
-                        getPanelsTask.cancel(false);
+                    if (getPanelsTask != null && getPanelsTask.getStatus() != AsyncTask.Status.FINISHED){
+
+                        getPanelsTask.cancel(false);}
 
                     getPanelsTask = new GetPanelsTask();
                     getPanelsTask.execute();
@@ -76,16 +97,28 @@ public class PanelListFragment extends Fragment {
         return rootView;
     }
 
+    @Override
+    public void onCreate(@Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+    }
+
     private void setupHeader() {
         ((TextView) getActivity().findViewById(R.id.title)).setText(getString(R.string.analystics));
         getActivity().findViewById(R.id.back_btn).setVisibility(View.GONE);
 
         getActivity().findViewById(R.id.grid_btn).setVisibility(View.GONE);
         getActivity().findViewById(R.id.sandwich_btn).setVisibility(View.VISIBLE);
-        getActivity().findViewById(R.id.group_by_btn).setVisibility(View.GONE);
+        getActivity().findViewById(R.id.group_by_btn).setVisibility(View.VISIBLE);
         getActivity().findViewById(R.id.search_btn).setVisibility(View.GONE);
         getActivity().findViewById(R.id.notification_btn).setVisibility(View.GONE);
         getActivity().findViewById(R.id.qr_btn).setVisibility(View.GONE);
+        getActivity().findViewById(R.id.group_by_btn).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
     }
 
     private void initDialog() {
@@ -131,10 +164,24 @@ public class PanelListFragment extends Fragment {
                 onPanelClick(panel);
             }
         }));
+
+    }
+    public void onItemsSelected(boolean[] selected) {
+        for(int i = 0; i < selected.length; i++){
+            if(selected[i]){
+                tags.add(organisations.get(i).getId());
+            }
+        }
+        updateNotifications();
+}
+
+
+    private void updateNotifications() {
+            new GetPanelsTask().execute();
     }
 
     private class GetPanelsTask extends AsyncTask<Void, Void, Integer> {
-        private List<Panel> panels;
+
         private boolean isAll;
 
         @Override
@@ -147,19 +194,36 @@ public class PanelListFragment extends Fragment {
         @Override
         protected Integer doInBackground(Void... params) {
             try {
-                panels = new ArrayList<>();
-                Response response = RequestService.createGetRequest("/api/analytic" + (isAll ? "/all" : ""));
-                String responseStr = response.body().string();
+                Response response;
+                String filter = "";
+                if(organisations.size() == 0 || tags.size() == 0){
 
-                JSONArray panelsJson = new JSONArray(responseStr);
+                    response = RequestService.createGetRequest("/api/analytic2");}
+                else {
+                    wasCreated = true;
+                    String sortParameter = "tag=";
+                    filter = "?";
+                    for (int i = 0; i < tags.size(); i++){
+                        filter = filter + sortParameter + tags.get(i);
+                        if(i != (tags.size() - 1)){
+                            filter = filter + "&";
+                        }
+                    }
+
+                    response = RequestService.createGetRequest("/api/analytic2" + filter);
+                }
+
+                String responseStr = response.body().string();
+                jsonObject = new JSONObject(responseStr);
+                JSONArray panelsJson = jsonObject.getJSONArray("list");
                 panels = new ObjectMapper().readValue(panelsJson.toString(), new TypeReference<ArrayList<Panel>>() {
                 });
-
                 for (Panel panel : panels)
                     panel.fixDate();
-
                 return response.code();
             } catch (Exception exc) {
+                Log.e("Panel", "unexpected JSON exception", exc);
+
                 exc.printStackTrace();
                 return null;
             }
@@ -169,15 +233,29 @@ public class PanelListFragment extends Fragment {
         protected void onPostExecute(Integer responseCode) {
             super.onPostExecute(responseCode);
             try {
+                if(!wasCreated){
+                JSONArray organizationsJson = jsonObject.getJSONObject("available").getJSONArray("tags");
+                organisations = new ObjectMapper().readValue(organizationsJson.toString(), new TypeReference<ArrayList<Organisation>>() {});
+                ArrayList<String> organisationNames = new ArrayList<>();
+                multiSpinner = (MultiSpinner) getActivity().findViewById(R.id.spin);
+                for (int i = 0; i < organisations.size(); i++){
+                    organisationNames.add(organisations.get(i).getName());
+                }
+                multiSpinner.setItems(getActivity(), organisations, "aaa", PanelListFragment.this::onItemsSelected);
+            wasCreated = true;}
+
                 if (loopDialog != null && loopDialog.isShowing())
                     loopDialog.dismiss();
-
                 if (!isCancelled())
                     showPanels(panels);
 
             } catch (Exception exc) {
+                Log.e("spinner", exc.toString());
                 exc.printStackTrace();
             }
         }
     }
+
+
+
 }

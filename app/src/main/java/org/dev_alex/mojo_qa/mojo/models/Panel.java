@@ -3,6 +3,7 @@ package org.dev_alex.mojo_qa.mojo.models;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Panel implements Serializable {
@@ -14,6 +15,8 @@ public class Panel implements Serializable {
     public TimeSeries current;
     public TimeSeries complete;
     public String config;
+    public String color;
+    public ArrayList<PanelTag> tags;
 
     public static Panel getSeparatorPanel() {
         Panel panel = new Panel();

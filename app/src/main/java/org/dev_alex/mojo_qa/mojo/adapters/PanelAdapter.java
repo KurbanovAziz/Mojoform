@@ -29,13 +29,16 @@ public class PanelAdapter extends RecyclerView.Adapter<PanelAdapter.TaskViewHold
     static class TaskViewHolder extends RecyclerView.ViewHolder {
         TextView panelName;
         TextView panelStats;
+        ImageView point;
         ImageView panelIcon;
 
         TaskViewHolder(View itemView) {
             super(itemView);
             panelIcon = (ImageView) itemView.findViewById(R.id.panel_icon_image);
+            point = (ImageView) itemView.findViewById(R.id.point);
             panelName = (TextView) itemView.findViewById(R.id.panel_name);
             panelStats = (TextView) itemView.findViewById(R.id.panel_stats);
+
         }
     }
 
@@ -76,6 +79,10 @@ public class PanelAdapter extends RecyclerView.Adapter<PanelAdapter.TaskViewHold
 
         if (getItemViewType(i) == 0) {
             viewHolder.panelName.setText(panel.name);
+            if (panel.tags.get(0).getColor() != null){
+                viewHolder.point.setImageResource(R.drawable.point);
+                viewHolder.point.setColorFilter(Color.parseColor(panel.tags.get(0).getColor()));
+            }
             viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {

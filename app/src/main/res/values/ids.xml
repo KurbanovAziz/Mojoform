@@ -3,6 +3,11 @@
 
     <item name="mcv_pager" type="id" />
     <item name="back_card" type="id"/>
+    <item name="text1" type="id"/>
+    <item name="point1" type="id"/>
+
+
+
 
 
 </resources>

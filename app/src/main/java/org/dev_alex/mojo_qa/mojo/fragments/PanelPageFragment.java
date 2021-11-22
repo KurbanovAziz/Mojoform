@@ -51,6 +51,7 @@ public class PanelPageFragment extends Fragment {
     private View rootView;
     private LinearLayout dashbordContainer;
     private SimpleDateFormat xDateFormat = new SimpleDateFormat("dd-MM", Locale.getDefault());
+    private Integer color;
 
 
     public static PanelPageFragment newInstance(JSONObject page) {
@@ -97,11 +98,14 @@ public class PanelPageFragment extends Fragment {
                 JSONArray rowItems = row.getJSONArray("items");
                 for (int j = 0; j < rowItems.length(); j++) {
                     JSONObject rowItem = rowItems.getJSONObject(j);
+                    color= Integer.parseInt(rowItem.getJSONObject("color").getString("autoCaption"));
+                    
 
                     View title = null;
                     if (rowItem.has("indicator")) {
                         title = renderGraphTitle(rowItem.getJSONObject("indicator").getString("autoCaption"));
                         dashbordContainer.addView(title);
+                     
                         dashbordContainer.addView(renderIndicator(rowItem.getJSONObject("indicator")));
                     }
 
@@ -116,6 +120,7 @@ public class PanelPageFragment extends Fragment {
                         dashbordContainer.addView(title);
                         dashbordContainer.addView(renderHistogramOrSpline(rowItem.getJSONObject("spline"), true));
                     }
+                    
 
 
                     if (title != null) {
@@ -155,6 +160,13 @@ public class PanelPageFragment extends Fragment {
     private View renderGraphTitle(String title) {
         View titleView = LayoutInflater.from(getContext()).inflate(R.layout.title_graph, null);
         ((TextView) titleView.findViewById(R.id.title)).setText(title);
+        renderPoint(color);
+        return titleView;
+    }
+    private View renderPoint(Integer color) {
+        View titleView = LayoutInflater.from(getContext()).inflate(R.layout.title_graph, null);
+        titleView.findViewById(R.id.point).setBackgroundColor(color);
+
         return titleView;
     }
 

@@ -94,9 +94,6 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
 
 
         if(notification.color != null){
-            viewHolder.notification_bell.setImageResource(R.drawable.bell_image);
-
-            viewHolder.notification_bell.setColorFilter(Color.parseColor(notification.color));
             }
         else {
             viewHolder.notification_bell.setImageResource(R.drawable.bell_task);
