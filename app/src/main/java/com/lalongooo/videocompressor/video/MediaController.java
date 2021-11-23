@@ -225,7 +225,7 @@ public class MediaController {
     @TargetApi(16)
     public boolean convertVideo2(final String path, String newFilePath, Context context){ //новый кодек ffmpeg
         try {
-            if(System.getProperty("os.arch").equals("i686")){
+            if(System.getProperty("os.arch").equals("i686") || true){
                 return false;
             }
             LoadJNI vk = new LoadJNI();
