@@ -202,9 +202,9 @@ public class PanelListFragment extends Fragment {
                 Response response;
                 String filter = "";
 
-                if(organisations.size() == 0){
+                if(organisations.size() == 0 || tags.size() == 0){
 
-                    response = RequestService.createGetRequest("/api/analytic2");}
+                    response = RequestService.createGetRequest("/api/analytic2" + (isAll ? "?type=ALL" : "?type=SIMPLE"));}
                 else {
                     wasCreated = true;
                     String sortParameter = "tag=";
@@ -216,7 +216,7 @@ public class PanelListFragment extends Fragment {
                         }
                     }
 
-                    response = RequestService.createGetRequest("/api/analytic2" + filter);
+                    response = RequestService.createGetRequest("/api/analytic2" + filter + (isAll ? "&type=ALL" : "&type=SIMPLE"));
                 }
 
                 String responseStr = response.body().string();
