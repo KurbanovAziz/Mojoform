@@ -43,6 +43,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
+import lecho.lib.hellocharts.view.PieChartView;
 import okhttp3.Response;
 
 public class GraphFragment extends Fragment {
@@ -230,7 +231,6 @@ public class GraphFragment extends Fragment {
         xAxis.setTextColor(Color.parseColor("#4E3F60"));
 
         xAxis.setValueFormatter(new IAxisValueFormatter() {
-
             @Override
             public String getFormattedValue(float value, AxisBase axis) {
                 String stringValue;
@@ -268,8 +268,7 @@ public class GraphFragment extends Fragment {
                             stringValue = "";
                         }
                     } else {
-                        stringValue = "";
-                    }
+                        stringValue = "";}
                 } else {
                     stringValue = "";
                 }

@@ -72,8 +72,8 @@
                 <category android:name="android.intent.category.BROWSABLE" />
 
                 <data
-                    android:host="mojo-qa.dev-alex.org"
-                    android:pathPrefix="/attachment"
+                    android:host="tasks-qa.dev-alex.org"
+                    android:pathPrefix="/reports"
                     android:scheme="https" />
             </intent-filter>
             <intent-filter android:autoVerify="true">

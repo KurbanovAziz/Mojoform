@@ -14,13 +14,24 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.github.mikephil.charting.charts.PieChart;
+import com.github.mikephil.charting.data.PieData;
+import com.github.mikephil.charting.data.PieDataSet;
+import com.github.mikephil.charting.data.PieEntry;
+import com.github.mikephil.charting.formatter.PercentFormatter;
+
 import org.dev_alex.mojo_qa.mojo.R;
 import org.dev_alex.mojo_qa.mojo.models.Panel;
 import org.dev_alex.mojo_qa.mojo.models.Value;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+
+import lecho.lib.hellocharts.model.PieChartData;
+import lecho.lib.hellocharts.model.SliceValue;
+import lecho.lib.hellocharts.view.PieChartView;
 
 public class PanelAdapter extends RecyclerView.Adapter<PanelAdapter.TaskViewHolder> {
     private List<Panel> panels;
@@ -29,13 +40,13 @@ public class PanelAdapter extends RecyclerView.Adapter<PanelAdapter.TaskViewHold
     static class TaskViewHolder extends RecyclerView.ViewHolder {
         TextView panelName;
         TextView panelStats;
-        ImageView point;
+        PieChartView point;
         ImageView panelIcon;
 
         TaskViewHolder(View itemView) {
             super(itemView);
             panelIcon = (ImageView) itemView.findViewById(R.id.panel_icon_image);
-            point = (ImageView) itemView.findViewById(R.id.point);
+            point = (PieChartView ) itemView.findViewById(R.id.point);
             panelName = (TextView) itemView.findViewById(R.id.panel_name);
             panelStats = (TextView) itemView.findViewById(R.id.panel_stats);
 
@@ -72,10 +83,19 @@ public class PanelAdapter extends RecyclerView.Adapter<PanelAdapter.TaskViewHold
 
         if (getItemViewType(i) == 0) {
             viewHolder.panelName.setText(panel.name);
-            if (panel.tags.get(0).getColor() != null){
-                viewHolder.point.setImageResource(R.drawable.point);
-                viewHolder.point.setColorFilter(Color.parseColor(panel.tags.get(0).getColor()));
+            if (panel.tags.get(0).getColor() != null ){
+                //viewHolder.point.setImageResource(R.drawable.point);
+                //viewHolder.point.setColorFilter(Color.parseColor(panel.tags.get(0).getColor()));
+                List< SliceValue > pieData = new ArrayList<>();
+                for (int j = 0; j < panel.tags.size(); j++){
+                    pieData.add(new SliceValue(1, Color.parseColor(panel.tags.get(j).getColor())));
+                }
+                PieChartData pieChartData = new PieChartData(pieData);
+                viewHolder.point.setPieChartData(pieChartData);
+                viewHolder.point.setVisibility(View.VISIBLE);
             }
+            else {
+            viewHolder.point.setVisibility(View.INVISIBLE);}
             viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {

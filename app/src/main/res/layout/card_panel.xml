@@ -19,14 +19,12 @@
         android:layout_gravity="center_vertical"
         android:adjustViewBounds="true"
         android:src="@drawable/analystics_icon" />
-    <ImageView
-        android:id="@+id/point"
-        android:layout_width="10dp"
-        android:layout_height="10dp"
-        android:layout_marginLeft="10dp"
-        android:adjustViewBounds="true"
-        android:layout_gravity="center_vertical"
- />
+    <lecho.lib.hellocharts.view.PieChartView
+    android:id="@+id/point"
+    android:layout_width="30dp"
+    android:layout_height="30dp"
+    android:layout_marginLeft="10dp"
+    android:layout_gravity="center_vertical"/>
 
     <TextView
         android:id="@+id/panel_name"
