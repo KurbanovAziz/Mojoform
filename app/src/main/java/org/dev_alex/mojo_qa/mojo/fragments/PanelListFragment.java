@@ -193,6 +193,11 @@ public class PanelListFragment extends Fragment {
         protected void onPreExecute() {
             super.onPreExecute();
             isAll = allAnalyticsSwitch.isChecked();
+            TextView textView = rootView.findViewById(R.id.all_text);
+            if(isAll){
+                textView.setVisibility(View.VISIBLE);
+            }
+            else {textView.setVisibility(View.GONE);}
             loopDialog.show();
         }
 

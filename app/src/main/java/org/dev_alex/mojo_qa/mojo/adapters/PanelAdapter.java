@@ -59,7 +59,7 @@ public class PanelAdapter extends RecyclerView.Adapter<PanelAdapter.TaskViewHold
         if (viewType == 0)
             v = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.card_panel, viewGroup, false);
         else {
-  v = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.separator, viewGroup, false);
+  v = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.simple_text, viewGroup, false);
 
 
         }
