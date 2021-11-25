@@ -224,6 +224,7 @@ public class PanelListFragment extends Fragment {
                 JSONArray panelsJson = jsonObject.getJSONArray("list");
                 panels = new ObjectMapper().readValue(panelsJson.toString(), new TypeReference<ArrayList<Panel>>() {
                 });
+
                 for (Panel panel : panels)
                     panel.fixDate();
                 return response.code();

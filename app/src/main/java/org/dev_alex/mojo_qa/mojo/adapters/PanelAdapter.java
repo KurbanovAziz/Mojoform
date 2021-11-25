@@ -59,16 +59,9 @@ public class PanelAdapter extends RecyclerView.Adapter<PanelAdapter.TaskViewHold
         if (viewType == 0)
             v = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.card_panel, viewGroup, false);
         else {
-            v = new View(viewGroup.getContext());
+  v = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.separator, viewGroup, false);
 
-            LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dpToPx(viewGroup.getContext(), 2.5f));
-            layoutParams.rightMargin = dpToPx(viewGroup.getContext(), 8);
-            layoutParams.leftMargin = dpToPx(viewGroup.getContext(), 8);
-            layoutParams.topMargin = dpToPx(viewGroup.getContext(), 18);
-            layoutParams.bottomMargin = dpToPx(viewGroup.getContext(), 12);
 
-            v.setLayoutParams(layoutParams);
-            v.setBackgroundColor(Color.parseColor("#4E3F60"));
         }
         return new TaskViewHolder(v);
     }

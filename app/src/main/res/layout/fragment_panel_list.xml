@@ -10,6 +10,12 @@
         android:layout_width="match_parent"
         android:layout_height="45dp"
         android:background="#95699e">
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:layout_centerVertical="true"
+            android:text="Составные показатели"/>
 
 
         <Switch
