@@ -211,7 +211,7 @@ public class PanelListFragment extends Fragment {
                 String filter = "";
 
                 if(organisations.size() == 0 || tags.size() == 0){
-                    responseComplex = RequestService.createGetRequest("/api/analytic2" + (isAll ? "?type=COMPLEX" : "?type=COMPLEX"));
+                    responseComplex = RequestService.createGetRequest("/api/analytic2" + (isAll ? "?type=COMPLEX" : "?type=ROOTS_COMPLEX"));
                     responseSimple = RequestService.createGetRequest("/api/analytic2" + (isAll ? "?type=SIMPLE" : "?type=ROOTS_SIMPLE"));
 
                 }
@@ -230,7 +230,7 @@ public class PanelListFragment extends Fragment {
                         }
                     }
 
-                    responseComplex = RequestService.createGetRequest("/api/analytic2" + filter+ (isAll ? "&type=COMPLEX" : "&type=COMPLEX"));
+                    responseComplex = RequestService.createGetRequest("/api/analytic2" + filter+ (isAll ? "&type=COMPLEX" : "&type=ROOTS_COMPLEX"));
                     responseSimple = RequestService.createGetRequest("/api/analytic2" + filter+(isAll ? "&type=SIMPLE" : "&type=ROOTS_SIMPLE"));                }
 
                 String responseComplexStr = responseComplex.body().string();
