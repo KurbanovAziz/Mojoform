@@ -17,7 +17,7 @@
             android:layout_centerVertical="true"
             android:layout_marginLeft="20dp"
             android:textSize="18dp"
-            android:text="Составные показатели"/>
+            android:text=""/>
 
 
         <Switch

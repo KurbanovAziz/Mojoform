@@ -54,6 +54,8 @@ public class PanelListFragment extends Fragment {
 
     private GetPanelsTask getPanelsTask = null;
     public static boolean wasCreated = false;
+    Response responseComplex = null;
+    Response responseSimple= null;
     //
 
 
@@ -194,22 +196,29 @@ public class PanelListFragment extends Fragment {
             super.onPreExecute();
             isAll = allAnalyticsSwitch.isChecked();
             TextView textView = rootView.findViewById(R.id.all_text);
-            if(isAll){
-                textView.setVisibility(View.VISIBLE);
-            }
-            else {textView.setVisibility(View.GONE);}
+
             loopDialog.show();
         }
 
         @Override
         protected Integer doInBackground(Void... params) {
             try {
-                Response response;
+
+
+
+
+
                 String filter = "";
 
                 if(organisations.size() == 0 || tags.size() == 0){
+                    responseComplex = RequestService.createGetRequest("/api/analytic2" + (isAll ? "?type=COMPLEX" : "?type=COMPLEX"));
+                    responseSimple = RequestService.createGetRequest("/api/analytic2" + (isAll ? "?type=SIMPLE" : "?type=ROOTS_SIMPLE"));
 
-                    response = RequestService.createGetRequest("/api/analytic2" + (isAll ? "?type=ALL" : "?type=SIMPLE"));}
+                }
+
+
+
+
                 else {
                     wasCreated = true;
                     String sortParameter = "tag=";
@@ -221,18 +230,25 @@ public class PanelListFragment extends Fragment {
                         }
                     }
 
-                    response = RequestService.createGetRequest("/api/analytic2" + filter + (isAll ? "&type=ALL" : "&type=SIMPLE"));
-                }
+                    responseComplex = RequestService.createGetRequest("/api/analytic2" + filter+ (isAll ? "&type=COMPLEX" : "&type=COMPLEX"));
+                    responseSimple = RequestService.createGetRequest("/api/analytic2" + filter+(isAll ? "&type=SIMPLE" : "&type=ROOTS_SIMPLE"));                }
 
-                String responseStr = response.body().string();
-                jsonObject = new JSONObject(responseStr);
-                JSONArray panelsJson = jsonObject.getJSONArray("list");
-                panels = new ObjectMapper().readValue(panelsJson.toString(), new TypeReference<ArrayList<Panel>>() {
-                });
+                String responseComplexStr = responseComplex.body().string();
+                JSONObject jsonObjectComplex = new JSONObject(responseComplexStr);
+                JSONArray panelsJsonComplex = jsonObjectComplex.getJSONArray("list");
+                ArrayList<Panel> panelsComplex  = new ObjectMapper().readValue(panelsJsonComplex.toString(), new TypeReference<ArrayList<Panel>>() {});
+
+                String responseSimpleStr = responseSimple.body().string();
+                JSONObject jsonObjectSimple = new JSONObject(responseSimpleStr);
+                JSONArray panelsJsonSimple = jsonObjectSimple.getJSONArray("list");
+                ArrayList<Panel> panelsSimple  = new ObjectMapper().readValue(panelsJsonSimple.toString(), new TypeReference<ArrayList<Panel>>() {});
+                panelsComplex.addAll(panelsSimple);
+                jsonObject = jsonObjectSimple;
+                panels = panelsComplex;
 
                 for (Panel panel : panels)
                     panel.fixDate();
-                return response.code();
+                return responseComplex.code();
             } catch (Exception exc) {
                 Log.e("Panel", "unexpected JSON exception", exc);
 
