@@ -8,6 +8,7 @@ import android.content.DialogInterface.OnCancelListener;
 import android.content.DialogInterface.OnMultiChoiceClickListener;
 import android.graphics.Color;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -140,6 +141,7 @@ public class MultiSpinner extends androidx.appcompat.widget.AppCompatSpinner imp
                     }
                 });
         builder.setOnCancelListener(this);
+        try{
 
         AlertDialog dialog = builder.create();
 
@@ -152,7 +154,11 @@ public class MultiSpinner extends androidx.appcompat.widget.AppCompatSpinner imp
 
        // positive_button.setHeight(30);
         positive_button.setTextColor(Color.parseColor("#f0f8ff"));
-        return true;
+        return true;}
+        catch (Exception e){
+            Log.e("multispinner", e.toString());
+            return false;
+        }
     }
 
     public void setItems(Activity activity, List<Organisation> items, String allText,

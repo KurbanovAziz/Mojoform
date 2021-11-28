@@ -249,8 +249,11 @@ public class PanelListFragment extends Fragment {
                 jsonObject = jsonObjectSimple;
                 panels = panelsComplex;
 
+
                 for (Panel panel : panels)
                     panel.fixDate();
+
+
                 return responseComplex.code();
             } catch (Exception exc) {
                 Log.e("Panel", "unexpected JSON exception", exc);
