@@ -216,8 +216,10 @@
                     android:src="@drawable/download_icon" />
                 <org.dev_alex.mojo_qa.mojo.custom_views.MultiSpinner
                     android:id="@+id/spin"
+                    android:visibility="gone"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent" />
+
             </FrameLayout>
 
             <FrameLayout

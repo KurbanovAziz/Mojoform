@@ -115,6 +115,7 @@ public class PanelListFragment extends Fragment {
         getActivity().findViewById(R.id.group_by_btn).setVisibility(View.VISIBLE);
         getActivity().findViewById(R.id.search_btn).setVisibility(View.GONE);
         getActivity().findViewById(R.id.notification_btn).setVisibility(View.GONE);
+        getActivity().findViewById(R.id.spin).setVisibility(View.VISIBLE);
         getActivity().findViewById(R.id.qr_btn).setVisibility(View.GONE);
         getActivity().findViewById(R.id.group_by_btn).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -160,6 +161,8 @@ public class PanelListFragment extends Fragment {
         panels.addAll(syntheticPanels);
         panels.add(Panel.getSeparatorPanel());
         panels.addAll(normalPanels);
+        Panel panel = new Panel();
+        panels.add(0, panel);
 
         recyclerView.setAdapter(new PanelAdapter(panels, new PanelAdapter.OnPanelClickListener() {
             @Override

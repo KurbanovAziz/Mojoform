@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Составные показатели"
+        android:textColor="@color/multiple_image_select_primaryDark"
+        android:textSize="20dp"
+        android:layout_marginLeft="6dp" />
+</LinearLayout>

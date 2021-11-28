@@ -14,11 +14,15 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
+import android.widget.Button;
 import android.widget.CheckedTextView;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import androidx.annotation.Dimension;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
 
 import org.dev_alex.mojo_qa.mojo.R;
@@ -138,9 +142,16 @@ public class MultiSpinner extends androidx.appcompat.widget.AppCompatSpinner imp
         builder.setOnCancelListener(this);
 
         AlertDialog dialog = builder.create();
+
+
         dialog.getListView().setOnItemClickListener(this);
 
         dialog.show();
+        Button positive_button = dialog.getButton(DialogInterface.BUTTON_POSITIVE);
+        positive_button.setBackground(ContextCompat.getDrawable(activity, R.drawable.rounded_view));
+
+       // positive_button.setHeight(30);
+        positive_button.setTextColor(Color.parseColor("#f0f8ff"));
         return true;
     }
 

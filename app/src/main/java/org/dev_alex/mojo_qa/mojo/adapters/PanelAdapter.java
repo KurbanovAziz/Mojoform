@@ -61,16 +61,19 @@ public class PanelAdapter extends RecyclerView.Adapter<PanelAdapter.TaskViewHold
 
     @Override
     public int getItemViewType(int position) {
-        return panels.get(position).isSeparator() ? 1 : 0;
-    }
+        if(position == 0){return 2;}
+        if (panels.get(position).isSeparator()){return 1;}
+        return 0;   }
 
     @Override
     public TaskViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
         View v;
         if (viewType == 0)
             v = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.card_panel, viewGroup, false);
+        else if (viewType == 2)
+            v = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.complex_text, viewGroup, false);
         else {
-  v = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.simple_text, viewGroup, false);
+        v = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.simple_text, viewGroup, false);
 
 
         }
