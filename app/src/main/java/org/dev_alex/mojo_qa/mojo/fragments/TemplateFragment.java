@@ -3359,7 +3359,7 @@ public class TemplateFragment extends Fragment {
                 if (successfullySentMediaCt < totalSize) {
                     saveTemplateState();
 
-                    Toast.makeText(getContext(), R.string.error_not_all_images_were_sent, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), R.string.network_error, Toast.LENGTH_SHORT).show();
                 } else
                     new CompleteTemplateTask().execute();
             } catch (Exception exc) {
@@ -3412,8 +3412,10 @@ public class TemplateFragment extends Fragment {
                 if (loopDialog != null && loopDialog.isShowing())
                     loopDialog.dismiss();
 
-                if (responseCode == null)
+                if (responseCode == null){
                     Toast.makeText(getContext(), R.string.network_error, Toast.LENGTH_LONG).show();
+                    saveTemplateState();
+                return;}
                 else if (responseCode == 401)
                     Toast.makeText(getContext(), R.string.invalid_username_or_password, Toast.LENGTH_LONG).show();
                 else if (responseCode == 202 || responseCode == 200) {

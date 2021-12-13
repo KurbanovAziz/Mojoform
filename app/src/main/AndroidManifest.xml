@@ -29,7 +29,7 @@
         android:screenOrientation="portrait"
         android:theme="@style/Theme.AppCompat.Light.NoActionBar.FullScreen"
         android:usesCleartextTraffic="true"
-        tools:replace="android:allowBackup"
+        tools:replace="android:allowBackup,android:icon"
         tools:targetApi="q">
         <activity android:name=".activities.RecordAudio"></activity>
         <activity
