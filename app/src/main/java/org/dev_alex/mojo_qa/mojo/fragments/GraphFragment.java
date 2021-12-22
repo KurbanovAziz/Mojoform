@@ -7,6 +7,9 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
@@ -17,6 +20,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.components.AxisBase;
@@ -30,15 +34,22 @@ import com.github.mikephil.charting.formatter.IAxisValueFormatter;
 import com.github.mikephil.charting.highlight.Highlight;
 
 import org.dev_alex.mojo_qa.mojo.R;
+import org.dev_alex.mojo_qa.mojo.adapters.ComplexGraphAdapter;
+import org.dev_alex.mojo_qa.mojo.adapters.PanelAdapter;
+import org.dev_alex.mojo_qa.mojo.adapters.ResultGraphAdapter;
 import org.dev_alex.mojo_qa.mojo.models.GraphInfo;
 import org.dev_alex.mojo_qa.mojo.models.IndicatorModel;
+import org.dev_alex.mojo_qa.mojo.models.Panel;
 import org.dev_alex.mojo_qa.mojo.models.Value;
 import org.dev_alex.mojo_qa.mojo.services.RequestService;
 import org.dev_alex.mojo_qa.mojo.services.Utils;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -51,6 +62,8 @@ public class GraphFragment extends Fragment {
     public static final String WEEK = "week";
     public static final String MONTH = "month";
     public static final String YEAR = "year";
+    private RecyclerView recyclerView;
+
 
     private static final String TYPE_ARG = "type";
     private static final String ID_ARG = "panel_id";
@@ -61,6 +74,8 @@ public class GraphFragment extends Fragment {
     private long panelId;
     private boolean isPercents;
     private GraphInfo graphInfo;
+    public List<Panel> panels = new ArrayList<>();
+
     private SimpleDateFormat xDateFormat = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
     private SimpleDateFormat xDateFormatNoYear = new SimpleDateFormat("dd-MM", Locale.getDefault());
 
@@ -83,23 +98,95 @@ public class GraphFragment extends Fragment {
         panelId = getArguments().getLong(ID_ARG);
         isPercents = getArguments().getBoolean(IS_PERCENTS_ARG);
 
+
         if (rootView == null) {
             rootView = inflater.inflate(R.layout.fragment_graph, container, false);
+
             setListeners();
             Utils.setupCloseKeyboardUI(getActivity(), rootView);
 
             new GetGraphTask().execute();
         }
+        else {
+
+        }
+        recyclerView = (RecyclerView) rootView.findViewById(R.id.recycler_view);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         return rootView;
+    }
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        if (rootView != null) {
+            ViewGroup parentViewGroup = (ViewGroup) rootView.getParent();
+            if (parentViewGroup != null) {
+                parentViewGroup.removeAllViews();
+            }
+        }
     }
 
     private void setListeners() {
 
     }
+    private void showComplexPanels(List<Panel> panels) {
+        List<Panel> syntheticPanels = new ArrayList<>();
+        List<Panel> normalPanels = new ArrayList<>();
+
+        for (Panel panel : panels) {
+            if (panel.type.equals("complex"))
+                syntheticPanels.add(panel);
+            else
+                normalPanels.add(panel);
+        }
+
+        Collections.sort(syntheticPanels, (o1, o2) -> o1.name.compareToIgnoreCase(o2.name));
+        Collections.sort(normalPanels, (o1, o2) -> o1.name.compareToIgnoreCase(o2.name));
+
+        panels.clear();
+        panels.addAll(syntheticPanels);
+        panels.add(Panel.getSeparatorPanel());
+        panels.addAll(normalPanels);
+        Panel panel = new Panel();
+        panels.add(0, panel);
+
+        recyclerView.setAdapter(new ComplexGraphAdapter(panels, new ComplexGraphAdapter.OnPanelClickListener() {
+            @Override
+            public void onClick(Panel panel) {
+                onPanelClick(panel);
+            }
+        }));
+
+    }
+    private void showResultPanels(List<Panel> panels) {
+
+
+
+        Panel panel = new Panel();
+        panels.add(0, panel);
+
+        recyclerView.setAdapter(new ResultGraphAdapter(panels, new ResultGraphAdapter.OnPanelClickListener() {
+            @Override
+            public void onClick(Panel panel) {
+                //onPanelClick(panel);
+            }
+        }));
+
+    }
+    private void onPanelClick(Panel panel) {
+        getActivity()
+                .getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.container, GraphListFragment.newInstance(panel))
+                .addToBackStack(null)
+                .commit();
+    }
+
 
     private void buildGraph() {
         try {
+            View view = renderHistogram(graphInfo);
             ((ViewGroup) rootView).addView(renderHistogram(graphInfo));
+
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -108,7 +195,7 @@ public class GraphFragment extends Fragment {
     private View renderHistogram(GraphInfo graphInfo) throws Exception {
         Resources resources = getContext().getResources();
         int chartHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 300, resources.getDisplayMetrics());
-        RelativeLayout chartContainer = new RelativeLayout(getContext());
+        LinearLayout chartContainer = rootView.findViewById(R.id.LLcontainer);
         chartContainer.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, chartHeight));
 
         float yMin = 0, yMax = 0;
@@ -160,7 +247,7 @@ public class GraphFragment extends Fragment {
             chartContainer.addView(emptyText);
 
             RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams
-                    (ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                    (ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.MATCH_PARENT);
             layoutParams.addRule(RelativeLayout.CENTER_IN_PARENT);
             emptyText.setLayoutParams(layoutParams);
             emptyText.requestLayout();
@@ -176,7 +263,7 @@ public class GraphFragment extends Fragment {
         */
         for (k = 0; k < barEntries.size(); k++) {
             float value = barEntries.get(k).getY();
-            int defaultColor = Color.parseColor("#2baaf6");
+            int defaultColor = Color.parseColor("#288978");
 
             for (IndicatorModel.Range range : ranges) {
                 if (value >= range.from && value <= range.to)
@@ -187,7 +274,8 @@ public class GraphFragment extends Fragment {
 
 
         BarChart barChart = new BarChart(getContext());
-        barChart.setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT));
+
+        barChart.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, chartHeight));
         barChart.setDrawValueAboveBar(false);
 
         BarDataSet set = new BarDataSet(barEntries, "BarDataSet");
@@ -205,6 +293,7 @@ public class GraphFragment extends Fragment {
         barChart.getXAxis().setGridColor(Color.parseColor("#374E3F60"));
         barChart.getXAxis().setAxisLineColor(Color.parseColor("#374E3F60"));
 
+
         barChart.setData(barData);
         barChart.setFitBars(false);
         barChart.getLegend().setEnabled(false);
@@ -215,10 +304,12 @@ public class GraphFragment extends Fragment {
 
         barChart.invalidate();
         barChart.zoom(barEntries.size() / 10, 0.9f, 0, 0);
-
+        RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams
+                (ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.MATCH_PARENT);
         CustomMarkerView mv = new CustomMarkerView(getContext(), R.layout.higlight_marker, xValues, 0, xValues.size() - 1, yMin, yMax);
         barChart.setMarker(mv);
         chartContainer.addView(barChart);
+
 
         return chartContainer;
     }
@@ -268,7 +359,8 @@ public class GraphFragment extends Fragment {
                             stringValue = "";
                         }
                     } else {
-                        stringValue = "";}
+                        stringValue = "";
+                    }
                 } else {
                     stringValue = "";
                 }
@@ -355,7 +447,7 @@ public class GraphFragment extends Fragment {
     }
 
     public class GetGraphTask extends AsyncTask<Void, Void, Integer> {
-
+boolean isComplex;
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
@@ -369,6 +461,27 @@ public class GraphFragment extends Fragment {
 
                 graphInfo = new ObjectMapper().readValue(responseStr, GraphInfo.class);
                 graphInfo.fixDates();
+                JSONObject jsonObjectComplex = new JSONObject(responseStr);
+                if(jsonObjectComplex.has("complex_info")){
+                JSONArray panelsJsonComplex = jsonObjectComplex.getJSONObject("complex_info").getJSONArray("components");
+                ArrayList<Panel> panels1  = new ObjectMapper().readValue(panelsJsonComplex.toString(), new TypeReference<ArrayList<Panel>>() {});
+                panels = panels1;
+                isComplex = true;
+                for (Panel panel : panels){
+                    panel.fixDate(); }}
+                else {
+                    JSONArray panelsJsonComplex = jsonObjectComplex.getJSONArray("values");
+                    String resultName = jsonObjectComplex.getJSONObject("template_info").getJSONObject("template").getString("name");
+                    ArrayList<Panel> panels1  = new ObjectMapper().readValue(panelsJsonComplex.toString(), new TypeReference<ArrayList<Panel>>() {});
+
+                    panels = panels1;
+                    isComplex = false;
+                    for (Panel panel : panels){
+                        panel.fixDate();
+
+
+                        panel.name = resultName; }}
+
 
                 return response.code();
             } catch (Exception exc) {
@@ -380,8 +493,13 @@ public class GraphFragment extends Fragment {
         @Override
         protected void onPostExecute(Integer responseCode) {
             super.onPostExecute(responseCode);
-            if (responseCode == 200 || responseCode == 201)
+
+            if (responseCode == 200 || responseCode == 201){
                 buildGraph();
+                if(isComplex){
+            showComplexPanels(panels);}
+            else {showResultPanels(panels);}}
+
             else {
                 Toast.makeText(getContext(), R.string.try_later, Toast.LENGTH_SHORT).show();
                 getActivity().getSupportFragmentManager().popBackStack();

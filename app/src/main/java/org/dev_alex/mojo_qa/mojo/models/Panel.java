@@ -3,6 +3,7 @@ package org.dev_alex.mojo_qa.mojo.models;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import java.io.Serializable;
+import java.io.StringReader;
 import java.util.ArrayList;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -14,8 +15,12 @@ public class Panel implements Serializable {
 
     public TimeSeries current;
     public TimeSeries complete;
+
     public String config;
     public String color;
+    public String prc;
+    public String val;
+
     public ArrayList<PanelTag> tags;
 
     public static Panel getSeparatorPanel() {
@@ -28,7 +33,7 @@ public class Panel implements Serializable {
     }
 
     public boolean isSeparator() {
-        return name == null && type.equals("separator") && id == -1;
+        return name == null && "separator".equals(type) && id == -1;
     }
 
     public static class TimeSeries implements Serializable {
@@ -39,6 +44,10 @@ public class Panel implements Serializable {
     }
 
     public void fixDate() {
+
+
+
+
         if (current != null) {
             if (current.day != null) {
                 current.day.from *= 1000;
