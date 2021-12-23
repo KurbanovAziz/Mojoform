@@ -35,10 +35,10 @@ import com.github.mikephil.charting.highlight.Highlight;
 
 import org.dev_alex.mojo_qa.mojo.R;
 import org.dev_alex.mojo_qa.mojo.adapters.ComplexGraphAdapter;
-import org.dev_alex.mojo_qa.mojo.adapters.PanelAdapter;
 import org.dev_alex.mojo_qa.mojo.adapters.ResultGraphAdapter;
 import org.dev_alex.mojo_qa.mojo.models.GraphInfo;
 import org.dev_alex.mojo_qa.mojo.models.IndicatorModel;
+import org.dev_alex.mojo_qa.mojo.models.Organisation;
 import org.dev_alex.mojo_qa.mojo.models.Panel;
 import org.dev_alex.mojo_qa.mojo.models.Value;
 import org.dev_alex.mojo_qa.mojo.services.RequestService;
@@ -54,7 +54,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-import lecho.lib.hellocharts.view.PieChartView;
 import okhttp3.Response;
 
 public class GraphFragment extends Fragment {
@@ -72,6 +71,7 @@ public class GraphFragment extends Fragment {
     private View rootView;
     private String type;
     private long panelId;
+    String color;
     private boolean isPercents;
     private GraphInfo graphInfo;
     public List<Panel> panels = new ArrayList<>();
@@ -185,7 +185,7 @@ public class GraphFragment extends Fragment {
     private void buildGraph() {
         try {
             View view = renderHistogram(graphInfo);
-            ((ViewGroup) rootView).addView(renderHistogram(graphInfo));
+            ((ViewGroup) rootView).addView(view);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -204,6 +204,7 @@ public class GraphFragment extends Fragment {
 
         int k = 0;
         for (Value value : graphInfo.values) {
+            if (isValueOk(value)){
             Date date = new Date(value.from);
 
             BarEntry barEntry;
@@ -238,19 +239,11 @@ public class GraphFragment extends Fragment {
             barEntries.add(barEntry);
             xValues.add(xDateFormat.format(date));
             k++;
-        }
+        }}
         if (barEntries.isEmpty()) {
             barEntries.add(new BarEntry(0, 0));
 
-            TextView emptyText = new TextView(getContext());
-            emptyText.setText(R.string.no_data);
-            chartContainer.addView(emptyText);
-
-            RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams
-                    (ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.MATCH_PARENT);
-            layoutParams.addRule(RelativeLayout.CENTER_IN_PARENT);
-            emptyText.setLayoutParams(layoutParams);
-            emptyText.requestLayout();
+   Toast.makeText(getContext(), "На графике нет значений за этот период", Toast.LENGTH_LONG).show();
         }
 
         ArrayList<Integer> colors = new ArrayList<>();
@@ -264,6 +257,9 @@ public class GraphFragment extends Fragment {
         for (k = 0; k < barEntries.size(); k++) {
             float value = barEntries.get(k).getY();
             int defaultColor = Color.parseColor("#288978");
+            if(color != null){
+                defaultColor = Color.parseColor(color);
+            }
 
             for (IndicatorModel.Range range : ranges) {
                 if (value >= range.from && value <= range.to)
@@ -301,18 +297,20 @@ public class GraphFragment extends Fragment {
         barChart.setScaleYEnabled(true);
 
         setupAxis(barChart.getXAxis(), xValues);
+        Date date = new Date();
 
         barChart.invalidate();
         barChart.zoom(barEntries.size() / 10, 0.9f, 0, 0);
         RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams
                 (ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.MATCH_PARENT);
-        CustomMarkerView mv = new CustomMarkerView(getContext(), R.layout.higlight_marker, xValues, 0, xValues.size() - 1, yMin, yMax);
+        CustomMarkerView mv = new CustomMarkerView(getContext(), R.layout.higlight_marker, xValues, 0 , xValues.size() - 1, yMin, yMax);
         barChart.setMarker(mv);
         chartContainer.addView(barChart);
 
 
         return chartContainer;
     }
+
 
     private void setupAxis(XAxis xAxis, final List<String> xValues) {
         xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
@@ -368,6 +366,7 @@ public class GraphFragment extends Fragment {
             }
         });
     }
+
 
     public class CustomMarkerView extends MarkerView {
 
@@ -438,8 +437,94 @@ public class GraphFragment extends Fragment {
             } catch (ParseException e1) {
                 e1.printStackTrace();
             }
+        }    }
+    public boolean isPanelOk(Panel panel){
+        Date date = new Date();
+        switch (type){
+            case (YEAR):
+                long from = panel.from * 1000;
+                long to = panel.to *1000;
+                long limit1 = date.getTime() - Long.parseLong("73072000000");
+                return to < date.getTime() && from > limit1;
+            case (MONTH):
+                long from2 = panel.from * 1000;
+                long to2 = panel.to *1000;
+                long limit2 = date.getTime() - Long.parseLong("10713600000");
+                return to2 < date.getTime() && from2 > limit2;
+            case (WEEK):
+                long from3 = panel.from * 1000;
+                long to3 = panel.to *1000;
+                long date3 = date.getTime();
+                long limit3 = date.getTime() - Long.parseLong("3024000000");
+                return to3 < date.getTime() && from3 > limit3;
+            case(DAY):
+                long from4 = panel.from * 1000;
+                long to4 = panel.to *1000;
+                long date4 = date.getTime();
+                long limit4 = date.getTime() - Long.parseLong("691200000");
+                return to4 < date.getTime() && from4 > limit4;
+
         }
+        return false;
+
     }
+    public boolean isValueOk(Value panel){
+        Date date = new Date();
+        if(panel == null) return false;
+
+        switch (type){
+            case (YEAR):
+                long from = panel.from;
+                long to = panel.to;
+                if(panel.from == 0 && panel.to == 0) return false;
+
+                long limit1 = date.getTime() - Long.parseLong("63072000000");
+                return to < date.getTime() && from > limit1;
+            case (MONTH):
+                long from2 = panel.from;
+                long to2 = panel.to ;
+                if(panel.from == 0 && panel.to == 0) return false;
+
+                long limit2 = date.getTime() - Long.parseLong("10713600000");
+                return to2 < date.getTime() && from2 > limit2;
+            case (WEEK):
+                long from3 = panel.from ;
+                long to3 = panel.to ;
+                if(panel.from == 0 && panel.to == 0) return false;
+
+                long limit3 = date.getTime() - Long.parseLong("3024000000");
+                return to3 < date.getTime() && from3 > limit3;
+            case(DAY):
+                long from4 = panel.from ;
+                long to4 = panel.to ;
+                if(panel.from == 0 && panel.to == 0) return false;
+                long limit4 = date.getTime() - Long.parseLong("691200000");
+                return to4 < date.getTime() && from4 > limit4;
+
+        }
+        return false;
+
+    }
+
+
+    public long getTimeLimit(){
+        Date date = new Date();
+        switch (type){
+            case (YEAR):
+                return date.getTime() - Long.parseLong("63072000000");
+            case (MONTH):
+                return date.getTime() - Long.parseLong("10713600000");
+            case (WEEK):
+                return date.getTime() - Long.parseLong("3024000000");
+            case(DAY):
+                return date.getTime() - Long.parseLong("691200000");
+
+        }
+        return date.getTime();
+
+    }
+
+
 
     private int dpToPx(int dp) {
         Resources resources = getContext().getResources();
@@ -458,12 +543,24 @@ boolean isComplex;
             try {
                 Response response = RequestService.createGetRequest("/api/analytic/graph/" + panelId + "/" + type);
                 String responseStr = response.body().string();
+                Response findResponse = RequestService.createGetRequest("/api/analytic/find/" + panelId);
+                String findResponseStr = findResponse.body().string();
 
                 graphInfo = new ObjectMapper().readValue(responseStr, GraphInfo.class);
                 graphInfo.fixDates();
+
+                JSONArray colorsJson = new JSONObject(findResponseStr).getJSONArray("tags");
+                ArrayList<Organisation> colors = new ObjectMapper().readValue(colorsJson.toString(), new TypeReference<ArrayList<Organisation>>() {});
+                if(colors != null){
+                    color = colors.get(0).getColor();
+                }
+
+
+
                 JSONObject jsonObjectComplex = new JSONObject(responseStr);
                 if(jsonObjectComplex.has("complex_info")){
                 JSONArray panelsJsonComplex = jsonObjectComplex.getJSONObject("complex_info").getJSONArray("components");
+
                 ArrayList<Panel> panels1  = new ObjectMapper().readValue(panelsJsonComplex.toString(), new TypeReference<ArrayList<Panel>>() {});
                 panels = panels1;
                 isComplex = true;
@@ -474,21 +571,27 @@ boolean isComplex;
                     String resultName = jsonObjectComplex.getJSONObject("template_info").getJSONObject("template").getString("name");
                     ArrayList<Panel> panels1  = new ObjectMapper().readValue(panelsJsonComplex.toString(), new TypeReference<ArrayList<Panel>>() {});
 
-                    panels = panels1;
                     isComplex = false;
-                    for (Panel panel : panels){
+                    panels = new ArrayList<Panel>();
+
+                    for (Panel panel : panels1){
                         panel.fixDate();
-
-
-                        panel.name = resultName; }}
+                        panel.name = resultName;
+                        if(isPanelOk(panel)){panels.add(panel); }
+                        else{Log.e("lol", "kek");}
+                   }
+                }
 
 
                 return response.code();
             } catch (Exception exc) {
                 exc.printStackTrace();
+                Log.e("t", String.valueOf(exc));
                 return null;
+
             }
         }
+
 
         @Override
         protected void onPostExecute(Integer responseCode) {

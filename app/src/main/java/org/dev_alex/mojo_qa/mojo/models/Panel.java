@@ -20,6 +20,8 @@ public class Panel implements Serializable {
     public String color;
     public String prc;
     public String val;
+    public long from;
+    public long to;
 
     public ArrayList<PanelTag> tags;
 
