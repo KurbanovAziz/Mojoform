@@ -2,21 +2,76 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
+    android:background="@drawable/main_activity_background"
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <com.google.android.material.tabs.TabLayout
-        android:id="@+id/tab_layout"
+    <RadioGroup
+        android:id="@+id/select_period"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="#95699e"
-        app:tabGravity="fill"
-        app:tabMode="fixed"
-        app:tabSelectedTextColor="@android:color/white"
-        app:tabTextColor="#c9c9c9" />
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_marginBottom="20dp"
+        android:layout_marginTop="15dp"
+        android:background="@drawable/mark"
+        android:layout_gravity="center"
+        android:orientation="horizontal"
+        android:paddingLeft="4dp"
+        android:paddingRight="4dp"
+        android:gravity="center"
 
-    <org.dev_alex.mojo_qa.mojo.custom_views.NoSwipeViewPager
-        android:id="@+id/view_pager"
+        android:paddingTop="4dp"
+        android:paddingBottom="4dp">
+
+        <RadioButton
+            android:id="@+id/day"
+            android:layout_width="0dp"
+            android:layout_height="40dp"
+            android:layout_weight="1.1"
+            android:background="@drawable/graph_switch_button_background"
+            android:button="@null"
+            android:gravity="center"
+
+            android:text="ДЕНЬ"
+            android:textColor="@color/toggle_button_text_color" />
+
+        <RadioButton
+            android:id="@+id/week"
+            android:layout_width="0dp"
+            android:layout_height="40dp"
+            android:layout_weight="1"
+
+            android:background="@drawable/graph_switch_button_background"
+            android:button="@null"
+            android:gravity="center"
+            android:text="НЕДЕЛЯ"
+            android:textColor="@color/toggle_button_text_color" />
+        <RadioButton
+            android:id="@+id/month"
+            android:layout_width="0dp"
+            android:layout_height="40dp"
+            android:layout_weight="1"
+            android:background="@drawable/graph_switch_button_background"
+            android:button="@null"
+            android:gravity="center"
+            android:text="МЕСЯЦ"
+            android:textColor="@color/toggle_button_text_color" />
+
+        <RadioButton
+            android:id="@+id/year"
+            android:layout_width="0dp"
+            android:layout_height="40dp"
+            android:layout_weight="1"
+            android:background="@drawable/graph_switch_button_background"
+            android:button="@null"
+            android:gravity="center"
+            android:text="ГОД"
+            android:textColor="@color/toggle_button_text_color" />
+    </RadioGroup>
+
+    <RelativeLayout
+        android:id="@+id/graph_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@drawable/main_activity_background" />

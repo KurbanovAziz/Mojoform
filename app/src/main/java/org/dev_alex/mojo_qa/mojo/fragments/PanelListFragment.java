@@ -16,7 +16,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.CheckBox;
 import android.widget.CompoundButton;
+import android.widget.RadioButton;
 import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.TextView;
@@ -45,7 +47,7 @@ public class PanelListFragment extends Fragment {
     private View rootView;
     private ProgressDialog loopDialog;
     private RecyclerView recyclerView;
-    private Switch allAnalyticsSwitch;
+    private CheckBox allAnalyticsSwitch;
     JSONObject jsonObject;
     public List<Panel> panels;
     public List<Organisation> organisations = new ArrayList<>();
@@ -70,7 +72,7 @@ public class PanelListFragment extends Fragment {
         if (rootView == null) {
             rootView = inflater.inflate(R.layout.fragment_panel_list, container, false);
 
-            allAnalyticsSwitch = (Switch) rootView.findViewById(R.id.all_analytics_switch);
+            allAnalyticsSwitch =  rootView.findViewById(R.id.all_analytics_switch);
 
             recyclerView = (RecyclerView) rootView.findViewById(R.id.recycler_view);
             recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
@@ -198,7 +200,6 @@ public class PanelListFragment extends Fragment {
         protected void onPreExecute() {
             super.onPreExecute();
             isAll = allAnalyticsSwitch.isChecked();
-            TextView textView = rootView.findViewById(R.id.all_text);
 
             loopDialog.show();
         }

@@ -107,9 +107,6 @@ public class GraphFragment extends Fragment {
 
             new GetGraphTask().execute();
         }
-        else {
-
-        }
         recyclerView = (RecyclerView) rootView.findViewById(R.id.recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         return rootView;
@@ -288,6 +285,7 @@ public class GraphFragment extends Fragment {
         barChart.getAxisLeft().setAxisLineColor(Color.parseColor("#374E3F60"));
         barChart.getXAxis().setGridColor(Color.parseColor("#374E3F60"));
         barChart.getXAxis().setAxisLineColor(Color.parseColor("#374E3F60"));
+        barChart.setBackgroundColor(Color.parseColor("#fffafa"));
 
 
         barChart.setData(barData);

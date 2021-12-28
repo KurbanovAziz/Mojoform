@@ -52,8 +52,9 @@ public class RecordAudio extends AppCompatActivity {
         stopplay.setEnabled(false);
         save.setEnabled(false);
 
-        mFileName = Environment.getExternalStorageDirectory().getAbsolutePath();
-        mFileName += "/AudioRecording.3gp";
+        mFileName = String.valueOf(Environment
+                .getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS));
+        mFileName += "/AudioR.3gp";
 
         startbtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -74,10 +75,11 @@ public class RecordAudio extends AppCompatActivity {
                     mRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
                     mRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
                     mRecorder.setOutputFile(mFileName);
+
                     try {
                         mRecorder.prepare();
                     } catch (IOException e) {
-                        Log.e(LOG_TAG, "prepare() failed");
+                        e.printStackTrace();
                     }
                     mRecorder.start();
                     Toast.makeText(getApplicationContext(), "Идёт запись...", Toast.LENGTH_SHORT).show();
@@ -171,6 +173,25 @@ public class RecordAudio extends AppCompatActivity {
                 break;
         }
     }
+    public void stop() {
+        if (mRecorder != null) {
+            try {
+                mRecorder.stop();
+            } catch (RuntimeException stopException) {
+                //handle cleanup here
+            } finally {
+                mRecorder.release();
+            }
+            mRecorder = null;
+        }
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        stop();
+    }
+
     public boolean CheckPermissions() {
         int result = ContextCompat.checkSelfPermission(getApplicationContext(), WRITE_EXTERNAL_STORAGE);
         int result1 = ContextCompat.checkSelfPermission(getApplicationContext(), RECORD_AUDIO);

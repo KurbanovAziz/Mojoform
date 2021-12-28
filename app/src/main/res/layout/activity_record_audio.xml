@@ -97,11 +97,12 @@
 
     <Button
         android:id="@+id/btnSave"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="120dp"
+        android:layout_height="60dp"
         android:visibility="invisible"
-        android:textColor="#EBFFFFFF"
-        android:background="#60800AA1"
+        android:textColor="#EBE1E1E1"
+        android:textSize="17dp"
+        android:background="@drawable/rounded_view"
         android:text="Сохранить" />
 
 </LinearLayout>

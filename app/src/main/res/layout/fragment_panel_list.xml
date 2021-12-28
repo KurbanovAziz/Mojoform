@@ -5,41 +5,17 @@
     android:background="@drawable/main_activity_background"
     android:orientation="vertical">
 
-    <RelativeLayout
+    <FrameLayout
         android:id="@+id/calendar_control_panel"
         android:layout_width="match_parent"
-        android:layout_height="45dp"
-        android:background="#95699e">
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center_vertical"
-            android:layout_centerVertical="true"
-            android:layout_marginLeft="20dp"
-            android:textSize="18dp"
-            android:text=""/>
+        android:layout_height="match_parent"
+        android:gravity="right"
+        android:background="#0095699E">
 
 
-        <Switch
-            android:id="@+id/all_analytics_switch"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:layout_marginRight="10dp" />
-    </RelativeLayout>
-    <TextView
-        android:id="@+id/all_text"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center_vertical"
-        android:visibility="gone"
-        android:layout_marginTop="10dp"
-        android:layout_marginBottom="-8dp"
-        android:layout_centerVertical="true"
-        android:layout_marginStart="15dp"
-        android:textColor="@color/multiple_image_select_primaryDark"
-        android:textSize="20dp"
-        android:text="Составные показатели"/>
+
+
+
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recycler_view"
@@ -50,4 +26,16 @@
         android:paddingLeft="10dp"
         android:paddingRight="10dp"
         android:paddingTop="10dp" />
+        <CheckBox
+            android:id="@+id/all_analytics_switch"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="right"
+            android:layout_gravity="right"
+            android:button="@drawable/switcher_background"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="10dp" />
+    </FrameLayout>
+
 </LinearLayout>
+

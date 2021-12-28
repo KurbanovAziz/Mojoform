@@ -1,6 +1,8 @@
 package org.dev_alex.mojo_qa.mojo.fragments;
 
 import android.os.Bundle;
+
+import androidx.annotation.IdRes;
 import androidx.annotation.Nullable;
 import com.google.android.material.tabs.TabLayout;
 import androidx.fragment.app.Fragment;
@@ -10,9 +12,12 @@ import androidx.viewpager.widget.ViewPager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 
 import org.dev_alex.mojo_qa.mojo.R;
+import org.dev_alex.mojo_qa.mojo.adapters.TaskAdapter;
 import org.dev_alex.mojo_qa.mojo.models.Panel;
 import org.dev_alex.mojo_qa.mojo.services.Utils;
 import org.json.JSONObject;
@@ -22,8 +27,8 @@ import java.util.List;
 
 public class GraphListFragment extends Fragment {
     private View rootView = null;
-    private ViewPager viewPager;
-    private TabLayout tabLayout;
+    ///private ViewPager viewPager;
+    private RadioGroup tabLayout;
 
     private Panel panel;
 
@@ -48,11 +53,56 @@ public class GraphListFragment extends Fragment {
             Utils.setupCloseKeyboardUI(getActivity(), rootView);
 
 
-            viewPager = (ViewPager) rootView.findViewById(R.id.view_pager);
-            setupViewPager();
-            tabLayout = (TabLayout) rootView.findViewById(R.id.tab_layout);
-            tabLayout.setupWithViewPager(viewPager);
-        }
+            //viewPager = (ViewPager) rootView.findViewById(R.id.view_pager);
+            tabLayout = (RadioGroup) rootView.findViewById(R.id.select_period);
+            tabLayout.check(R.id.day);
+            boolean isPercents = true;
+            try {
+                if (panel.config != null)
+                    isPercents = new JSONObject(panel.config).getInt("dataType") == 2;
+            } catch (Exception exc) {
+                exc.printStackTrace();
+            }
+            getFragmentManager().beginTransaction().replace(R.id.graph_container, GraphFragment.newInstance(GraphFragment.DAY, panel.id, isPercents)).commitAllowingStateLoss();
+
+
+            tabLayout.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+                @Override
+                public void onCheckedChanged(RadioGroup group, @IdRes int checkedId) {
+                    boolean isPercents = true;
+                    try {
+                        if (panel.config != null)
+                            isPercents = new JSONObject(panel.config).getInt("dataType") == 2;
+                    } catch (Exception exc) {
+                        exc.printStackTrace();
+                    }
+                    switch (checkedId) {
+                        case R.id.day:
+                            getFragmentManager().beginTransaction().replace(R.id.graph_container, GraphFragment.newInstance(GraphFragment.DAY, panel.id, isPercents)).commitAllowingStateLoss();
+
+                            break;
+
+                        case R.id.week:
+                            getFragmentManager().beginTransaction().replace(R.id.graph_container, GraphFragment.newInstance(GraphFragment.WEEK, panel.id, isPercents)).commitAllowingStateLoss();
+                            break;
+
+                        case R.id.month:
+                            getFragmentManager().beginTransaction().replace(R.id.graph_container, GraphFragment.newInstance(GraphFragment.MONTH, panel.id, isPercents)).commitAllowingStateLoss();
+                            break;
+
+                        case R.id.year:
+                            getFragmentManager().beginTransaction().replace(R.id.graph_container, GraphFragment.newInstance(GraphFragment.YEAR, panel.id, isPercents)).commitAllowingStateLoss();
+                            break;
+                    }
+                }
+            });
+/*
+        adapter.addFragment(GraphFragment.newInstance(GraphFragment.DAY, panel.id, isPercents), "День");
+        adapter.addFragment(GraphFragment.newInstance(GraphFragment.WEEK, panel.id, isPercents), "Неделя");
+        adapter.addFragment(GraphFragment.newInstance(GraphFragment.MONTH, panel.id, isPercents), "Месяц");
+        adapter.addFragment(GraphFragment.newInstance(GraphFragment.YEAR, panel.id, isPercents), "Год");
+ */
+      }
         return rootView;
     }
 
@@ -94,7 +144,7 @@ public class GraphListFragment extends Fragment {
         adapter.addFragment(GraphFragment.newInstance(GraphFragment.WEEK, panel.id, isPercents), "Неделя");
         adapter.addFragment(GraphFragment.newInstance(GraphFragment.MONTH, panel.id, isPercents), "Месяц");
         adapter.addFragment(GraphFragment.newInstance(GraphFragment.YEAR, panel.id, isPercents), "Год");
-        viewPager.setAdapter(adapter);
+        //viewPager.setAdapter(adapter);
     }
 
 
