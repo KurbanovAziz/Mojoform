@@ -91,7 +91,10 @@ public class PanelAdapter extends RecyclerView.Adapter<PanelAdapter.TaskViewHold
                 //viewHolder.point.setColorFilter(Color.parseColor(panel.tags.get(0).getColor()));
                 List< SliceValue > pieData = new ArrayList<>();
                 for (int j = 0; j < panel.tags.size(); j++){
-                    pieData.add(new SliceValue(1, Color.parseColor(panel.tags.get(j).getColor())));
+                    try {
+                        pieData.add(new SliceValue(1, Color.parseColor(panel.tags.get(j).getColor())));
+                    }
+                    catch (Exception ignored){}
                 }
                 PieChartData pieChartData = new PieChartData(pieData);
                 viewHolder.point.setPieChartData(pieChartData);
