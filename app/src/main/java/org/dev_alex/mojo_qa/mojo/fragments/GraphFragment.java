@@ -208,7 +208,7 @@ public class GraphFragment extends Fragment {
 
             BarEntry barEntry;
 
-            if (false) {
+            if (isPercents) {
                 barEntry = new BarEntry((float) k, (float) value.prc);
 
                 if (k == 0) {
