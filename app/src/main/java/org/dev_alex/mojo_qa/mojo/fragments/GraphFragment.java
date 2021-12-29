@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.util.Log;
+import android.util.Range;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -40,6 +41,7 @@ import org.dev_alex.mojo_qa.mojo.models.GraphInfo;
 import org.dev_alex.mojo_qa.mojo.models.IndicatorModel;
 import org.dev_alex.mojo_qa.mojo.models.Organisation;
 import org.dev_alex.mojo_qa.mojo.models.Panel;
+import org.dev_alex.mojo_qa.mojo.models.Ranges;
 import org.dev_alex.mojo_qa.mojo.models.Value;
 import org.dev_alex.mojo_qa.mojo.services.RequestService;
 import org.dev_alex.mojo_qa.mojo.services.Utils;
@@ -71,10 +73,10 @@ public class GraphFragment extends Fragment {
     private View rootView;
     private String type;
     private long panelId;
-    String color;
     private boolean isPercents;
     private GraphInfo graphInfo;
     public List<Panel> panels = new ArrayList<>();
+    public List<Ranges> ranges;
 
     private SimpleDateFormat xDateFormat = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
     private SimpleDateFormat xDateFormatNoYear = new SimpleDateFormat("dd-MM", Locale.getDefault());
@@ -206,7 +208,7 @@ public class GraphFragment extends Fragment {
 
             BarEntry barEntry;
 
-            if (isPercents) {
+            if (false) {
                 barEntry = new BarEntry((float) k, (float) value.prc);
 
                 if (k == 0) {
@@ -244,7 +246,6 @@ public class GraphFragment extends Fragment {
         }
 
         ArrayList<Integer> colors = new ArrayList<>();
-        ArrayList<IndicatorModel.Range> ranges = new ArrayList<>();
         /*    if (graphInfo.has("ranges")) {
             ranges = new ObjectMapper()
                     .readValue(graphObj.getJSONArray("ranges").toString(), new TypeReference<ArrayList<IndicatorModel.Range>>() {
@@ -253,14 +254,28 @@ public class GraphFragment extends Fragment {
         */
         for (k = 0; k < barEntries.size(); k++) {
             float value = barEntries.get(k).getY();
-            int defaultColor = Color.parseColor("#288978");
-            if(color != null){
-                defaultColor = Color.parseColor(color);
-            }
+            int defaultColor = Color.parseColor("#42aaff");
 
-            for (IndicatorModel.Range range : ranges) {
+            if(ranges != null && ranges.size() != 0){
+            for (Ranges range : ranges) {
                 if (value >= range.from && value <= range.to)
                     defaultColor = Color.parseColor("#AA" + range.color.substring(1));
+            }
+            }
+            else{
+                try {
+
+
+                defaultColor = Color.parseColor("#ff0000");
+                if(value < 86)  defaultColor = Color.parseColor("#ff0000");
+                if (value > 85 && value < 96){  defaultColor = Color.parseColor("#eaff00");}
+                if (value > 95 && value < 101){  defaultColor = Color.parseColor("#15ff00");}
+                if (value > 100){defaultColor = Color.parseColor("#42aaff");}}
+                catch (Exception e ){
+                    e.printStackTrace();
+                }
+
+
             }
             colors.add(defaultColor);
         }
@@ -546,12 +561,21 @@ boolean isComplex;
 
                 graphInfo = new ObjectMapper().readValue(responseStr, GraphInfo.class);
                 graphInfo.fixDates();
-
-                JSONArray colorsJson = new JSONObject(findResponseStr).getJSONArray("tags");
-                ArrayList<Organisation> colors = new ObjectMapper().readValue(colorsJson.toString(), new TypeReference<ArrayList<Organisation>>() {});
-                if(colors != null){
-                    color = colors.get(0).getColor();
+                try {
+                    String configStr = new JSONObject(findResponseStr).getString("config");
+                    JSONArray configJsonArray = new JSONObject(configStr).getJSONArray("ranges");
+                    ArrayList<Ranges> ranges1  = new ObjectMapper().readValue(configJsonArray.toString(), new TypeReference<ArrayList<Ranges>>() {});
+                    ranges = ranges1;
                 }
+                catch (Exception e){
+                    ranges = new ArrayList<>();
+                }
+
+
+
+
+
+
 
 
 
@@ -584,9 +608,7 @@ boolean isComplex;
                 return response.code();
             } catch (Exception exc) {
                 exc.printStackTrace();
-                Log.e("t", String.valueOf(exc));
                 return null;
-
             }
         }
 
