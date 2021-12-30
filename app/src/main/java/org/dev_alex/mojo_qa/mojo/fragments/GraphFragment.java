@@ -48,6 +48,8 @@ import org.dev_alex.mojo_qa.mojo.services.Utils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -579,6 +581,9 @@ boolean isComplex;
 
 
 
+
+
+
                 JSONObject jsonObjectComplex = new JSONObject(responseStr);
                 if(jsonObjectComplex.has("complex_info")){
                 JSONArray panelsJsonComplex = jsonObjectComplex.getJSONObject("complex_info").getJSONArray("components");
@@ -607,6 +612,9 @@ boolean isComplex;
 
                 return response.code();
             } catch (Exception exc) {
+                StringWriter writer = new StringWriter();
+                exc.printStackTrace( new PrintWriter(writer,true ));
+                Log.e("aaa", "exeption stack is :\n" + writer.toString());
                 exc.printStackTrace();
                 return null;
             }

@@ -5,4 +5,6 @@ public class Ranges {
     public int to;
     public String color;
     public String name;
+    public String id;
+    public String dataType;
 }
