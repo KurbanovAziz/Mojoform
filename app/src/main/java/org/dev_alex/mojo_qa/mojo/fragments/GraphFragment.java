@@ -293,7 +293,8 @@ public class GraphFragment extends Fragment {
 
         BarData barData = new BarData(set);
         barData.setDrawValues(false);
-        barData.setBarWidth(1f);
+        barData.setBarWidth(0.8f);
+
 
         //barChart.getAxisLeft().setAxisMaximum(barChart.getAxisLeft().getAxisMaximum() * 1.2f);
 
