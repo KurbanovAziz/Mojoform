@@ -168,7 +168,7 @@ public class GraphFragment extends Fragment {
         recyclerView.setAdapter(new ResultGraphAdapter(panels, new ResultGraphAdapter.OnPanelClickListener() {
             @Override
             public void onClick(Panel panel) {
-                //onPanelClick(panel);
+                onPanelClick(panel);
             }
         }));
 

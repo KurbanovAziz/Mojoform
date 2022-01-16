@@ -101,6 +101,9 @@ import com.github.mikephil.charting.utils.Transformer;
 import com.github.mikephil.charting.utils.ViewPortHandler;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
+import com.google.zxing.integration.android.IntentIntegrator;
+import com.google.zxing.integration.android.IntentResult;
+import com.journeyapps.barcodescanner.CaptureActivity;
 import com.lalongooo.videocompressor.video.MediaController;
 
 
@@ -188,7 +191,7 @@ public class TemplateFragment extends Fragment {
     private final int AUDIO_REQUEST_CODE = 12;
     private final int DOCUMENT_REQUEST_CODE = 13;
     private final int IMAGE_SHOW_REQUEST_CODE = 110;
-    private final int SCAN_CODE_REQUEST_CODE = 120;
+    private final int SCAN_CODE_REQUEST_CODE = 0x0000c0de;
 
     private static final String TAG = "MiuiUtils";
 
@@ -241,7 +244,6 @@ public class TemplateFragment extends Fragment {
         fragment.setArguments(args);
         return fragment;
     }
-//
     public static TemplateFragment newInstance(String taskUUID, boolean isReportMode) {
         Bundle args = new Bundle();
         args.putString("task_uuid", taskUUID);
@@ -444,6 +446,7 @@ public class TemplateFragment extends Fragment {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        Log.e("aaa", "Aaa");
 
         if (requestCode == Constants.REQUEST_CODE && resultCode == RESULT_OK && data != null) {
             ArrayList<Image> images = data.getParcelableArrayListExtra(Constants.INTENT_EXTRA_IMAGES);
@@ -541,8 +544,16 @@ public class TemplateFragment extends Fragment {
 
         if (requestCode == SCAN_CODE_REQUEST_CODE) {
             if (resultCode == RESULT_OK) {
-                String contents = data.getStringExtra("SCAN_RESULT");
-                tryParseCode(contents);
+                IntentResult intentResult = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
+                if (intentResult != null) {
+                    if (intentResult.getContents() != null) {
+                        scanTo.setText(intentResult.getContents());
+                    } else {
+                        Toast.makeText(getActivity(), "Что-то пошло не так", Toast.LENGTH_LONG).show();
+                    }
+                } else {
+                    super.onActivityResult(requestCode, resultCode, data);
+                }
             }
         }
     }
@@ -1579,35 +1590,26 @@ public class TemplateFragment extends Fragment {
         try {
             this.scanTo = scanTo;
             this.scanToObj = scanToObj;
-            Intent intent = new Intent("com.google.zxing.client.android.SCAN");
-            intent.putExtra("SCAN_MODE", "QR_CODE_MODE"); // "PRODUCT_MODE for bar codes
-            intent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
-            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-            startActivityForResult(intent, SCAN_CODE_REQUEST_CODE);
+            IntentIntegrator intentIntegrator = new IntentIntegrator(getActivity()){
+                @Override
+                protected void startActivityForResult(Intent intent, int code) {
+                    TemplateFragment.this.startActivityForResult(intent, SCAN_CODE_REQUEST_CODE); // REQUEST_CODE override
+                }
+            };
+
+            intentIntegrator.setCaptureActivity(CaptureActivity.class);
+            intentIntegrator.setOrientationLocked(true);
+            intentIntegrator.setDesiredBarcodeFormats(IntentIntegrator.ALL_CODE_TYPES);
+            intentIntegrator.setPrompt("Сканируем...");
+            intentIntegrator.initiateScan();
 
         } catch (Exception e) {
-            Uri marketUri = Uri.parse("market://details?id=com.google.zxing.client.android");
-            Intent marketIntent = new Intent(Intent.ACTION_VIEW, marketUri);
-            startActivity(marketIntent);
+           Toast.makeText(getContext(), "ошибка", Toast.LENGTH_LONG).show();
         }
     }
 
     private void scanBarCode(TextView scanTo, JSONObject scanToObj) {
-        try {
-            this.scanTo = scanTo;
-            this.scanToObj = scanToObj;
-            Intent intent = new Intent("com.google.zxing.client.android.SCAN");
-            intent.putExtra("SCAN_MODE", "PRODUCT_MODE");
-            intent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
-            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-            startActivityForResult(intent, SCAN_CODE_REQUEST_CODE);
-        } catch (Exception e) {
-            Uri marketUri = Uri.parse("market://details?id=com.google.zxing.client.android");
-            Intent marketIntent = new Intent(Intent.ACTION_VIEW, marketUri);
-            startActivity(marketIntent);
-        }
+       scanQrCode(scanTo, scanToObj);
     }
 
     private void createCategory(JSONObject value, LinearLayout container, int offset) throws Exception {
@@ -1678,21 +1680,22 @@ public class TemplateFragment extends Fragment {
         final View qrCodeBtn = ((ViewGroup) seekBarContainer.getChildAt(3)).getChildAt(1);
         final View barcodeBtn = ((ViewGroup) seekBarContainer.getChildAt(3)).getChildAt(2);
         final TextView captionLabel = ((TextView) seekBarContainer.getChildAt(0));
+        final EditText changeValue = (EditText) ((LinearLayout) ((LinearLayout) seekBarContainer.getChildAt(3)).getChildAt(0)).getChildAt(1);
+
 
         if (value.has("barcode")) {
-            captionLabel.setText(value.getString("barcode"));
+            changeValue.setText(value.getString("barcode"));
         } else {
             if (value.has("caption"))
-                captionLabel.setText(value.getString("caption"));
+                changeValue.setText(value.getString("caption"));
             else
-                captionLabel.setText(R.string.no_text);
+                changeValue.setText(R.string.no_text);
         }
 
         if (value.has("measure"))
             ((TextView) ((LinearLayout) ((LinearLayout) seekBarContainer.getChildAt(3)).getChildAt(0)).getChildAt(2)).setText(value.getString("measure"));
 
         final SeekBar seekBar = ((SeekBar) seekBarContainer.getChildAt(1));
-        final EditText changeValue = (EditText) ((LinearLayout) ((LinearLayout) seekBarContainer.getChildAt(3)).getChildAt(0)).getChildAt(1);
 
         final float minValue = (float) value.getDouble("min_value");
         final float maxValue = (float) value.getDouble("max_value");
@@ -1809,9 +1812,8 @@ public class TemplateFragment extends Fragment {
             barcodeBtn.setVisibility(View.GONE);
         }
 
-        qrCodeBtn.setOnClickListener(view -> scanQrCode(captionLabel, value));
-
-        barcodeBtn.setOnClickListener(view -> scanBarCode(captionLabel, value));
+        qrCodeBtn.setOnClickListener(view -> scanQrCode((TextView) changeValue, value));
+        barcodeBtn.setOnClickListener(view -> scanBarCode(changeValue, value));
     }
 
     private void createSignature(final JSONObject value, LinearLayout container) throws Exception {
