@@ -72,6 +72,8 @@ import org.json.JSONObject;
 import java.io.File;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -384,6 +386,14 @@ public class GraphFragment extends Fragment implements ResultGraphAdapter.GraphC
                             commentsDialog.getWindow().requestFeature(Window.FEATURE_NO_TITLE);
                             commentsDialog.setContentView(LayoutInflater.from(getContext()).inflate(R.layout.comments_dialog, null, false));
                             commentsDialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+                            ImageView kresticIV = commentsDialog.findViewById(R.id.krestic);
+                            kresticIV.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    commentsDialog.cancel();
+                                    graphDialog.cancel();
+                                }
+                            });
                             RecyclerView recyclerComment = commentsDialog.findViewById(R.id.recycler_view);
                             recyclerComment.setLayoutManager(new LinearLayoutManager(getContext()));
                             recyclerComment.setAdapter(new CommentAdapter(getActivity(), graphInfo.values.get((int) h.getX()).comments));
@@ -409,7 +419,7 @@ public class GraphFragment extends Fragment implements ResultGraphAdapter.GraphC
                             commentsDialog.show();
                         }
                     });
-                    textView.setText("Баллы " + graphInfo.values.get((int) h.getX()).val +  " | Проценты " +  graphInfo.values.get((int) h.getX()).prc + "%");
+                    textView.setText("Баллы " + new BigDecimal(graphInfo.values.get((int) h.getX()).val).setScale(2, RoundingMode.HALF_EVEN).doubleValue()  +  " | Проценты " +  new BigDecimal(graphInfo.values.get((int) h.getX()).prc).setScale(2, RoundingMode.HALF_EVEN).doubleValue() + "%");
                     graphDialog.show();
                 }
 
@@ -673,6 +683,7 @@ public class GraphFragment extends Fragment implements ResultGraphAdapter.GraphC
                 panels = panels1;
                 isComplex = true;
                 for (Panel panel : panels){
+                    panel.prc =  new BigDecimal(panel.prc).setScale(2, RoundingMode.HALF_EVEN).doubleValue();;
                     panel.fixDate(); }}
                 else {
                     JSONArray panelsJsonComplex = jsonObjectComplex.getJSONArray("values");
@@ -686,11 +697,13 @@ public class GraphFragment extends Fragment implements ResultGraphAdapter.GraphC
                     panels = new ArrayList<Panel>();
                     for (Indicator indicator : indicators1){
                         indicator.name = resultName;
+                        indicator.prc =  new BigDecimal(indicator.prc).setScale(2, RoundingMode.HALF_EVEN).doubleValue();
                         indicators.add(indicator);
                     }
 
                     for (Panel panel : panels1){
                         panel.fixDate();
+                        panel.prc = new BigDecimal(panel.prc).setScale(2, RoundingMode.HALF_EVEN).doubleValue();
                         panel.name = resultName;
                         panels.add(panel);
                    }
@@ -753,6 +766,7 @@ public class GraphFragment extends Fragment implements ResultGraphAdapter.GraphC
                     indicators.add(new Indicator());
                 for (Indicator indicator : indicators1){
                     indicator.name = name;
+                    indicator.prc =  new BigDecimal(indicator.prc).setScale(2, RoundingMode.HALF_EVEN).doubleValue();
                     indicators.add(indicator);
                 }
                     return indicatorResponse.code();

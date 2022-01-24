@@ -37,6 +37,8 @@ import org.dev_alex.mojo_qa.mojo.services.Utils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -207,22 +209,11 @@ public class PanelListFragment extends Fragment {
         @Override
         protected Integer doInBackground(Void... params) {
             try {
-
-
-
-
-
                 String filter = "";
-
                 if(organisations.size() == 0 || tags.size() == 0){
                     responseComplex = RequestService.createGetRequest("/api/analytic2" + (isAll ? "?type=COMPLEX" : "?type=ROOTS_COMPLEX"));
                     responseSimple = RequestService.createGetRequest("/api/analytic2" + (isAll ? "?type=SIMPLE" : "?type=ROOTS_SIMPLE"));
-
                 }
-
-
-
-
                 else {
                     wasCreated = true;
                     String sortParameter = "tag=";
@@ -236,7 +227,6 @@ public class PanelListFragment extends Fragment {
 
                     responseComplex = RequestService.createGetRequest("/api/analytic2" + filter+ (isAll ? "&type=COMPLEX" : "&type=ROOTS_COMPLEX"));
                     responseSimple = RequestService.createGetRequest("/api/analytic2" + filter+(isAll ? "&type=SIMPLE" : "&type=ROOTS_SIMPLE"));                }
-
                 String responseComplexStr = responseComplex.body().string();
                 JSONObject jsonObjectComplex = new JSONObject(responseComplexStr);
                 JSONArray panelsJsonComplex = jsonObjectComplex.getJSONArray("list");
@@ -251,8 +241,9 @@ public class PanelListFragment extends Fragment {
                 panels = panelsComplex;
 
 
-                for (Panel panel : panels)
-                    panel.fixDate();
+                for (Panel panel : panels){
+                    panel.prc =  new BigDecimal(panel.prc).setScale(2, RoundingMode.HALF_EVEN).doubleValue();;
+                    panel.fixDate();}
 
 
                 return responseComplex.code();

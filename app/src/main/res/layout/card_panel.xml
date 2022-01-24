@@ -2,15 +2,15 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/card"
     android:layout_width="match_parent"
-    android:layout_height="70dp"
-    android:layout_marginBottom="-8dp"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="-15dp"
     android:layout_marginTop="10dp"
     android:background="@drawable/folder_card_background"
     android:orientation="horizontal"
     android:paddingBottom="15dp"
     android:paddingLeft="28dp"
     android:paddingRight="7dp"
-    android:paddingTop="2dp">
+    android:paddingTop="-8dp">
 
     <ImageView
         android:id="@+id/panel_icon_image"
@@ -29,12 +29,15 @@
     <TextView
         android:id="@+id/panel_name"
         android:layout_width="0dp"
+        android:maxLines="4"
+
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
         android:layout_marginLeft="15dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginBottom="20dp"
         android:layout_weight="1"
         android:ellipsize="end"
-        android:maxLines="1"
         android:text="Прочее"
         android:textColor="#4c3d5f"
         android:textSize="17sp" />

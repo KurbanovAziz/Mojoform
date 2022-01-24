@@ -20,7 +20,7 @@ public class Panel implements Serializable {
 
     public String config;
     public String color;
-    public String prc;
+    public double prc;
     public String val;
     public ArrayList<Comment> comments;
     public long from;
