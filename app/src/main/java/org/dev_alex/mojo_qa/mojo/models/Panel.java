@@ -2,6 +2,8 @@ package org.dev_alex.mojo_qa.mojo.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+import org.dev_alex.mojo_qa.mojo.models.response.Comment;
+
 import java.io.Serializable;
 import java.io.StringReader;
 import java.util.ArrayList;
@@ -20,6 +22,7 @@ public class Panel implements Serializable {
     public String color;
     public String prc;
     public String val;
+    public ArrayList<Comment> comments;
     public long from;
     public long to;
 

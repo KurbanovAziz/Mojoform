@@ -1,22 +1,36 @@
 package org.dev_alex.mojo_qa.mojo.fragments;
 
+import android.Manifest;
+import android.app.Dialog;
 import android.content.Context;
+import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import androidx.annotation.Nullable;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.os.Environment;
 import android.util.Log;
-import android.util.Range;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RatingBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -33,21 +47,28 @@ import com.github.mikephil.charting.data.BarEntry;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.formatter.IAxisValueFormatter;
 import com.github.mikephil.charting.highlight.Highlight;
+import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
 
 import org.dev_alex.mojo_qa.mojo.R;
+import org.dev_alex.mojo_qa.mojo.activities.MainActivity;
+import org.dev_alex.mojo_qa.mojo.adapters.CommentAdapter;
 import org.dev_alex.mojo_qa.mojo.adapters.ComplexGraphAdapter;
+import org.dev_alex.mojo_qa.mojo.adapters.IndicatorGraphAdapter;
 import org.dev_alex.mojo_qa.mojo.adapters.ResultGraphAdapter;
+import org.dev_alex.mojo_qa.mojo.models.Employee;
 import org.dev_alex.mojo_qa.mojo.models.GraphInfo;
-import org.dev_alex.mojo_qa.mojo.models.IndicatorModel;
-import org.dev_alex.mojo_qa.mojo.models.Organisation;
+import org.dev_alex.mojo_qa.mojo.models.Indicator;
+import org.dev_alex.mojo_qa.mojo.models.Notification;
 import org.dev_alex.mojo_qa.mojo.models.Panel;
 import org.dev_alex.mojo_qa.mojo.models.Ranges;
+import org.dev_alex.mojo_qa.mojo.models.User;
 import org.dev_alex.mojo_qa.mojo.models.Value;
 import org.dev_alex.mojo_qa.mojo.services.RequestService;
 import org.dev_alex.mojo_qa.mojo.services.Utils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.io.File;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.text.ParseException;
@@ -57,20 +78,24 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
+import java.util.UUID;
 
 import okhttp3.Response;
+import okio.BufferedSink;
+import okio.Okio;
 
-public class GraphFragment extends Fragment {
+public class GraphFragment extends Fragment implements ResultGraphAdapter.GraphClickListener{
     public static final String DAY = "day";
     public static final String WEEK = "week";
     public static final String MONTH = "month";
     public static final String YEAR = "year";
     private RecyclerView recyclerView;
-
-
+    boolean isComplex;
     private static final String TYPE_ARG = "type";
     private static final String ID_ARG = "panel_id";
     private static final String IS_PERCENTS_ARG = "is_percents";
+    public static String name;
 
     private View rootView;
     private String type;
@@ -78,7 +103,23 @@ public class GraphFragment extends Fragment {
     private boolean isPercents;
     private GraphInfo graphInfo;
     public List<Panel> panels = new ArrayList<>();
-    public List<Ranges> ranges;
+    public List<Indicator> indicators = new ArrayList<>();
+    public static List<Employee> users = new ArrayList<>();
+
+
+
+
+    public static List<Ranges> ranges;
+    LinearLayout chartContainer;
+    ViewGroup container;
+    ImageView sendBTN;
+    EditText messageET;
+    String message;
+    long vid;
+    long from;
+    long to;
+
+
 
     private SimpleDateFormat xDateFormat = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
     private SimpleDateFormat xDateFormatNoYear = new SimpleDateFormat("dd-MM", Locale.getDefault());
@@ -95,12 +136,16 @@ public class GraphFragment extends Fragment {
         return fragment;
     }
 
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         type = getArguments().getString(TYPE_ARG);
         panelId = getArguments().getLong(ID_ARG);
         isPercents = getArguments().getBoolean(IS_PERCENTS_ARG);
+        this.container = container;
+
+
 
 
         if (rootView == null) {
@@ -108,11 +153,19 @@ public class GraphFragment extends Fragment {
 
             setListeners();
             Utils.setupCloseKeyboardUI(getActivity(), rootView);
-
-            new GetGraphTask().execute();
+            if(GraphListFragment.isIndicatorShow){
+                
+            }
+            else {
+            new GetGraphTask().execute();}
         }
-        recyclerView = (RecyclerView) rootView.findViewById(R.id.recycler_view);
+        chartContainer = rootView.findViewById(R.id.recycler_container);
+        chartContainer.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+
+        recyclerView = (RecyclerView) getActivity().getLayoutInflater().inflate(R.layout.recycle_graph, container, false);
+
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        chartContainer.addView(recyclerView);
         return rootView;
     }
     @Override
@@ -158,21 +211,18 @@ public class GraphFragment extends Fragment {
         }));
 
     }
+
     private void showResultPanels(List<Panel> panels) {
 
 
 
-        Panel panel = new Panel();
-        panels.add(0, panel);
+        Indicator indicator = new Indicator();
+        indicators.add(0, indicator);
 
-        recyclerView.setAdapter(new ResultGraphAdapter(panels, new ResultGraphAdapter.OnPanelClickListener() {
-            @Override
-            public void onClick(Panel panel) {
-                onPanelClick(panel);
-            }
-        }));
+        recyclerView.setAdapter(new ResultGraphAdapter(indicators, this, users));
 
     }
+
     private void onPanelClick(Panel panel) {
         getActivity()
                 .getSupportFragmentManager()
@@ -181,7 +231,6 @@ public class GraphFragment extends Fragment {
                 .addToBackStack(null)
                 .commit();
     }
-
 
     private void buildGraph() {
         try {
@@ -194,25 +243,21 @@ public class GraphFragment extends Fragment {
     }
 
     private View renderHistogram(GraphInfo graphInfo) throws Exception {
+        Collections.reverse(graphInfo.values);
         Resources resources = getContext().getResources();
         int chartHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 300, resources.getDisplayMetrics());
         LinearLayout chartContainer = rootView.findViewById(R.id.LLcontainer);
         chartContainer.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, chartHeight));
-
         float yMin = 0, yMax = 0;
         List<BarEntry> barEntries = new ArrayList<>();
         final List<String> xValues = new ArrayList<>();
-
         int k = 0;
         for (Value value : graphInfo.values) {
-            if (isValueOk(value)){
+            if (value != null){
             Date date = new Date(value.from);
-
             BarEntry barEntry;
-
             if (isPercents) {
                 barEntry = new BarEntry((float) k, (float) value.prc);
-
                 if (k == 0) {
                     yMax = (float) value.prc;
                     yMin = (float) value.prc;
@@ -225,7 +270,6 @@ public class GraphFragment extends Fragment {
                 }
             } else {
                 barEntry = new BarEntry((float) k, (float) value.val);
-
                 if (k == 0) {
                     yMax = (float) value.val;
                     yMin = (float) value.val;
@@ -243,31 +287,24 @@ public class GraphFragment extends Fragment {
         }}
         if (barEntries.isEmpty()) {
             barEntries.add(new BarEntry(0, 0));
-
-   Toast.makeText(getContext(), "На графике нет значений за этот период", Toast.LENGTH_LONG).show();
-        }
-
+   Toast.makeText(getContext(), "На графике нет значений за этот период", Toast.LENGTH_LONG).show();}
         ArrayList<Integer> colors = new ArrayList<>();
-        /*    if (graphInfo.has("ranges")) {
-            ranges = new ObjectMapper()
-                    .readValue(graphObj.getJSONArray("ranges").toString(), new TypeReference<ArrayList<IndicatorModel.Range>>() {
-                    });
-        }
-        */
         for (k = 0; k < barEntries.size(); k++) {
             float value = barEntries.get(k).getY();
             int defaultColor = Color.parseColor("#42aaff");
 
             if(ranges != null && ranges.size() != 0){
             for (Ranges range : ranges) {
-                if (value >= range.from && value <= range.to)
-                    defaultColor = Color.parseColor("#AA" + range.color.substring(1));
+                if (value >= range.from && value <= range.to){
+                    try {
+                    String colorString = "#AA" + range.color.substring(1);
+                    defaultColor = Color.parseColor(colorString);}
+                    catch (Exception ignored){}
+                }
             }
             }
             else{
                 try {
-
-
                 defaultColor = Color.parseColor("#ff0000");
                 if(value < 86)  defaultColor = Color.parseColor("#ff0000");
                 if (value > 85 && value < 96){  defaultColor = Color.parseColor("#eaff00");}
@@ -276,52 +313,101 @@ public class GraphFragment extends Fragment {
                 catch (Exception e ){
                     e.printStackTrace();
                 }
-
-
             }
             colors.add(defaultColor);
         }
-
-
         BarChart barChart = new BarChart(getContext());
-
         barChart.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, chartHeight));
         barChart.setDrawValueAboveBar(false);
-
         BarDataSet set = new BarDataSet(barEntries, "BarDataSet");
         set.setColors(colors);
-
         BarData barData = new BarData(set);
         barData.setDrawValues(false);
         barData.setBarWidth(0.8f);
-
-
         //barChart.getAxisLeft().setAxisMaximum(barChart.getAxisLeft().getAxisMaximum() * 1.2f);
-
         barChart.getAxisRight().setEnabled(false);
         barChart.getAxisLeft().setGridColor(Color.parseColor("#374E3F60"));
         barChart.getAxisLeft().setAxisLineColor(Color.parseColor("#374E3F60"));
         barChart.getXAxis().setGridColor(Color.parseColor("#374E3F60"));
         barChart.getXAxis().setAxisLineColor(Color.parseColor("#374E3F60"));
         barChart.setBackgroundColor(Color.parseColor("#fffafa"));
-
-
         barChart.setData(barData);
         barChart.setFitBars(false);
         barChart.getLegend().setEnabled(false);
         barChart.getDescription().setEnabled(false);
         barChart.setScaleYEnabled(true);
-
         setupAxis(barChart.getXAxis(), xValues);
         Date date = new Date();
-
         barChart.invalidate();
         barChart.zoom(barEntries.size() / 10, 0.9f, 0, 0);
         RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams
                 (ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.MATCH_PARENT);
         CustomMarkerView mv = new CustomMarkerView(getContext(), R.layout.higlight_marker, xValues, 0 , xValues.size() - 1, yMin, yMax);
-        barChart.setMarker(mv);
+        //barChart.setMarker(mv);
         chartContainer.addView(barChart);
+        barChart.setOnChartValueSelectedListener(new OnChartValueSelectedListener()
+        {
+            @Override
+            public void onValueSelected(Entry e, Highlight h)
+            {
+                try {
+                    if(!isComplex){
+                    from = graphInfo.values.get((int) h.getX()).from;
+                    to = graphInfo.values.get((int) h.getX()).to;
+                    new GetRaw().execute();}
+                    final Dialog graphDialog = new Dialog(getContext());
+                    graphDialog.getWindow().requestFeature(Window.FEATURE_NO_TITLE);
+                    graphDialog.setContentView(LayoutInflater.from(getContext()).inflate(R.layout.graph_dialog, null, false));
+                    graphDialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+                    final TextView textView = graphDialog.findViewById(R.id.information);
+                    final Button commentBTN = graphDialog.findViewById(R.id.commentsBTN);
+                    commentBTN.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            if(!isComplex){
+                                from = graphInfo.values.get((int) h.getX()).from;
+                                to = graphInfo.values.get((int) h.getX()).to;
+                                new GetRaw().execute();}
+                            final Dialog commentsDialog = new Dialog(getContext());
+                            commentsDialog.getWindow().requestFeature(Window.FEATURE_NO_TITLE);
+                            commentsDialog.setContentView(LayoutInflater.from(getContext()).inflate(R.layout.comments_dialog, null, false));
+                            commentsDialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+                            RecyclerView recyclerComment = commentsDialog.findViewById(R.id.recycler_view);
+                            recyclerComment.setLayoutManager(new LinearLayoutManager(getContext()));
+                            recyclerComment.setAdapter(new CommentAdapter(getActivity(), graphInfo.values.get((int) h.getX()).comments));
+                            sendBTN = (ImageView) commentsDialog.findViewById(R.id.send);
+                            messageET = (EditText) commentsDialog.findViewById(R.id.et_text_message);
+                            TextView labelTV = commentsDialog.findViewById(R.id.label);
+                            TextView timeTV = commentsDialog.findViewById(R.id.time);
+                            labelTV.setText(name);
+                            SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy | HH:mm", Locale.getDefault());
+                            String time = dateFormat.format(graphInfo.values.get((int) h.getX()).from * 1000);
+                            timeTV.setText(time);
+
+                            sendBTN.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    message = messageET.getText().toString();
+                                    vid = graphInfo.values.get((int) h.getX()).id;
+                                    new SendComment().execute();
+                                }
+                            });
+                            commentsDialog.show();
+                        }
+                    });
+                    textView.setText("Баллы " + graphInfo.values.get((int) h.getX()).val +  " | Проценты " +  graphInfo.values.get((int) h.getX()).prc + "%");
+                    graphDialog.show();
+                }
+
+                catch (Exception exc){}
+            }
+
+            @Override
+            public void onNothingSelected()
+            {
+
+            }
+        });
 
 
         return chartContainer;
@@ -354,17 +440,13 @@ public class GraphFragment extends Fragment {
                                 long startDate = xDateFormat.parse(xValues.get(startV)).getTime();
                                 long endDate = xDateFormat.parse(xValues.get(endV)).getTime();
                                 long delta = endDate - startDate;
-
                                 double valueDelta = value - ((int) value);
                                 long resultDate = startDate + (long) (delta * valueDelta);
                                 return xDateFormatNoYear.format(new Date(resultDate));
                             } catch (Exception exc) {
                                 exc.printStackTrace();
                                 return "exc";
-                            }
-                        }
-                    }
-
+                            } }}
                     if (finalIPos != -1 && finalIPos < xValues.size()) {
                         try {
                             stringValue = xDateFormatNoYear.format(xDateFormat.parse(xValues.get(finalIPos)));
@@ -418,30 +500,24 @@ public class GraphFragment extends Fragment {
 
                 SimpleDateFormat dateFotmat = new SimpleDateFormat("dd.MM.yyyy | HH:mm", Locale.getDefault());
                 xValue.setText(dateFotmat.format(xDateFormat.parse(xValues.get((int) e.getX())).getTime()));
-
                 String yValStr = String.format(Locale.getDefault(), "%.2f", e.getY());
                 if (isPercents)
                     yValStr += " %";
                 else
                     yValStr += " б.";
-
                 yValue.setText(yValStr);
                 xValue.requestLayout();
                 yValue.requestLayout();
                 yValue.invalidate();
-
                 float xVal = e.getX();
                 float yVal = e.getY();
-
                 float xPosPercent = (xMax - xMin) == 0 ? 0 : (xVal - xMin) / (xMax - xMin);
                 float yPosPercent = (yMax - yMin) == 0 ? 0 : (yVal - yMin) / (yMax - yMin);
-
                 float xOffset, yOffset;
                 if (xPosPercent > 0.65)
                     xOffset = -getMeasuredWidth();
                 else
                     xOffset = dpToPx(10);
-
                 Log.d("testt", xPosPercent + " " + yPosPercent);
                 if (yPosPercent < 0.25)
                     yOffset = -getMeasuredHeight();
@@ -548,7 +624,6 @@ public class GraphFragment extends Fragment {
     }
 
     public class GetGraphTask extends AsyncTask<Void, Void, Integer> {
-boolean isComplex;
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
@@ -557,6 +632,7 @@ boolean isComplex;
         @Override
         protected Integer doInBackground(Void... params) {
             try {
+
                 Response response = RequestService.createGetRequest("/api/analytic/graph/" + panelId + "/" + type);
                 String responseStr = response.body().string();
                 Response findResponse = RequestService.createGetRequest("/api/analytic/find/" + panelId);
@@ -570,21 +646,9 @@ boolean isComplex;
                     ArrayList<Ranges> ranges1  = new ObjectMapper().readValue(configJsonArray.toString(), new TypeReference<ArrayList<Ranges>>() {});
                     ranges = ranges1;
                 }
-                catch (Exception e){
+                catch (Exception e) {
                     ranges = new ArrayList<>();
                 }
-
-
-
-
-
-
-
-
-
-
-
-
                 JSONObject jsonObjectComplex = new JSONObject(responseStr);
                 if(jsonObjectComplex.has("complex_info")){
                 JSONArray panelsJsonComplex = jsonObjectComplex.getJSONObject("complex_info").getJSONArray("components");
@@ -599,14 +663,20 @@ boolean isComplex;
                     String resultName = jsonObjectComplex.getJSONObject("template_info").getJSONObject("template").getString("name");
                     ArrayList<Panel> panels1  = new ObjectMapper().readValue(panelsJsonComplex.toString(), new TypeReference<ArrayList<Panel>>() {});
 
+                    ArrayList<Indicator>  indicators1  = new ArrayList<Indicator>();
+
                     isComplex = false;
+                    name = resultName;
                     panels = new ArrayList<Panel>();
+                    for (Indicator indicator : indicators1){
+                        indicator.name = resultName;
+                        indicators.add(indicator);
+                    }
 
                     for (Panel panel : panels1){
                         panel.fixDate();
                         panel.name = resultName;
-                        if(isPanelOk(panel)){panels.add(panel); }
-                        else{Log.e("lol", "kek");}
+                        panels.add(panel);
                    }
                 }
 
@@ -638,4 +708,259 @@ boolean isComplex;
             }
         }
     }
+    public class GetRaw extends AsyncTask<Void, Void, Integer> {
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        @Override
+        protected Integer doInBackground(Void... params) {
+            try {
+                    Response indicatorResponse = RequestService.createGetRequestWithQuery("/api/analytic/raw/" + panelId, from / 1000, to / 1000);
+                    String indicatorResponseStr = indicatorResponse.body().string();
+                    JSONObject jsonObjectIndicator= new JSONObject(indicatorResponseStr);
+                    JSONArray indicatorsJsonArray = jsonObjectIndicator.getJSONArray("datas");
+                    ArrayList<Indicator>  indicators1  = new ObjectMapper().readValue(indicatorsJsonArray.toString(), new TypeReference<ArrayList<Indicator>>() {});
+                    JSONArray usersJsonArray = jsonObjectIndicator.getJSONArray("users");
+                    ArrayList<Employee>  users1  = new ObjectMapper().readValue(usersJsonArray.toString(), new TypeReference<ArrayList<Employee>>() {});
+                    if (users1 != null){
+                    users = users1;}
+                    indicators.clear();
+                    indicators.add(new Indicator());
+                for (Indicator indicator : indicators1){
+                    indicator.name = name;
+                    indicators.add(indicator);
+                }
+                    return indicatorResponse.code();
+            } catch (Exception exc) {
+                StringWriter writer = new StringWriter();
+                exc.printStackTrace( new PrintWriter(writer,true ));
+                Log.e("aaa", "exeption stack is :\n" + writer.toString());
+                exc.printStackTrace();
+                return null;
+            }
+        }
+
+
+        @Override
+        protected void onPostExecute(Integer responseCode) {
+            super.onPostExecute(responseCode);
+            if (responseCode == 200 || responseCode == 201){
+                Objects.requireNonNull(recyclerView.getAdapter()).notifyDataSetChanged();
+
+            }
+
+            else {
+                Toast.makeText(getContext(), R.string.try_later, Toast.LENGTH_SHORT).show();
+                getActivity().getSupportFragmentManager().popBackStack();
+            }
+        }
+    }
+    @Override
+    public void onDownloadPdfClick(Indicator indicator) {
+        if (checkExternalPermissions()) {
+            new DownloadPdfTask(indicator.id, UUID.randomUUID().toString()).execute();
+        } else {
+            requestExternalPermissions();
+        }
+    }
+
+    @Override
+    public void onDownloadDocClick(Indicator indicator) {
+        if (checkExternalPermissions()) {
+            new DownloadDocTask(indicator.id, UUID.randomUUID().toString()).execute();
+        } else {
+            requestExternalPermissions();
+        }
+    }
+    private class DownloadPdfTask extends AsyncTask<Void, Void, Integer> {
+        private java.io.File resultFile;
+        private long id;
+        private String name;
+
+        DownloadPdfTask(long id, String name) {
+            this.id = id;
+            this.name = name;}
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            File downloadsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+            resultFile = new File(downloadsDir, name + ".pdf");
+        }
+
+        @Override
+        protected Integer doInBackground(Void... params) {
+            try {
+                if (resultFile.exists())
+                    return 200;
+
+                String url = "/api/fs-mojo/document/id/" + id + "/pdf";
+                Response response = RequestService.createGetRequest(url);
+
+                if (response.code() == 200) {
+                    BufferedSink sink = Okio.buffer(Okio.sink(resultFile));
+                    sink.writeAll(response.body().source());
+                    sink.close();
+                }
+                response.body().close();
+
+                return response.code();
+            } catch (Exception exc) {
+                exc.printStackTrace();
+                return null;
+            }
+        }
+
+        @Override
+        protected void onPostExecute(Integer responseCode) {
+            super.onPostExecute(responseCode);
+            try {
+
+
+                if (responseCode == null)
+                    Toast.makeText(getContext(), R.string.network_error, Toast.LENGTH_LONG).show();
+                else if (responseCode == 200) {
+                    try {
+                        Intent viewIntent = new Intent(Intent.ACTION_VIEW);
+                        Uri fileUri = FileProvider.getUriForFile(getContext(), getContext().getApplicationContext().getPackageName() + ".provider", resultFile);
+                        viewIntent.setDataAndType(fileUri, "application/pdf");
+                        viewIntent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                        startActivity(viewIntent);
+                    } catch (Exception exc) {
+                        exc.printStackTrace();
+                        Toast.makeText(getContext(), "Нет приложения, которое может открыть этот файл", Toast.LENGTH_LONG).show();
+                        try {
+                            resultFile.delete();
+                        } catch (Exception exc1) {
+                            exc1.printStackTrace();
+                        }
+                    }
+                } else
+                    Toast.makeText(getContext(), R.string.unknown_error, Toast.LENGTH_LONG).show();
+            } catch (Exception exc) {
+                exc.printStackTrace();
+            }
+        }
+    }
+    private class DownloadDocTask extends AsyncTask<Void, Void, Integer> {
+        private java.io.File resultFile;
+        private long id;
+        private String name;
+
+        DownloadDocTask(long id, String name) {
+            this.id = id;
+            this.name = name;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            File downloadsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+            resultFile = new File(downloadsDir, name + ".docx");
+        }
+
+        @Override
+        protected Integer doInBackground(Void... params) {
+            try {
+                if (resultFile.exists())
+                    return 200;
+
+                String url = "/api/fs-mojo/document/id/" + id + "/docx";
+                Response response = RequestService.createGetRequest(url);
+
+                if (response.code() == 200) {
+                    BufferedSink sink = Okio.buffer(Okio.sink(resultFile));
+                    sink.writeAll(response.body().source());
+                    sink.close();
+                }
+                response.body().close();
+
+                return response.code();
+            } catch (Exception exc) {
+                exc.printStackTrace();
+                return null;
+            }
+        }
+
+        @Override
+        protected void onPostExecute(Integer responseCode) {
+            super.onPostExecute(responseCode);
+
+            try {
+                if (responseCode == null)
+                    Toast.makeText(getContext(), R.string.network_error, Toast.LENGTH_LONG).show();
+                else if (responseCode == 200) {
+                    try {
+                        Intent viewIntent = new Intent(Intent.ACTION_VIEW);
+                        Uri fileUri = FileProvider.getUriForFile(getContext(), getContext().getApplicationContext().getPackageName() + ".provider", resultFile);
+                        viewIntent.setDataAndType(fileUri, "application/msword");
+                        viewIntent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                        startActivity(viewIntent);
+                    } catch (Exception exc) {
+                        exc.printStackTrace();
+                        Toast.makeText(getContext(), "Нет приложения, которое может открыть этот файл", Toast.LENGTH_LONG).show();
+                        try {
+                            resultFile.delete();
+                        } catch (Exception exc1) {
+                            exc1.printStackTrace();
+                        }
+                    }
+                } else
+                    Toast.makeText(getContext(), R.string.unknown_error, Toast.LENGTH_LONG).show();
+            } catch (Exception exc) {
+                exc.printStackTrace();
+            }
+        }
+    }
+    public class SendComment extends AsyncTask<Void, Void, Integer> {
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        @Override
+        protected Integer doInBackground(Void... params) {
+            try {
+                if (message != null) {
+                    Response response = RequestService.createPostRequest(String.format("/api/analytic/comment/%s/%s", panelId, vid), message);
+                    return response.code();
+                }
+                return null;
+            } catch (Exception exc) {
+                StringWriter writer = new StringWriter();
+                exc.printStackTrace(new PrintWriter(writer, true));
+                Log.e("aaa", "exeption stack is :\n" + writer.toString());
+                exc.printStackTrace();
+                return null;
+            }
+        }
+
+
+        @Override
+        protected void onPostExecute(Integer responseCode) {
+            super.onPostExecute(responseCode);
+
+            if (responseCode == 200 || responseCode == 201){
+                Toast.makeText(getContext(), "Сообщение отправлено", Toast.LENGTH_SHORT).show();
+
+            }
+            else {
+                Toast.makeText(getContext(), R.string.try_later, Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
+    private boolean checkExternalPermissions() {
+        int permissionCheckWrite = ContextCompat.checkSelfPermission(getContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        int permissionCheckRead = ContextCompat.checkSelfPermission(getContext(), Manifest.permission.READ_EXTERNAL_STORAGE);
+        return (permissionCheckRead == PackageManager.PERMISSION_GRANTED && permissionCheckWrite == PackageManager.PERMISSION_GRANTED);
+    }
+
+    private void requestExternalPermissions() {
+        ActivityCompat.requestPermissions(getActivity(),
+                new String[]{Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE}, 0);
+    }
+
 }

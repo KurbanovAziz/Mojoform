@@ -18,6 +18,7 @@ import android.widget.TextView;
 
 import org.dev_alex.mojo_qa.mojo.R;
 import org.dev_alex.mojo_qa.mojo.adapters.TaskAdapter;
+import org.dev_alex.mojo_qa.mojo.models.Indicator;
 import org.dev_alex.mojo_qa.mojo.models.Panel;
 import org.dev_alex.mojo_qa.mojo.services.Utils;
 import org.json.JSONObject;
@@ -29,6 +30,9 @@ public class GraphListFragment extends Fragment {
     private View rootView = null;
     ///private ViewPager viewPager;
     private RadioGroup tabLayout;
+    public static boolean isIndicatorShow;
+    public static Indicator indicator;
+
 
     private Panel panel;
 
@@ -38,6 +42,17 @@ public class GraphListFragment extends Fragment {
 
         GraphListFragment fragment = new GraphListFragment();
         fragment.setArguments(args);
+        isIndicatorShow = false;
+        return fragment;
+    }
+    public static GraphListFragment newIndicatorInstance(Indicator indicator1) {
+        Bundle args = new Bundle();
+        args.putSerializable("panel", indicator1);
+
+        GraphListFragment fragment = new GraphListFragment();
+        fragment.setArguments(args);
+        isIndicatorShow = true;
+        indicator = indicator1;
         return fragment;
     }
 
@@ -104,6 +119,16 @@ public class GraphListFragment extends Fragment {
  */
       }
         return rootView;
+    }
+    public void restartGraphFragment(){
+        boolean isPercents = true;
+        try {
+            if (panel.config != null)
+                isPercents = new JSONObject(panel.config).getInt("dataType") == 2;
+        } catch (Exception exc) {
+            exc.printStackTrace();
+        }
+        getFragmentManager().beginTransaction().replace(R.id.graph_container, GraphFragment.newInstance(GraphFragment.DAY, panel.id, isPercents)).commitAllowingStateLoss();
     }
 
 

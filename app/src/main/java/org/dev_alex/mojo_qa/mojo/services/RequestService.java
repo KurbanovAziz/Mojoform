@@ -109,6 +109,18 @@ public class RequestService {
         return client.newCall(requestBuilder.build()).execute();
     }
 
+    //ЛЮТАЯ ГРЯЗЬ, НЕ ЗАБЫТЬ ПЕРЕДЕЛАТЬ
+    public static Response createGetRequestWithQuery(String path, long from, long to) throws Exception {
+        OkHttpClient client = createOkHttpClient();
+        String url = App.getHost() + path;
+        HttpUrl.Builder urlBuilder = HttpUrl.parse(url).newBuilder();
+        urlBuilder.addQueryParameter("time_length", String.valueOf(to - from));
+        urlBuilder.addQueryParameter("last", String.valueOf(to));
+        Request.Builder requestBuilder = new Request.Builder().url(urlBuilder.build());
+        return client.newCall(requestBuilder.build()).execute();
+    }
+
+
 
     private static OkHttpClient createOkHttpClient() {
         if (TokenService.isTokenExists())

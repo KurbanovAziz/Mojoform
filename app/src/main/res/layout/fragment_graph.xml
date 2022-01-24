@@ -14,15 +14,14 @@
     android:orientation="vertical">
 
 </LinearLayout>
-
-    <androidx.recyclerview.widget.RecyclerView android:id="@+id/recycler_view"
+    <LinearLayout
+        android:id="@+id/recycler_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:overScrollMode="never"
-        android:clipToPadding="false"
-        android:paddingBottom="10dp"
-        android:paddingLeft="10dp"
-        android:paddingRight="10dp"
-        android:paddingTop="10dp" />
+        android:orientation="vertical">
+
+    </LinearLayout>
+
+
 </LinearLayout>
 </androidx.core.widget.NestedScrollView>
