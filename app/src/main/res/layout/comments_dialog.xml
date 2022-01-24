@@ -94,6 +94,8 @@
                     android:background="#DDD7E9"
                     android:inputType="textCapSentences|textMultiLine"
                     android:maxLength="3000"
+                    android:textColor="#433A4D"
+                    android:textColorHint="#FFFFFF"
                     android:layout_height="match_parent"
                     android:hint="Ваш комментарий" />
                 </androidx.cardview.widget.CardView>

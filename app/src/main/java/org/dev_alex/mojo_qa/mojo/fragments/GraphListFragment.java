@@ -32,6 +32,7 @@ public class GraphListFragment extends Fragment {
     private RadioGroup tabLayout;
     public static boolean isIndicatorShow;
     public static Indicator indicator;
+    public static FragmentManager fragmentManager;
 
 
     private Panel panel;
@@ -60,6 +61,8 @@ public class GraphListFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         panel = (Panel) getArguments().getSerializable("panel");
+        fragmentManager = getFragmentManager();
+
         setupHeader();
 
         if (rootView == null) {
@@ -94,7 +97,6 @@ public class GraphListFragment extends Fragment {
                     switch (checkedId) {
                         case R.id.day:
                             getFragmentManager().beginTransaction().replace(R.id.graph_container, GraphFragment.newInstance(GraphFragment.DAY, panel.id, isPercents)).commitAllowingStateLoss();
-
                             break;
 
                         case R.id.week:
@@ -120,15 +122,8 @@ public class GraphListFragment extends Fragment {
       }
         return rootView;
     }
-    public void restartGraphFragment(){
-        boolean isPercents = true;
-        try {
-            if (panel.config != null)
-                isPercents = new JSONObject(panel.config).getInt("dataType") == 2;
-        } catch (Exception exc) {
-            exc.printStackTrace();
-        }
-        getFragmentManager().beginTransaction().replace(R.id.graph_container, GraphFragment.newInstance(GraphFragment.DAY, panel.id, isPercents)).commitAllowingStateLoss();
+    public static void restartGraphFragment(long id, boolean isPercents){
+        fragmentManager.beginTransaction().replace(R.id.graph_container, GraphFragment.newInstance(GraphFragment.DAY, id, isPercents)).commitAllowingStateLoss();
     }
 
 

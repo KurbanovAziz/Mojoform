@@ -2,6 +2,7 @@ package org.dev_alex.mojo_qa.mojo.fragments;
 
 import android.Manifest;
 import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -105,6 +106,8 @@ public class GraphFragment extends Fragment implements ResultGraphAdapter.GraphC
     public List<Panel> panels = new ArrayList<>();
     public List<Indicator> indicators = new ArrayList<>();
     public static List<Employee> users = new ArrayList<>();
+    private ProgressDialog loopDialog;
+
 
 
 
@@ -140,6 +143,7 @@ public class GraphFragment extends Fragment implements ResultGraphAdapter.GraphC
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        initDialog();
         type = getArguments().getString(TYPE_ARG);
         panelId = getArguments().getLong(ID_ARG);
         isPercents = getArguments().getBoolean(IS_PERCENTS_ARG);
@@ -230,6 +234,14 @@ public class GraphFragment extends Fragment implements ResultGraphAdapter.GraphC
                 .replace(R.id.container, GraphListFragment.newInstance(panel))
                 .addToBackStack(null)
                 .commit();
+    }
+    private void initDialog() {
+        loopDialog = new ProgressDialog(getContext(), R.style.ProgressDialogStyle);
+        loopDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        loopDialog.setMessage(getString(R.string.loading_please_wait));
+        loopDialog.setIndeterminate(true);
+        loopDialog.setCanceledOnTouchOutside(false);
+        loopDialog.setCancelable(false);
     }
 
     private void buildGraph() {
@@ -390,6 +402,8 @@ public class GraphFragment extends Fragment implements ResultGraphAdapter.GraphC
                                     message = messageET.getText().toString();
                                     vid = graphInfo.values.get((int) h.getX()).id;
                                     new SendComment().execute();
+                                    commentsDialog.cancel();
+                                    graphDialog.cancel();
                                 }
                             });
                             commentsDialog.show();
@@ -627,6 +641,8 @@ public class GraphFragment extends Fragment implements ResultGraphAdapter.GraphC
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
+            loopDialog.show();
+
         }
 
         @Override
@@ -695,6 +711,10 @@ public class GraphFragment extends Fragment implements ResultGraphAdapter.GraphC
         @Override
         protected void onPostExecute(Integer responseCode) {
             super.onPostExecute(responseCode);
+            try {
+                if (loopDialog != null && loopDialog.isShowing())
+                    loopDialog.dismiss();
+
 
             if (responseCode == 200 || responseCode == 201){
                 buildGraph();
@@ -707,11 +727,14 @@ public class GraphFragment extends Fragment implements ResultGraphAdapter.GraphC
                 getActivity().getSupportFragmentManager().popBackStack();
             }
         }
+            catch (Exception e){}}
     }
     public class GetRaw extends AsyncTask<Void, Void, Integer> {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
+            loopDialog.show();
+
         }
 
         @Override
@@ -746,6 +769,10 @@ public class GraphFragment extends Fragment implements ResultGraphAdapter.GraphC
         @Override
         protected void onPostExecute(Integer responseCode) {
             super.onPostExecute(responseCode);
+            try {
+                if (loopDialog != null && loopDialog.isShowing())
+                    loopDialog.dismiss();
+
             if (responseCode == 200 || responseCode == 201){
                 Objects.requireNonNull(recyclerView.getAdapter()).notifyDataSetChanged();
 
@@ -754,7 +781,8 @@ public class GraphFragment extends Fragment implements ResultGraphAdapter.GraphC
             else {
                 Toast.makeText(getContext(), R.string.try_later, Toast.LENGTH_SHORT).show();
                 getActivity().getSupportFragmentManager().popBackStack();
-            }
+            }}
+            catch (Exception e){}
         }
     }
     @Override
@@ -786,6 +814,7 @@ public class GraphFragment extends Fragment implements ResultGraphAdapter.GraphC
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
+            loopDialog.show();
             File downloadsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
             resultFile = new File(downloadsDir, name + ".pdf");
         }
@@ -816,7 +845,10 @@ public class GraphFragment extends Fragment implements ResultGraphAdapter.GraphC
         @Override
         protected void onPostExecute(Integer responseCode) {
             super.onPostExecute(responseCode);
+
             try {
+                if (loopDialog != null && loopDialog.isShowing())
+                    loopDialog.dismiss();
 
 
                 if (responseCode == null)
@@ -857,6 +889,7 @@ public class GraphFragment extends Fragment implements ResultGraphAdapter.GraphC
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
+            loopDialog.show();
             File downloadsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
             resultFile = new File(downloadsDir, name + ".docx");
         }
@@ -889,6 +922,8 @@ public class GraphFragment extends Fragment implements ResultGraphAdapter.GraphC
             super.onPostExecute(responseCode);
 
             try {
+                if (loopDialog != null && loopDialog.isShowing())
+                    loopDialog.dismiss();
                 if (responseCode == null)
                     Toast.makeText(getContext(), R.string.network_error, Toast.LENGTH_LONG).show();
                 else if (responseCode == 200) {
@@ -918,6 +953,7 @@ public class GraphFragment extends Fragment implements ResultGraphAdapter.GraphC
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
+            loopDialog.show();
         }
 
         @Override
@@ -941,15 +977,18 @@ public class GraphFragment extends Fragment implements ResultGraphAdapter.GraphC
         @Override
         protected void onPostExecute(Integer responseCode) {
             super.onPostExecute(responseCode);
-
+            try {
+            if (loopDialog != null && loopDialog.isShowing())
+                loopDialog.dismiss();
             if (responseCode == 200 || responseCode == 201){
                 Toast.makeText(getContext(), "Сообщение отправлено", Toast.LENGTH_SHORT).show();
-
+GraphListFragment.restartGraphFragment(panelId, isPercents);
             }
             else {
                 Toast.makeText(getContext(), R.string.try_later, Toast.LENGTH_SHORT).show();
             }
         }
+        catch (Exception e){}}
     }
 
     private boolean checkExternalPermissions() {
