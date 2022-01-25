@@ -20,8 +20,11 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.Environment;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.util.TypedValue;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -399,6 +402,21 @@ public class GraphFragment extends Fragment implements ResultGraphAdapter.GraphC
                             recyclerComment.setAdapter(new CommentAdapter(getActivity(), graphInfo.values.get((int) h.getX()).comments));
                             sendBTN = (ImageView) commentsDialog.findViewById(R.id.send);
                             messageET = (EditText) commentsDialog.findViewById(R.id.et_text_message);
+                            messageET.addTextChangedListener(new TextWatcher() {
+                                @Override
+                                public void onTextChanged(CharSequence s, int start, int before, int count) {
+                                    sendBTN.setVisibility(View.VISIBLE);
+                                }
+
+                                @Override
+                                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+                                }
+                                @Override
+                                public void afterTextChanged(Editable s) {
+
+                                }
+                            });
                             TextView labelTV = commentsDialog.findViewById(R.id.label);
                             TextView timeTV = commentsDialog.findViewById(R.id.time);
                             labelTV.setText(name);

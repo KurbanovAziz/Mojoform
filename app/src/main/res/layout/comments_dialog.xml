@@ -28,7 +28,7 @@
                 android:layout_marginRight="10dp"
                 android:orientation="vertical">
 
-                <RelativeLayout
+                <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
                     android:orientation="horizontal"
                     android:layout_height="wrap_content">
@@ -39,21 +39,25 @@
                         android:layout_height="wrap_content"
                         android:text="Контроль наблюдения"
                         android:textColor="#433A4D"
-                        android:textSize="16dp" />
+                        android:textSize="16dp"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
 
                     <ImageView
                         android:id="@+id/krestic"
                         android:layout_width="15dp"
                         android:layout_height="20dp"
-                        android:clickable="true"
                         android:layout_alignParentEnd="true"
                         android:layout_gravity="right"
-                        android:layout_marginStart="160dp"
-                        android:layout_marginEnd="5dp"
                         android:layout_toEndOf="@+id/label"
+                        android:clickable="true"
                         android:gravity="right"
-                        android:src="@drawable/krestik" />
-                </RelativeLayout>
+                        android:src="@drawable/krestik"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+                </androidx.constraintlayout.widget.ConstraintLayout>
 
                 <TextView
                     android:id="@+id/time"
@@ -114,7 +118,9 @@
                     android:id="@+id/et_text_message"
                     android:layout_width="match_parent"
                     android:background="#DDD7E9"
-                    android:inputType="textCapSentences|textMultiLine"
+                    android:imeOptions="actionDone"
+
+                    android:inputType="textMultiLine"
                     android:maxLength="3000"
                     android:textColor="#433A4D"
                     android:textColorHint="#FFFFFF"
@@ -128,6 +134,7 @@
                     android:layout_gravity="center"
                     android:layout_marginTop="2dp"
                     android:clickable="true"
+                    android:visibility="invisible"
                     android:layout_height="50dp"
                     android:src="@drawable/send"
                     android:focusable="true" />
