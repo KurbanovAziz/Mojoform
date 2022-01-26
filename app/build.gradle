@@ -15,7 +15,7 @@ android {
         targetSdkVersion 30
         multiDexEnabled true
         versionCode 68
-        versionName "1.9.7"
+        versionName "1.9.8"
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
     }
     buildTypes {
