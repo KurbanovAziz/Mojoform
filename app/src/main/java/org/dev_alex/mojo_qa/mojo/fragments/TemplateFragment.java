@@ -1681,6 +1681,7 @@ public class TemplateFragment extends Fragment {
         final View barcodeBtn = ((ViewGroup) seekBarContainer.getChildAt(3)).getChildAt(2);
         final TextView captionLabel = ((TextView) seekBarContainer.getChildAt(0));
         final EditText changeValue = (EditText) ((LinearLayout) ((LinearLayout) seekBarContainer.getChildAt(3)).getChildAt(0)).getChildAt(1);
+        captionLabel.setText(value.getString("caption"));
 
 
         if (value.has("barcode")) {
