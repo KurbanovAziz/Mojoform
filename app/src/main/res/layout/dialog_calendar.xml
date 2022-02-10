@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
+    android:layout_gravity="center"
     android:layout_height="310dp">
 
     <ImageView
@@ -13,10 +14,19 @@
         xmlns:app="http://schemas.android.com/apk/res-auto"
         android:id="@+id/calendarView"
         android:layout_width="match_parent"
-        android:layout_height="310dp"
+        android:layout_height="match_parent"
         app:mcv_firstDayOfWeek="monday"
         app:mcv_selectionColor="#ff26c373"
         app:mcv_showOtherDates="none"
         app:mcv_tileHeight="0dp"
         app:mcv_tileWidth="0dp" />
+    <Button
+        android:id="@+id/save"
+        android:layout_width="120dp"
+        android:layout_height="60dp"
+        android:textColor="#EBE1E1E1"
+        android:textSize="17dp"
+        android:background="@drawable/rounded_view"
+        android:text="Выбрать"
+         android:layout_gravity="bottom|center"/>
 </FrameLayout>

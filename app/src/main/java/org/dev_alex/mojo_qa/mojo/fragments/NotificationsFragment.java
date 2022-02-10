@@ -1,6 +1,7 @@
 package org.dev_alex.mojo_qa.mojo.fragments;
 
 import android.Manifest;
+import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
@@ -16,28 +17,45 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.RadioGroup;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.prolificinteractive.materialcalendarview.CalendarDay;
+import com.prolificinteractive.materialcalendarview.DayViewDecorator;
+import com.prolificinteractive.materialcalendarview.DayViewFacade;
+import com.prolificinteractive.materialcalendarview.MaterialCalendarView;
 
 import org.dev_alex.mojo_qa.mojo.R;
 import org.dev_alex.mojo_qa.mojo.SortUtil;
 import org.dev_alex.mojo_qa.mojo.activities.AuthActivity;
 import org.dev_alex.mojo_qa.mojo.activities.MainActivity;
 import org.dev_alex.mojo_qa.mojo.adapters.NotificationAdapter;
+import org.dev_alex.mojo_qa.mojo.custom_views.MultiSpinner;
 import org.dev_alex.mojo_qa.mojo.custom_views.RelativeLayoutWithPopUp;
 import org.dev_alex.mojo_qa.mojo.models.Notification;
+import org.dev_alex.mojo_qa.mojo.models.Organisation;
 import org.dev_alex.mojo_qa.mojo.services.RequestService;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
 
 import androidx.annotation.Nullable;
@@ -55,12 +73,6 @@ import okio.Okio;
 public class NotificationsFragment extends Fragment implements NotificationAdapter.NotificationClickListener {
     private static final String ARG_NOTIFICATION_ID = "ARG_NOTIF";
 
-    private final int SORT_BY_NAME = 1;
-    private final int SORT_BY_NAME_DESC = 2;
-    private final int SORT_BY_CREATED_AT = 3;
-    private final int SORT_BY_CREATED_AT_DESC = 4;
-    private int sortType = SORT_BY_NAME;
-
     private RelativeLayoutWithPopUp rootView;
 
     private ProgressDialog loopDialog;
@@ -70,11 +82,27 @@ public class NotificationsFragment extends Fragment implements NotificationAdapt
     private static boolean needUpdate = true;
 
     private ArrayList<Notification> notifications;
+    //private ArrayList<Organisation> organisations;
+
 
     private String searchText = null;
     private TextWatcher searchListener;
 
     private Integer pendingNotificationId = null;
+    public MultiSpinner multiSpinner;
+    public ArrayList<String> tags = new ArrayList<>();
+    ArrayList<Organisation> organisations;
+
+    private Date fromFilter;
+    private Date toFilter;
+    private String readTypeFilter;
+    private String orderTypeFilter;
+
+    public Dialog filterDialog;
+
+
+
+
 
     public static NotificationsFragment newInstance(Integer notificationId) {
         Bundle args = new Bundle();
@@ -96,20 +124,24 @@ public class NotificationsFragment extends Fragment implements NotificationAdapt
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        multiSpinner = (MultiSpinner) getActivity().findViewById(R.id.spin);
+        filterDialog = new Dialog(getContext());
+        filterDialog.getWindow().requestFeature(Window.FEATURE_NO_TITLE);
+        filterDialog.setContentView(LayoutInflater.from(getContext()).inflate(R.layout.dialog_notification_filter, null, false));
+        filterDialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+        filterDialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        filterDialog.setCanceledOnTouchOutside(false);
+        filterDialog.create();
         if (rootView == null) {
             if (getArguments() != null && getArguments().containsKey(ARG_NOTIFICATION_ID)) {
                 pendingNotificationId = getArguments().getInt(ARG_NOTIFICATION_ID);
             }
-
             rootView = (RelativeLayoutWithPopUp) inflater.inflate(R.layout.fragment_notifications, container, false);
-
             recyclerView = rootView.findViewById(R.id.recycler_view);
             recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-
             sortTypePopupWindow = (RelativeLayout) rootView.findViewById(R.id.notif_sort_popup_layout);
             rootView.addPopUpWindow(sortTypePopupWindow);
             sortTypePopupWindow.setVisibility(View.GONE);
-
             initDialog();
             setListeners();
             new Handler().postDelayed(new Runnable() {
@@ -119,9 +151,20 @@ public class NotificationsFragment extends Fragment implements NotificationAdapt
                 }
             }, 500);
         }
-        sortType = SORT_BY_CREATED_AT_DESC;
         return rootView;
     }
+    public void onItemsSelected(boolean[] selected) {
+        tags.clear();
+        for(int i = 0; i < selected.length; i++){
+            if(selected[i]){
+                tags.add(organisations.get(i).getId());
+            }
+        }
+        if(tags.size() == 0){
+            Toast.makeText(getContext(), "Вы ничего не выбрали!", Toast.LENGTH_SHORT).show();
+        }
+    }
+
 
     @Override
     public void onResume() {
@@ -136,6 +179,9 @@ public class NotificationsFragment extends Fragment implements NotificationAdapt
         getActivity().findViewById(R.id.grid_btn).setVisibility(View.GONE);
         getActivity().findViewById(R.id.back_btn).setVisibility(View.GONE);
         getActivity().findViewById(R.id.qr_btn).setVisibility(View.GONE);
+        getActivity().findViewById(R.id.spin).setVisibility(View.GONE);
+
+
 
         getActivity().findViewById(R.id.group_by_btn).setVisibility(View.VISIBLE);
         getActivity().findViewById(R.id.sandwich_btn).setVisibility(View.VISIBLE);
@@ -145,7 +191,122 @@ public class NotificationsFragment extends Fragment implements NotificationAdapt
         getActivity().findViewById(R.id.group_by_btn).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                sortTypePopupWindow.setVisibility(View.VISIBLE);
+                 ArrayList<String> organisationNames = new ArrayList<>();
+                    for (int i = 0; i < organisations.size(); i++){
+                        organisationNames.add(organisations.get(i).getName());
+                    }
+                    multiSpinner.setItems(getActivity(), organisations, "", NotificationsFragment.this::onItemsSelected);
+
+
+                TextView calendarText = filterDialog.findViewById(R.id.calendarText);
+                LinearLayout calendarLL = filterDialog.findViewById(R.id.calendarLL);
+                RadioGroup readGroup = filterDialog.findViewById(R.id.read_group);
+                RadioGroup orderGroup = filterDialog.findViewById(R.id.orderGroup);
+                ImageView okeyBTN = filterDialog.findViewById(R.id.okeyBTN);
+                ImageView kresticBTN = filterDialog.findViewById(R.id.krestik);
+                kresticBTN.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        filterDialog.cancel();
+                    }
+                });
+                okeyBTN.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        needUpdate = true;
+                        updateNotifications();
+                        filterDialog.cancel();
+                    }
+                });
+                readGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+                    @Override
+                    public void onCheckedChanged(RadioGroup group, int checkedId) {
+                        switch (checkedId) {
+                            case R.id.radio_not_read:
+                                readTypeFilter = "unreaded";
+                                break;
+                            case R.id.radio_read:
+                                readTypeFilter = "readed";
+                                break;
+                            case R.id.radio_all_read:
+                                readTypeFilter = "all";
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+                });
+                 orderGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+                    @Override
+                    public void onCheckedChanged(RadioGroup group, int checkedId) {
+                        switch (checkedId) {
+                            case R.id.radio_new:
+                                orderTypeFilter = "date_desc";
+                                break;
+                            case R.id.radio_old:
+                                orderTypeFilter = "date";
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+                });
+                calendarLL.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        final Dialog calendarDialog = new Dialog(getContext());
+                        calendarDialog.getWindow().requestFeature(Window.FEATURE_NO_TITLE);
+                        calendarDialog.setContentView(LayoutInflater.from(getContext()).inflate(R.layout.dialog_calendar, null, false));
+                        calendarDialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+                        calendarDialog.show();
+                        MaterialCalendarView calendarView = (MaterialCalendarView) calendarDialog.findViewById(R.id.calendarView);
+                        calendarView.setTopbarVisible(false);
+                        calendarView.setCurrentDate(CalendarDay.from(Calendar.getInstance()), true);
+                        calendarView.setSelectionMode(MaterialCalendarView.SELECTION_MODE_RANGE);
+                        calendarView.addDecorator(new DayViewDecorator() {
+                            @Override
+                            public boolean shouldDecorate(CalendarDay day) {
+                                Calendar currentCalendar = Calendar.getInstance();
+                                currentCalendar.setTime(new Date());
+                                return day.getCalendar().get(Calendar.DAY_OF_YEAR) == currentCalendar.get(Calendar.DAY_OF_YEAR);
+                            }
+
+                            @Override
+                            public void decorate(DayViewFacade view) {
+                                view.setBackgroundDrawable(ContextCompat.getDrawable(getContext(), R.drawable.image_ring));
+                            }
+                        });
+                        Button setCalendarBTN = calendarDialog.findViewById(R.id.save);
+                        setCalendarBTN.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+
+                                List<CalendarDay> days =  calendarView.getSelectedDates();
+                               if (days.size() == 0){Toast.makeText(getContext(), "вы не выбрали промежуток", Toast.LENGTH_SHORT).show();}
+                               else {
+                                   if (days.size() == 1){
+                                       toFilter = days.get(0).getDate();
+                                       fromFilter = days.get(0).getDate();
+                                   }
+                                   else {
+                                   if (days.get(0).getDate().getTime() < days.get(1).getDate().getTime()){
+                                   fromFilter = days.get(0).getDate();
+                                   toFilter = days.get(1).getDate();}
+                                   else {
+                                       toFilter = days.get(0).getDate();
+                                       fromFilter = days.get(1).getDate();}}
+                                   SimpleDateFormat xDateFormat = new SimpleDateFormat("dd.MM.yyyy", Locale.getDefault());
+                                   calendarText.setText("с " + xDateFormat.format(fromFilter) + " по " + xDateFormat.format(toFilter));
+                                   calendarDialog.cancel();
+
+                               }
+
+                            }
+                        });
+                    }
+                });
+
+                filterDialog.show();
             }
         });
     }
@@ -273,7 +434,6 @@ public class NotificationsFragment extends Fragment implements NotificationAdapt
                 sortTypePopupWindow.findViewById(R.id.sort_by_name_desc_tick).setVisibility(View.GONE);
 
                 sortTypePopupWindow.findViewById(R.id.sort_by_name_tick).setVisibility(View.VISIBLE);
-                sortType = SORT_BY_NAME;
                 sortTypePopupWindow.setVisibility(View.GONE);
                 needUpdate = true;
                 updateNotifications();
@@ -288,7 +448,6 @@ public class NotificationsFragment extends Fragment implements NotificationAdapt
 
                 sortTypePopupWindow.findViewById(R.id.sort_by_name_desc_tick).setVisibility(View.VISIBLE);
 
-                sortType = SORT_BY_NAME_DESC;
                 sortTypePopupWindow.setVisibility(View.GONE);
                 needUpdate = true;
 
@@ -305,7 +464,6 @@ public class NotificationsFragment extends Fragment implements NotificationAdapt
 
                 sortTypePopupWindow.findViewById(R.id.sort_by_create_time_tick).setVisibility(View.VISIBLE);
 
-                sortType = SORT_BY_CREATED_AT;
                 sortTypePopupWindow.setVisibility(View.GONE);
                 needUpdate = true;
                 updateNotifications();
@@ -321,7 +479,6 @@ public class NotificationsFragment extends Fragment implements NotificationAdapt
 
                 sortTypePopupWindow.findViewById(R.id.sort_by_create_time_desc_tick).setVisibility(View.VISIBLE);
 
-                sortType = SORT_BY_CREATED_AT_DESC;
                 sortTypePopupWindow.setVisibility(View.GONE);
                 needUpdate = true;
 
@@ -397,18 +554,33 @@ public class NotificationsFragment extends Fragment implements NotificationAdapt
                 Response response;
                 notifications = new ArrayList<>();
                 String url;
+                StringBuilder filter = new StringBuilder();
+                filter.append("?orderBy=");
+                if(orderTypeFilter != null){
+                filter.append(orderTypeFilter);
+                }
+                else filter.append("date_desc");
 
-                String sortParameter = "?orderBy=";
-                if (sortType == SORT_BY_CREATED_AT)
-                    sortParameter += "date";
-                else if (sortType == SORT_BY_CREATED_AT_DESC)
-                    sortParameter += "date_desc";
-                else if (sortType == SORT_BY_NAME)
-                    sortParameter += "name";
-                else if (sortType == SORT_BY_NAME_DESC)
-                    sortParameter += "name_desc";
+                filter.append("&type=");
+                if(readTypeFilter != null){
+                filter.append(readTypeFilter);
+                }
+                else filter.append("all");
+                if(fromFilter != null && toFilter != null){
+                    filter.append("&from=" + (fromFilter.getTime() / (long)1000) + "&to=" + (toFilter.getTime() / (long)1000 + (long)86400));
+                }
 
-                url = "/api/notifications" + sortParameter;
+                if (tags.size() != 0){
+                    filter.append("&");
+                    for (int i = 0; i < tags.size(); i++){
+                        filter.append("orgID=").append(tags.get(i));
+                        if(i != (tags.size() - 1)){
+                            filter.append("&");
+                        }
+                    }
+                }
+
+                url = "/api/notifications" + filter;
 
                 response = RequestService.createGetRequest(url);
                 Log.d("mojo-response", "url = " + url + "&size=100");
@@ -418,8 +590,11 @@ public class NotificationsFragment extends Fragment implements NotificationAdapt
                     JSONArray notificationsJson = responseJson.getJSONArray("list");
                     Log.d("mojo-response", "notifications = " + notificationsJson);
 
-                    notifications = new ObjectMapper().readValue(notificationsJson.toString(), new TypeReference<ArrayList<Notification>>() {
-                    });
+                    JSONArray availableJson = responseJson.getJSONObject("available").getJSONArray("organisation");
+
+                    organisations = new ObjectMapper().readValue(availableJson.toString(), new TypeReference<ArrayList<Organisation>>() {});;
+
+                    notifications = new ObjectMapper().readValue(notificationsJson.toString(), new TypeReference<ArrayList<Notification>>() {});
 
                     notifications = new ArrayList(SortUtil.INSTANCE.sortNotifications(notifications));
 

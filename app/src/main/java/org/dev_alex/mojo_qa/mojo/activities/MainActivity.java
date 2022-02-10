@@ -76,7 +76,6 @@ import okio.Okio;
 //
 public class MainActivity extends AppCompatActivity {
     public Drawer drawer;
-    private boolean isFirstLaunch = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

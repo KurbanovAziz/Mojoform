@@ -210,7 +210,7 @@
 
                 <ImageView
                     android:layout_width="20dp"
-                    android:layout_height="20dp"
+                    android:layout_height="19dp"
                     android:layout_gravity="bottom|right"
                     android:adjustViewBounds="true"
                     android:src="@drawable/download_icon" />

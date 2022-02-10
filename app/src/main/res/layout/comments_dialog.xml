@@ -134,7 +134,7 @@
                     android:layout_gravity="center"
                     android:layout_marginTop="2dp"
                     android:clickable="true"
-                    android:visibility="invisible"
+                    android:visibility="gone"
                     android:layout_height="50dp"
                     android:src="@drawable/send"
                     android:focusable="true" />

@@ -2,6 +2,7 @@ package org.dev_alex.mojo_qa.mojo.custom_views;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnCancelListener;
@@ -12,6 +13,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
@@ -72,12 +74,12 @@ public class MultiSpinner extends androidx.appcompat.widget.AppCompatSpinner imp
         }
     }
 
-    private MultiSpinnerListAdapter adapter;
-    private Activity activity;
-    private List<Organisation> items;
-    private boolean[] selected;
-    private String defaultText;
-    private MultiSpinnerListener listener;
+    private static MultiSpinnerListAdapter adapter;
+    private  Activity activity;
+    private static List<Organisation> items;
+    private static boolean[] selected;
+    private static String defaultText;
+    private static MultiSpinnerListener listener;
 
     public MultiSpinner(Context context) {
         super(context);
@@ -146,7 +148,9 @@ public class MultiSpinner extends androidx.appcompat.widget.AppCompatSpinner imp
         AlertDialog dialog = builder.create();
 
 
+
         dialog.getListView().setOnItemClickListener(this);
+
 
         dialog.show();
         Button positive_button = dialog.getButton(DialogInterface.BUTTON_POSITIVE);
@@ -156,7 +160,7 @@ public class MultiSpinner extends androidx.appcompat.widget.AppCompatSpinner imp
         positive_button.setTextColor(Color.parseColor("#f0f8ff"));
         return true;}
         catch (Exception e){
-            Log.e("multispinner", e.toString());
+            e.printStackTrace();
             return false;
         }
     }

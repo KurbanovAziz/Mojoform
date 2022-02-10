@@ -126,9 +126,6 @@ public class GraphFragment extends Fragment implements ResultGraphAdapter.GraphC
     long vid;
     long from;
     long to;
-
-
-
     private SimpleDateFormat xDateFormat = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
     private SimpleDateFormat xDateFormatNoYear = new SimpleDateFormat("dd-MM", Locale.getDefault());
 
