@@ -373,6 +373,8 @@ public class GraphFragment extends Fragment implements ResultGraphAdapter.GraphC
                     graphDialog.getWindow().requestFeature(Window.FEATURE_NO_TITLE);
                     graphDialog.setContentView(LayoutInflater.from(getContext()).inflate(R.layout.graph_dialog, null, false));
                     graphDialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+                    graphDialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+
                     final TextView textView = graphDialog.findViewById(R.id.information);
                     final Button commentBTN = graphDialog.findViewById(R.id.commentsBTN);
                     commentBTN.setOnClickListener(new View.OnClickListener() {
@@ -383,9 +385,11 @@ public class GraphFragment extends Fragment implements ResultGraphAdapter.GraphC
                                 to = graphInfo.values.get((int) h.getX()).to;
                                 new GetRaw().execute();}
                             final Dialog commentsDialog = new Dialog(getContext());
-                            commentsDialog.getWindow().requestFeature(Window.FEATURE_NO_TITLE);
+
                             commentsDialog.setContentView(LayoutInflater.from(getContext()).inflate(R.layout.comments_dialog, null, false));
                             commentsDialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+                            commentsDialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+
                             ImageView kresticIV = commentsDialog.findViewById(R.id.krestic);
                             kresticIV.setOnClickListener(new View.OnClickListener() {
                                 @Override

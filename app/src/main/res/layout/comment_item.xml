@@ -5,6 +5,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="wrap_content"
     android:layout_marginTop="10dp"
+    android:layout_gravity="left"
+    android:gravity="left"
     android:layout_height="wrap_content">
 
 
@@ -12,7 +14,7 @@
     <androidx.cardview.widget.CardView
         android:layout_width="wrap_content"
         app:cardBackgroundColor="#DDD7E9"
-        android:layout_marginLeft="30dp"
+        android:layout_marginLeft="5dp"
         android:layout_marginRight="30dp"
         app:cardCornerRadius="20dp"
         android:layout_height="wrap_content">
@@ -32,7 +34,7 @@
                 android:textSize="16dp"
 
                 android:layout_height="wrap_content"
-                android:gravity="center"
+                android:gravity="left"
                 tools:text="Cюжет фильма «Один дома». Семья Маккалистер собирается провести рождественские каникулы в Париже. Они собираются в доме Питера (актёр Джон Хёрд) и Кейт (актриса Кэтрин О’Хара) в пригороде Чикаго. Младший сын Питера и Кейт, Кевин (актёр Маколей Калкин) постоянно страдает от издёвок многочисленных братьев и сестёр." />
 
             <LinearLayout
