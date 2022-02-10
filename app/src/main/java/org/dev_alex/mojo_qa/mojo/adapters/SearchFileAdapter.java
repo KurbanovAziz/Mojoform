@@ -1,6 +1,7 @@
 package org.dev_alex.mojo_qa.mojo.adapters;
 
 
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -12,6 +13,7 @@ import android.widget.TextView;
 import org.dev_alex.mojo_qa.mojo.R;
 import org.dev_alex.mojo_qa.mojo.fragments.SearchFragment;
 import org.dev_alex.mojo_qa.mojo.models.File;
+import org.dev_alex.mojo_qa.mojo.services.Utils;
 
 import java.util.ArrayList;
 
@@ -50,11 +52,36 @@ public class SearchFileAdapter extends RecyclerView.Adapter<SearchFileAdapter.Fi
         final File file = files.get(i);
         viewHolder.fileName.setText(file.name);
 
-        if (parentFragment.bitmapCacheService.hasThumbnailInMemCache(file.id)) {
-            Bitmap bitmap = parentFragment.bitmapCacheService.getThumbnailFromMemCache(file.id);
-            viewHolder.fileIcon.setImageBitmap(bitmap);
-        } else
-            viewHolder.fileIcon.setImageResource(R.drawable.file_icon);
+
+            String mimeType = file.nodeType;
+            switch (mimeType) {
+                case "cm:content":
+                    String fileExt = Utils.getFileExtension(file.name);
+                    if (!fileExt.isEmpty()) {
+                        Resources resources = parentFragment.getResources();
+                        final int resourceId = resources.getIdentifier("_" + fileExt, "drawable",
+                                parentFragment.getContext().getPackageName());
+                        if (resourceId != 0)
+                            viewHolder.fileIcon.setImageResource(resourceId);
+                        else
+                            viewHolder.fileIcon.setImageResource(R.drawable.unknown);
+                    } else
+                        viewHolder.fileIcon.setImageResource(R.drawable.unknown);
+                    break;
+                case "mojo:template":
+                    viewHolder.fileIcon.setImageResource(R.drawable.icon_template);
+                    break;
+                case "mojo:document":
+                    viewHolder.fileIcon.setImageResource(R.drawable.icon_filled_doc);
+                    break;
+                case "mojo:analytic":
+                    viewHolder.fileIcon.setImageResource(R.drawable.icon_analytics);
+                    break;
+                default:
+                    viewHolder.fileIcon.setImageResource(R.drawable.icon_mojo_file);
+                    break;
+            }
+
 
         viewHolder.separator.setVisibility(i == files.size() - 1 ? View.GONE : View.VISIBLE);
 
