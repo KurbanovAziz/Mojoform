@@ -17,6 +17,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.google.zxing.integration.android.IntentIntegrator;
+import com.google.zxing.integration.android.IntentResult;
+import com.journeyapps.barcodescanner.CaptureActivity;
 
 import org.dev_alex.mojo_qa.mojo.Data;
 import org.dev_alex.mojo_qa.mojo.R;
@@ -58,24 +61,32 @@ public class LoginFragment extends Fragment {
         }
         return rootView;
     }
+    public void scanСode(View v) {
+        IntentIntegrator intentIntegrator = new IntentIntegrator(getActivity());
+        intentIntegrator.setCaptureActivity(CaptureActivity.class);
+        intentIntegrator.setOrientationLocked(true);
+        intentIntegrator.setDesiredBarcodeFormats(IntentIntegrator.QR_CODE_TYPES);
+        intentIntegrator.setPrompt("Сканируем...");
+        intentIntegrator.initiateScan();
+    }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == SCAN_CODE_REQUEST_CODE) {
-            if (resultCode == RESULT_OK) {
-                String contents = data.getStringExtra("SCAN_RESULT");
-                String UUID = contents.substring(contents.lastIndexOf("/")).replace("/", "");
+        try {
 
-                if (contents.contains("reports")) {
-                    Data.pendingOpenTaskUUID = UUID;
-                    Data.isReportTaskMode = true;
-                    Toast.makeText(getContext(), R.string.log_in_to_execute_task, Toast.LENGTH_LONG).show();
-                } else {
-                    startActivity(OpenLinkActivity.getActivityIntent(getContext(), UUID, false));
-                }
+            IntentResult intentResult = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
+            String contents = intentResult.getContents();
+            String UUID = contents.substring(contents.lastIndexOf("/")).replace("/", "");
+            if (contents.contains("reports")) {
+                Data.pendingOpenTaskUUID = UUID;
+                Data.isReportTaskMode = true;
+                Toast.makeText(getContext(), R.string.log_in_to_execute_task, Toast.LENGTH_LONG).show();
+            } else {
+                startActivity(OpenLinkActivity.getActivityIntent(getContext(), UUID, false));
             }
         }
+        catch (Exception e){e.printStackTrace();}
     }
 
     private void showFirstLaunchHint() {
@@ -121,34 +132,10 @@ public class LoginFragment extends Fragment {
             }
         });
 
-        rootView.findViewById(R.id.btScanQr).setOnClickListener(v -> {
-            try {
-                Intent intent = new Intent("com.google.zxing.client.android.SCAN");
-                intent.putExtra("SCAN_MODE", "QR_CODE_MODE"); // "PRODUCT_MODE for bar codes
-                intent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
-                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                startActivityForResult(intent, SCAN_CODE_REQUEST_CODE);
-            } catch (Exception e) {
-                showQrAppDownloadDialog();
-            }
-        });
+        rootView.findViewById(R.id.btScanQr).setOnClickListener(this::scanСode);
 
         rootView.findViewById(R.id.about_btn).setOnClickListener(v -> startActivity(new Intent(getContext(), OnboardingActivity.class)));
     }
 
-    private void showQrAppDownloadDialog() {
-        new MaterialDialog.Builder(getContext())
-                .title(R.string.attention)
-                .content(R.string.need_download_app)
-                .positiveText("Ok")
-                .negativeText(R.string.cancel_)
-                .autoDismiss(true)
-                .onPositive((dialog, which) -> {
-                    Uri marketUri = Uri.parse("market://details?id=com.google.zxing.client.android");
-                    Intent marketIntent = new Intent(Intent.ACTION_VIEW, marketUri);
-                    startActivity(marketIntent);
-                })
-                .show();
-    }
+
 }

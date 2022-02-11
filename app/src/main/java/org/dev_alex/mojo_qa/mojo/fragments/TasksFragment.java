@@ -33,6 +33,9 @@ import android.widget.Toast;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.zxing.integration.android.IntentIntegrator;
+import com.google.zxing.integration.android.IntentResult;
+import com.journeyapps.barcodescanner.CaptureActivity;
 import com.prolificinteractive.materialcalendarview.CalendarDay;
 import com.prolificinteractive.materialcalendarview.DayViewDecorator;
 import com.prolificinteractive.materialcalendarview.DayViewFacade;
@@ -143,9 +146,9 @@ public class TasksFragment extends Fragment {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == SCAN_CODE_REQUEST_CODE) {
-            if (resultCode == RESULT_OK) {
-                String contents = data.getStringExtra("SCAN_RESULT");
+        try{
+        IntentResult intentResult = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
+        String contents = intentResult.getContents();
                 String UUID = contents.substring(contents.lastIndexOf("/")).replace("/", "");
 
                 boolean isReport = false;
@@ -156,8 +159,10 @@ public class TasksFragment extends Fragment {
                 getActivity().getSupportFragmentManager().beginTransaction()
                         .replace(R.id.container, TemplateFragment.newInstance(UUID, isReport)).addToBackStack(null).commit();
             }
+    catch (Exception e){e.printStackTrace();}
+
         }
-    }
+
 
     @Override
     public void onResume() {
@@ -181,18 +186,7 @@ public class TasksFragment extends Fragment {
         getActivity().findViewById(R.id.qr_btn).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                try {
-                    Intent intent = new Intent("com.google.zxing.client.android.SCAN");
-                    intent.putExtra("SCAN_MODE", "QR_CODE_MODE"); // "PRODUCT_MODE for bar codes
-                    intent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
-                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                    intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                    startActivityForResult(intent, SCAN_CODE_REQUEST_CODE);
-                } catch (Exception e) {
-                    Uri marketUri = Uri.parse("market://details?id=com.google.zxing.client.android");
-                    Intent marketIntent = new Intent(Intent.ACTION_VIEW, marketUri);
-                    startActivity(marketIntent);
-                }
+            scanСode(v);
             }
         });
     }
@@ -446,6 +440,14 @@ public class TasksFragment extends Fragment {
 
         rootView.findViewById(R.id.calendar_reset_btn).setVisibility(
                 (withDay || currentDate.get(Calendar.MONTH) != Calendar.getInstance().get(Calendar.MONTH)) ? View.VISIBLE : View.GONE);
+    }
+    public void scanСode(View v) {
+        IntentIntegrator intentIntegrator = new IntentIntegrator(getActivity());
+        intentIntegrator.setCaptureActivity(CaptureActivity.class);
+        intentIntegrator.setOrientationLocked(true);
+        intentIntegrator.setDesiredBarcodeFormats(IntentIntegrator.QR_CODE_TYPES);
+        intentIntegrator.setPrompt("Сканируем...");
+        intentIntegrator.initiateScan();
     }
 
     private void updateDecorators(ArrayList<Task> monthTasks) {

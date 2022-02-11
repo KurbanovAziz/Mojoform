@@ -140,6 +140,11 @@
             android:theme="@style/Theme.AppCompat.Light.NoActionBar.FullScreen" />
         <activity android:name=".custom_views.camera.CustomCamera2Activity" />
         <activity android:name=".activities.OnboardingActivity" />
+        <activity
+            android:name="com.journeyapps.barcodescanner.CaptureActivity"
+            android:screenOrientation="portrait"
+            tools:replace="android:screenOrientation"
+            android:stateNotNeeded="true"/>
 
         <service android:name=".gcm.MyFirebaseMessagingService">
             <intent-filter>
