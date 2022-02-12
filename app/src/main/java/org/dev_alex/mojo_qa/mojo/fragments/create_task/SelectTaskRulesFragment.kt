@@ -282,13 +282,17 @@ class SelectTaskRulesFragment : Fragment() {
                 val periodicalConfigJson = JSONObject().apply {
                     when (selectedPeriod) {
                         CreateTaskModel.TaskPeriod.Daily -> {
+                            val list: ArrayList<String> = ArrayList()
+                            list.add(periodTime)
                             put("daily", JSONObject().apply {
-                                put("times", JSONArray(model.periodicalTimes.orEmpty()))
+                                put("times", JSONArray(list))
                             })
                         }
                         is CreateTaskModel.TaskPeriod.Weekly -> {
+                            val list: ArrayList<String> = ArrayList()
+                            list.add(periodTime)
                             put("weekly", JSONObject().apply {
-                                put("times", JSONArray(model.periodicalTimes.orEmpty()))
+                                put("times", JSONArray(list))
                                 put("weekDays", JSONArray(selectedPeriod.days))
                             })
                         }
