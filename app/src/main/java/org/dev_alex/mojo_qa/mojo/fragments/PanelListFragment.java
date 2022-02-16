@@ -117,10 +117,18 @@ public class PanelListFragment extends Fragment {
         getActivity().findViewById(R.id.grid_btn).setVisibility(View.GONE);
         getActivity().findViewById(R.id.sandwich_btn).setVisibility(View.VISIBLE);
         getActivity().findViewById(R.id.group_by_btn).setVisibility(View.VISIBLE);
-        getActivity().findViewById(R.id.search_btn).setVisibility(View.GONE);
+        getActivity().findViewById(R.id.search_btn).setVisibility(View.VISIBLE);
         getActivity().findViewById(R.id.notification_btn).setVisibility(View.GONE);
         getActivity().findViewById(R.id.spin).setVisibility(View.VISIBLE);
         getActivity().findViewById(R.id.qr_btn).setVisibility(View.GONE);
+        getActivity().findViewById(R.id.search_btn).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                getActivity().getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.container, SearchResultFragment.newInstance()).addToBackStack(null).commit();
+            }
+        });
         getActivity().findViewById(R.id.group_by_btn).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -136,6 +144,12 @@ public class PanelListFragment extends Fragment {
         loopDialog.setIndeterminate(true);
         loopDialog.setCanceledOnTouchOutside(false);
         loopDialog.setCancelable(false);
+    }
+    @Override
+    public void onResume() {
+        super.onResume();
+        getActivity().findViewById(R.id.main_menu_search_block).setVisibility(View.GONE);
+        getActivity().findViewById(R.id.main_menu_buttons_block).setVisibility(View.VISIBLE);
     }
 
     private void onPanelClick(Panel panel) {
