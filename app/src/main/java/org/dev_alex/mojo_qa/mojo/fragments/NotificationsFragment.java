@@ -35,6 +35,7 @@ import com.prolificinteractive.materialcalendarview.CalendarDay;
 import com.prolificinteractive.materialcalendarview.DayViewDecorator;
 import com.prolificinteractive.materialcalendarview.DayViewFacade;
 import com.prolificinteractive.materialcalendarview.MaterialCalendarView;
+import com.prolificinteractive.materialcalendarview.OnMonthChangedListener;
 
 import org.dev_alex.mojo_qa.mojo.R;
 import org.dev_alex.mojo_qa.mojo.SortUtil;
@@ -50,6 +51,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.text.DateFormatSymbols;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -263,6 +265,17 @@ public class NotificationsFragment extends Fragment implements NotificationAdapt
                         calendarView.setTopbarVisible(false);
                         calendarView.setCurrentDate(CalendarDay.from(Calendar.getInstance()), true);
                         calendarView.setSelectionMode(MaterialCalendarView.SELECTION_MODE_RANGE);
+                        TextView month = calendarDialog.findViewById(R.id.month);
+                        CalendarDay calDate = calendarView.getCurrentDate();
+                        month.setText(getCalendarText(calDate));
+
+                        calendarView.setOnMonthChangedListener(new OnMonthChangedListener() {
+                            @Override
+                            public void onMonthChanged(MaterialCalendarView widget, CalendarDay date) {
+                                CalendarDay calDate = calendarView.getCurrentDate();
+                                month.setText(getCalendarText(calDate));
+                            }
+                        });
                         calendarView.addDecorator(new DayViewDecorator() {
                             @Override
                             public boolean shouldDecorate(CalendarDay day) {
@@ -309,6 +322,16 @@ public class NotificationsFragment extends Fragment implements NotificationAdapt
                 filterDialog.show();
             }
         });
+    }
+
+    private String getCalendarText(CalendarDay calendarDay) {
+        String monthName;
+        if (Locale.getDefault().getISO3Language().equals("rus")) {
+            String monthList[] = {"Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"};
+            monthName = monthList[calendarDay.getMonth()];
+        } else
+            monthName = new DateFormatSymbols(Locale.getDefault()).getMonths()[calendarDay.getMonth()];
+        return String.format("%s %s", monthName, calendarDay.getYear());
     }
 
     private void stopSearch() {
