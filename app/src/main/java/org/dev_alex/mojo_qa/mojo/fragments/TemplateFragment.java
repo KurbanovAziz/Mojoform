@@ -1685,12 +1685,12 @@ public class TemplateFragment extends Fragment {
 
 
         if (value.has("barcode")) {
-            changeValue.setText(value.getString("barcode"));
+            captionLabel.setText(value.getString("barcode"));
         } else {
             if (value.has("caption"))
-                changeValue.setText(value.getString("caption"));
+                captionLabel.setText(value.getString("caption"));
             else
-                changeValue.setText(R.string.no_text);
+                captionLabel.setText(R.string.no_text);
         }
 
         if (value.has("measure"))
@@ -1813,8 +1813,8 @@ public class TemplateFragment extends Fragment {
             barcodeBtn.setVisibility(View.GONE);
         }
 
-        qrCodeBtn.setOnClickListener(view -> scanQrCode((TextView) changeValue, value));
-        barcodeBtn.setOnClickListener(view -> scanBarCode(changeValue, value));
+        qrCodeBtn.setOnClickListener(view -> scanQrCode((TextView) captionLabel, value));
+        barcodeBtn.setOnClickListener(view -> scanBarCode(captionLabel, value));
     }
 
     private void createSignature(final JSONObject value, LinearLayout container) throws Exception {
