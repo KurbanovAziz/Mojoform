@@ -1,8 +1,15 @@
 package org.dev_alex.mojo_qa.mojo.adapters;
 
 
+import static org.dev_alex.mojo_qa.mojo.App.getContext;
+
+import android.app.ProgressDialog;
+import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
+import android.net.Uri;
+import android.os.AsyncTask;
+import android.os.Environment;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,18 +17,26 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.dev_alex.mojo_qa.mojo.R;
 import org.dev_alex.mojo_qa.mojo.fragments.DocumentsFragment;
 import org.dev_alex.mojo_qa.mojo.models.File;
 import org.dev_alex.mojo_qa.mojo.services.LoginHistoryService;
+import org.dev_alex.mojo_qa.mojo.services.RequestService;
 import org.dev_alex.mojo_qa.mojo.services.Utils;
+import org.json.JSONException;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Locale;
 
+import androidx.core.content.FileProvider;
 import androidx.recyclerview.widget.RecyclerView;
+
+import okhttp3.Response;
+import okio.BufferedSink;
+import okio.Okio;
 
 
 public class FileAdapter extends RecyclerView.Adapter<FileAdapter.FileViewHolder> {
@@ -30,6 +45,9 @@ public class FileAdapter extends RecyclerView.Adapter<FileAdapter.FileViewHolder
     private boolean isGrid;
     private boolean selectionModeEnabled;
     private ArrayList<String> selectedIds;
+    private ProgressDialog loopDialog;
+
+
 
     static class FileViewHolder extends RecyclerView.ViewHolder {
         TextView fileName;
@@ -72,6 +90,7 @@ public class FileAdapter extends RecyclerView.Adapter<FileAdapter.FileViewHolder
     @Override
     public FileViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
         View v;
+        initDialog();
         if (isGrid)
             v = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.card_file_grid, viewGroup, false);
         else
@@ -164,6 +183,13 @@ public class FileAdapter extends RecyclerView.Adapter<FileAdapter.FileViewHolder
                 viewHolder.itemView.setOnClickListener(v -> parentFragment.new OpenFileTask(file).execute());
             }
         }
+        viewHolder.itemView.setOnClickListener(v -> {
+            try {
+            //   new DownloadPdfTask(file.properties.getString("mojo:id")).execute() ;
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
 
         viewHolder.itemView.setOnLongClickListener(v -> {
             if (!selectionModeEnabled) {
@@ -208,5 +234,84 @@ public class FileAdapter extends RecyclerView.Adapter<FileAdapter.FileViewHolder
 
         return selectedFiles;
     }
+    private void initDialog() {
+        loopDialog = new ProgressDialog(getContext(), R.style.ProgressDialogStyle);
+        loopDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        loopDialog.setMessage("Загрузка, пожалуйста подождите...");
+        loopDialog.setIndeterminate(true);
+        loopDialog.setCanceledOnTouchOutside(false);
+        loopDialog.setCancelable(false);
+    }
+    private class DownloadPdfTask extends AsyncTask<Void, Void, Integer> {
+        private java.io.File resultFile;
+        private String id;
+
+        DownloadPdfTask(String id) {
+            this.id = id;}
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            java.io.File downloadsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+            resultFile = new java.io.File(downloadsDir, id + ".pdf");
+            loopDialog.show();
+        }
+
+        @Override
+        protected Integer doInBackground(Void... params) {
+            try {
+                if (resultFile.exists())
+                    return 200;
+
+                String url = "/api/notifications/" + id + "/pdf";
+                Response response = RequestService.createGetRequest(url);
+
+                if (response.code() == 200) {
+                    BufferedSink sink = Okio.buffer(Okio.sink(resultFile));
+                    sink.writeAll(response.body().source());
+                    sink.close();
+                }
+                response.body().close();
+
+                return response.code();
+            } catch (Exception exc) {
+                exc.printStackTrace();
+                return null;
+            }
+        }
+
+        @Override
+        protected void onPostExecute(Integer responseCode) {
+            super.onPostExecute(responseCode);
+            try {
+                if (loopDialog != null && loopDialog.isShowing())
+                    loopDialog.dismiss();
+
+                if (responseCode == null)
+                    Toast.makeText(getContext(), R.string.network_error, Toast.LENGTH_LONG).show();
+                else if (responseCode == 200) {
+                    try {
+                        Intent viewIntent = new Intent(Intent.ACTION_VIEW);
+                        Uri fileUri = FileProvider.getUriForFile(getContext(), getContext().getApplicationContext().getPackageName() + ".provider", resultFile);
+                        viewIntent.setDataAndType(fileUri, "application/pdf");
+                        viewIntent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                        parentFragment.startActivity(viewIntent);
+                    } catch (Exception exc) {
+                        exc.printStackTrace();
+                        Toast.makeText(getContext(), "Нет приложения, которое может открыть этот файл", Toast.LENGTH_LONG).show();
+                        try {
+                            resultFile.delete();
+                        } catch (Exception exc1) {
+                            exc1.printStackTrace();
+                        }
+                    }
+                } else
+                    Toast.makeText(getContext(), R.string.unknown_error, Toast.LENGTH_LONG).show();
+            } catch (Exception exc) {
+                exc.printStackTrace();
+            }
+        }
+    }
+
 }
 

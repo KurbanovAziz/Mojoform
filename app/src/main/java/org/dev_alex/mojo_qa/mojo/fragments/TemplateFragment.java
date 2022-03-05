@@ -505,13 +505,8 @@ public class TemplateFragment extends Fragment {
             if (new File(data.getData().getPath()).exists())
                 documentPath = data.getData().getPath();
             else {
-                String uriStr;
-                if(!data.getData().toString().contains("0@media")){
-                uriStr = "content://0@media/external/file/" + data.getData().toString().substring(data.getData().toString().lastIndexOf("3A") + 2);}
-                else{uriStr = data.getData().toString();}
-                Log.e("aaa", uriStr);
-                uriStr = data.getData().toString();
-                documentPath = Utils.getPathFromUri(getContext(), Uri.parse(uriStr));
+                new File(data.getData().getPath()).mkdirs();
+                documentPath = data.getData().getPath();
             }
 
             if (documentPath == null)

@@ -26,7 +26,7 @@ public class File {
 
     public Content content;
 
-    //public JSONObject properties;
+   // public Propertie properties;
     public ArrayList<String> aspectNames;
 
 /*    public void setProperties(String string) {

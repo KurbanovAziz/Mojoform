@@ -374,6 +374,15 @@ public class GraphFragment extends Fragment implements ResultGraphAdapter.GraphC
                     graphDialog.setContentView(LayoutInflater.from(getContext()).inflate(R.layout.graph_dialog, null, false));
                     graphDialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
                     graphDialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                    SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy", Locale.getDefault());
+                    String graphFrom = dateFormat.format(graphInfo.values.get((int) h.getX()).from);
+                    String graphTo = dateFormat.format(graphInfo.values.get((int) h.getX()).to);
+                    String date = "от " + graphFrom + " до " + graphTo;
+                    final TextView dateTV = graphDialog.findViewById(R.id.graph_date);
+                    dateTV.setText(date);
+                    final TextView kolvoTV = graphDialog.findViewById(R.id.kolvo);
+                    kolvoTV.setText("Количество комментариев: " + graphInfo.values.get((int) h.getX()).comments.size());
+
 
                     final TextView textView = graphDialog.findViewById(R.id.information);
                     final Button commentBTN = graphDialog.findViewById(R.id.commentsBTN);

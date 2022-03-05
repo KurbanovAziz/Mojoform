@@ -5,7 +5,7 @@
     <string name="next">Следующий</string>
     <string name="calendar">Календарь</string>
 
-    <string name="username">имя пользователя</string>
+    <string name="username">логин</string>
     <string name="password">пароль</string>
     <string name="not_all_fields_filled">Заполнены не все поля</string>
     <string name="loading_please_wait">Загрузка, пожалуйста подождите…</string>
@@ -184,7 +184,7 @@
     <string name="exec_start">Начало выполнения</string>
     <string name="exec_end">Конец выполнения</string>
     <string name="poll_date_and_count">Кол-во и дата завершения опросов</string>
-    <string name="set_task_execution_time">Задайте время на выполнение задачи</string>
+    <string name="set_task_execution_time">Укажите время начала выполнения задачи</string>
     <string name="task_execution_period">Переодичность выполнения задачи</string>
     <string name="hours">Часы</string>
     <string name="minutes">Минуты</string>

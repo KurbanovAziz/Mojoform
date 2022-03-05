@@ -210,17 +210,11 @@
         app:layout_constraintStart_toStartOf="@+id/button_left_guideline">
 
         <ImageView
-            android:layout_width="20dp"
-            android:layout_height="20dp"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
             android:src="@drawable/qr_button_icon" />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="6dp"
-            android:text="@string/scan"
-            android:textColor="@android:color/white"
-            android:textSize="18sp" />
+
     </LinearLayout>
 
     <TextView
