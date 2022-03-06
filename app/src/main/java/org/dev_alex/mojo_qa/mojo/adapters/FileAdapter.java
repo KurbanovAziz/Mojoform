@@ -4,6 +4,7 @@ package org.dev_alex.mojo_qa.mojo.adapters;
 import static org.dev_alex.mojo_qa.mojo.App.getContext;
 
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
@@ -21,6 +22,7 @@ import android.widget.Toast;
 
 import org.dev_alex.mojo_qa.mojo.R;
 import org.dev_alex.mojo_qa.mojo.fragments.DocumentsFragment;
+import org.dev_alex.mojo_qa.mojo.models.Content;
 import org.dev_alex.mojo_qa.mojo.models.File;
 import org.dev_alex.mojo_qa.mojo.services.LoginHistoryService;
 import org.dev_alex.mojo_qa.mojo.services.RequestService;
@@ -45,6 +47,7 @@ public class FileAdapter extends RecyclerView.Adapter<FileAdapter.FileViewHolder
     private boolean isGrid;
     private boolean selectionModeEnabled;
     private ArrayList<String> selectedIds;
+    private Context context;
     private ProgressDialog loopDialog;
 
 
@@ -71,18 +74,19 @@ public class FileAdapter extends RecyclerView.Adapter<FileAdapter.FileViewHolder
     }
 
 
-    public FileAdapter(DocumentsFragment parentFragment, ArrayList<File> files, boolean isGrid) {
+    public FileAdapter(DocumentsFragment parentFragment, ArrayList<File> files, boolean isGrid, Context context) {
         this.parentFragment = parentFragment;
         this.files = files;
         this.isGrid = isGrid;
         selectionModeEnabled = false;
+        this.context = context;
     }
 
-    public FileAdapter(DocumentsFragment parentFragment, ArrayList<File> files, boolean isGrid, ArrayList<String> selectedIds) {
+    public FileAdapter(DocumentsFragment parentFragment, ArrayList<File> files, boolean isGrid, ArrayList<String> selectedIds, Context context) {
         this.parentFragment = parentFragment;
         this.files = files;
         this.isGrid = isGrid;
-
+        this.context = context;
         this.selectedIds = selectedIds;
         selectionModeEnabled = true;
     }
@@ -183,16 +187,20 @@ public class FileAdapter extends RecyclerView.Adapter<FileAdapter.FileViewHolder
                 viewHolder.itemView.setOnClickListener(v -> parentFragment.new OpenFileTask(file).execute());
             }
         }
+
         viewHolder.itemView.setOnClickListener(v -> {
-            try {
-            //   new DownloadPdfTask(file.properties.getString("mojo:id")).execute() ;
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        });
+            String id = file.properties.mojoId;
+            if (id!= null && !id.equals("")){
+                try {
+                    new DownloadPdf(id, "pdf_document" + id).execute();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }}
+                }
+        );
 
         viewHolder.itemView.setOnLongClickListener(v -> {
-            if (!selectionModeEnabled) {
+        if (!selectionModeEnabled) {
                 parentFragment.startSelectionMode();
                 selectedIds.add(file.id);
                 parentFragment.checkIfSelectionModeFinished();
@@ -235,26 +243,28 @@ public class FileAdapter extends RecyclerView.Adapter<FileAdapter.FileViewHolder
         return selectedFiles;
     }
     private void initDialog() {
-        loopDialog = new ProgressDialog(getContext(), R.style.ProgressDialogStyle);
+        loopDialog = new ProgressDialog(context, R.style.ProgressDialogStyle);
         loopDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
         loopDialog.setMessage("Загрузка, пожалуйста подождите...");
         loopDialog.setIndeterminate(true);
         loopDialog.setCanceledOnTouchOutside(false);
         loopDialog.setCancelable(false);
     }
-    private class DownloadPdfTask extends AsyncTask<Void, Void, Integer> {
+    private class DownloadPdf extends AsyncTask<Void, Void, Integer> {
         private java.io.File resultFile;
         private String id;
+        private String name;
 
-        DownloadPdfTask(String id) {
-            this.id = id;}
+        DownloadPdf(String id, String name) {
+            this.id = id;
+            this.name = name;}
 
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            java.io.File downloadsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
-            resultFile = new java.io.File(downloadsDir, id + ".pdf");
             loopDialog.show();
+            java.io.File downloadsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+            resultFile = new java.io.File(downloadsDir, name + ".pdf");
         }
 
         @Override
@@ -263,7 +273,7 @@ public class FileAdapter extends RecyclerView.Adapter<FileAdapter.FileViewHolder
                 if (resultFile.exists())
                     return 200;
 
-                String url = "/api/notifications/" + id + "/pdf";
+                String url = "/api/fs-mojo/document/id/" + id + "/pdf";
                 Response response = RequestService.createGetRequest(url);
 
                 if (response.code() == 200) {
@@ -283,19 +293,22 @@ public class FileAdapter extends RecyclerView.Adapter<FileAdapter.FileViewHolder
         @Override
         protected void onPostExecute(Integer responseCode) {
             super.onPostExecute(responseCode);
+
             try {
-                if (loopDialog != null && loopDialog.isShowing())
-                    loopDialog.dismiss();
+                if (loopDialog != null && loopDialog.isShowing()) loopDialog.dismiss();
+
 
                 if (responseCode == null)
                     Toast.makeText(getContext(), R.string.network_error, Toast.LENGTH_LONG).show();
                 else if (responseCode == 200) {
                     try {
                         Intent viewIntent = new Intent(Intent.ACTION_VIEW);
-                        Uri fileUri = FileProvider.getUriForFile(getContext(), getContext().getApplicationContext().getPackageName() + ".provider", resultFile);
+                        Uri fileUri = FileProvider.getUriForFile(context, context.getApplicationContext().getPackageName() + ".provider", resultFile);
                         viewIntent.setDataAndType(fileUri, "application/pdf");
                         viewIntent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                        parentFragment.startActivity(viewIntent);
+                        viewIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+                        getContext().startActivity(viewIntent);
                     } catch (Exception exc) {
                         exc.printStackTrace();
                         Toast.makeText(getContext(), "Нет приложения, которое может открыть этот файл", Toast.LENGTH_LONG).show();

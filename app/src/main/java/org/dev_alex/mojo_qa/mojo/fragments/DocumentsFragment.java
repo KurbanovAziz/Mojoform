@@ -463,11 +463,11 @@ public class DocumentsFragment extends Fragment {
 
         if (selectModeEnabled && withSelection) {
             folderAdapter = new FolderAdapter(this, folders, isGridView, folderAdapter.getSelectedIds());
-            fileAdapter = new FileAdapter(DocumentsFragment.this, files, isGridView, fileAdapter.getSelectedIds());
+            fileAdapter = new FileAdapter(DocumentsFragment.this, files, isGridView, fileAdapter.getSelectedIds(), getContext());
         } else {
             stopSelectionMode();
             folderAdapter = new FolderAdapter(this, folders, isGridView);
-            fileAdapter = new FileAdapter(DocumentsFragment.this, files, isGridView);
+            fileAdapter = new FileAdapter(DocumentsFragment.this, files, isGridView, getContext());
         }
 
         folderRecyclerView.setLayoutParams(folderParams);
