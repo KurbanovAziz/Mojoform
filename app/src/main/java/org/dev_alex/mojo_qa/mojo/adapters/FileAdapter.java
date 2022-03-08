@@ -24,6 +24,7 @@ import org.dev_alex.mojo_qa.mojo.R;
 import org.dev_alex.mojo_qa.mojo.fragments.DocumentsFragment;
 import org.dev_alex.mojo_qa.mojo.models.Content;
 import org.dev_alex.mojo_qa.mojo.models.File;
+import org.dev_alex.mojo_qa.mojo.models.Indicator;
 import org.dev_alex.mojo_qa.mojo.services.LoginHistoryService;
 import org.dev_alex.mojo_qa.mojo.services.RequestService;
 import org.dev_alex.mojo_qa.mojo.services.Utils;
@@ -48,6 +49,7 @@ public class FileAdapter extends RecyclerView.Adapter<FileAdapter.FileViewHolder
     private boolean selectionModeEnabled;
     private ArrayList<String> selectedIds;
     private Context context;
+    private DocumentClickListener documentClickListener;
     private ProgressDialog loopDialog;
 
 
@@ -74,21 +76,24 @@ public class FileAdapter extends RecyclerView.Adapter<FileAdapter.FileViewHolder
     }
 
 
-    public FileAdapter(DocumentsFragment parentFragment, ArrayList<File> files, boolean isGrid, Context context) {
+    public FileAdapter(DocumentsFragment parentFragment, ArrayList<File> files, boolean isGrid, Context context, DocumentClickListener documentClickListener) {
         this.parentFragment = parentFragment;
         this.files = files;
         this.isGrid = isGrid;
         selectionModeEnabled = false;
         this.context = context;
+        this.documentClickListener = documentClickListener;
     }
 
-    public FileAdapter(DocumentsFragment parentFragment, ArrayList<File> files, boolean isGrid, ArrayList<String> selectedIds, Context context) {
+    public FileAdapter(DocumentsFragment parentFragment, ArrayList<File> files, boolean isGrid, ArrayList<String> selectedIds, Context context, DocumentClickListener documentClickListener) {
         this.parentFragment = parentFragment;
         this.files = files;
         this.isGrid = isGrid;
         this.context = context;
         this.selectedIds = selectedIds;
         selectionModeEnabled = true;
+        this.documentClickListener = documentClickListener;
+
     }
 
     @Override
@@ -188,16 +193,13 @@ public class FileAdapter extends RecyclerView.Adapter<FileAdapter.FileViewHolder
             }
         }
 
-        viewHolder.itemView.setOnClickListener(v -> {
-            String id = file.properties.mojoId;
+
+        String id = file.properties.mojoId;
             if (id!= null && !id.equals("")){
-                try {
-                    new DownloadPdf(id, "pdf_document" + id).execute();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }}
-                }
-        );
+                viewHolder.itemView.setOnClickListener(v -> documentClickListener.onDownloadPdfClick(Long.parseLong(id)));
+
+            }
+
 
         viewHolder.itemView.setOnLongClickListener(v -> {
         if (!selectionModeEnabled) {
@@ -324,6 +326,9 @@ public class FileAdapter extends RecyclerView.Adapter<FileAdapter.FileViewHolder
                 exc.printStackTrace();
             }
         }
+    }
+    public interface DocumentClickListener {
+         void onDownloadPdfClick(long id);
     }
 
 }

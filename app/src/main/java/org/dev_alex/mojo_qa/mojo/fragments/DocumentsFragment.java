@@ -1,9 +1,11 @@
 package org.dev_alex.mojo_qa.mojo.fragments;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
@@ -11,6 +13,7 @@ import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Environment;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -30,11 +33,13 @@ import org.dev_alex.mojo_qa.mojo.R;
 import org.dev_alex.mojo_qa.mojo.activities.AuthActivity;
 import org.dev_alex.mojo_qa.mojo.adapters.FileAdapter;
 import org.dev_alex.mojo_qa.mojo.adapters.FolderAdapter;
+import org.dev_alex.mojo_qa.mojo.adapters.ResultGraphAdapter;
 import org.dev_alex.mojo_qa.mojo.custom_views.MaxHeightRecycleView;
 import org.dev_alex.mojo_qa.mojo.custom_views.RelativeLayoutWithPopUp;
 import org.dev_alex.mojo_qa.mojo.fragments.create_task.CreateTaskInfoFragment;
 import org.dev_alex.mojo_qa.mojo.models.File;
 import org.dev_alex.mojo_qa.mojo.models.FileSystemStackEntry;
+import org.dev_alex.mojo_qa.mojo.models.Indicator;
 import org.dev_alex.mojo_qa.mojo.services.BitmapCacheService;
 import org.dev_alex.mojo_qa.mojo.services.BlurHelper;
 import org.dev_alex.mojo_qa.mojo.services.LoginHistoryService;
@@ -50,6 +55,8 @@ import java.util.UUID;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
 import androidx.core.widget.NestedScrollView;
 import androidx.fragment.app.Fragment;
@@ -62,7 +69,7 @@ import okio.Okio;
 
 @SuppressWarnings("deprecation")
 @SuppressLint("StaticFieldLeak")
-public class DocumentsFragment extends Fragment {
+public class DocumentsFragment extends Fragment implements FileAdapter.DocumentClickListener {
     private final int FILE_OPEN_REQUEST_CODE = 1;
     private final int SORT_BY_NAME = 1;
     private final int SORT_BY_CREATED_AT = 2;
@@ -463,11 +470,11 @@ public class DocumentsFragment extends Fragment {
 
         if (selectModeEnabled && withSelection) {
             folderAdapter = new FolderAdapter(this, folders, isGridView, folderAdapter.getSelectedIds());
-            fileAdapter = new FileAdapter(DocumentsFragment.this, files, isGridView, fileAdapter.getSelectedIds(), getContext());
+            fileAdapter = new FileAdapter(DocumentsFragment.this, files, isGridView, fileAdapter.getSelectedIds(), getContext(), this);
         } else {
             stopSelectionMode();
             folderAdapter = new FolderAdapter(this, folders, isGridView);
-            fileAdapter = new FileAdapter(DocumentsFragment.this, files, isGridView, getContext());
+            fileAdapter = new FileAdapter(DocumentsFragment.this, files, isGridView, getContext(), this);
         }
 
         folderRecyclerView.setLayoutParams(folderParams);
@@ -620,6 +627,28 @@ public class DocumentsFragment extends Fragment {
                 .replace(R.id.container, CreateTaskInfoFragment.newInstance(item, openedOrgId))
                 .addToBackStack("CreateTaskInfoFragment")
                 .commit();
+    }
+
+
+    private boolean checkExternalPermissions() {
+        int permissionCheckWrite = ContextCompat.checkSelfPermission(getContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        int permissionCheckRead = ContextCompat.checkSelfPermission(getContext(), Manifest.permission.READ_EXTERNAL_STORAGE);
+        return (permissionCheckRead == PackageManager.PERMISSION_GRANTED && permissionCheckWrite == PackageManager.PERMISSION_GRANTED);
+    }
+
+    private void requestExternalPermissions() {
+        ActivityCompat.requestPermissions(getActivity(),
+                new String[]{Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE}, 0);
+    }
+
+    @Override
+    public void onDownloadPdfClick(long id) {
+        if (checkExternalPermissions()) {
+            new DownloadPdfTask(id, UUID.randomUUID().toString()).execute();
+        } else {
+            requestExternalPermissions();
+        }
+
     }
 
     private class CreateDirTask extends AsyncTask<Void, Void, Integer> {
@@ -956,7 +985,9 @@ public class DocumentsFragment extends Fragment {
                 exc.printStackTrace();
             }
         }
+
     }
+
 
     public class OpenFileTask extends AsyncTask<Void, Void, Integer> {
         private File file;
@@ -993,6 +1024,17 @@ public class DocumentsFragment extends Fragment {
                 return null;
             }
         }
+        private boolean checkExternalPermissions() {
+            int permissionCheckWrite = ContextCompat.checkSelfPermission(getContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE);
+            int permissionCheckRead = ContextCompat.checkSelfPermission(getContext(), Manifest.permission.READ_EXTERNAL_STORAGE);
+            return (permissionCheckRead == PackageManager.PERMISSION_GRANTED && permissionCheckWrite == PackageManager.PERMISSION_GRANTED);
+        }
+
+        private void requestExternalPermissions() {
+            ActivityCompat.requestPermissions(getActivity(),
+                    new String[]{Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE}, 0);
+        }
+
 
         @Override
         protected void onPostExecute(Integer responseCode) {
@@ -1099,4 +1141,80 @@ public class DocumentsFragment extends Fragment {
         getActivity().findViewById(R.id.main_menu_search_block).setVisibility(View.GONE);
         getActivity().findViewById(R.id.main_menu_buttons_block).setVisibility(View.VISIBLE);
     }
+    private class DownloadPdfTask extends AsyncTask<Void, Void, Integer> {
+        private java.io.File resultFile;
+        private long id;
+        private String name;
+
+        DownloadPdfTask(long id, String name) {
+            this.id = id;
+            this.name = name;}
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            loopDialog.show();
+            java.io.File downloadsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+            resultFile = new java.io.File(downloadsDir, name + ".pdf");
+        }
+
+        @Override
+        protected Integer doInBackground(Void... params) {
+            try {
+                if (resultFile.exists())
+                    return 200;
+
+                String url = "/api/fs-mojo/document/id/" + id + "/pdf";
+                Response response = RequestService.createGetRequest(url);
+
+                if (response.code() == 200) {
+                    BufferedSink sink = Okio.buffer(Okio.sink(resultFile));
+                    sink.writeAll(response.body().source());
+                    sink.close();
+                }
+                response.body().close();
+
+                return response.code();
+            } catch (Exception exc) {
+                exc.printStackTrace();
+                return null;
+            }
+        }
+
+        @Override
+        protected void onPostExecute(Integer responseCode) {
+            super.onPostExecute(responseCode);
+
+            try {
+                if (loopDialog != null && loopDialog.isShowing())
+                    loopDialog.dismiss();
+
+
+                if (responseCode == null)
+                    Toast.makeText(getContext(), R.string.network_error, Toast.LENGTH_LONG).show();
+                else if (responseCode == 200) {
+                    try {
+                        Intent viewIntent = new Intent(Intent.ACTION_VIEW);
+                        Uri fileUri = FileProvider.getUriForFile(getContext(), getContext().getApplicationContext().getPackageName() + ".provider", resultFile);
+                        viewIntent.setDataAndType(fileUri, "application/pdf");
+                        viewIntent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                        startActivity(viewIntent);
+                    } catch (Exception exc) {
+                        exc.printStackTrace();
+                        Toast.makeText(getContext(), "Нет приложения, которое может открыть этот файл", Toast.LENGTH_LONG).show();
+                        try {
+                            resultFile.delete();
+                        } catch (Exception exc1) {
+                            exc1.printStackTrace();
+                        }
+                    }
+                } else
+                    Toast.makeText(getContext(), R.string.unknown_error, Toast.LENGTH_LONG).show();
+            } catch (Exception exc) {
+                exc.printStackTrace();
+            }
+        }
+    }
+
+
 }
