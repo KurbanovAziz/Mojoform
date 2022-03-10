@@ -103,7 +103,7 @@ public class LoginHistoryFragment extends Fragment {
                 intentIntegrator.setPrompt("Сканируем...");
                 intentIntegrator.initiateScan();
             } catch (Exception e) {
-                showQrAppDownloadDialog();
+              e.printStackTrace();
             }
         });
     }

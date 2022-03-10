@@ -36,7 +36,6 @@ public class App extends Application {
             case "debug_flavor":
                 host = "https://mojo-qa.dev-alex.org";
                 host = "https://system.mojoform.com";
-
                 break;
 
             case "demo_flavor":
