@@ -112,11 +112,6 @@ public class GraphFragment extends Fragment implements ResultGraphAdapter.GraphC
     public List<Indicator> indicators = new ArrayList<>();
     public static List<Employee> users = new ArrayList<>();
     private ProgressDialog loopDialog;
-
-
-
-
-
     public static List<Ranges> ranges;
     LinearLayout chartContainer;
     ViewGroup container;
@@ -128,7 +123,6 @@ public class GraphFragment extends Fragment implements ResultGraphAdapter.GraphC
     long to;
     private SimpleDateFormat xDateFormat = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
     private SimpleDateFormat xDateFormatNoYear = new SimpleDateFormat("dd-MM", Locale.getDefault());
-
 
     public static GraphFragment newInstance(String type, long id, boolean isPersents) {
         Bundle args = new Bundle();
@@ -150,10 +144,6 @@ public class GraphFragment extends Fragment implements ResultGraphAdapter.GraphC
         panelId = getArguments().getLong(ID_ARG);
         isPercents = getArguments().getBoolean(IS_PERCENTS_ARG);
         this.container = container;
-
-
-
-
         if (rootView == null) {
             rootView = inflater.inflate(R.layout.fragment_graph, container, false);
 
@@ -381,9 +371,9 @@ public class GraphFragment extends Fragment implements ResultGraphAdapter.GraphC
                     final TextView dateTV = graphDialog.findViewById(R.id.graph_date);
                     dateTV.setText(date);
                     final TextView kolvoTV = graphDialog.findViewById(R.id.kolvo);
-                    kolvoTV.setText("Количество комментариев: " + graphInfo.values.get((int) h.getX()).comments.size());
-
-
+                    if (graphInfo.values.get((int) h.getX()).comments != null){
+                    kolvoTV.setText("Количество комментариев: " + graphInfo.values.get((int) h.getX()).comments.size());}
+                    else {kolvoTV.setText("Количество комментариев: 0");}
                     final TextView textView = graphDialog.findViewById(R.id.information);
                     final Button commentBTN = graphDialog.findViewById(R.id.commentsBTN);
                     commentBTN.setOnClickListener(new View.OnClickListener() {
@@ -451,7 +441,9 @@ public class GraphFragment extends Fragment implements ResultGraphAdapter.GraphC
                     graphDialog.show();
                 }
 
-                catch (Exception exc){}
+                catch (Exception exc){
+                    exc.printStackTrace();
+                }
             }
 
             @Override

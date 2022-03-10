@@ -309,7 +309,6 @@ public class FileAdapter extends RecyclerView.Adapter<FileAdapter.FileViewHolder
                         viewIntent.setDataAndType(fileUri, "application/pdf");
                         viewIntent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                         viewIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-
                         getContext().startActivity(viewIntent);
                     } catch (Exception exc) {
                         exc.printStackTrace();
