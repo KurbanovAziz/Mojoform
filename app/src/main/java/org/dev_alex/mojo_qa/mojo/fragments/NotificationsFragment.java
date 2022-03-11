@@ -1,6 +1,7 @@
 package org.dev_alex.mojo_qa.mojo.fragments;
 
 import android.Manifest;
+import android.app.Activity;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -31,6 +32,7 @@ import android.widget.Toast;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.android.exoplayer2.C;
 import com.prolificinteractive.materialcalendarview.CalendarDay;
 import com.prolificinteractive.materialcalendarview.DayViewDecorator;
 import com.prolificinteractive.materialcalendarview.DayViewFacade;
@@ -74,37 +76,24 @@ import okio.Okio;
 
 public class NotificationsFragment extends Fragment implements NotificationAdapter.NotificationClickListener {
     private static final String ARG_NOTIFICATION_ID = "ARG_NOTIF";
-
     private RelativeLayoutWithPopUp rootView;
-
     private ProgressDialog loopDialog;
     private RecyclerView recyclerView;
     private RelativeLayout sortTypePopupWindow;
-
     private static boolean needUpdate = true;
-
     private ArrayList<Notification> notifications;
-    //private ArrayList<Organisation> organisations;
-
-
+    Context context;
     private String searchText = null;
     private TextWatcher searchListener;
-
     private Integer pendingNotificationId = null;
     public MultiSpinner multiSpinner;
     public ArrayList<String> tags = new ArrayList<>();
     ArrayList<Organisation> organisations;
-
     private Date fromFilter;
     private Date toFilter;
     private String readTypeFilter;
     private String orderTypeFilter;
-
     public Dialog filterDialog;
-
-
-
-
 
     public static NotificationsFragment newInstance(Integer notificationId) {
         Bundle args = new Bundle();
@@ -175,6 +164,16 @@ public class NotificationsFragment extends Fragment implements NotificationAdapt
         if (recyclerView != null && recyclerView.getAdapter() != null)
             recyclerView.getAdapter().notifyDataSetChanged();
     }
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        this.context = context;
+    }
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        context = null;
+    }
 
     private void setupHeader() {
         ((TextView) getActivity().findViewById(R.id.title)).setText(getString(R.string.notifications));
@@ -197,7 +196,7 @@ public class NotificationsFragment extends Fragment implements NotificationAdapt
                     for (int i = 0; i < organisations.size(); i++){
                         organisationNames.add(organisations.get(i).getName());
                     }
-                    multiSpinner.setItems(getActivity(), organisations, "", NotificationsFragment.this::onItemsSelected);
+                    multiSpinner.setItems(getActivity(), context, organisations, "", NotificationsFragment.this::onItemsSelected);
 
 
                 TextView calendarText = filterDialog.findViewById(R.id.calendarText);
@@ -295,7 +294,7 @@ public class NotificationsFragment extends Fragment implements NotificationAdapt
                             public void onClick(View v) {
 
                                 List<CalendarDay> days =  calendarView.getSelectedDates();
-                               if (days.size() == 0){Toast.makeText(getContext(), "вы не выбрали промежуток", Toast.LENGTH_SHORT).show();}
+                               if (days.size() == 0){Toast.makeText(getContext(), "вы не выбрали период", Toast.LENGTH_SHORT).show();}
                                else {
                                    if (days.size() == 1){
                                        toFilter = days.get(0).getDate();

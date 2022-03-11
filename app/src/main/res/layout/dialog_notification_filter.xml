@@ -169,7 +169,7 @@
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
                         android:textColor="#4D6A7F"
-                        android:text="Выбрать промежуток"/>
+                        android:text="Выбрать период"/>
                 </LinearLayout>
                 <View
                     android:layout_width="match_parent"

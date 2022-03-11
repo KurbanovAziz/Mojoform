@@ -76,6 +76,7 @@ public class MultiSpinner extends androidx.appcompat.widget.AppCompatSpinner imp
 
     private static MultiSpinnerListAdapter adapter;
     private  Activity activity;
+    private Context context;
     private static List<Organisation> items;
     private static boolean[] selected;
     private static String defaultText;
@@ -144,18 +145,11 @@ public class MultiSpinner extends androidx.appcompat.widget.AppCompatSpinner imp
                 });
         builder.setOnCancelListener(this);
         try{
-
         AlertDialog dialog = builder.create();
-
-
-
         dialog.getListView().setOnItemClickListener(this);
-
-
         dialog.show();
         Button positive_button = dialog.getButton(DialogInterface.BUTTON_POSITIVE);
-        positive_button.setBackground(ContextCompat.getDrawable(activity, R.drawable.rounded_view));
-
+        positive_button.setBackground(ContextCompat.getDrawable(getContext(), R.drawable.rounded_view));
        // positive_button.setHeight(30);
         positive_button.setTextColor(Color.parseColor("#f0f8ff"));
         return true;}
@@ -165,19 +159,18 @@ public class MultiSpinner extends androidx.appcompat.widget.AppCompatSpinner imp
         }
     }
 
-    public void setItems(Activity activity, List<Organisation> items, String allText,
+    public void setItems(Activity activity, Context context, List<Organisation> items, String allText,
                          MultiSpinnerListener listener) {
         this.adapter = new MultiSpinnerListAdapter();
         this.activity = activity;
         this.items = items;
         this.defaultText = allText;
         this.listener = listener;
-
+        this.context = context;
         // all selected by default
         selected = new boolean[items.size()];
         for (int i = 0; i < selected.length; i++)
             selected[i] = true;
-
         // all text on the spinner
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(getContext(),
                 android.R.layout.simple_spinner_item, new String[] { allText });

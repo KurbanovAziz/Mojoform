@@ -282,7 +282,7 @@ public class PanelListFragment extends Fragment {
                 for (int i = 0; i < organisations.size(); i++){
                     organisationNames.add(organisations.get(i).getName());
                 }
-                multiSpinner.setItems(getActivity(), organisations, "aaa", PanelListFragment.this::onItemsSelected);
+                multiSpinner.setItems(getActivity(), getContext(), organisations, "aaa", PanelListFragment.this::onItemsSelected);
             wasCreated = true;}
 
                 if (loopDialog != null && loopDialog.isShowing())
