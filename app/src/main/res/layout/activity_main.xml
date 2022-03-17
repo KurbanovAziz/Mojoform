@@ -131,22 +131,38 @@
                     android:background="@drawable/bg_red_circle"
                     android:visibility="gone" />
             </FrameLayout>
+            <FrameLayout
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_gravity="bottom"
 
+                android:layout_height="wrap_content"
+                android:paddingBottom="12dp">
             <TextView
                 android:id="@+id/title"
-                android:layout_width="0dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="bottom"
                 android:layout_marginLeft="10dp"
                 android:layout_marginBottom="-0.8dp"
-                android:layout_weight="1"
                 android:ellipsize="end"
                 android:maxLines="1"
-                android:paddingBottom="11dp"
                 android:text="@string/documents"
                 android:textAllCaps="true"
                 android:textColor="@android:color/white"
                 android:textSize="18sp" />
+                <TextView
+                    android:id="@+id/path_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginBottom="-0.8dp"
+                    android:ellipsize="end"
+                    android:maxLines="3"
+                    android:visibility="gone"
+                    android:textAllCaps="true"
+                    android:textColor="@android:color/white"
+                    android:textSize="12sp" />
+            </FrameLayout>
 
             <FrameLayout
                 android:id="@+id/grid_btn"

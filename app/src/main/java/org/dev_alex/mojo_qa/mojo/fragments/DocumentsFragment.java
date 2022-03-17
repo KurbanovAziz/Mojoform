@@ -12,10 +12,13 @@ import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
@@ -23,6 +26,7 @@ import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.PopupMenu;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -63,6 +67,8 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import io.github.douglasjunior.androidSimpleTooltip.SimpleTooltip;
 import okhttp3.Response;
 import okio.BufferedSink;
 import okio.Okio;
@@ -95,9 +101,11 @@ public class DocumentsFragment extends Fragment implements FileAdapter.DocumentC
 
     private String selectedItemId;
     private boolean selectModeEnabled = false;
+    ArrayList<String> pathTexts = new ArrayList<>();
 
     private java.io.File openingFile;
     private String openedOrgId;
+    TextView title;
 
     public static DocumentsFragment newInstance() {
         Bundle args = new Bundle();
@@ -190,6 +198,8 @@ public class DocumentsFragment extends Fragment implements FileAdapter.DocumentC
             selectionMenu = (LinearLayout) rootView.findViewById(R.id.selection_menu);
             rootView.addPopUpWindow(itemPopupWindow);
             rootView.addPopUpWindow(sortTypePopupWindow);
+            rootView.findViewById(R.id.documents_layout).getForeground().setAlpha(0);
+
 
             sortTypePopupWindow.setVisibility(View.GONE);
             itemPopupWindow.setVisibility(View.GONE);
@@ -226,10 +236,11 @@ public class DocumentsFragment extends Fragment implements FileAdapter.DocumentC
 
     private void setupHeader() {
         ((TextView) getActivity().findViewById(R.id.title)).setText(getString(R.string.documents));
+        getActivity().findViewById(R.id.path_text).setVisibility(View.GONE);
+        getActivity().findViewById(R.id.title).setVisibility(View.VISIBLE);
         getActivity().findViewById(R.id.back_btn).setVisibility(View.GONE);
         getActivity().findViewById(R.id.notification_btn).setVisibility(View.GONE);
         getActivity().findViewById(R.id.qr_btn).setVisibility(View.GONE);
-
         getActivity().findViewById(R.id.grid_btn).setVisibility(View.VISIBLE);
         getActivity().findViewById(R.id.sandwich_btn).setVisibility(View.VISIBLE);
         getActivity().findViewById(R.id.group_by_btn).setVisibility(View.VISIBLE);
@@ -267,17 +278,33 @@ public class DocumentsFragment extends Fragment implements FileAdapter.DocumentC
         });
     }
 
+
     private void updateHeader() {
         if (getActivity() != null) {
+            pathTexts.clear();
+            boolean first = true;
+            for (FileSystemStackEntry fileSystemStackEntry : foldersStack) {
+                if (first) {
+                    first = false;
+                    continue;
+                }
+                pathTexts.add(" / " + fileSystemStackEntry.parentName + "\n");
+            }
+
             if (foldersStack != null && foldersStack.size() > 1) {
+
+
                 ((TextView) getActivity().findViewById(R.id.title))
                         .setText(foldersStack.get(foldersStack.size() - 1).parentName);
+
 
                 getActivity().findViewById(R.id.sandwich_btn).setVisibility(View.GONE);
                 getActivity().findViewById(R.id.back_btn).setVisibility(View.VISIBLE);
 
             } else {
                 ((TextView) getActivity().findViewById(R.id.title)).setText(R.string.documents);
+                getActivity().findViewById(R.id.title).setVisibility(View.VISIBLE);
+                getActivity().findViewById(R.id.path_text).setVisibility(View.GONE);
                 getActivity().findViewById(R.id.sandwich_btn).setVisibility(View.VISIBLE);
                 getActivity().findViewById(R.id.back_btn).setVisibility(View.GONE);
             }
@@ -382,6 +409,38 @@ public class DocumentsFragment extends Fragment implements FileAdapter.DocumentC
             sortTypePopupWindow.setVisibility(View.GONE);
             updateCurrentFolder();
         });
+        title = ((TextView) getActivity().findViewById(R.id.title));
+        title.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (pathTexts.size() != 0) {
+                    PopupMenu menu = new PopupMenu(getContext(), title);
+                    int i = 0;
+                    for (String path : pathTexts){
+                    menu.getMenu().add(i, i, i, path);
+                    i++;}
+                    menu.setOnDismissListener(new PopupMenu.OnDismissListener() {
+                        @Override
+                        public void onDismiss(PopupMenu menu) {
+                            rootView.findViewById(R.id.documents_layout).getForeground().setAlpha(0);
+                        }
+                    });
+                    menu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                        @Override
+                        public boolean onMenuItemClick(MenuItem item) {
+                            int itemId = item.getOrder();
+                            int itemsSize = menu.getMenu().size();
+                            popFileStack(itemsSize - itemId);
+                            return false;
+                        }
+                    });
+                    rootView.findViewById(R.id.documents_layout).getForeground().setAlpha(150);
+                    menu.show();
+                }
+            }
+        });
+
+
     }
 
     private File convertOrganizationToFolder(JSONObject orgJson) {
@@ -418,7 +477,8 @@ public class DocumentsFragment extends Fragment implements FileAdapter.DocumentC
             setAdapters(foldersStack.get(foldersStack.size() - 1).files, foldersStack.get(foldersStack.size() - 1).folders, true);
     }
 
-    private void setAdapters(ArrayList<File> files, ArrayList<File> folders, boolean withSelection) {
+    private void setAdapters(ArrayList<File> files, ArrayList<File> folders,
+                             boolean withSelection) {
         if ((LoginHistoryService.getCurrentUser().is_manager != null && LoginHistoryService.getCurrentUser().is_manager)
                 || (LoginHistoryService.getCurrentUser().is_orgowner != null && LoginHistoryService.getCurrentUser().is_orgowner))
             rootView.findViewById(R.id.create_dir_btn).setVisibility(foldersStack.size() > 1 ? View.VISIBLE : View.GONE);
@@ -568,6 +628,40 @@ public class DocumentsFragment extends Fragment implements FileAdapter.DocumentC
     private boolean popFileStack() {
         if (foldersStack != null && foldersStack.size() > 1) {
             foldersStack.remove(foldersStack.size() - 1);
+            updateHeader();
+            setAdapters(foldersStack.get(foldersStack.size() - 1).files, foldersStack.get(foldersStack.size() - 1).folders, false);
+
+            if (downloadTask != null && downloadTask.getStatus() != AsyncTask.Status.FINISHED)
+                downloadTask.cancel(false);
+
+            downloadTask = new DownloadImagesTask(foldersStack.get(foldersStack.size() - 1).files, true);
+            downloadTask.execute();
+            return true;
+        } else
+            return false;
+    }
+
+    private boolean changeFileStack() {
+        if (foldersStack != null && foldersStack.size() > 1) {
+            foldersStack.remove(foldersStack.size() - 1);
+            updateHeader();
+            setAdapters(foldersStack.get(foldersStack.size() - 1).files, foldersStack.get(foldersStack.size() - 1).folders, false);
+
+            if (downloadTask != null && downloadTask.getStatus() != AsyncTask.Status.FINISHED)
+                downloadTask.cancel(false);
+
+            downloadTask = new DownloadImagesTask(foldersStack.get(foldersStack.size() - 1).files, true);
+            downloadTask.execute();
+            return true;
+        } else
+            return false;
+    }
+
+    private boolean popFileStack( int i) {
+        if (foldersStack != null && foldersStack.size() > 1) {
+            for (int j = 1; j < i; j++){
+                foldersStack.remove(foldersStack.size() - 1);
+            }
             updateHeader();
             setAdapters(foldersStack.get(foldersStack.size() - 1).files, foldersStack.get(foldersStack.size() - 1).folders, false);
 
@@ -1024,6 +1118,7 @@ public class DocumentsFragment extends Fragment implements FileAdapter.DocumentC
                 return null;
             }
         }
+
         private boolean checkExternalPermissions() {
             int permissionCheckWrite = ContextCompat.checkSelfPermission(getContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE);
             int permissionCheckRead = ContextCompat.checkSelfPermission(getContext(), Manifest.permission.READ_EXTERNAL_STORAGE);
@@ -1141,6 +1236,7 @@ public class DocumentsFragment extends Fragment implements FileAdapter.DocumentC
         getActivity().findViewById(R.id.main_menu_search_block).setVisibility(View.GONE);
         getActivity().findViewById(R.id.main_menu_buttons_block).setVisibility(View.VISIBLE);
     }
+
     private class DownloadPdfTask extends AsyncTask<Void, Void, Integer> {
         private java.io.File resultFile;
         private long id;
@@ -1148,7 +1244,8 @@ public class DocumentsFragment extends Fragment implements FileAdapter.DocumentC
 
         DownloadPdfTask(long id, String name) {
             this.id = id;
-            this.name = name;}
+            this.name = name;
+        }
 
         @Override
         protected void onPreExecute() {

@@ -11,6 +11,7 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -91,7 +92,7 @@ import okhttp3.Response;
 import okio.BufferedSink;
 import okio.Okio;
 
-public class GraphFragment extends Fragment implements ResultGraphAdapter.GraphClickListener{
+public class GraphFragment extends Fragment implements ResultGraphAdapter.GraphClickListener {
     public static final String DAY = "day";
     public static final String WEEK = "week";
     public static final String MONTH = "month";
@@ -149,11 +150,11 @@ public class GraphFragment extends Fragment implements ResultGraphAdapter.GraphC
 
             setListeners();
             Utils.setupCloseKeyboardUI(getActivity(), rootView);
-            if(GraphListFragment.isIndicatorShow){
-                
+            if (GraphListFragment.isIndicatorShow) {
+
+            } else {
+                new GetGraphTask().execute();
             }
-            else {
-            new GetGraphTask().execute();}
         }
         chartContainer = rootView.findViewById(R.id.recycler_container);
         chartContainer.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
@@ -164,6 +165,7 @@ public class GraphFragment extends Fragment implements ResultGraphAdapter.GraphC
         chartContainer.addView(recyclerView);
         return rootView;
     }
+
     @Override
     public void onDestroyView() {
         super.onDestroyView();
@@ -178,6 +180,7 @@ public class GraphFragment extends Fragment implements ResultGraphAdapter.GraphC
     private void setListeners() {
 
     }
+
     private void showComplexPanels(List<Panel> panels) {
         List<Panel> syntheticPanels = new ArrayList<>();
         List<Panel> normalPanels = new ArrayList<>();
@@ -211,7 +214,6 @@ public class GraphFragment extends Fragment implements ResultGraphAdapter.GraphC
     private void showResultPanels(List<Panel> panels) {
 
 
-
         Indicator indicator = new Indicator();
         indicators.add(0, indicator);
 
@@ -227,6 +229,7 @@ public class GraphFragment extends Fragment implements ResultGraphAdapter.GraphC
                 .addToBackStack(null)
                 .commit();
     }
+
     private void initDialog() {
         loopDialog = new ProgressDialog(getContext(), R.style.ProgressDialogStyle);
         loopDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
@@ -256,64 +259,72 @@ public class GraphFragment extends Fragment implements ResultGraphAdapter.GraphC
         final List<String> xValues = new ArrayList<>();
         int k = 0;
         for (Value value : graphInfo.values) {
-            if (value != null){
-            Date date = new Date(value.from);
-            BarEntry barEntry;
-            if (isPercents) {
-                barEntry = new BarEntry((float) k, (float) value.prc);
-                if (k == 0) {
-                    yMax = (float) value.prc;
-                    yMin = (float) value.prc;
-                } else {
-                    if (value.prc > yMax)
+            if (value != null) {
+                Date date = new Date(value.from);
+                BarEntry barEntry;
+                if (isPercents) {
+                    barEntry = new BarEntry((float) k, (float) value.prc);
+                    if (k == 0) {
                         yMax = (float) value.prc;
-
-                    if (value.prc < yMin)
                         yMin = (float) value.prc;
-                }
-            } else {
-                barEntry = new BarEntry((float) k, (float) value.val);
-                if (k == 0) {
-                    yMax = (float) value.val;
-                    yMin = (float) value.val;
-                } else {
-                    if (value.val > yMax)
-                        yMax = (float) value.val;
+                    } else {
+                        if (value.prc > yMax)
+                            yMax = (float) value.prc;
 
-                    if (value.val < yMin)
+                        if (value.prc < yMin)
+                            yMin = (float) value.prc;
+                    }
+                } else {
+                    barEntry = new BarEntry((float) k, (float) value.val);
+                    if (k == 0) {
+                        yMax = (float) value.val;
                         yMin = (float) value.val;
+                    } else {
+                        if (value.val > yMax)
+                            yMax = (float) value.val;
+
+                        if (value.val < yMin)
+                            yMin = (float) value.val;
+                    }
                 }
+                barEntries.add(barEntry);
+                xValues.add(xDateFormat.format(date));
+                k++;
             }
-            barEntries.add(barEntry);
-            xValues.add(xDateFormat.format(date));
-            k++;
-        }}
+        }
         if (barEntries.isEmpty()) {
             barEntries.add(new BarEntry(0, 0));
-   Toast.makeText(getContext(), "На графике нет значений за этот период", Toast.LENGTH_LONG).show();}
+            Toast.makeText(getContext(), "На графике нет значений за этот период", Toast.LENGTH_LONG).show();
+        }
         ArrayList<Integer> colors = new ArrayList<>();
         for (k = 0; k < barEntries.size(); k++) {
             float value = barEntries.get(k).getY();
             int defaultColor = Color.parseColor("#42aaff");
 
-            if(ranges != null && ranges.size() != 0){
-            for (Ranges range : ranges) {
-                if (value >= range.from && value <= range.to){
-                    try {
-                    String colorString = "#AA" + range.color.substring(1);
-                    defaultColor = Color.parseColor(colorString);}
-                    catch (Exception ignored){}
+            if (ranges != null && ranges.size() != 0) {
+                for (Ranges range : ranges) {
+                    if (value >= range.from && value <= range.to) {
+                        try {
+                            String colorString = "#AA" + range.color.substring(1);
+                            defaultColor = Color.parseColor(colorString);
+                        } catch (Exception ignored) {
+                        }
+                    }
                 }
-            }
-            }
-            else{
+            } else {
                 try {
-                defaultColor = Color.parseColor("#ff0000");
-                if(value < 86)  defaultColor = Color.parseColor("#ff0000");
-                if (value > 85 && value < 96){  defaultColor = Color.parseColor("#eaff00");}
-                if (value > 95 && value < 101){  defaultColor = Color.parseColor("#15ff00");}
-                if (value > 100){defaultColor = Color.parseColor("#42aaff");}}
-                catch (Exception e ){
+                    defaultColor = Color.parseColor("#ff0000");
+                    if (value < 86) defaultColor = Color.parseColor("#ff0000");
+                    if (value > 85 && value < 96) {
+                        defaultColor = Color.parseColor("#eaff00");
+                    }
+                    if (value > 95 && value < 101) {
+                        defaultColor = Color.parseColor("#15ff00");
+                    }
+                    if (value > 100) {
+                        defaultColor = Color.parseColor("#42aaff");
+                    }
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
@@ -345,19 +356,18 @@ public class GraphFragment extends Fragment implements ResultGraphAdapter.GraphC
         barChart.zoom(barEntries.size() / 10, 0.9f, 0, 0);
         RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams
                 (ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.MATCH_PARENT);
-        CustomMarkerView mv = new CustomMarkerView(getContext(), R.layout.higlight_marker, xValues, 0 , xValues.size() - 1, yMin, yMax);
+        CustomMarkerView mv = new CustomMarkerView(getContext(), R.layout.higlight_marker, xValues, 0, xValues.size() - 1, yMin, yMax);
         //barChart.setMarker(mv);
         chartContainer.addView(barChart);
-        barChart.setOnChartValueSelectedListener(new OnChartValueSelectedListener()
-        {
+        barChart.setOnChartValueSelectedListener(new OnChartValueSelectedListener() {
             @Override
-            public void onValueSelected(Entry e, Highlight h)
-            {
+            public void onValueSelected(Entry e, Highlight h) {
                 try {
-                    if(!isComplex){
-                    from = graphInfo.values.get((int) h.getX()).from;
-                    to = graphInfo.values.get((int) h.getX()).to;
-                    new GetRaw().execute();}
+                    if (!isComplex) {
+                        from = graphInfo.values.get((int) h.getX()).from;
+                        to = graphInfo.values.get((int) h.getX()).to;
+                        new GetRaw().execute();
+                    }
                     final Dialog graphDialog = new Dialog(getContext());
                     graphDialog.getWindow().requestFeature(Window.FEATURE_NO_TITLE);
                     graphDialog.setContentView(LayoutInflater.from(getContext()).inflate(R.layout.graph_dialog, null, false));
@@ -370,18 +380,21 @@ public class GraphFragment extends Fragment implements ResultGraphAdapter.GraphC
                     final TextView dateTV = graphDialog.findViewById(R.id.graph_date);
                     dateTV.setText(date);
                     final TextView kolvoTV = graphDialog.findViewById(R.id.kolvo);
-                    if (graphInfo.values.get((int) h.getX()).comments != null){
-                    kolvoTV.setText("Количество комментариев: " + graphInfo.values.get((int) h.getX()).comments.size());}
-                    else {kolvoTV.setText("Количество комментариев: 0");}
+                    if (graphInfo.values.get((int) h.getX()).comments != null) {
+                        kolvoTV.setText("Количество комментариев: " + graphInfo.values.get((int) h.getX()).comments.size());
+                    } else {
+                        kolvoTV.setText("Количество комментариев: 0");
+                    }
                     final TextView textView = graphDialog.findViewById(R.id.information);
                     final Button commentBTN = graphDialog.findViewById(R.id.commentsBTN);
                     commentBTN.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            if(!isComplex){
+                            if (!isComplex) {
                                 from = graphInfo.values.get((int) h.getX()).from;
                                 to = graphInfo.values.get((int) h.getX()).to;
-                                new GetRaw().execute();}
+                                new GetRaw().execute();
+                            }
                             final Dialog commentsDialog = new Dialog(getContext());
 
                             commentsDialog.setContentView(LayoutInflater.from(getContext()).inflate(R.layout.comments_dialog, null, false));
@@ -411,6 +424,7 @@ public class GraphFragment extends Fragment implements ResultGraphAdapter.GraphC
                                 public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 
                                 }
+
                                 @Override
                                 public void afterTextChanged(Editable s) {
 
@@ -436,18 +450,15 @@ public class GraphFragment extends Fragment implements ResultGraphAdapter.GraphC
                             commentsDialog.show();
                         }
                     });
-                    textView.setText("Баллы " + new BigDecimal(graphInfo.values.get((int) h.getX()).val).setScale(2, RoundingMode.HALF_EVEN).doubleValue()  +  " | Проценты " +  new BigDecimal(graphInfo.values.get((int) h.getX()).prc).setScale(2, RoundingMode.HALF_EVEN).doubleValue() + "%");
+                    textView.setText("Баллы " + new BigDecimal(graphInfo.values.get((int) h.getX()).val).setScale(2, RoundingMode.HALF_EVEN).doubleValue() + " | Проценты " + new BigDecimal(graphInfo.values.get((int) h.getX()).prc).setScale(2, RoundingMode.HALF_EVEN).doubleValue() + "%");
                     graphDialog.show();
-                }
-
-                catch (Exception exc){
+                } catch (Exception exc) {
                     exc.printStackTrace();
                 }
             }
 
             @Override
-            public void onNothingSelected()
-            {
+            public void onNothingSelected() {
 
             }
         });
@@ -489,7 +500,9 @@ public class GraphFragment extends Fragment implements ResultGraphAdapter.GraphC
                             } catch (Exception exc) {
                                 exc.printStackTrace();
                                 return "exc";
-                            } }}
+                            }
+                        }
+                    }
                     if (finalIPos != -1 && finalIPos < xValues.size()) {
                         try {
                             stringValue = xDateFormatNoYear.format(xDateFormat.parse(xValues.get(finalIPos)));
@@ -572,29 +585,31 @@ public class GraphFragment extends Fragment implements ResultGraphAdapter.GraphC
             } catch (ParseException e1) {
                 e1.printStackTrace();
             }
-        }    }
-    public boolean isPanelOk(Panel panel){
+        }
+    }
+
+    public boolean isPanelOk(Panel panel) {
         Date date = new Date();
-        switch (type){
+        switch (type) {
             case (YEAR):
                 long from = panel.from * 1000;
-                long to = panel.to *1000;
+                long to = panel.to * 1000;
                 long limit1 = date.getTime() - Long.parseLong("73072000000");
                 return to < date.getTime() && from > limit1;
             case (MONTH):
                 long from2 = panel.from * 1000;
-                long to2 = panel.to *1000;
+                long to2 = panel.to * 1000;
                 long limit2 = date.getTime() - Long.parseLong("10713600000");
                 return to2 < date.getTime() && from2 > limit2;
             case (WEEK):
                 long from3 = panel.from * 1000;
-                long to3 = panel.to *1000;
+                long to3 = panel.to * 1000;
                 long date3 = date.getTime();
                 long limit3 = date.getTime() - Long.parseLong("3024000000");
                 return to3 < date.getTime() && from3 > limit3;
-            case(DAY):
+            case (DAY):
                 long from4 = panel.from * 1000;
-                long to4 = panel.to *1000;
+                long to4 = panel.to * 1000;
                 long date4 = date.getTime();
                 long limit4 = date.getTime() - Long.parseLong("691200000");
                 return to4 < date.getTime() && from4 > limit4;
@@ -603,36 +618,37 @@ public class GraphFragment extends Fragment implements ResultGraphAdapter.GraphC
         return false;
 
     }
-    public boolean isValueOk(Value panel){
-        Date date = new Date();
-        if(panel == null) return false;
 
-        switch (type){
+    public boolean isValueOk(Value panel) {
+        Date date = new Date();
+        if (panel == null) return false;
+
+        switch (type) {
             case (YEAR):
                 long from = panel.from;
                 long to = panel.to;
-                if(panel.from == 0 && panel.to == 0) return false;
+                if (panel.from == 0 && panel.to == 0) return false;
 
                 long limit1 = date.getTime() - Long.parseLong("63072000000");
                 return to < date.getTime() && from > limit1;
             case (MONTH):
                 long from2 = panel.from;
-                long to2 = panel.to ;
-                if(panel.from == 0 && panel.to == 0) return false;
+                long to2 = panel.to;
+                if (panel.from == 0 && panel.to == 0) return false;
 
                 long limit2 = date.getTime() - Long.parseLong("10713600000");
                 return to2 < date.getTime() && from2 > limit2;
             case (WEEK):
-                long from3 = panel.from ;
-                long to3 = panel.to ;
-                if(panel.from == 0 && panel.to == 0) return false;
+                long from3 = panel.from;
+                long to3 = panel.to;
+                if (panel.from == 0 && panel.to == 0) return false;
 
                 long limit3 = date.getTime() - Long.parseLong("3024000000");
                 return to3 < date.getTime() && from3 > limit3;
-            case(DAY):
-                long from4 = panel.from ;
-                long to4 = panel.to ;
-                if(panel.from == 0 && panel.to == 0) return false;
+            case (DAY):
+                long from4 = panel.from;
+                long to4 = panel.to;
+                if (panel.from == 0 && panel.to == 0) return false;
                 long limit4 = date.getTime() - Long.parseLong("691200000");
                 return to4 < date.getTime() && from4 > limit4;
 
@@ -642,23 +658,22 @@ public class GraphFragment extends Fragment implements ResultGraphAdapter.GraphC
     }
 
 
-    public long getTimeLimit(){
+    public long getTimeLimit() {
         Date date = new Date();
-        switch (type){
+        switch (type) {
             case (YEAR):
                 return date.getTime() - Long.parseLong("63072000000");
             case (MONTH):
                 return date.getTime() - Long.parseLong("10713600000");
             case (WEEK):
                 return date.getTime() - Long.parseLong("3024000000");
-            case(DAY):
+            case (DAY):
                 return date.getTime() - Long.parseLong("691200000");
 
         }
         return date.getTime();
 
     }
-
 
 
     private int dpToPx(int dp) {
@@ -688,51 +703,55 @@ public class GraphFragment extends Fragment implements ResultGraphAdapter.GraphC
                 try {
                     String configStr = new JSONObject(findResponseStr).getString("config");
                     JSONArray configJsonArray = new JSONObject(configStr).getJSONArray("ranges");
-                    ArrayList<Ranges> ranges1  = new ObjectMapper().readValue(configJsonArray.toString(), new TypeReference<ArrayList<Ranges>>() {});
+                    ArrayList<Ranges> ranges1 = new ObjectMapper().readValue(configJsonArray.toString(), new TypeReference<ArrayList<Ranges>>() {
+                    });
                     ranges = ranges1;
-                }
-                catch (Exception e) {
+                } catch (Exception e) {
                     ranges = new ArrayList<>();
                 }
                 JSONObject jsonObjectComplex = new JSONObject(responseStr);
-                if(jsonObjectComplex.has("complex_info")){
-                JSONArray panelsJsonComplex = jsonObjectComplex.getJSONObject("complex_info").getJSONArray("components");
+                if (jsonObjectComplex.has("complex_info")) {
+                    JSONArray panelsJsonComplex = jsonObjectComplex.getJSONObject("complex_info").getJSONArray("components");
 
-                ArrayList<Panel> panels1  = new ObjectMapper().readValue(panelsJsonComplex.toString(), new TypeReference<ArrayList<Panel>>() {});
-                panels = panels1;
-                isComplex = true;
-                for (Panel panel : panels){
-                    panel.prc =  new BigDecimal(panel.prc).setScale(2, RoundingMode.HALF_EVEN).doubleValue();;
-                    panel.fixDate(); }}
-                else {
+                    ArrayList<Panel> panels1 = new ObjectMapper().readValue(panelsJsonComplex.toString(), new TypeReference<ArrayList<Panel>>() {
+                    });
+                    panels = panels1;
+                    isComplex = true;
+                    for (Panel panel : panels) {
+                        panel.prc = new BigDecimal(panel.prc).setScale(2, RoundingMode.HALF_EVEN).doubleValue();
+                        ;
+                        panel.fixDate();
+                    }
+                } else {
                     JSONArray panelsJsonComplex = jsonObjectComplex.getJSONArray("values");
                     String resultName = jsonObjectComplex.getJSONObject("template_info").getJSONObject("template").getString("name");
-                    ArrayList<Panel> panels1  = new ObjectMapper().readValue(panelsJsonComplex.toString(), new TypeReference<ArrayList<Panel>>() {});
+                    ArrayList<Panel> panels1 = new ObjectMapper().readValue(panelsJsonComplex.toString(), new TypeReference<ArrayList<Panel>>() {
+                    });
 
-                    ArrayList<Indicator>  indicators1  = new ArrayList<Indicator>();
+                    ArrayList<Indicator> indicators1 = new ArrayList<Indicator>();
 
                     isComplex = false;
                     name = resultName;
                     panels = new ArrayList<Panel>();
-                    for (Indicator indicator : indicators1){
+                    for (Indicator indicator : indicators1) {
                         indicator.name = resultName;
-                        indicator.prc =  new BigDecimal(indicator.prc).setScale(2, RoundingMode.HALF_EVEN).doubleValue();
+                        indicator.prc = new BigDecimal(indicator.prc).setScale(2, RoundingMode.HALF_EVEN).doubleValue();
                         indicators.add(indicator);
                     }
 
-                    for (Panel panel : panels1){
+                    for (Panel panel : panels1) {
                         panel.fixDate();
                         panel.prc = new BigDecimal(panel.prc).setScale(2, RoundingMode.HALF_EVEN).doubleValue();
                         panel.name = resultName;
                         panels.add(panel);
-                   }
+                    }
                 }
 
 
                 return response.code();
             } catch (Exception exc) {
                 StringWriter writer = new StringWriter();
-                exc.printStackTrace( new PrintWriter(writer,true ));
+                exc.printStackTrace(new PrintWriter(writer, true));
                 Log.e("aaa", "exeption stack is :\n" + writer.toString());
                 exc.printStackTrace();
                 return null;
@@ -748,19 +767,22 @@ public class GraphFragment extends Fragment implements ResultGraphAdapter.GraphC
                     loopDialog.dismiss();
 
 
-            if (responseCode == 200 || responseCode == 201){
-                buildGraph();
-                if(isComplex){
-            showComplexPanels(panels);}
-            else {showResultPanels(panels);}}
-
-            else {
-                Toast.makeText(getContext(), R.string.try_later, Toast.LENGTH_SHORT).show();
-                getActivity().getSupportFragmentManager().popBackStack();
+                if (responseCode == 200 || responseCode == 201) {
+                    buildGraph();
+                    if (isComplex) {
+                        showComplexPanels(panels);
+                    } else {
+                        showResultPanels(panels);
+                    }
+                } else {
+                    Toast.makeText(getContext(), R.string.try_later, Toast.LENGTH_SHORT).show();
+                    getActivity().getSupportFragmentManager().popBackStack();
+                }
+            } catch (Exception e) {
             }
         }
-            catch (Exception e){}}
     }
+
     public class GetRaw extends AsyncTask<Void, Void, Integer> {
         @Override
         protected void onPreExecute() {
@@ -772,26 +794,29 @@ public class GraphFragment extends Fragment implements ResultGraphAdapter.GraphC
         @Override
         protected Integer doInBackground(Void... params) {
             try {
-                    Response indicatorResponse = RequestService.createGetRequestWithQuery("/api/analytic/raw/" + panelId, from / 1000, to / 1000);
-                    String indicatorResponseStr = indicatorResponse.body().string();
-                    JSONObject jsonObjectIndicator= new JSONObject(indicatorResponseStr);
-                    JSONArray indicatorsJsonArray = jsonObjectIndicator.getJSONArray("datas");
-                    ArrayList<Indicator>  indicators1  = new ObjectMapper().readValue(indicatorsJsonArray.toString(), new TypeReference<ArrayList<Indicator>>() {});
-                    JSONArray usersJsonArray = jsonObjectIndicator.getJSONArray("users");
-                    ArrayList<Employee>  users1  = new ObjectMapper().readValue(usersJsonArray.toString(), new TypeReference<ArrayList<Employee>>() {});
-                    if (users1 != null){
-                    users = users1;}
-                    indicators.clear();
-                    indicators.add(new Indicator());
-                for (Indicator indicator : indicators1){
+                Response indicatorResponse = RequestService.createGetRequestWithQuery("/api/analytic/raw/" + panelId, from / 1000, to / 1000);
+                String indicatorResponseStr = indicatorResponse.body().string();
+                JSONObject jsonObjectIndicator = new JSONObject(indicatorResponseStr);
+                JSONArray indicatorsJsonArray = jsonObjectIndicator.getJSONArray("datas");
+                ArrayList<Indicator> indicators1 = new ObjectMapper().readValue(indicatorsJsonArray.toString(), new TypeReference<ArrayList<Indicator>>() {
+                });
+                JSONArray usersJsonArray = jsonObjectIndicator.getJSONArray("users");
+                ArrayList<Employee> users1 = new ObjectMapper().readValue(usersJsonArray.toString(), new TypeReference<ArrayList<Employee>>() {
+                });
+                if (users1 != null) {
+                    users = users1;
+                }
+                indicators.clear();
+                indicators.add(new Indicator());
+                for (Indicator indicator : indicators1) {
                     indicator.name = name;
-                    indicator.prc =  new BigDecimal(indicator.prc).setScale(2, RoundingMode.HALF_EVEN).doubleValue();
+                    indicator.prc = new BigDecimal(indicator.prc).setScale(2, RoundingMode.HALF_EVEN).doubleValue();
                     indicators.add(indicator);
                 }
-                    return indicatorResponse.code();
+                return indicatorResponse.code();
             } catch (Exception exc) {
                 StringWriter writer = new StringWriter();
-                exc.printStackTrace( new PrintWriter(writer,true ));
+                exc.printStackTrace(new PrintWriter(writer, true));
                 Log.e("aaa", "exeption stack is :\n" + writer.toString());
                 exc.printStackTrace();
                 return null;
@@ -806,18 +831,18 @@ public class GraphFragment extends Fragment implements ResultGraphAdapter.GraphC
                 if (loopDialog != null && loopDialog.isShowing())
                     loopDialog.dismiss();
 
-            if (responseCode == 200 || responseCode == 201){
-                Objects.requireNonNull(recyclerView.getAdapter()).notifyDataSetChanged();
+                if (responseCode == 200 || responseCode == 201) {
+                    Objects.requireNonNull(recyclerView.getAdapter()).notifyDataSetChanged();
 
+                } else {
+                    Toast.makeText(getContext(), R.string.try_later, Toast.LENGTH_SHORT).show();
+                    getActivity().getSupportFragmentManager().popBackStack();
+                }
+            } catch (Exception e) {
             }
-
-            else {
-                Toast.makeText(getContext(), R.string.try_later, Toast.LENGTH_SHORT).show();
-                getActivity().getSupportFragmentManager().popBackStack();
-            }}
-            catch (Exception e){}
         }
     }
+
     @Override
     public void onDownloadPdfClick(Indicator indicator) {
         if (checkExternalPermissions()) {
@@ -835,6 +860,7 @@ public class GraphFragment extends Fragment implements ResultGraphAdapter.GraphC
             requestExternalPermissions();
         }
     }
+
     private class DownloadPdfTask extends AsyncTask<Void, Void, Integer> {
         private java.io.File resultFile;
         private long id;
@@ -842,7 +868,8 @@ public class GraphFragment extends Fragment implements ResultGraphAdapter.GraphC
 
         DownloadPdfTask(long id, String name) {
             this.id = id;
-            this.name = name;}
+            this.name = name;
+        }
 
         @Override
         protected void onPreExecute() {
@@ -909,6 +936,7 @@ public class GraphFragment extends Fragment implements ResultGraphAdapter.GraphC
             }
         }
     }
+
     private class DownloadDocTask extends AsyncTask<Void, Void, Integer> {
         private java.io.File resultFile;
         private long id;
@@ -982,6 +1010,7 @@ public class GraphFragment extends Fragment implements ResultGraphAdapter.GraphC
             }
         }
     }
+
     public class SendComment extends AsyncTask<Void, Void, Integer> {
         @Override
         protected void onPreExecute() {
@@ -1011,17 +1040,17 @@ public class GraphFragment extends Fragment implements ResultGraphAdapter.GraphC
         protected void onPostExecute(Integer responseCode) {
             super.onPostExecute(responseCode);
             try {
-            if (loopDialog != null && loopDialog.isShowing())
-                loopDialog.dismiss();
-            if (responseCode == 200 || responseCode == 201){
-                Toast.makeText(getContext(), "Сообщение отправлено", Toast.LENGTH_SHORT).show();
-GraphListFragment.restartGraphFragment(panelId, isPercents);
-            }
-            else {
-                Toast.makeText(getContext(), R.string.try_later, Toast.LENGTH_SHORT).show();
+                if (loopDialog != null && loopDialog.isShowing())
+                    loopDialog.dismiss();
+                if (responseCode == 200 || responseCode == 201) {
+                    Toast.makeText(getContext(), "Сообщение отправлено", Toast.LENGTH_SHORT).show();
+                    GraphListFragment.restartGraphFragment(panelId, isPercents);
+                } else {
+                    Toast.makeText(getContext(), R.string.try_later, Toast.LENGTH_SHORT).show();
+                }
+            } catch (Exception e) {
             }
         }
-        catch (Exception e){}}
     }
 
     private boolean checkExternalPermissions() {

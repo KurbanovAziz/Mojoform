@@ -618,7 +618,7 @@ public class NotificationsFragment extends Fragment implements NotificationAdapt
 
                     notifications = new ObjectMapper().readValue(notificationsJson.toString(), new TypeReference<ArrayList<Notification>>() {});
 
-                    notifications = new ArrayList(SortUtil.INSTANCE.sortNotifications(notifications));
+                    //notifications = new ArrayList(SortUtil.INSTANCE.sortNotifications(notifications));
 
                     for (Notification notification : notifications)
                         notification.fixTime();

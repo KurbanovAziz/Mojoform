@@ -2,6 +2,7 @@
 <org.dev_alex.mojo_qa.mojo.custom_views.RelativeLayoutWithPopUp xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/documents_layout"
     android:layout_width="match_parent"
+    android:foreground="@drawable/shape_window_dim"
     android:layout_height="match_parent"
     android:background="@drawable/main_activity_background">
 

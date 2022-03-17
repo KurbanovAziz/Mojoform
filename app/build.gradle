@@ -129,6 +129,8 @@ dependencies {
 
     implementation 'com.github.woxthebox:draglistview:1.5.1'
     implementation 'com.github.AsynctaskCoffee:VoiceRecorder:beta-0.5'
+    implementation 'com.github.douglasjunior:android-simple-tooltip:1.0.0-rc.0'
+
 
     // Firebase
     implementation 'com.google.android.gms:play-services-base:11.8.0'
