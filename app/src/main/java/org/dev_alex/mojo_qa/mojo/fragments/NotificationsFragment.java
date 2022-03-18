@@ -68,6 +68,7 @@ import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.OrientationHelper;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import okhttp3.Response;
@@ -94,6 +95,8 @@ public class NotificationsFragment extends Fragment implements NotificationAdapt
     private String readTypeFilter;
     private String orderTypeFilter;
     public Dialog filterDialog;
+    public int countItem;
+
 
     public static NotificationsFragment newInstance(Integer notificationId) {
         Bundle args = new Bundle();
@@ -430,13 +433,64 @@ public class NotificationsFragment extends Fragment implements NotificationAdapt
         if (searchText != null && !searchText.isEmpty())
             applySearch();
     }
+    public int findLastVisibleItemPosition() {
+        final View child = findOneVisibleChild(recyclerView.getLayoutManager().getChildCount() - 1, -1, false, true);
+        return child == null ? RecyclerView.NO_POSITION : recyclerView.getChildAdapterPosition(child);
+    }
+    View findOneVisibleChild(int fromIndex, int toIndex, boolean completelyVisible,
+                             boolean acceptPartiallyVisible) {
+        OrientationHelper helper;
+        if (recyclerView.getLayoutManager().canScrollVertically()) {
+            helper = OrientationHelper.createVerticalHelper(recyclerView.getLayoutManager());
+        } else {
+            helper = OrientationHelper.createHorizontalHelper(recyclerView.getLayoutManager());
+        }
 
+        final int start = helper.getStartAfterPadding();
+        final int end = helper.getEndAfterPadding();
+        final int next = toIndex > fromIndex ? 1 : -1;
+        View partiallyVisible = null;
+        for (int i = fromIndex; i != toIndex; i += next) {
+            final View child = recyclerView.getLayoutManager().getChildAt(i);
+            final int childStart = helper.getDecoratedStart(child);
+            final int childEnd = helper.getDecoratedEnd(child);
+            if (childStart < end && childEnd > start) {
+                if (completelyVisible) {
+                    if (childStart >= start && childEnd <= end) {
+                        return child;
+                    } else if (acceptPartiallyVisible && partiallyVisible == null) {
+                        partiallyVisible = child;
+                    }
+                } else {
+                    return child;
+                }
+            }
+        }
+        return partiallyVisible;
+    }
     private void setListeners() {
         ((SwipeRefreshLayout) rootView.findViewById(R.id.swipe_refresh)).setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
                 ((SwipeRefreshLayout) rootView.findViewById(R.id.swipe_refresh)).setRefreshing(false);
                 updateNotifications();
+            }
+        });
+        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+                super.onScrollStateChanged(recyclerView, newState);
+
+                int lastvisibleitemposition = findLastVisibleItemPosition();
+
+                if (lastvisibleitemposition == recyclerView.getAdapter().getItemCount() - 1) {
+                    countItem = lastvisibleitemposition + 1;
+                    if (countItem % 100 == 0){
+                        new UpdateNotifications().execute();
+
+                    }
+
+                }
             }
         });
 
@@ -562,6 +616,101 @@ public class NotificationsFragment extends Fragment implements NotificationAdapt
         }
     }
 
+
+    private class UpdateNotifications extends AsyncTask<Void, Void, Integer> {
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            loopDialog.show();
+        }
+
+        @Override
+        protected Integer doInBackground(Void... params) {
+            try {
+                Response response;
+                String url;
+                StringBuilder filter = new StringBuilder();
+                filter.append("?orderBy=");
+                if(orderTypeFilter != null){
+                    filter.append(orderTypeFilter);
+                }
+                else filter.append("date_desc");
+
+                filter.append("&type=");
+                if(readTypeFilter != null){
+                    filter.append(readTypeFilter);
+                }
+                else filter.append("all");
+                if(fromFilter != null && toFilter != null){
+                    filter.append("&from=" + (fromFilter.getTime() / (long)1000) + "&to=" + (toFilter.getTime() / (long)1000 + (long)86400));
+                }
+
+                if (tags.size() != 0){
+                    filter.append("&");
+                    for (int i = 0; i < tags.size(); i++){
+                        filter.append("orgID=").append(tags.get(i));
+                        if(i != (tags.size() - 1)){
+                            filter.append("&");
+                        }
+                    }
+                }
+
+                url = "/api/notifications" + filter + "&size=100" + "&offset=" + countItem;
+
+                response = RequestService.createGetRequest(url);
+                Log.d("mojo-response", "url = " + url + "&size=100");
+
+                if (response.code() == 200) {
+                    JSONObject responseJson = new JSONObject(response.body().string());
+                    JSONArray notificationsJson = responseJson.getJSONArray("list");
+                    Log.d("mojo-response", "notifications = " + notificationsJson);
+
+                    JSONArray availableJson = responseJson.getJSONObject("available").getJSONArray("organisation");
+
+                    organisations = new ObjectMapper().readValue(availableJson.toString(), new TypeReference<ArrayList<Organisation>>() {});;
+                    ArrayList<Notification> newNotification = new ObjectMapper().readValue(notificationsJson.toString(), new TypeReference<ArrayList<Notification>>() {});
+                    for (Notification notification : newNotification)
+                        notification.fixTime();
+                    notifications.addAll(newNotification);
+
+                    //notifications = new ArrayList(SortUtil.INSTANCE.sortNotifications(notifications));
+
+
+                }
+
+                return response.code();
+            } catch (Exception exc) {
+                exc.printStackTrace();
+                return null;
+            }
+        }
+
+        @Override
+        protected void onPostExecute(Integer responseCode) {
+            super.onPostExecute(responseCode);
+            try {
+                if (loopDialog != null && loopDialog.isShowing())
+                    loopDialog.dismiss();
+
+                if (responseCode == null)
+                    Toast.makeText(getContext(), R.string.network_error, Toast.LENGTH_LONG).show();
+                else if (responseCode == 401) {
+                    startActivity(new Intent(getContext(), AuthActivity.class));
+                    getActivity().finish();
+                } else if (responseCode == 200) {
+                    recyclerView.getAdapter().notifyDataSetChanged();
+                } else
+                    Toast.makeText(getContext(), R.string.unknown_error, Toast.LENGTH_LONG).show();
+            } catch (Exception exc) {
+                exc.printStackTrace();
+            }
+
+            styleNotificationBadge();
+        }
+    }
+
+
     private class GetNotificationsTask extends AsyncTask<Void, Void, Integer> {
 
         @Override
@@ -602,7 +751,7 @@ public class NotificationsFragment extends Fragment implements NotificationAdapt
                     }
                 }
 
-                url = "/api/notifications" + filter;
+                url = "/api/notifications" + filter + "&size=100";
 
                 response = RequestService.createGetRequest(url);
                 Log.d("mojo-response", "url = " + url + "&size=100");
@@ -851,6 +1000,7 @@ public class NotificationsFragment extends Fragment implements NotificationAdapt
             }
         }
     }
+
 
     private boolean checkExternalPermissions() {
         int permissionCheckWrite = ContextCompat.checkSelfPermission(getContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE);
