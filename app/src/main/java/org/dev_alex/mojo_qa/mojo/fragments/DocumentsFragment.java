@@ -641,21 +641,6 @@ public class DocumentsFragment extends Fragment implements FileAdapter.DocumentC
             return false;
     }
 
-    private boolean changeFileStack() {
-        if (foldersStack != null && foldersStack.size() > 1) {
-            foldersStack.remove(foldersStack.size() - 1);
-            updateHeader();
-            setAdapters(foldersStack.get(foldersStack.size() - 1).files, foldersStack.get(foldersStack.size() - 1).folders, false);
-
-            if (downloadTask != null && downloadTask.getStatus() != AsyncTask.Status.FINISHED)
-                downloadTask.cancel(false);
-
-            downloadTask = new DownloadImagesTask(foldersStack.get(foldersStack.size() - 1).files, true);
-            downloadTask.execute();
-            return true;
-        } else
-            return false;
-    }
 
     private boolean popFileStack( int i) {
         if (foldersStack != null && foldersStack.size() > 1) {
