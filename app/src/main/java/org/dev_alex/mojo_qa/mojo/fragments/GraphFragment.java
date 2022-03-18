@@ -250,6 +250,7 @@ public class GraphFragment extends Fragment implements ResultGraphAdapter.GraphC
     }
 
     private View renderHistogram(GraphInfo graphInfo) throws Exception {
+        Collections.reverse(graphInfo.values);
         Resources resources = getContext().getResources();
         int chartHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 300, resources.getDisplayMetrics());
         LinearLayout chartContainer = rootView.findViewById(R.id.LLcontainer);
