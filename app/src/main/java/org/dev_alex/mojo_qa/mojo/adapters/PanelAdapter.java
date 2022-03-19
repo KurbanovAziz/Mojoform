@@ -86,7 +86,7 @@ public class PanelAdapter extends RecyclerView.Adapter<PanelAdapter.TaskViewHold
 
         if (getItemViewType(i) == 0) {
             viewHolder.panelName.setText(panel.name);
-            if (panel.tags.get(0).getColor() != null ){
+            if (panel.tags != null && panel.tags.size() > 0 && panel.tags.get(0).getColor() != null ){
                 //viewHolder.point.setImageResource(R.drawable.point);
                 //viewHolder.point.setColorFilter(Color.parseColor(panel.tags.get(0).getColor()));
                 List< SliceValue > pieData = new ArrayList<>();
