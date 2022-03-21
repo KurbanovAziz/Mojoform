@@ -249,8 +249,11 @@ public class GraphFragment extends Fragment implements ResultGraphAdapter.GraphC
         }
     }
 
+
+
+
     private View renderHistogram(GraphInfo graphInfo) throws Exception {
-        Collections.reverse(graphInfo.values);
+        //Collections.reverse(graphInfo.values);
         Resources resources = getContext().getResources();
         int chartHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 300, resources.getDisplayMetrics());
         LinearLayout chartContainer = rootView.findViewById(R.id.LLcontainer);
@@ -332,13 +335,14 @@ public class GraphFragment extends Fragment implements ResultGraphAdapter.GraphC
             colors.add(defaultColor);
         }
         BarChart barChart = new BarChart(getContext());
+        barChart.moveViewToX(graphInfo.values.size() - 1);
         barChart.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, chartHeight));
         barChart.setDrawValueAboveBar(false);
         BarDataSet set = new BarDataSet(barEntries, "BarDataSet");
         set.setColors(colors);
         BarData barData = new BarData(set);
         barData.setDrawValues(false);
-        barData.setBarWidth(0.8f);
+        barData.setBarWidth(0.95f);
         //barChart.getAxisLeft().setAxisMaximum(barChart.getAxisLeft().getAxisMaximum() * 1.2f);
         barChart.getAxisRight().setEnabled(false);
         barChart.getAxisLeft().setGridColor(Color.parseColor("#374E3F60"));
