@@ -9,6 +9,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
+
 import androidx.annotation.IdRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -17,6 +18,7 @@ import androidx.core.content.ContextCompat;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -68,7 +70,6 @@ import okhttp3.Response;
 import static android.app.Activity.RESULT_OK;
 
 public class TasksFragment extends Fragment {
-    private final int SCAN_CODE_REQUEST_CODE = 5222;
 
     private enum CurrentAdapterType {FINISHED, BUSY, PERMANENT}
 
@@ -92,6 +93,8 @@ public class TasksFragment extends Fragment {
     private CurrentAdapterType currentAdapterType = null;
 
     public boolean needUpdate = false;
+    private final int SCAN_CODE_REQUEST_CODE = 0x0000c0de;
+
 
 
     public static TasksFragment newInstance() {
@@ -146,22 +149,25 @@ public class TasksFragment extends Fragment {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        try{
-        IntentResult intentResult = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
-        String contents = intentResult.getContents();
+        try {
+            IntentResult intentResult = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
+            if (intentResult != null) {
+                String contents = intentResult.getContents();
                 String UUID = contents.substring(contents.lastIndexOf("/")).replace("/", "");
-
                 boolean isReport = false;
                 if (contents.contains("reports")) {
                     isReport = true;
                 }
-
                 getActivity().getSupportFragmentManager().beginTransaction()
                         .replace(R.id.container, TemplateFragment.newInstance(UUID, isReport)).addToBackStack(null).commit();
+            } else {
+                super.onActivityResult(requestCode, resultCode, data);
             }
-    catch (Exception e){e.printStackTrace();}
-
+        } catch (Exception e) {
+            e.printStackTrace();
         }
+
+    }
 
 
     @Override
@@ -186,7 +192,7 @@ public class TasksFragment extends Fragment {
         getActivity().findViewById(R.id.qr_btn).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-            scanСode(v);
+                scanСode(v);
             }
         });
     }
@@ -441,8 +447,15 @@ public class TasksFragment extends Fragment {
         rootView.findViewById(R.id.calendar_reset_btn).setVisibility(
                 (withDay || currentDate.get(Calendar.MONTH) != Calendar.getInstance().get(Calendar.MONTH)) ? View.VISIBLE : View.GONE);
     }
+
     public void scanСode(View v) {
-        IntentIntegrator intentIntegrator = new IntentIntegrator(getActivity());
+        IntentIntegrator intentIntegrator = new IntentIntegrator(getActivity()) {
+            @Override
+            protected void startActivityForResult(Intent intent, int code) {
+                TasksFragment.this.startActivityForResult(intent, SCAN_CODE_REQUEST_CODE); // REQUEST_CODE override
+            }
+        };
+
         intentIntegrator.setCaptureActivity(CaptureActivity.class);
         intentIntegrator.setOrientationLocked(true);
         intentIntegrator.setDesiredBarcodeFormats(IntentIntegrator.QR_CODE_TYPES);
