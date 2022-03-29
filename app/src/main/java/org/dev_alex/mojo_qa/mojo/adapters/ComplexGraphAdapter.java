@@ -4,7 +4,9 @@ package org.dev_alex.mojo_qa.mojo.adapters;
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Color;
+
 import androidx.recyclerview.widget.RecyclerView;
+
 import android.text.TextUtils;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
@@ -46,7 +48,7 @@ public class ComplexGraphAdapter extends RecyclerView.Adapter<ComplexGraphAdapte
         TaskViewHolder(View itemView) {
             super(itemView);
             panelIcon = (ImageView) itemView.findViewById(R.id.panel_icon_image);
-            point = (PieChartView ) itemView.findViewById(R.id.point);
+            point = (PieChartView) itemView.findViewById(R.id.point);
             panelName = (TextView) itemView.findViewById(R.id.panel_name);
             panelStats = (TextView) itemView.findViewById(R.id.panel_stats);
 
@@ -61,9 +63,14 @@ public class ComplexGraphAdapter extends RecyclerView.Adapter<ComplexGraphAdapte
 
     @Override
     public int getItemViewType(int position) {
-        if(position == 0){return 2;}
-        if (panels.get(position).isSeparator()){return 1;}
-        return 0;   }
+        if (position == 0) {
+            return 2;
+        }
+        if (panels.get(position).isSeparator()) {
+            return 1;
+        }
+        return 0;
+    }
 
     @Override
     public TaskViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
@@ -86,19 +93,19 @@ public class ComplexGraphAdapter extends RecyclerView.Adapter<ComplexGraphAdapte
 
         if (getItemViewType(i) == 0) {
             viewHolder.panelName.setText(panel.name);
-            if (panel.tags.get(0).getColor() != null ){
+            if (panel.tags.get(0).getColor() != null) {
                 //viewHolder.point.setImageResource(R.drawable.point);
                 //viewHolder.point.setColorFilter(Color.parseColor(panel.tags.get(0).getColor()));
-                List< SliceValue > pieData = new ArrayList<>();
-                for (int j = 0; j < panel.tags.size(); j++){
+                List<SliceValue> pieData = new ArrayList<>();
+                for (int j = 0; j < panel.tags.size(); j++) {
                     pieData.add(new SliceValue(1, Color.parseColor(panel.tags.get(j).getColor())));
                 }
                 PieChartData pieChartData = new PieChartData(pieData);
                 viewHolder.point.setPieChartData(pieChartData);
                 viewHolder.point.setVisibility(View.VISIBLE);
+            } else {
+                viewHolder.point.setVisibility(View.INVISIBLE);
             }
-            else {
-                viewHolder.point.setVisibility(View.INVISIBLE);}
             viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -163,12 +170,12 @@ public class ComplexGraphAdapter extends RecyclerView.Adapter<ComplexGraphAdapte
                             secondVal = valueComplete.val;
                     }
                 }
-                if (firstVal != null && secondVal != null) {
+                if (firstVal == null){
+                    firstVal = 0.0;}
+                if (secondVal == null){
+                    secondVal = 0.0;}
                     viewHolder.panelStats.setText(String.format(Locale.getDefault(), "%.1f | %.1f%s",
                             firstVal, secondVal, isPercents ? "%" : " " + viewHolder.itemView.getContext().getString(R.string.balls)));
-                } else {
-                    viewHolder.panelStats.setText("");
-                }
             } catch (Exception exc) {
                 exc.printStackTrace();
             }
