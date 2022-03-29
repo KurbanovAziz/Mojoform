@@ -53,7 +53,6 @@ public class FileAdapter extends RecyclerView.Adapter<FileAdapter.FileViewHolder
     private ProgressDialog loopDialog;
 
 
-
     static class FileViewHolder extends RecyclerView.ViewHolder {
         TextView fileName;
         TextView fileDate;
@@ -193,16 +192,19 @@ public class FileAdapter extends RecyclerView.Adapter<FileAdapter.FileViewHolder
             }
         }
 
+        String id = "";
+        if (file.properties != null) {
+            id = file.properties.mojoId;
+        }
+        if (id != null && !id.equals("")) {
+            String finalId = id;
+            viewHolder.itemView.setOnClickListener(v -> documentClickListener.onDownloadPdfClick(Long.parseLong(finalId)));
 
-        String id = file.properties.mojoId;
-            if (id!= null && !id.equals("")){
-                viewHolder.itemView.setOnClickListener(v -> documentClickListener.onDownloadPdfClick(Long.parseLong(id)));
-
-            }
+        }
 
 
         viewHolder.itemView.setOnLongClickListener(v -> {
-        if (!selectionModeEnabled) {
+            if (!selectionModeEnabled) {
                 parentFragment.startSelectionMode();
                 selectedIds.add(file.id);
                 parentFragment.checkIfSelectionModeFinished();
@@ -244,6 +246,7 @@ public class FileAdapter extends RecyclerView.Adapter<FileAdapter.FileViewHolder
 
         return selectedFiles;
     }
+
     private void initDialog() {
         loopDialog = new ProgressDialog(context, R.style.ProgressDialogStyle);
         loopDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
@@ -252,6 +255,7 @@ public class FileAdapter extends RecyclerView.Adapter<FileAdapter.FileViewHolder
         loopDialog.setCanceledOnTouchOutside(false);
         loopDialog.setCancelable(false);
     }
+
     private class DownloadPdf extends AsyncTask<Void, Void, Integer> {
         private java.io.File resultFile;
         private String id;
@@ -259,7 +263,8 @@ public class FileAdapter extends RecyclerView.Adapter<FileAdapter.FileViewHolder
 
         DownloadPdf(String id, String name) {
             this.id = id;
-            this.name = name;}
+            this.name = name;
+        }
 
         @Override
         protected void onPreExecute() {
@@ -326,8 +331,9 @@ public class FileAdapter extends RecyclerView.Adapter<FileAdapter.FileViewHolder
             }
         }
     }
+
     public interface DocumentClickListener {
-         void onDownloadPdfClick(long id);
+        void onDownloadPdfClick(long id);
     }
 
 }
