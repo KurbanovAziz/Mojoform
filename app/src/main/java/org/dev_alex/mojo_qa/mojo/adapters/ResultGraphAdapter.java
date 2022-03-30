@@ -51,7 +51,6 @@ public class ResultGraphAdapter extends RecyclerView.Adapter<ResultGraphAdapter.
         TextView informationTV;
 
         ImageView moreBtn;
-        ImageView notification_bell;
         ImageView panel_icon;
         Button btDownloadPdf;
         Button btDownloadDoc;
@@ -80,8 +79,6 @@ public class ResultGraphAdapter extends RecyclerView.Adapter<ResultGraphAdapter.
             expandableLayout = itemView.findViewById(R.id.vExpandable);
             mainNotificationView = itemView.findViewById(R.id.main_block);
             notificationNewBorder = itemView.findViewById(R.id.vNotificationUnread);
-            notification_bell = itemView.findViewById(R.id.notification_bell);
-            panelIcon = itemView.findViewById(R.id.panel_icon_imag);
         }
     }
 
@@ -144,7 +141,7 @@ public class ResultGraphAdapter extends RecyclerView.Adapter<ResultGraphAdapter.
                         viewHolder.panelIcon.setImageResource(R.drawable.bell_image);
                     }
                     else {
-                        viewHolder.notification_bell.setImageResource(R.drawable.bell_task);
+                        viewHolder.panelIcon.setImageResource(R.drawable.bell_task);
                     }
                     viewHolder.panelIcon.setColorFilter(defaultColor);
                 }
