@@ -35,6 +35,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.provider.MediaStore;
+
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
@@ -244,6 +245,7 @@ public class TemplateFragment extends Fragment {
         fragment.setArguments(args);
         return fragment;
     }
+
     public static TemplateFragment newInstance(String taskUUID, boolean isReportMode) {
         Bundle args = new Bundle();
         args.putString("task_uuid", taskUUID);
@@ -402,7 +404,7 @@ public class TemplateFragment extends Fragment {
         Intent intent = null;
         String packageName = context.getPackageName();
         intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
-        Uri uri = Uri.fromParts("package" , packageName, null);
+        Uri uri = Uri.fromParts("package", packageName, null);
         intent.setData(uri);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         context.startActivity(intent);
@@ -415,8 +417,8 @@ public class TemplateFragment extends Fragment {
         intent.putExtra("extra_pkgname", context.getPackageName());
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
-            context.startActivity(intent);
-            Log.e(TAG, "Intent is not available!");
+        context.startActivity(intent);
+        Log.e(TAG, "Intent is not available!");
 
     }
 
@@ -427,7 +429,7 @@ public class TemplateFragment extends Fragment {
         intent.putExtra("extra_pkgname", context.getPackageName());
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
-            context.startActivity(intent);
+        context.startActivity(intent);
 
     }
 
@@ -469,14 +471,13 @@ public class TemplateFragment extends Fragment {
                     Toast.makeText(getContext(), R.string.something_wrong, Toast.LENGTH_SHORT).show();
                 else
                     try {
-                        File file = new File(videoPath );
+                        File file = new File(videoPath);
                         if (!file.exists()) {
                             file.mkdirs();
                         }
                         createVideoPreview(file.getAbsolutePath(), true);
 
-                    }
-                    catch (Exception e){
+                    } catch (Exception e) {
                         Log.e("video", e.toString());
                     }
             }
@@ -525,9 +526,9 @@ public class TemplateFragment extends Fragment {
         }
 
         if (requestCode == AUDIO_REQUEST_CODE && resultCode == RESULT_OK) {
-           String mFileName = data.getStringExtra("name");
+            String mFileName = data.getStringExtra("name");
 
-            File file = new File(mFileName );
+            File file = new File(mFileName);
             if (!file.exists()) {
                 file.mkdirs();
             }
@@ -916,7 +917,6 @@ public class TemplateFragment extends Fragment {
 
 
                     createSelectBtnContainer(value, container, offset);
-
 
 
                     break;
@@ -1585,7 +1585,7 @@ public class TemplateFragment extends Fragment {
         try {
             this.scanTo = scanTo;
             this.scanToObj = scanToObj;
-            IntentIntegrator intentIntegrator = new IntentIntegrator(getActivity()){
+            IntentIntegrator intentIntegrator = new IntentIntegrator(getActivity()) {
                 @Override
                 protected void startActivityForResult(Intent intent, int code) {
                     TemplateFragment.this.startActivityForResult(intent, SCAN_CODE_REQUEST_CODE); // REQUEST_CODE override
@@ -1599,12 +1599,12 @@ public class TemplateFragment extends Fragment {
             intentIntegrator.initiateScan();
 
         } catch (Exception e) {
-           Toast.makeText(getContext(), "ошибка", Toast.LENGTH_LONG).show();
+            Toast.makeText(getContext(), "ошибка", Toast.LENGTH_LONG).show();
         }
     }
 
     private void scanBarCode(TextView scanTo, JSONObject scanToObj) {
-       scanQrCode(scanTo, scanToObj);
+        scanQrCode(scanTo, scanToObj);
     }
 
     private void createCategory(JSONObject value, LinearLayout container, int offset) throws Exception {
@@ -2144,9 +2144,10 @@ public class TemplateFragment extends Fragment {
                             JSONArray optionals = value.getJSONArray("optionals");
                             for (int i = 0; i < optionals.length(); i++) {
                                 JSONObject optional = optionals.getJSONObject(i).getJSONObject("optional");
-                                if (optional.has("keys") && optional.getJSONArray("keys").length() > 0 && value.has("values")
-                                        && Utils.containsAllValues(value.getJSONArray("values"), optional.getJSONArray("keys"))) {
-
+                                if (optional.has("keys") &&
+                                        optional.getJSONArray("keys").length() > 0 &&
+                                        value.has("values")
+                                        && Utils.containsAllValues(optional.getJSONArray("keys"), value.getJSONArray("values"))) {
                                     if (optional.has("caption")) {
                                         TextView caption = new TextView(getContext());
                                         caption.setText(optional.getString("caption"));
@@ -2156,7 +2157,6 @@ public class TemplateFragment extends Fragment {
                                         int paddings = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 10, getResources().getDisplayMetrics());
                                         caption.setPadding(paddings, paddings, paddings, paddings / 3);
                                     }
-
                                     fillContainer(optionalContainer, optional.getJSONArray("items"), offset + 1);
                                 }
                             }
@@ -3411,11 +3411,11 @@ public class TemplateFragment extends Fragment {
                 if (loopDialog != null && loopDialog.isShowing())
                     loopDialog.dismiss();
 
-                if (responseCode == null){
+                if (responseCode == null) {
                     Toast.makeText(getContext(), R.string.network_error, Toast.LENGTH_LONG).show();
                     saveTemplateState();
-                return;}
-                else if (responseCode == 401)
+                    return;
+                } else if (responseCode == 401)
                     Toast.makeText(getContext(), R.string.invalid_username_or_password, Toast.LENGTH_LONG).show();
                 else if (responseCode == 202 || responseCode == 200) {
                     if (user == null) {
