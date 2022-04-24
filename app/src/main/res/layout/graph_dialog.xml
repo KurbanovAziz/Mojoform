@@ -48,7 +48,7 @@
         android:layout_marginRight="10dp"
         android:layout_marginBottom="15dp"
         android:gravity="center"
-        android:text="Количество комментарив:"
+        android:text="@string/comments_kolvo"
         android:textSize="12dp"
         android:textColor="#433A4D"
         android:layout_height="wrap_content"/>
@@ -64,7 +64,7 @@
         android:paddingLeft="30dp"
         android:background="@drawable/blue_button"
         android:backgroundTint="#20B8F7"
-        android:text="Комментарии"
+        android:text="@string/comments"
         android:textColor="#FFFFFF"/>
 
 </LinearLayout>

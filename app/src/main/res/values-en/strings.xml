@@ -85,7 +85,7 @@
     <string name="skip">Skip</string>
     <string name="hi_">Hi!</string>
     <string name="thanks_for_download">Thanks for download.\nLets get started?</string>
-    <string name="swipe_to_continue">Смахни экран, чтобы узнать больше</string>
+    <string name="swipe_to_continue">Smack the screen and learn more</string>
 
     <string name="onboarding_2_title">You can complete the ntasks.They \nhave to be set\nfor you on the platfrom.</string>
     <string name="onboarding_2_subtitle">Simply go to the sector <b>Tasks</b>.\nSelect task:</string>
@@ -214,6 +214,24 @@
     <string name="first_launch_hint">To use the application, take a username and password in your company registered on Mojoform.com</string>
     <string name="share">Share</string>
     <string name="groups">Groups</string>
+    <string name="comments_for_result">Comments on the results</string>
+    <string name="your_comment">Your comment</string>
+    <string name="i_work">I work</string>
+    <string name="complex_result">Composite indicators</string>
+    <string name="simple_result">Simple Indicators</string>
+    <string name="bally">Points</string>
+    <string name="procents">Percent</string>
+    <string name="comments_kolvo">Comments left:</string>
+    <string name="comments">Comments</string>
+    <string name="choose">To select</string>
+    <string name="organization">Organization</string>
+    <string name="form">Form</string>
+    <string name="type_of_task">Task type</string>
+    <string name="executors">Performers</string>
+    <string name="Day">Day</string>
+    <string name="Week">Week</string>
+    <string name="month">Month</string>
+    <string name="year">Year</string>
 
     <string-array name="day_names">
         <item>Su</item>

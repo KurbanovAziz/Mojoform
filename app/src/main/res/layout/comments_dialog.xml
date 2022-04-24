@@ -72,7 +72,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Комментарии к показателям"
+                    android:text="@string/comments_for_result"
                     android:textColor="#433A4D"
                     android:textSize="16dp"
                     android:textStyle="bold" />
@@ -127,7 +127,7 @@
                     android:textColor="#433A4D"
                     android:textColorHint="#FFFFFF"
                     android:layout_height="match_parent"
-                    android:hint="Ваш комментарий" />
+                    android:hint="@string/your_comment" />
                 </androidx.cardview.widget.CardView>
 
                 <ImageView

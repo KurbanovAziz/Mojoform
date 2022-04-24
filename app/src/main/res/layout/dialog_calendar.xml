@@ -42,7 +42,7 @@
         android:textColor="#EBE1E1E1"
         android:textSize="17dp"
         android:background="@drawable/rounded_view"
-        android:text="Выбрать"
+        android:text="@string/choose"
         android:layout_gravity="bottom|center"/>
 
 </FrameLayout>

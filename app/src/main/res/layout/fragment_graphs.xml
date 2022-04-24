@@ -32,7 +32,7 @@
             android:button="@null"
             android:gravity="center"
 
-            android:text="ДЕНЬ"
+            android:text="@string/Day"
             android:textColor="@color/toggle_button_text_color" />
 
         <RadioButton
@@ -44,7 +44,7 @@
             android:background="@drawable/graph_switch_button_background"
             android:button="@null"
             android:gravity="center"
-            android:text="НЕДЕЛЯ"
+            android:text="@string/Week"
             android:textColor="@color/toggle_button_text_color" />
         <RadioButton
             android:id="@+id/month"
@@ -54,7 +54,7 @@
             android:background="@drawable/graph_switch_button_background"
             android:button="@null"
             android:gravity="center"
-            android:text="МЕСЯЦ"
+            android:text="@string/month"
             android:textColor="@color/toggle_button_text_color" />
 
         <RadioButton
@@ -65,7 +65,7 @@
             android:background="@drawable/graph_switch_button_background"
             android:button="@null"
             android:gravity="center"
-            android:text="ГОД"
+            android:text="@string/year"
             android:textColor="@color/toggle_button_text_color" />
     </RadioGroup>
 

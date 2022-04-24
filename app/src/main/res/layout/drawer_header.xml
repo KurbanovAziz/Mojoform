@@ -132,7 +132,7 @@
                 android:layout_marginBottom="10dp"
                 android:gravity="center"
                 app:switchPadding="15dp"
-                android:text="На смене"
+                android:text="@string/i_work"
                 android:textColor="@android:color/white"
                 android:textSize="13sp"
                 app:backgroundTint="@android:color/white"

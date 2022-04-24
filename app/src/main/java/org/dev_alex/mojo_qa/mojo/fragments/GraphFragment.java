@@ -250,8 +250,6 @@ public class GraphFragment extends Fragment implements ResultGraphAdapter.GraphC
     }
 
 
-
-
     private View renderHistogram(GraphInfo graphInfo) throws Exception {
         //Collections.reverse(graphInfo.values);
         Resources resources = getContext().getResources();
@@ -439,7 +437,7 @@ public class GraphFragment extends Fragment implements ResultGraphAdapter.GraphC
                             TextView timeTV = commentsDialog.findViewById(R.id.time);
                             labelTV.setText(name);
                             SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy | HH:mm", Locale.getDefault());
-                            String time = dateFormat.format(graphInfo.values.get((int) h.getX()).from * 1000);
+                            String time = dateFormat.format(graphInfo.values.get((int) h.getX()).from);
                             timeTV.setText(time);
 
                             sendBTN.setOnClickListener(new View.OnClickListener() {
@@ -455,7 +453,10 @@ public class GraphFragment extends Fragment implements ResultGraphAdapter.GraphC
                             commentsDialog.show();
                         }
                     });
-                    textView.setText("Баллы " + new BigDecimal(graphInfo.values.get((int) h.getX()).val).setScale(2, RoundingMode.HALF_EVEN).doubleValue() + " | Проценты " + new BigDecimal(graphInfo.values.get((int) h.getX()).prc).setScale(2, RoundingMode.HALF_EVEN).doubleValue() + "%");
+                    textView.setText(getString(R.string.bally) + " "
+                            + new BigDecimal(graphInfo.values.get((int) h.getX()).val).setScale(2, RoundingMode.HALF_EVEN).doubleValue() + " | " +
+                            getString(R.string.procents) + " "
+                            + new BigDecimal(graphInfo.values.get((int) h.getX()).prc).setScale(2, RoundingMode.HALF_EVEN).doubleValue() + "%");
                     graphDialog.show();
                 } catch (Exception exc) {
                     exc.printStackTrace();

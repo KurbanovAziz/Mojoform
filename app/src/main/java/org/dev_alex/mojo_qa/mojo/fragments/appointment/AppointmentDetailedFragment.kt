@@ -68,10 +68,10 @@ class AppointmentDetailedFragment : Fragment() {
             else -> appointment.type
         }
 
-        styleKeyValueTextView("Организация", appointment.name, tvOrganization)
-        styleKeyValueTextView("Форма", appointment.templateName.orEmpty(), tvForm)
-        styleKeyValueTextView("Тип задачи", taskType, tvType)
-        styleKeyValueTextView("Исполнители", executorsText, tvExecutors)
+        styleKeyValueTextView(getString(R.string.organization), appointment.name, tvOrganization)
+        styleKeyValueTextView(getString(R.string.form), appointment.templateName.orEmpty(), tvForm)
+        styleKeyValueTextView(getString(R.string.type_of_task), taskType, tvType)
+        styleKeyValueTextView(getString(R.string.executors), executorsText, tvExecutors)
     }
 
     override fun onDestroyView() {

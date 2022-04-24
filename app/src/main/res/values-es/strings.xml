@@ -215,6 +215,24 @@
     <string name="first_launch_hint">Para usar la aplicación, tome un nombre de usuario y contraseña en su empresa registrada en Mojoform.com</string>
     <string name="share">Share</string>
     <string name="groups">Groups</string>
+    <string name="comments_for_result">Комментарии к показателям</string>
+    <string name="your_comment">Ваш комментарий</string>
+    <string name="i_work">На смене</string>
+    <string name="complex_result">Составные показатели</string>
+    <string name="simple_result">Простые показатели</string>
+    <string name="bally">Баллы</string>
+    <string name="procents">Проценты</string>
+    <string name="comments_kolvo">Оставлено комментарив:</string>
+    <string name="comments">Комментарии</string>
+    <string name="choose">Выбрать</string>
+    <string name="organization">Организация</string>
+    <string name="form">Форма</string>
+    <string name="type_of_task">Тип задачи</string>
+    <string name="executors">Исполнители</string>
+    <string name="Day">ДЕНЬ</string>
+    <string name="Week">НЕДЕЛЯ</string>
+    <string name="month">МЕСЯЦ</string>
+    <string name="year">ГОД</string>
 
     <string-array name="day_names">
         <item>Do</item>

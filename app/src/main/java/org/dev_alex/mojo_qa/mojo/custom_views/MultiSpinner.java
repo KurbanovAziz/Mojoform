@@ -136,7 +136,7 @@ public class MultiSpinner extends androidx.appcompat.widget.AppCompatSpinner imp
     public boolean performClick() {
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         builder.setAdapter(adapter, null);
-        builder.setPositiveButton("Сохранить",
+        builder.setPositiveButton(R.string.choose,
                 new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
