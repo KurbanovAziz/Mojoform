@@ -311,7 +311,7 @@ public class NotificationsFragment extends Fragment implements NotificationAdapt
                                        toFilter = days.get(0).getDate();
                                        fromFilter = days.get(1).getDate();}}
                                    SimpleDateFormat xDateFormat = new SimpleDateFormat("dd.MM.yyyy", Locale.getDefault());
-                                   calendarText.setText("с " + xDateFormat.format(fromFilter) + " по " + xDateFormat.format(toFilter));
+                                   calendarText.setText(R.string.from + " "+ xDateFormat.format(fromFilter) + " " + R.string.to+ " " + xDateFormat.format(toFilter));
                                    calendarDialog.cancel();
 
                                }

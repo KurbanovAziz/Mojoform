@@ -41,7 +41,7 @@
                         android:id="@+id/label"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Фильтры"
+                        android:text="@string/filter"
                         android:textColor="#4D6A7F"
                         android:textSize="16dp"
                         app:layout_constraintBottom_toBottomOf="parent"
@@ -68,7 +68,7 @@
                 <EditText
                     android:layout_width="wrap_content"
                     android:layout_height="15dp"
-                    android:text="Поиск по названию"
+                    android:text="@string/search_by_name"
                     android:visibility="invisible"
                     android:textColor="#433A4D"
                     android:textSize="16dp"
@@ -86,7 +86,7 @@
                         android:id="@+id/radio_not_read"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Не прочитанные"
+                        android:text="@string/not_read"
                         android:layout_gravity="left"
                         android:textColor="#4D6A7F"
                         android:buttonTint="#4D6A7F"
@@ -97,7 +97,7 @@
                         android:id="@+id/radio_read"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Прочитанные"
+                        android:text="@string/readed"
                         android:textColor="#4D6A7F"
                         android:buttonTint="#4D6A7F"
                         android:layout_weight="1" />
@@ -108,7 +108,7 @@
                         android:layout_height="wrap_content"
                         android:textColor="#4D6A7F"
                         android:buttonTint="#4D6A7F"
-                        android:text="Все"
+                        android:text="@string/all"
                         android:layout_weight="1" />
                 </RadioGroup>
 
@@ -130,7 +130,7 @@
                         android:id="@+id/radio_new"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Новые вначале"
+                        android:text="@string/new_before"
                         android:textColor="#4D6A7F"
                         android:buttonTint="#4D6A7F"
                         android:layout_weight="1" />
@@ -139,7 +139,7 @@
                         android:id="@+id/radio_old"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Сначало старые"
+                        android:text="@string/old_before"
                         android:textColor="#4D6A7F"
                         android:buttonTint="#4D6A7F"
                         android:layout_weight="1" />
@@ -169,7 +169,7 @@
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
                         android:textColor="#4D6A7F"
-                        android:text="Выбрать период"/>
+                        android:text="@string/search_period"/>
                 </LinearLayout>
                 <View
                     android:layout_width="match_parent"
@@ -207,7 +207,7 @@
                             android:layout_height="wrap_content"
                             android:layout_gravity="center"
                             android:textColor="#4D6A7F"
-                            android:text="По организациям"/>
+                            android:text="@string/to_organization"/>
                     </LinearLayout>
 
 

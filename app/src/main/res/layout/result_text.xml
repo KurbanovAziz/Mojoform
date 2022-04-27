@@ -7,7 +7,8 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Результаты выполнений"
+
+        android:text="@string/results_of_work"
         android:textColor="@color/multiple_image_select_primaryDark"
         android:textSize="20dp"
         android:layout_marginLeft="6dp" />

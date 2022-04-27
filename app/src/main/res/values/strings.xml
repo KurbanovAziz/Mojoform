@@ -196,7 +196,7 @@
     <string name="every_month">Ежемесячно по следующим числам</string>
     <string name="set_result_control_rules">Задайте правила контроля результата</string>
     <string name="from">От</string>
-    <string name="to">До</string>
+    <string name="to">до</string>
     <string name="user">Пользователь</string>
     <string name="add_email">Добавить email</string>
     <string name="add">Добавить</string>
@@ -234,6 +234,15 @@
     <string name="Week">НЕДЕЛЯ</string>
     <string name="month">МЕСЯЦ</string>
     <string name="year">ГОД</string>
+    <string name="filter">Фильтры</string>
+    <string name="search_by_name">Поиск по названию</string>
+    <string name="not_read">Не прочитанные</string>
+    <string name="readed">Прочитанные</string>
+    <string name="new_before">Новые вначале</string>
+    <string name="old_before">Сначала старые</string>
+    <string name="search_period">Выбрать период</string>
+    <string name="to_organization">По организациям</string>
+    <string name="results_of_work">Результаты выполнений</string>
 
     <string-array name="day_names">
         <item>вс</item>
