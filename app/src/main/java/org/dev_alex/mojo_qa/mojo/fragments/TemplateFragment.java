@@ -2140,15 +2140,14 @@ public class TemplateFragment extends Fragment {
 
                         optionalContainer.removeAllViewsInLayout();
                         optionalContainer.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
-                        if (value.has("optionals") && value.getJSONArray("optionals").length() > 0) {
+                        if (value.has("optionals")) {
                             JSONArray optionals = value.getJSONArray("optionals");
                             for (int i = 0; i < optionals.length(); i++) {
                                 JSONObject optional = optionals.getJSONObject(i).getJSONObject("optional");
                                 if (optional.has("keys") &&
-                                        optional.getJSONArray("keys").length() > 0 &&
                                         value.has("values")
-                                        && Utils.containsAllValues(optional.getJSONArray("keys"), value.getJSONArray("values"))) {
-                                    if (optional.has("caption")) {
+                                        && Utils.containsAllValues(value.getJSONArray("values"), optional.getJSONArray("keys"))) {
+                                    if (!optional.isNull("caption")) { //хрень здесь
                                         TextView caption = new TextView(getContext());
                                         caption.setText(optional.getString("caption"));
                                         caption.setTextColor(ContextCompat.getColor(getContext(), R.color.colorAccent));
@@ -2386,6 +2385,7 @@ public class TemplateFragment extends Fragment {
                 new String[]{Manifest.permission.RECORD_AUDIO, Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE}, 0);
     }
 
+    @androidx.annotation.NonNull
     private ViewGroup boxInContainerWithId(ViewGroup content, String tag) {
         int topAndBottomPaddings = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 5, getResources().getDisplayMetrics());
         FrameLayout boxLayout = new FrameLayout(getContext());

@@ -30,14 +30,19 @@ public class App extends Application {
         switch (BuildConfig.FLAVOR) {
             case "release_flavor":
                 host = "https://system.mojoform.com";
+                host = "https://system.mojoform.com";
                 break;
 
             case "debug_flavor":
                 host = "https://mojo-qa.dev-alex.org";
+               // host = "https://system.mojoform.com";
+
                 break;
 
             case "demo_flavor":
                 host = "https://demo.mojoform.com";
+               // host = "https://system.mojoform.com";
+
                 break;
 
             default:
