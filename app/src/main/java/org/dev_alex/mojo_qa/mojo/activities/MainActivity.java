@@ -20,6 +20,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.ArrayAdapter;
+import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -197,18 +198,25 @@ public class MainActivity extends AppCompatActivity {
                     "%s %s", TextUtils.isEmpty(currentUser.lastName) ? "" : currentUser.lastName,
                     TextUtils.isEmpty(currentUser.firstName) ? "" : currentUser.firstName));
 
-        SwitchCompat swPush = headerView.findViewById(R.id.swPush);
-        swPush.getTrackDrawable().setColorFilter(Color.parseColor("#D14A3F"), PorterDuff.Mode.SRC_IN);
+        CheckBox swPush = headerView.findViewById(R.id.checkBox);
+        TextView textView = headerView.findViewById(R.id.work_or_notwork);
+
         swPush.setOnCheckedChangeListener((buttonView, isChecked) -> {
+
             if (isChecked) {
-                swPush.getTrackDrawable().setColorFilter(Color.parseColor("#49A04D"), PorterDuff.Mode.SRC_IN);
+                textView.setText("На смене");
             } else {
-                swPush.getTrackDrawable().setColorFilter(Color.parseColor("#D14A3F"), PorterDuff.Mode.SRC_IN);
+                textView.setText("отдыхаю");
             }
 
             new UpdatePushInfoTask(!isChecked).execute();
         });
         swPush.setChecked(!currentUser.push_disabled);
+        if (currentUser.push_disabled){
+            textView.setText("отдыхаю");
+
+        }
+
 
 
         ArrayList<SecondaryDrawerItem> mainDraggableItems = new ArrayList<>();
@@ -320,7 +328,7 @@ public class MainActivity extends AppCompatActivity {
             ((TextView) headerView.findViewById(R.id.user_initials)).setText(userInitials);
         }
 
-        headerView.findViewById(R.id.btEdit).setOnClickListener(v -> {
+        headerView.findViewById(R.id.profile_image1).setOnClickListener(v -> {
             drawer.closeDrawer();
             getSupportFragmentManager()
                     .beginTransaction()

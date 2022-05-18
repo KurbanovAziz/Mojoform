@@ -150,7 +150,7 @@ public class Utils {
     }
 
     public static String formatHtmlContentSize(String html) {
-        String imgTag = "<img";
+        String imgTag = "<switcher_on.png";
         String videoTag = "<iframe";
         String video2Tag = "<video";
 

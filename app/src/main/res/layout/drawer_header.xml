@@ -24,10 +24,15 @@
             android:layout_alignBottom="@+id/background"
             android:layout_alignParentStart="true"
             android:layout_alignParentLeft="true"
-            android:layout_marginLeft="25dp"
+            android:layout_marginLeft="20dp"
             android:layout_marginBottom="55dp"
             android:gravity="center_horizontal"
+
             android:orientation="vertical">
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
 
             <RelativeLayout
                 android:layout_width="110dp"
@@ -40,6 +45,8 @@
                     android:background="@drawable/image_ring" />
 
                 <ImageView
+                    android:id="@+id/profile_image1"
+
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="6dp"
@@ -67,14 +74,12 @@
                     android:textColor="#ff5b3d8c"
                     android:textSize="26sp" />
             </RelativeLayout>
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
 
-            <FrameLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="3dp"
-                android:gravity="center"
-                android:orientation="horizontal">
-
+                    android:orientation="vertical">
                 <TextView
                     android:id="@+id/user_name"
                     android:layout_width="wrap_content"
@@ -87,30 +92,33 @@
                     android:textAlignment="center"
                     android:textColor="@android:color/white"
                     android:textSize="18sp" />
+                    <TextView
+                        android:id="@+id/position"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_horizontal"
+                        android:layout_marginTop="4dp"
+                        android:layout_marginBottom="-20dp"
+                        android:maxLines="2"
+                        android:text="product designer"
+                        android:textColor="@android:color/white"
+                        android:textSize="14sp"
+                        android:visibility="invisible" />
+                </LinearLayout>
 
-                <ImageView
-                    android:id="@+id/btEdit"
-                    android:layout_width="38dp"
-                    android:layout_height="38dp"
-                    android:layout_gravity="right|center_vertical"
-                    android:layout_marginStart="4dp"
-                    android:padding="10dp"
-                    android:src="@drawable/ic_edit_white"
-                    android:text="@string/edit"
-                    android:visibility="visible" />
+        </LinearLayout>
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="3dp"
+                android:gravity="center"
+                android:orientation="horizontal">
+
+
+
             </FrameLayout>
 
-            <TextView
-                android:id="@+id/position"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:layout_marginTop="2dp"
-                android:maxLines="2"
-                android:text="product designer"
-                android:textColor="@android:color/white"
-                android:textSize="14sp"
-                android:visibility="invisible" />
+
 
             <TextView
                 android:id="@+id/email"
@@ -124,20 +132,33 @@
                 android:textSize="13sp"
                 android:visibility="gone" />
 
-            <androidx.appcompat.widget.SwitchCompat
-                android:id="@+id/swPush"
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:layout_marginBottom="10dp"
-                android:gravity="center"
-                app:switchPadding="15dp"
-                android:text="@string/i_work"
-                android:textColor="@android:color/white"
-                android:textSize="13sp"
-                app:backgroundTint="@android:color/white"
-                app:thumbTint="#B6A9C9"
-                app:trackTint="@android:color/white" />
+                android:layout_marginBottom="-20dp"
+                android:layout_marginLeft="-25dp"
+                android:orientation="horizontal">
+
+                <CheckBox
+                    android:id="@+id/checkBox"
+                    android:layout_width="200dp"
+                    android:layout_height="80dp"
+
+                    android:layout_gravity="center_vertical"
+                    android:button="@drawable/custom_switcher"
+                    android:scaleX="0.5"
+                    android:scaleY="0.5" />
+
+                <TextView
+                    android:id="@+id/work_or_notwork"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginLeft="-80dp"
+                    android:text="На смене"
+                    android:textColor="#E9E7EC" />
+
+            </LinearLayout>
         </LinearLayout>
 
     </RelativeLayout>

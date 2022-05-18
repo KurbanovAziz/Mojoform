@@ -124,8 +124,6 @@ public class DocumentsFragment extends Fragment implements FileAdapter.DocumentC
             //folderRecyclerView.setBackgroundResource(R.drawable.selection_mode_background);
             selectionMenu.setVisibility(View.VISIBLE);
             updateSelectionMenuData();
-
-            rootView.findViewById(R.id.create_dir_btn).setVisibility(View.GONE);
         }
     }
 
@@ -142,9 +140,6 @@ public class DocumentsFragment extends Fragment implements FileAdapter.DocumentC
 
         selectionMenu.setVisibility(View.GONE);
 
-        if ((LoginHistoryService.getCurrentUser().is_manager != null && LoginHistoryService.getCurrentUser().is_manager)
-                || (LoginHistoryService.getCurrentUser().is_orgowner != null && LoginHistoryService.getCurrentUser().is_orgowner))
-            rootView.findViewById(R.id.create_dir_btn).setVisibility(foldersStack.size() > 1 ? View.VISIBLE : View.GONE);
     }
 
     public void checkIfSelectionModeFinished() {
@@ -268,7 +263,6 @@ public class DocumentsFragment extends Fragment implements FileAdapter.DocumentC
                 sortTypePopupWindow.setVisibility(View.VISIBLE);
             }
         });
-
         getActivity().findViewById(R.id.search_btn).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -277,8 +271,6 @@ public class DocumentsFragment extends Fragment implements FileAdapter.DocumentC
             }
         });
     }
-
-
     private void updateHeader() {
         if (getActivity() != null) {
             pathTexts.clear();
@@ -290,17 +282,11 @@ public class DocumentsFragment extends Fragment implements FileAdapter.DocumentC
                 }
                 pathTexts.add(" / " + fileSystemStackEntry.parentName + "\n");
             }
-
             if (foldersStack != null && foldersStack.size() > 1) {
-
-
                 ((TextView) getActivity().findViewById(R.id.title))
                         .setText(foldersStack.get(foldersStack.size() - 1).parentName);
-
-
                 getActivity().findViewById(R.id.sandwich_btn).setVisibility(View.GONE);
                 getActivity().findViewById(R.id.back_btn).setVisibility(View.VISIBLE);
-
             } else {
                 ((TextView) getActivity().findViewById(R.id.title)).setText(R.string.documents);
                 getActivity().findViewById(R.id.title).setVisibility(View.VISIBLE);
@@ -332,7 +318,7 @@ public class DocumentsFragment extends Fragment implements FileAdapter.DocumentC
             folderRecyclerView.setNestedScrollingEnabled(!scrollView.canScrollVertically(-1));
         });
 
-        rootView.findViewById(R.id.create_dir_btn).setOnClickListener(v -> showCreateDirDialog());
+       //rootView.findViewById(R.id.create_dir_btn).setOnClickListener(v -> showCreateDirDialog());
 
         selectionMenu.findViewById(R.id.selection_close_btn).setOnClickListener(v -> stopSelectionMode());
 
@@ -479,10 +465,6 @@ public class DocumentsFragment extends Fragment implements FileAdapter.DocumentC
 
     private void setAdapters(ArrayList<File> files, ArrayList<File> folders,
                              boolean withSelection) {
-        if ((LoginHistoryService.getCurrentUser().is_manager != null && LoginHistoryService.getCurrentUser().is_manager)
-                || (LoginHistoryService.getCurrentUser().is_orgowner != null && LoginHistoryService.getCurrentUser().is_orgowner))
-            rootView.findViewById(R.id.create_dir_btn).setVisibility(foldersStack.size() > 1 ? View.VISIBLE : View.GONE);
-
         if ((files == null || files.isEmpty()) && (folders == null || folders.isEmpty()))
             rootView.findViewById(R.id.empty_block).setVisibility(View.VISIBLE);
         else
