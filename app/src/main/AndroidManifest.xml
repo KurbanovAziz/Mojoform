@@ -2,6 +2,11 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     package="org.dev_alex.mojo_qa.mojo">
+    <queries>
+        <intent>
+            <action android:name="android.speech.RecognitionService" />
+        </intent>
+    </queries>
 
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
@@ -163,6 +168,7 @@
         <meta-data
             android:name="com.rollbar.android.ACCESS_TOKEN"
             android:value="3401a27630db49dea6bf34559d77c45d" />
+
     </application>
 
 </manifest>

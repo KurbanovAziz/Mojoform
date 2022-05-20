@@ -124,6 +124,7 @@ import org.dev_alex.mojo_qa.mojo.activities.MainActivity;
 import org.dev_alex.mojo_qa.mojo.activities.OpenLinkActivity;
 import org.dev_alex.mojo_qa.mojo.activities.PlayerActivity;
 import org.dev_alex.mojo_qa.mojo.activities.RecordAudio;
+import org.dev_alex.mojo_qa.mojo.custom_views.CustomImageView;
 import org.dev_alex.mojo_qa.mojo.custom_views.CustomWebview;
 import org.dev_alex.mojo_qa.mojo.custom_views.camera.CustomCamera2Activity;
 import org.dev_alex.mojo_qa.mojo.custom_views.indicator.IndicatorLayout;
@@ -931,7 +932,7 @@ public class TemplateFragment extends Fragment {
                     TextView textView = editTextMultiLineContainer.findViewById(R.id.caption);
                     EditText editText = editTextMultiLineContainer.findViewById(R.id.value);
                     ImageView scanBTN = editTextMultiLineContainer.findViewById(R.id.btScanQr);
-                    final ImageView microBTN = editTextMultiLineContainer.findViewById(R.id.micro1);
+                    final CustomImageView microBTN = editTextMultiLineContainer.findViewById(R.id.micro1);
 
                      final SpeechRecognizer mSpeechRecognizer = SpeechRecognizer.createSpeechRecognizer(getContext());
 
@@ -982,7 +983,7 @@ public class TemplateFragment extends Fragment {
 
                             //displaying the first match
                             if (matches != null)
-                                editText.setText(editText.getText() + " " + matches.get(0));
+                                editText.setText(editText.getText() + " " + matches);
                         }
 
                         @Override
@@ -995,6 +996,9 @@ public class TemplateFragment extends Fragment {
 
                         }
                     });
+
+
+
 
                     editText.setVisibility((value.has("is_required") && !value.getBoolean("is_required")) ? View.GONE : View.VISIBLE);
 
@@ -1009,6 +1013,27 @@ public class TemplateFragment extends Fragment {
                     if (isTaskFinished)
                         editText.setEnabled(false);
                     else {
+                        microBTN.microBTN = microBTN;
+                        microBTN.mSpeechRecognizerIntent = mSpeechRecognizerIntent;
+                        microBTN.mSpeechRecognizer = mSpeechRecognizer;
+
+                        microBTN.setOnTouchListener(new View.OnTouchListener() {
+                            @Override
+                            public boolean onTouch(View view, MotionEvent motionEvent) {
+                                switch (motionEvent.getAction()) {
+                                    case MotionEvent.ACTION_UP:
+                                        microBTN.setColorFilter(Color.parseColor("#CECECE"));
+                                        mSpeechRecognizer.stopListening();
+                                        return true;
+                                    case MotionEvent.ACTION_DOWN:
+                                        microBTN.setColorFilter(Color.parseColor("#ff2400"));
+                                        Toast.makeText(getContext(), "Говорите", Toast.LENGTH_SHORT).show();
+                                        mSpeechRecognizer.startListening(mSpeechRecognizerIntent);
+                                        return true;
+                                }
+                                return false;
+                            }
+                        });
                         editText.addTextChangedListener(new TextWatcher() {
                             @Override
                             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -1033,34 +1058,11 @@ public class TemplateFragment extends Fragment {
                         });
 
 
+
                         scanBTN.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
                                 scanQrCode(editText, null);
-                            }
-                        });
-
-                        microBTN.setOnTouchListener(new View.OnTouchListener() {
-                            @Override
-                            public boolean onTouch(View view, MotionEvent motionEvent) {
-                                switch (motionEvent.getAction()) {
-                                    case MotionEvent.ACTION_UP:
-                                        microBTN.setColorFilter(Color.parseColor("#CECECE"));
-
-                                        mSpeechRecognizer.stopListening();
-
-                                        break;
-                                    case MotionEvent.ACTION_DOWN:
-                                        microBTN.setColorFilter(Color.parseColor("#ff2400"));
-                                        Toast.makeText(getContext(), "Говорите", Toast.LENGTH_SHORT).show();
-                                        mSpeechRecognizer.startListening(mSpeechRecognizerIntent);
-
-                                        break;
-                                    default:
-                                        return false;
-
-                                }
-                                return true;
                             }
                         });
 
