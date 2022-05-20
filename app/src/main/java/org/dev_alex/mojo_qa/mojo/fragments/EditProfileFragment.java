@@ -47,6 +47,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
+
 import okhttp3.MediaType;
 import okhttp3.Response;
 
@@ -72,7 +73,9 @@ public class EditProfileFragment extends Fragment {
 
             initDialog();
             bindData();
-
+            User currentUser = LoginHistoryService.getCurrentUser();
+            TextView textView = rootView.findViewById(R.id.position);
+            textView.setText(currentUser.description);
             rootView.findViewById(R.id.btSave).setOnClickListener(v -> onSaveClick());
             rootView.findViewById(R.id.btAvatar).setOnClickListener(v -> onChangeAvatarClick());
         }

@@ -191,12 +191,17 @@ public class MainActivity extends AppCompatActivity {
         View headerView = getLayoutInflater().inflate(R.layout.drawer_header, null);
         User currentUser = LoginHistoryService.getCurrentUser();
 
-        if (TextUtils.isEmpty(currentUser.firstName) && TextUtils.isEmpty(currentUser.lastName))
+        if (TextUtils.isEmpty(currentUser.firstName) && TextUtils.isEmpty(currentUser.lastName)){
             ((TextView) headerView.findViewById(R.id.user_name)).setText(currentUser.username);
+            ((TextView) headerView.findViewById(R.id.position)).setText(currentUser.description);
+
+        }
         else
             ((TextView) headerView.findViewById(R.id.user_name)).setText(String.format(Locale.getDefault(),
                     "%s %s", TextUtils.isEmpty(currentUser.lastName) ? "" : currentUser.lastName,
                     TextUtils.isEmpty(currentUser.firstName) ? "" : currentUser.firstName));
+        ((TextView) headerView.findViewById(R.id.position)).setText(currentUser.description);
+
 
         CheckBox swPush = headerView.findViewById(R.id.checkBox);
         TextView textView = headerView.findViewById(R.id.work_or_notwork);

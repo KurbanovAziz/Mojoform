@@ -47,6 +47,17 @@
             android:textColor="#ff5b3d8c"
             android:textSize="26sp" />
     </RelativeLayout>
+    <TextView
+        android:id="@+id/position"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:layout_gravity="center"
+        android:layout_marginTop="-10dp"
+        android:layout_marginBottom="-10dp"
+        android:text=""
+        android:textColor="#4A4174"
+        android:textSize="14sp" />
 
     <EditText
         android:id="@+id/etName"

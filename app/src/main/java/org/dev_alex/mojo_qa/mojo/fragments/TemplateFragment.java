@@ -47,6 +47,9 @@ import androidx.legacy.widget.Space;
 import androidx.appcompat.widget.PopupMenu;
 
 import android.provider.Settings;
+import android.speech.RecognitionListener;
+import android.speech.RecognizerIntent;
+import android.speech.SpeechRecognizer;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.TextUtils;
@@ -922,80 +925,91 @@ public class TemplateFragment extends Fragment {
                     break;
 
                 case "lineedit":
-                    final LinearLayout editTextSingleLineContainer = (LinearLayout) getActivity().getLayoutInflater().inflate(R.layout.lineedit, container, false);
-                    ((ViewGroup) editTextSingleLineContainer.getChildAt(0)).getChildAt(1).setVisibility((value.has("is_required") && !value.getBoolean("is_required")) ? View.GONE : View.VISIBLE);
-
-                    if (value.has("caption"))
-                        ((TextView) ((ViewGroup) editTextSingleLineContainer.getChildAt(0)).getChildAt(0)).setText(value.getString("caption"));
-                    else
-                        ((TextView) ((ViewGroup) editTextSingleLineContainer.getChildAt(0)).getChildAt(0)).setText("Нет текста");
-
-                    if (value.has("value"))
-                        ((EditText) ((ViewGroup) editTextSingleLineContainer.getChildAt(1)).getChildAt(0)).setText(value.getString("value"));
-
-
-                    if (isTaskFinished)
-                        ((ViewGroup) editTextSingleLineContainer.getChildAt(1)).getChildAt(0).setEnabled(false);
-                    else {
-                        ((EditText) ((ViewGroup) editTextSingleLineContainer.getChildAt(1)).getChildAt(0)).addTextChangedListener(new TextWatcher() {
-                            @Override
-                            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-                            }
-
-                            @Override
-                            public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-                            }
-
-                            @Override
-                            public void afterTextChanged(Editable s) {
-                                try {
-                                    if (s.toString().trim().isEmpty())
-                                        value.remove("value");
-                                    else
-                                        value.put("value", s.toString().trim());
-                                } catch (Exception ignored) {
-                                }
-                            }
-                        });
-
-                        ((ViewGroup) editTextSingleLineContainer.getChildAt(1)).getChildAt(1).setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                scanQrCode(((EditText) ((ViewGroup) editTextSingleLineContainer.getChildAt(1)).getChildAt(0)), null);
-                            }
-                        });
-
-                        ((ViewGroup) editTextSingleLineContainer.getChildAt(1)).getChildAt(2).setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                scanBarCode(((EditText) ((ViewGroup) editTextSingleLineContainer.getChildAt(1)).getChildAt(0)), null);
-                            }
-                        });
-                    }
-                    container.addView(separator);
-
-                    container.addView(boxInContainerWithId(editTextSingleLineContainer, value.getString("id")));
-
-                    break;
 
                 case "textarea":
                     final LinearLayout editTextMultiLineContainer = (LinearLayout) getActivity().getLayoutInflater().inflate(R.layout.textarea, container, false);
-                    ((ViewGroup) editTextMultiLineContainer.getChildAt(0)).getChildAt(1).setVisibility((value.has("is_required") && !value.getBoolean("is_required")) ? View.GONE : View.VISIBLE);
+                    TextView textView = editTextMultiLineContainer.findViewById(R.id.caption);
+                    EditText editText = editTextMultiLineContainer.findViewById(R.id.value);
+                    ImageView scanBTN = editTextMultiLineContainer.findViewById(R.id.btScanQr);
+                    final ImageView microBTN = editTextMultiLineContainer.findViewById(R.id.micro1);
+
+                     final SpeechRecognizer mSpeechRecognizer = SpeechRecognizer.createSpeechRecognizer(getContext());
+
+
+                     final Intent mSpeechRecognizerIntent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+                    mSpeechRecognizerIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,
+                            RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
+                    mSpeechRecognizerIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE,
+                            Locale.getDefault());
+
+
+                    mSpeechRecognizer.setRecognitionListener(new RecognitionListener() {
+                        @Override
+                        public void onReadyForSpeech(Bundle bundle) {
+
+                        }
+
+                        @Override
+                        public void onBeginningOfSpeech() {
+
+                        }
+
+                        @Override
+                        public void onRmsChanged(float v) {
+
+                        }
+
+                        @Override
+                        public void onBufferReceived(byte[] bytes) {
+
+                        }
+
+                        @Override
+                        public void onEndOfSpeech() {
+
+                        }
+
+                        @Override
+                        public void onError(int i) {
+
+                        }
+
+                        @Override
+                        public void onResults(Bundle bundle) {
+                            //getting all the matches
+                            ArrayList<String> matches = bundle
+                                    .getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
+
+                            //displaying the first match
+                            if (matches != null)
+                                editText.setText(editText.getText() + " " + matches.get(0));
+                        }
+
+                        @Override
+                        public void onPartialResults(Bundle bundle) {
+
+                        }
+
+                        @Override
+                        public void onEvent(int i, Bundle bundle) {
+
+                        }
+                    });
+
+                    editText.setVisibility((value.has("is_required") && !value.getBoolean("is_required")) ? View.GONE : View.VISIBLE);
 
                     if (value.has("caption"))
-                        ((TextView) ((ViewGroup) editTextMultiLineContainer.getChildAt(0)).getChildAt(0)).setText(value.getString("caption"));
+                        textView.setText(value.getString("caption"));
                     else
-                        ((TextView) ((ViewGroup) editTextMultiLineContainer.getChildAt(0)).getChildAt(0)).setText("Нет текста");
+                        textView.setText("Нет текста");
 
                     if (value.has("value"))
-                        ((EditText) ((ViewGroup) editTextMultiLineContainer.getChildAt(1)).getChildAt(0)).setText(value.getString("value"));
+                        editText.setText(value.getString("value"));
 
                     if (isTaskFinished)
-                        (((ViewGroup) editTextMultiLineContainer.getChildAt(1)).getChildAt(0)).setEnabled(false);
+                        editText.setEnabled(false);
                     else {
-                        ((EditText) ((ViewGroup) editTextMultiLineContainer.getChildAt(1)).getChildAt(0)).addTextChangedListener(new TextWatcher() {
+                        editText.addTextChangedListener(new TextWatcher() {
                             @Override
                             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 
@@ -1018,25 +1032,46 @@ public class TemplateFragment extends Fragment {
                             }
                         });
 
-                        ((ViewGroup) editTextMultiLineContainer.getChildAt(1)).getChildAt(1).setOnClickListener(new View.OnClickListener() {
+
+                        scanBTN.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
-                                scanQrCode(((EditText) ((ViewGroup) editTextMultiLineContainer.getChildAt(1)).getChildAt(0)), null);
+                                scanQrCode(editText, null);
                             }
                         });
 
-                        ((ViewGroup) editTextMultiLineContainer.getChildAt(1)).getChildAt(2).setOnClickListener(new View.OnClickListener() {
+                        microBTN.setOnTouchListener(new View.OnTouchListener() {
                             @Override
-                            public void onClick(View v) {
-                                scanBarCode(((EditText) ((ViewGroup) editTextMultiLineContainer.getChildAt(1)).getChildAt(0)), null);
+                            public boolean onTouch(View view, MotionEvent motionEvent) {
+                                switch (motionEvent.getAction()) {
+                                    case MotionEvent.ACTION_UP:
+                                        microBTN.setColorFilter(Color.parseColor("#CECECE"));
+
+                                        mSpeechRecognizer.stopListening();
+
+                                        break;
+                                    case MotionEvent.ACTION_DOWN:
+                                        microBTN.setColorFilter(Color.parseColor("#ff2400"));
+                                        Toast.makeText(getContext(), "Говорите", Toast.LENGTH_SHORT).show();
+                                        mSpeechRecognizer.startListening(mSpeechRecognizerIntent);
+
+                                        break;
+                                    default:
+                                        return false;
+
+                                }
+                                return true;
                             }
                         });
+
+
                     }
                     container.addView(separator);
 
                     container.addView(boxInContainerWithId(editTextMultiLineContainer, value.getString("id")));
 
                     break;
+
 
                 case "money":
                     final LinearLayout moneyContainer = (LinearLayout) getActivity().getLayoutInflater().inflate(R.layout.text_plan, container, false);
@@ -1605,6 +1640,15 @@ public class TemplateFragment extends Fragment {
 
     private void scanBarCode(TextView scanTo, JSONObject scanToObj) {
         scanQrCode(scanTo, scanToObj);
+    }
+    private void checkPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (!(ContextCompat.checkSelfPermission(getContext(), Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED)) {
+                Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+                        Uri.parse("package:" + getContext().getPackageName()));
+                startActivity(intent);
+            }
+        }
     }
 
     private void createCategory(JSONObject value, LinearLayout container, int offset) throws Exception {

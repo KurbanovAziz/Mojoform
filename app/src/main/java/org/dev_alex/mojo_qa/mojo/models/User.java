@@ -11,6 +11,7 @@ public class User implements Serializable {
     public String token;
     public String refresh_token;
     public String username;
+    public String description;
     public boolean has_avatar;
     public Boolean is_orgowner = null;
     public Boolean is_manager = null;

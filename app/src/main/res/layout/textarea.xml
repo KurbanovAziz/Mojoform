@@ -2,6 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:paddingLeft="10dp"
     android:paddingRight="10dp">
@@ -10,15 +11,30 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal">
-
-        <TextView
-            android:layout_width="0dp"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:layout_weight="1"
-            android:text="Заголовок ввода"
-            android:textColor="#ff4c3d5f"
-            android:textSize="18sp" />
+            android:orientation="horizontal">
+            <TextView
+                android:id="@+id/caption"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_weight="1"
+                android:text="Заголовок ввода"
+                android:textColor="#ff4c3d5f"
+                android:textSize="18sp" />
+        <ImageView
+            android:id="@+id/btScanQr"
+
+            android:layout_width="55dp"
+            android:layout_height="55dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginTop="10.5dp"
+            android:src="@drawable/qr_icon" />
+
+
+        </LinearLayout>
 
         <ImageView
             android:layout_width="15dp"
@@ -28,37 +44,59 @@
             android:src="@drawable/red_star" />
     </LinearLayout>
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
 
-        <EditText
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
+<FrameLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+        <androidx.cardview.widget.CardView
             android:layout_marginTop="10dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:cardCornerRadius="10dp"
             android:layout_weight="1"
-            android:background="@drawable/input_text_background_gray_border"
-            android:inputType="text|textMultiLine"
-            android:minHeight="45dp"
-            android:paddingBottom="8dp"
+            android:layout_marginBottom="15dp"
+            android:paddingBottom="30dp"
+            android:paddingTop="10dp"
             android:paddingLeft="10dp"
             android:paddingRight="10dp"
-            android:paddingTop="8dp" />
-
-        <ImageView
-            android:layout_width="43dp"
-            android:layout_height="43dp"
+            android:layout_marginRight="15dp"
             android:layout_marginLeft="10dp"
-            android:layout_marginTop="10.5dp"
-            android:src="@drawable/qr_code_btn" />
+            app:cardBackgroundColor="#FFFFFF">
 
-        <ImageView
-            android:layout_width="43dp"
-            android:layout_height="43dp"
-            android:layout_marginLeft="10dp"
-            android:layout_marginTop="10.5dp"
-            android:src="@drawable/barcode_btn" />
-    </LinearLayout>
+            <EditText
+                android:id="@+id/value"
+                android:layout_width="match_parent"
+                android:minHeight="130dp"
+                android:layout_marginStart="6dp"
+                android:layout_marginTop="6dp"
+                android:layout_marginBottom="42dp"
+                android:layout_marginEnd="6dp"
+
+                android:background="#FFFFFF"
+                android:imeOptions="actionDone"
+
+                android:inputType="textMultiLine"
+                android:maxLength="3000"
+                android:isScrollContainer="true"
+
+                android:textColor="#433A4D"
+                android:textColorHint="#FFFFFF"
+                android:layout_height="wrap_content"
+                android:hint="@string/your_comment" />
+            <ImageView
+                android:id="@+id/micro1"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:src="@drawable/micro"
+                android:layout_gravity="right|bottom"
+                android:clickable="true"
+                android:layout_marginBottom="5dp"
+                android:layout_marginRight="10dp" />
+        </androidx.cardview.widget.CardView>
+</FrameLayout>
+
+
+
+
 
 </LinearLayout>
