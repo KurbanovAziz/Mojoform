@@ -178,6 +178,8 @@ import okhttp3.ResponseBody;
 import okio.BufferedSink;
 import okio.Okio;
 
+import static android.Manifest.permission.RECORD_AUDIO;
+import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
 import static android.app.Activity.RESULT_OK;
 import static android.content.Context.CLIPBOARD_SERVICE;
 import static org.dev_alex.mojo_qa.mojo.services.Utils.setupCloseKeyboardUI;
@@ -197,6 +199,8 @@ public class TemplateFragment extends Fragment {
     private final int DOCUMENT_REQUEST_CODE = 13;
     private final int IMAGE_SHOW_REQUEST_CODE = 110;
     private final int SCAN_CODE_REQUEST_CODE = 0x0000c0de;
+    public static final int REQUEST_AUDIO_PERMISSION_CODE = 1;
+
 
     private static final String TAG = "MiuiUtils";
 
@@ -206,9 +210,12 @@ public class TemplateFragment extends Fragment {
     public boolean isReportOpenLink = false;
 
     public long taskId;
+    public int xPosition = 0;
+    public int yPosition = 100;
     public long documentId;
 
     private View rootView;
+    public ScrollView scrollView;
     private ProgressDialog loopDialog;
 
     public ArrayList<Page> pages;
@@ -378,65 +385,6 @@ public class TemplateFragment extends Fragment {
         }
     }
 
-    public static void applyMiuiPermission(Context context) {
-        int versionCode = getMiuiVersion();
-        if (versionCode == 5) {
-            goToMiuiPermissionActivity_V5(context);
-        } else if (versionCode == 6) {
-            goToMiuiPermissionActivity_V6(context);
-        } else if (versionCode == 7) {
-            goToMiuiPermissionActivity_V7(context);
-        } else {
-            Log.e(TAG, "this is a special MIUI rom version, its version code " + versionCode);
-        }
-    }
-
-
-    public static int getMiuiVersion() {
-        String version = RomUtils.getSystemProperty("ro.miui.ui.version.name");
-        if (version != null) {
-            try {
-                return Integer.parseInt(version.substring(1));
-            } catch (Exception e) {
-                Log.e(TAG, "get miui version code error, version : " + version);
-            }
-        }
-        return -1;
-    }
-
-    public static void goToMiuiPermissionActivity_V5(Context context) {
-        Intent intent = null;
-        String packageName = context.getPackageName();
-        intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
-        Uri uri = Uri.fromParts("package", packageName, null);
-        intent.setData(uri);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        context.startActivity(intent);
-    }
-
-
-    public static void goToMiuiPermissionActivity_V6(Context context) {
-        Intent intent = new Intent("miui.intent.action.APP_PERM_EDITOR");
-        intent.setClassName("com.miui.securitycenter", "com.miui.permcenter.permissions.AppPermissionsEditorActivity");
-        intent.putExtra("extra_pkgname", context.getPackageName());
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-
-        context.startActivity(intent);
-        Log.e(TAG, "Intent is not available!");
-
-    }
-
-
-    public static void goToMiuiPermissionActivity_V7(Context context) {
-        Intent intent = new Intent("miui.intent.action.APP_PERM_EDITOR");
-        intent.setClassName("com.miui.securitycenter", "com.miui.permcenter.permissions.AppPermissionsEditorActivity");
-        intent.putExtra("extra_pkgname", context.getPackageName());
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-
-        context.startActivity(intent);
-
-    }
-
     @SuppressLint("MissingPermission")
     private void requestLocation() {
         if (checkLocationPermissions()) {
@@ -568,6 +516,8 @@ public class TemplateFragment extends Fragment {
     public void onResume() {
         super.onResume();
         Data.currentTaskId = taskId;
+        scrollView.scrollTo(xPosition, yPosition);
+
     }
 
     @Override
@@ -577,6 +527,7 @@ public class TemplateFragment extends Fragment {
     }
 
     private void setupHeader() {
+        scrollView = rootView.findViewById(R.id.scroll_view);
         ((TextView) getActivity().findViewById(R.id.title)).setText(getString(R.string.tasks));
         getActivity().findViewById(R.id.grid_btn).setVisibility(View.GONE);
         getActivity().findViewById(R.id.sandwich_btn).setVisibility(View.GONE);
@@ -590,8 +541,9 @@ public class TemplateFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 try {
-                    if (rootView.findViewById(R.id.scroll_view).canScrollVertically(-1))
-                        ((ScrollView) rootView.findViewById(R.id.scroll_view)).fullScroll(View.FOCUS_UP);
+                    if (rootView.findViewById(R.id.scroll_view).canScrollVertically(-1)) {
+                       // ((ScrollView) rootView.findViewById(R.id.scroll_view)).fullScroll(View.FOCUS_UP);
+                    }
                     else if (getActivity() != null && getActivity().getSupportFragmentManager() != null) {
                         if (getActivity() instanceof OpenLinkActivity) {
                             getActivity().finish();
@@ -724,6 +676,7 @@ public class TemplateFragment extends Fragment {
                 }
 
             updateArrows();
+
         } catch (Exception exc) {
             Toast.makeText(getContext(), getString(R.string.render_error) + exc.getMessage(), Toast.LENGTH_LONG).show();
             exc.printStackTrace();
@@ -767,9 +720,13 @@ public class TemplateFragment extends Fragment {
             SharedPreferences mSettings;
             mSettings = App.getContext().getSharedPreferences("templates", Context.MODE_PRIVATE);
             SharedPreferences.Editor editor = mSettings.edit();
-
             editor.putString(taskId + LoginHistoryService.getCurrentUser().username, template.toString());
             editor.apply();
+            SharedPreferences position;
+            position = App.getContext().getSharedPreferences("yTemplates", Context.MODE_PRIVATE);
+            SharedPreferences.Editor editor1 = position.edit();
+            editor1.putInt(taskId + LoginHistoryService.getCurrentUser().username, scrollView.getScrollY());
+            editor1.apply();
         } catch (Exception exc) {
             exc.printStackTrace();
         }
@@ -908,21 +865,13 @@ public class TemplateFragment extends Fragment {
 
             switch (fields.get(i)) {
                 case "category":
-
-
                     //container.addView(separator);
                     createCategory(value, container, offset);
-
-
                     break;
 
                 case "question":
                     container.addView(separator);
-
-
                     createSelectBtnContainer(value, container, offset);
-
-
                     break;
 
                 case "lineedit":
@@ -942,8 +891,6 @@ public class TemplateFragment extends Fragment {
                             RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
                     mSpeechRecognizerIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE,
                             Locale.getDefault());
-
-
                     mSpeechRecognizer.setRecognitionListener(new RecognitionListener() {
                         @Override
                         public void onReadyForSpeech(Bundle bundle) {
@@ -982,8 +929,12 @@ public class TemplateFragment extends Fragment {
                                     .getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
 
                             //displaying the first match
-                            if (matches != null)
-                                editText.setText(editText.getText() + " " + matches);
+                            if (matches != null){
+                                String text = "";
+                                for (String str : matches){
+                                    text += str;
+                                }
+                                editText.setText(editText.getText() + ". " + text);}
                         }
 
                         @Override
@@ -996,10 +947,6 @@ public class TemplateFragment extends Fragment {
 
                         }
                     });
-
-
-
-
                     editText.setVisibility((value.has("is_required") && !value.getBoolean("is_required")) ? View.GONE : View.VISIBLE);
 
                     if (value.has("caption"))
@@ -1016,24 +963,13 @@ public class TemplateFragment extends Fragment {
                         microBTN.microBTN = microBTN;
                         microBTN.mSpeechRecognizerIntent = mSpeechRecognizerIntent;
                         microBTN.mSpeechRecognizer = mSpeechRecognizer;
-
-                        microBTN.setOnTouchListener(new View.OnTouchListener() {
+                        microBTN.setOnClickListener(new View.OnClickListener() {
                             @Override
-                            public boolean onTouch(View view, MotionEvent motionEvent) {
-                                switch (motionEvent.getAction()) {
-                                    case MotionEvent.ACTION_UP:
-                                        microBTN.setColorFilter(Color.parseColor("#CECECE"));
-                                        mSpeechRecognizer.stopListening();
-                                        return true;
-                                    case MotionEvent.ACTION_DOWN:
-                                        microBTN.setColorFilter(Color.parseColor("#ff2400"));
-                                        Toast.makeText(getContext(), "Говорите", Toast.LENGTH_SHORT).show();
-                                        mSpeechRecognizer.startListening(mSpeechRecognizerIntent);
-                                        return true;
-                                }
-                                return false;
+                            public void onClick(View v) {
+                                if(!CheckPermissions()) RequestPermissions();
                             }
                         });
+
                         editText.addTextChangedListener(new TextWatcher() {
                             @Override
                             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -1487,6 +1423,23 @@ public class TemplateFragment extends Fragment {
                 container.addView(space);
             } catch (Exception exc) {
                 exc.printStackTrace();
+            }
+        }
+    }
+    public boolean CheckPermissions() {
+        int result = ContextCompat.checkSelfPermission(getContext().getApplicationContext(), WRITE_EXTERNAL_STORAGE);
+        int result1 = ContextCompat.checkSelfPermission(getContext().getApplicationContext(), RECORD_AUDIO);
+        return result == PackageManager.PERMISSION_GRANTED && result1 == PackageManager.PERMISSION_GRANTED;
+    }
+    private void RequestPermissions() {
+        ActivityCompat.requestPermissions(getActivity(), new String[]{RECORD_AUDIO, WRITE_EXTERNAL_STORAGE}, REQUEST_AUDIO_PERMISSION_CODE);
+    }
+    private void checkAudioPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (!(ContextCompat.checkSelfPermission(getContext(), Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED)) {
+                Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+                        Uri.parse("package:" + getContext().getPackageName()));
+                startActivity(intent);
             }
         }
     }
@@ -2431,6 +2384,7 @@ public class TemplateFragment extends Fragment {
                 new String[]{Manifest.permission.RECORD_AUDIO, Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE}, 0);
     }
 
+
     @androidx.annotation.NonNull
     private ViewGroup boxInContainerWithId(ViewGroup content, String tag) {
         int topAndBottomPaddings = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 5, getResources().getDisplayMetrics());
@@ -3129,6 +3083,10 @@ public class TemplateFragment extends Fragment {
                         SharedPreferences mSettings;
                         mSettings = App.getContext().getSharedPreferences("templates", Context.MODE_PRIVATE);
                         templateJson = mSettings.getString(taskId + LoginHistoryService.getCurrentUser().username, "");
+                        SharedPreferences pos;
+                        pos = App.getContext().getSharedPreferences("yTemplates", Context.MODE_PRIVATE);
+                        yPosition = pos.getInt(taskId + LoginHistoryService.getCurrentUser().username, 100);
+                        scrollView.scrollTo(xPosition, yPosition);
                     }
 
                     if (templateJson != null && !templateJson.equals("")) {
@@ -3161,6 +3119,7 @@ public class TemplateFragment extends Fragment {
         protected void onPostExecute(Integer responseCode) {
             super.onPostExecute(responseCode);
             try {
+
                 if (loopDialog != null && loopDialog.isShowing())
                     loopDialog.dismiss();
 
@@ -3172,6 +3131,8 @@ public class TemplateFragment extends Fragment {
                     getActivity().finish();
                 } else if (responseCode == 200) {
                     renderTemplate();
+                    //scrollView.scrollTo(xPosition, yPosition);
+
                 } else {
                     if (isOpenLink) {
                         Toast.makeText(getContext(), "Задача недоступна", Toast.LENGTH_SHORT).show();
@@ -3545,6 +3506,11 @@ public class TemplateFragment extends Fragment {
                         SharedPreferences.Editor editor = mSettings.edit();
                         editor.putString(taskId + LoginHistoryService.getCurrentUser().username, "");
                         editor.apply();
+                        SharedPreferences position;
+                        position = App.getContext().getSharedPreferences("yTemplates", Context.MODE_PRIVATE);
+                        SharedPreferences.Editor editor1 = position.edit();
+                        editor1.putInt(taskId + LoginHistoryService.getCurrentUser().username, 100);
+                        editor1.apply();
                     }
 
                     if (getActivity() != null && getActivity().getSupportFragmentManager().findFragmentByTag("tasks") != null) {
@@ -3588,6 +3554,12 @@ public class TemplateFragment extends Fragment {
         SharedPreferences.Editor editor = mSettings.edit();
         editor.putString(taskId + LoginHistoryService.getCurrentUser().username, "");
         editor.apply();
+        SharedPreferences position;
+        position = App.getContext().getSharedPreferences("yTemplates", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor1 = position.edit();
+        editor1.putInt(taskId + LoginHistoryService.getCurrentUser().username, 100);
+        editor1.apply();
+
     }
 
     @SuppressLint("CheckResult")

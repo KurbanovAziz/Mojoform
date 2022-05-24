@@ -57,10 +57,14 @@ public SpeechRecognizer mSpeechRecognizer;
                 mSpeechRecognizer.startListening(mSpeechRecognizerIntent);
                 return true;
 
+            case MotionEvent.ACTION_CANCEL:
             case MotionEvent.ACTION_UP:
+            case MotionEvent.ACTION_BUTTON_RELEASE:
                 microBTN.setColorFilter(Color.parseColor("#CECECE"));
                 mSpeechRecognizer.stopListening();
                 return true;
+
+
         }
         return false;}
 }

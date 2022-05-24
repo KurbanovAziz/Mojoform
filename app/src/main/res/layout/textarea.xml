@@ -67,6 +67,7 @@
                 android:id="@+id/value"
                 android:layout_width="match_parent"
                 android:minHeight="130dp"
+                android:gravity="left|top"
                 android:layout_marginStart="6dp"
                 android:layout_marginTop="6dp"
                 android:layout_marginBottom="42dp"
