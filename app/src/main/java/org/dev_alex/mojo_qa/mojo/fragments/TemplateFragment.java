@@ -875,18 +875,15 @@ public class TemplateFragment extends Fragment {
                     break;
 
                 case "lineedit":
-
                 case "textarea":
-                    final LinearLayout editTextMultiLineContainer = (LinearLayout) getActivity().getLayoutInflater().inflate(R.layout.textarea, container, false);
+                     LinearLayout editTextMultiLineContainer = (LinearLayout) getActivity().getLayoutInflater().inflate(R.layout.textarea, container, false);
                     TextView textView = editTextMultiLineContainer.findViewById(R.id.caption);
                     EditText editText = editTextMultiLineContainer.findViewById(R.id.value);
                     ImageView scanBTN = editTextMultiLineContainer.findViewById(R.id.btScanQr);
-                    final CustomImageView microBTN = editTextMultiLineContainer.findViewById(R.id.micro1);
-
-                     final SpeechRecognizer mSpeechRecognizer = SpeechRecognizer.createSpeechRecognizer(getContext());
-
-
-                     final Intent mSpeechRecognizerIntent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+                    ImageView redStar = editTextMultiLineContainer.findViewById(R.id.red_star);
+                   final CustomImageView microBTN = editTextMultiLineContainer.findViewById(R.id.micro1);
+                    final   SpeechRecognizer mSpeechRecognizer = SpeechRecognizer.createSpeechRecognizer(getContext());
+                    final   Intent mSpeechRecognizerIntent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
                     mSpeechRecognizerIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,
                             RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
                     mSpeechRecognizerIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE,
@@ -894,7 +891,7 @@ public class TemplateFragment extends Fragment {
                     mSpeechRecognizer.setRecognitionListener(new RecognitionListener() {
                         @Override
                         public void onReadyForSpeech(Bundle bundle) {
-
+                            Toast.makeText(getContext(), "Говорите", Toast.LENGTH_SHORT).show();
                         }
 
                         @Override
@@ -947,8 +944,7 @@ public class TemplateFragment extends Fragment {
 
                         }
                     });
-                    editText.setVisibility((value.has("is_required") && !value.getBoolean("is_required")) ? View.GONE : View.VISIBLE);
-
+                    redStar.setVisibility((value.has("is_required") && !value.getBoolean("is_required")) ? View.GONE : View.VISIBLE);
                     if (value.has("caption"))
                         textView.setText(value.getString("caption"));
                     else
@@ -969,7 +965,6 @@ public class TemplateFragment extends Fragment {
                                 if(!CheckPermissions()) RequestPermissions();
                             }
                         });
-
                         editText.addTextChangedListener(new TextWatcher() {
                             @Override
                             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -992,20 +987,14 @@ public class TemplateFragment extends Fragment {
                                 }
                             }
                         });
-
-
-
                         scanBTN.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
                                 scanQrCode(editText, null);
                             }
                         });
-
-
                     }
                     container.addView(separator);
-
                     container.addView(boxInContainerWithId(editTextMultiLineContainer, value.getString("id")));
 
                     break;

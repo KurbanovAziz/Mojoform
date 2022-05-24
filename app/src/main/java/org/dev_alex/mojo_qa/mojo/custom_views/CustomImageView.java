@@ -53,7 +53,6 @@ public SpeechRecognizer mSpeechRecognizer;
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
                 microBTN.setColorFilter(Color.parseColor("#ff2400"));
-                Toast.makeText(getContext(), "Говорите", Toast.LENGTH_SHORT).show();
                 mSpeechRecognizer.startListening(mSpeechRecognizerIntent);
                 return true;
 
