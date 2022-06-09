@@ -43,6 +43,7 @@ import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
 import androidx.core.util.Pair;
 import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.legacy.widget.Space;
 import androidx.appcompat.widget.PopupMenu;
 
@@ -213,6 +214,9 @@ public class TemplateFragment extends Fragment {
     public int xPosition = 0;
     public int yPosition = 100;
     public long documentId;
+    public static boolean isFromLink = false;
+    public static boolean isReport = false;
+
 
     private View rootView;
     public ScrollView scrollView;
@@ -231,7 +235,7 @@ public class TemplateFragment extends Fragment {
     public Pair<LinearLayout, JSONObject> currentMediaBlock;
     @State
     public String cameraVideoPath;
-    public boolean isTaskFinished;
+    public static boolean isTaskFinished;
     private ProgressDialog progressDialog;
     private Handler handler;
 
@@ -251,6 +255,7 @@ public class TemplateFragment extends Fragment {
         Bundle args = new Bundle();
         args.putLong("task_id", taskId);
         args.putBoolean("is_finished", isTaskFinished);
+        isFromLink = false;
 
         TemplateFragment fragment = new TemplateFragment();
         fragment.setArguments(args);
@@ -262,6 +267,19 @@ public class TemplateFragment extends Fragment {
         args.putString("task_uuid", taskUUID);
         args.putBoolean("is_finished", false);
         args.putBoolean("is_report_open_link", isReportMode);
+
+        TemplateFragment fragment = new TemplateFragment();
+        fragment.setArguments(args);
+        return fragment;
+    }
+
+    public static TemplateFragment newInstance(String taskUUID, boolean isReportMode, boolean fromLink) {
+        Bundle args = new Bundle();
+        args.putString("task_uuid", taskUUID);
+        args.putBoolean("is_finished", false);
+        args.putBoolean("is_report_open_link", isReportMode);
+        isFromLink = fromLink;
+        isReport = isReportMode;
 
         TemplateFragment fragment = new TemplateFragment();
         fragment.setArguments(args);
@@ -298,6 +316,7 @@ public class TemplateFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
         if (rootView == null) {
+            Toast.makeText(getContext(), taskId+"", Toast.LENGTH_LONG).show();
             isoDateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
 
             requiredElementTags = new ArrayList<>();
@@ -523,7 +542,6 @@ public class TemplateFragment extends Fragment {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        saveTemplateState();
     }
 
     private void setupHeader() {
@@ -542,9 +560,8 @@ public class TemplateFragment extends Fragment {
             public void onClick(View v) {
                 try {
                     if (rootView.findViewById(R.id.scroll_view).canScrollVertically(-1)) {
-                       // ((ScrollView) rootView.findViewById(R.id.scroll_view)).fullScroll(View.FOCUS_UP);
-                    }
-                    else if (getActivity() != null && getActivity().getSupportFragmentManager() != null) {
+                        // ((ScrollView) rootView.findViewById(R.id.scroll_view)).fullScroll(View.FOCUS_UP);
+                    } else if (getActivity() != null && getActivity().getSupportFragmentManager() != null) {
                         if (getActivity() instanceof OpenLinkActivity) {
                             getActivity().finish();
                             return;
@@ -583,7 +600,6 @@ public class TemplateFragment extends Fragment {
         rootView.findViewById(R.id.hold_task_btn).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                saveTemplateState();
                 getActivity().getSupportFragmentManager().popBackStack();
             }
         });
@@ -591,6 +607,7 @@ public class TemplateFragment extends Fragment {
         rootView.findViewById(R.id.finish_btn).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Toast.makeText(getContext(), "pp " , Toast.LENGTH_LONG).show();
                 if (userLocation == null) {
                     requestLocation();
                 }
@@ -712,6 +729,7 @@ public class TemplateFragment extends Fragment {
 
     private void saveTemplateState() {
         try {
+
             if (isTaskFinished || isOpenLink)
                 return;
 
@@ -721,12 +739,14 @@ public class TemplateFragment extends Fragment {
             mSettings = App.getContext().getSharedPreferences("templates", Context.MODE_PRIVATE);
             SharedPreferences.Editor editor = mSettings.edit();
             editor.putString(taskId + LoginHistoryService.getCurrentUser().username, template.toString());
+            editor.putString("lastTemplate", String.valueOf(taskId));
             editor.apply();
             SharedPreferences position;
             position = App.getContext().getSharedPreferences("yTemplates", Context.MODE_PRIVATE);
             SharedPreferences.Editor editor1 = position.edit();
             editor1.putInt(taskId + LoginHistoryService.getCurrentUser().username, scrollView.getScrollY());
             editor1.apply();
+
         } catch (Exception exc) {
             exc.printStackTrace();
         }
@@ -876,14 +896,14 @@ public class TemplateFragment extends Fragment {
 
                 case "lineedit":
                 case "textarea":
-                     LinearLayout editTextMultiLineContainer = (LinearLayout) getActivity().getLayoutInflater().inflate(R.layout.textarea, container, false);
+                    LinearLayout editTextMultiLineContainer = (LinearLayout) getActivity().getLayoutInflater().inflate(R.layout.textarea, container, false);
                     TextView textView = editTextMultiLineContainer.findViewById(R.id.caption);
                     EditText editText = editTextMultiLineContainer.findViewById(R.id.value);
                     ImageView scanBTN = editTextMultiLineContainer.findViewById(R.id.btScanQr);
                     ImageView redStar = editTextMultiLineContainer.findViewById(R.id.red_star);
-                   final CustomImageView microBTN = editTextMultiLineContainer.findViewById(R.id.micro1);
-                    final   SpeechRecognizer mSpeechRecognizer = SpeechRecognizer.createSpeechRecognizer(getContext());
-                    final   Intent mSpeechRecognizerIntent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+                    final CustomImageView microBTN = editTextMultiLineContainer.findViewById(R.id.micro1);
+                    final SpeechRecognizer mSpeechRecognizer = SpeechRecognizer.createSpeechRecognizer(getContext());
+                    final Intent mSpeechRecognizerIntent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
                     mSpeechRecognizerIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,
                             RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
                     mSpeechRecognizerIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE,
@@ -926,12 +946,13 @@ public class TemplateFragment extends Fragment {
                                     .getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
 
                             //displaying the first match
-                            if (matches != null){
+                            if (matches != null) {
                                 String text = "";
-                                for (String str : matches){
+                                for (String str : matches) {
                                     text += str;
                                 }
-                                editText.setText(editText.getText() + ". " + text);}
+                                editText.setText(editText.getText() + ". " + text);
+                            }
                         }
 
                         @Override
@@ -962,7 +983,7 @@ public class TemplateFragment extends Fragment {
                         microBTN.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
-                                if(!CheckPermissions()) RequestPermissions();
+                                if (!CheckPermissions()) RequestPermissions();
                             }
                         });
                         editText.addTextChangedListener(new TextWatcher() {
@@ -1415,14 +1436,17 @@ public class TemplateFragment extends Fragment {
             }
         }
     }
+
     public boolean CheckPermissions() {
         int result = ContextCompat.checkSelfPermission(getContext().getApplicationContext(), WRITE_EXTERNAL_STORAGE);
         int result1 = ContextCompat.checkSelfPermission(getContext().getApplicationContext(), RECORD_AUDIO);
         return result == PackageManager.PERMISSION_GRANTED && result1 == PackageManager.PERMISSION_GRANTED;
     }
+
     private void RequestPermissions() {
         ActivityCompat.requestPermissions(getActivity(), new String[]{RECORD_AUDIO, WRITE_EXTERNAL_STORAGE}, REQUEST_AUDIO_PERMISSION_CODE);
     }
+
     private void checkAudioPermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (!(ContextCompat.checkSelfPermission(getContext(), Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED)) {
@@ -1585,6 +1609,7 @@ public class TemplateFragment extends Fragment {
     private void scanBarCode(TextView scanTo, JSONObject scanToObj) {
         scanQrCode(scanTo, scanToObj);
     }
+
     private void checkPermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (!(ContextCompat.checkSelfPermission(getContext(), Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED)) {
@@ -2738,7 +2763,6 @@ public class TemplateFragment extends Fragment {
         media.put("mime", mimeType);
 
         currentMediaBlock.second.getJSONArray(MEDIA_PATH_JSON_ARRAY).put(media);
-        saveTemplateState();
     }
 
     private void deleteMediaPath(JSONObject currentMediaBlock, String mediaPath) {
@@ -2750,7 +2774,6 @@ public class TemplateFragment extends Fragment {
                         tmp.put(currentMediaBlock.getJSONArray(MEDIA_PATH_JSON_ARRAY).getJSONObject(j));
                 currentMediaBlock.put(MEDIA_PATH_JSON_ARRAY, tmp);
             }
-            saveTemplateState();
             new File(mediaPath).delete();
         } catch (Exception exc) {
             exc.printStackTrace();
@@ -3352,7 +3375,6 @@ public class TemplateFragment extends Fragment {
 
             try {
                 if (successfullySentMediaCt < totalSize) {
-                    saveTemplateState();
 
                     Toast.makeText(getContext(), R.string.network_error, Toast.LENGTH_SHORT).show();
                 } else
@@ -3409,7 +3431,6 @@ public class TemplateFragment extends Fragment {
 
                 if (responseCode == null) {
                     Toast.makeText(getContext(), R.string.network_error, Toast.LENGTH_LONG).show();
-                    saveTemplateState();
                     return;
                 } else if (responseCode == 401)
                     Toast.makeText(getContext(), R.string.invalid_username_or_password, Toast.LENGTH_LONG).show();
@@ -3481,7 +3502,6 @@ public class TemplateFragment extends Fragment {
                 if (loopDialog != null && loopDialog.isShowing())
                     loopDialog.dismiss();
 
-                saveTemplateState();
 
                 if (responseCode == null)
                     Toast.makeText(getContext(), R.string.network_error, Toast.LENGTH_LONG).show();
@@ -4231,6 +4251,16 @@ public class TemplateFragment extends Fragment {
     @Override
     public void onStop() {
         super.onStop();
+
+        Toast.makeText(getActivity(), "kk " + isFromLink, Toast.LENGTH_LONG).show();
+        if (isFromLink) {
+            SharedPreferences pos = App.getContext().getSharedPreferences("templates", Context.MODE_PRIVATE);
+            String id = pos.getString("lastTemplate", "");
+            Toast.makeText(getActivity(), "zza " + id, Toast.LENGTH_LONG).show();
+            if (!id.equals("")) {
+                ((MainActivity)getContext()).openTask(id);
+            }
+        }
         saveTemplateState();
     }
 }

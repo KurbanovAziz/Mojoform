@@ -156,12 +156,10 @@ public class AuthActivity extends AppCompatActivity {
                         if(data != null){
 
                             if(data.contains("task") && !data.contains("reports")){
-
                                 String taskId = data.substring(data.lastIndexOf("/") + 1);
                                 Intent intentP = new Intent(AuthActivity.this, MainActivity.class);
                                 intentP.putExtra("task", taskId);
                                 intentP.putExtra("isReport", false);
-
                                 startActivity(intentP);
                                 finish();
                             }

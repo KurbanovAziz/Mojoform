@@ -107,11 +107,18 @@ public class MainActivity extends AppCompatActivity {
             if (taskIdStr != null && !taskIdStr.isEmpty()) {
                 getSupportFragmentManager().beginTransaction()
                         .replace(R.id.container, TemplateFragment.newInstance(
-                                taskIdStr,  getIntent().getBooleanExtra("isReport", true)))
+                                taskIdStr,  getIntent().getBooleanExtra("isReport", true), true))
                         .addToBackStack(null).commit();
             }
             return;
         }
+    }
+    public void openTask(String id) {
+            if (id != null) {
+               getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.container, TemplateFragment.newInstance(Long.parseLong(id), false)).addToBackStack(null).commit();
+            }
+
     }
 
     public void updateNotificationsBadge() {
