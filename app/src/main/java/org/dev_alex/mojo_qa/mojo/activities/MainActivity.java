@@ -15,6 +15,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.PersistableBundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -115,9 +116,65 @@ public class MainActivity extends AppCompatActivity {
     }
     public void openTask(String id) {
             if (id != null) {
-               getSupportFragmentManager().beginTransaction()
+                getSupportFragmentManager().popBackStack(null, 0);
+                getSupportFragmentManager().beginTransaction()
                         .replace(R.id.container, TemplateFragment.newInstance(Long.parseLong(id), false)).addToBackStack(null).commit();
             }
+    }
+    public void openFromLinkInApp(String data) {
+        if(data.contains("task") && !data.contains("reports")){
+            String taskId = data.substring(data.lastIndexOf("/") + 1);
+            getSupportFragmentManager().popBackStack(null, 0);
+
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.container, TemplateFragment.newInstance(
+                            taskId,  false, true))
+                    .addToBackStack(null).commit();
+
+        }
+        else if(data.contains("reports")){
+            String taskId = data.substring(data.lastIndexOf("/") + 1);
+            getSupportFragmentManager().popBackStack(null, 0);
+
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.container, TemplateFragment.newInstance(
+                            taskId,  true, true))
+                    .addToBackStack(null).commit();
+            return;
+        }
+        else {
+            Thread thread = new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    try  {
+                        String attachmentId = data.substring(data.lastIndexOf("/") + 1);
+                        String info = "/api/file/info/"+attachmentId + "?auth_token=" + TokenService.getToken();
+                        Response response = RequestService.createGetRequest(info);
+                        JSONObject tasksJson = new JSONObject(response.body().string());
+
+                        Log.d("aaa", tasksJson.toString());
+                        String type = tasksJson.getString("mimeType");
+                        if(type.equals("video/mp4")){
+                            Intent intentP = new Intent(MainActivity.this, PlayerActivity.class);
+                            intentP.putExtra("video", data);
+                            startActivity(intentP);}
+                        else {
+                            Toast.makeText(MainActivity.this, "Данный тип файла пока не поддерживается приложением", Toast.LENGTH_SHORT).show();
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
+
+            thread.start();
+
+        }
+    }
+
+        public void openURL(Uri url) {
+        startActivity(new Intent(Intent.ACTION_VIEW, url));
+
 
     }
 

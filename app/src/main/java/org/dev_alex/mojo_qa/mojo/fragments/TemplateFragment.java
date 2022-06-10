@@ -4,14 +4,10 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.ProgressDialog;
-import android.content.ClipData;
-import android.content.ClipboardManager;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.content.pm.ResolveInfo;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.Config;
@@ -19,7 +15,6 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.Path;
 import android.graphics.PorterDuff;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
@@ -43,7 +38,6 @@ import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
 import androidx.core.util.Pair;
 import androidx.drawerlayout.widget.DrawerLayout;
-import androidx.fragment.app.FragmentTransaction;
 import androidx.legacy.widget.Space;
 import androidx.appcompat.widget.PopupMenu;
 
@@ -66,6 +60,9 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.CookieManager;
+import android.webkit.WebResourceRequest;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
@@ -123,7 +120,6 @@ import org.dev_alex.mojo_qa.mojo.activities.AuthActivity;
 import org.dev_alex.mojo_qa.mojo.activities.ImageViewActivity;
 import org.dev_alex.mojo_qa.mojo.activities.MainActivity;
 import org.dev_alex.mojo_qa.mojo.activities.OpenLinkActivity;
-import org.dev_alex.mojo_qa.mojo.activities.PlayerActivity;
 import org.dev_alex.mojo_qa.mojo.activities.RecordAudio;
 import org.dev_alex.mojo_qa.mojo.custom_views.CustomImageView;
 import org.dev_alex.mojo_qa.mojo.custom_views.CustomWebview;
@@ -137,7 +133,6 @@ import org.dev_alex.mojo_qa.mojo.services.LoginHistoryService;
 import org.dev_alex.mojo_qa.mojo.services.RequestService;
 import org.dev_alex.mojo_qa.mojo.services.TokenService;
 import org.dev_alex.mojo_qa.mojo.services.Utils;
-import org.dev_alex.mojo_qa.mojo.utils.RomUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -155,6 +150,7 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.TimeZone;
 import java.util.UUID;
 
@@ -182,7 +178,6 @@ import okio.Okio;
 import static android.Manifest.permission.RECORD_AUDIO;
 import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
 import static android.app.Activity.RESULT_OK;
-import static android.content.Context.CLIPBOARD_SERVICE;
 import static org.dev_alex.mojo_qa.mojo.services.Utils.setupCloseKeyboardUI;
 
 public class TemplateFragment extends Fragment {
@@ -214,8 +209,8 @@ public class TemplateFragment extends Fragment {
     public int xPosition = 0;
     public int yPosition = 100;
     public long documentId;
-    public static boolean isFromLink = false;
-    public static boolean isReport = false;
+    public  boolean isFromLink = false;
+    public  boolean isReport = false;
 
 
     private View rootView;
@@ -235,7 +230,7 @@ public class TemplateFragment extends Fragment {
     public Pair<LinearLayout, JSONObject> currentMediaBlock;
     @State
     public String cameraVideoPath;
-    public static boolean isTaskFinished;
+    public boolean isTaskFinished;
     private ProgressDialog progressDialog;
     private Handler handler;
 
@@ -255,10 +250,10 @@ public class TemplateFragment extends Fragment {
         Bundle args = new Bundle();
         args.putLong("task_id", taskId);
         args.putBoolean("is_finished", isTaskFinished);
-        isFromLink = false;
 
         TemplateFragment fragment = new TemplateFragment();
         fragment.setArguments(args);
+        fragment.isFromLink = false;
         return fragment;
     }
 
@@ -278,11 +273,11 @@ public class TemplateFragment extends Fragment {
         args.putString("task_uuid", taskUUID);
         args.putBoolean("is_finished", false);
         args.putBoolean("is_report_open_link", isReportMode);
-        isFromLink = fromLink;
-        isReport = isReportMode;
 
         TemplateFragment fragment = new TemplateFragment();
+        fragment.isFromLink = fromLink;
         fragment.setArguments(args);
+        fragment.isReport = isReportMode;
         return fragment;
     }
 
@@ -1215,6 +1210,28 @@ public class TemplateFragment extends Fragment {
                             CookieManager.getInstance().setAcceptThirdPartyCookies(richEdit, true);
 
                         richEdit.loadDataWithBaseURL("", html, mime, encoding, null);
+                        Toast.makeText(getContext(), "Web!", Toast.LENGTH_LONG).show();
+
+                        richEdit.setWebViewClient(new WebViewClient() {
+
+                            @Override
+                            public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
+                                String link = request.getUrl().toString();
+                                if(link.contains("mojo-qa.dev-alex.org") || link.contains("mojoform.com")){
+                                ((MainActivity) Objects.requireNonNull(getContext())).openFromLinkInApp(request.getUrl().toString());}
+                                else {
+                                    ((MainActivity) Objects.requireNonNull(getContext())).openURL(request.getUrl());
+                                }
+                                return true;
+                            }
+
+                            @Override
+
+                            public void onPageFinished(WebView view, String url) {
+                                scrollView.scrollTo(xPosition, yPosition);
+                            }
+                        });
+
                         container.addView(separator);
 
                         container.addView(richEdit);
@@ -4252,7 +4269,6 @@ public class TemplateFragment extends Fragment {
     public void onStop() {
         super.onStop();
 
-        Toast.makeText(getActivity(), "kk " + isFromLink, Toast.LENGTH_LONG).show();
         if (isFromLink) {
             SharedPreferences pos = App.getContext().getSharedPreferences("templates", Context.MODE_PRIVATE);
             String id = pos.getString("lastTemplate", "");
