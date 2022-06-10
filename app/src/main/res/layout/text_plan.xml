@@ -25,6 +25,7 @@
             android:layout_height="14dp"
             android:layout_gravity="center_vertical"
             android:adjustViewBounds="true"
+            android:visibility="invisible"
             android:src="@drawable/red_star" />
     </LinearLayout>
 
