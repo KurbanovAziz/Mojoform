@@ -311,7 +311,6 @@ public class TemplateFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
         if (rootView == null) {
-            Toast.makeText(getContext(), taskId+"", Toast.LENGTH_LONG).show();
             isoDateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
 
             requiredElementTags = new ArrayList<>();
@@ -602,7 +601,6 @@ public class TemplateFragment extends Fragment {
         rootView.findViewById(R.id.finish_btn).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(getContext(), "pp " , Toast.LENGTH_LONG).show();
                 if (userLocation == null) {
                     requestLocation();
                 }
@@ -1213,7 +1211,6 @@ public class TemplateFragment extends Fragment {
                             CookieManager.getInstance().setAcceptThirdPartyCookies(richEdit, true);
 
                         richEdit.loadDataWithBaseURL("", html, mime, encoding, null);
-                        Toast.makeText(getContext(), "Web!", Toast.LENGTH_LONG).show();
 
                         richEdit.setWebViewClient(new WebViewClient() {
 
@@ -3284,7 +3281,6 @@ public class TemplateFragment extends Fragment {
                                         .onNegative(new MaterialDialog.SingleButtonCallback() {
                                             @Override
                                             public void onClick(@androidx.annotation.NonNull MaterialDialog dialog, @androidx.annotation.NonNull DialogAction which) {
-                                                Toast.makeText(getContext(), "bbb", Toast.LENGTH_LONG).show();
                                                 dialog.dismiss();
                                             }
                                         })
@@ -4275,7 +4271,6 @@ public class TemplateFragment extends Fragment {
         if (isFromLink) {
             SharedPreferences pos = App.getContext().getSharedPreferences("templates", Context.MODE_PRIVATE);
             String id = pos.getString("lastTemplate", "");
-            Toast.makeText(getActivity(), "zza " + id, Toast.LENGTH_LONG).show();
             if (!id.equals("")) {
                 ((MainActivity)getContext()).openTask(id);
             }
