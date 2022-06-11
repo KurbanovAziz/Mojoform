@@ -56,9 +56,9 @@
         <ImageView
             android:id="@+id/btScanQr"
 
-            android:layout_width="50dp"
+            android:layout_width="45dp"
             android:layout_marginRight="20dp"
-            android:layout_height="50dp"
+            android:layout_height="45dp"
             android:layout_gravity="center_vertical"
             android:layout_marginTop="1dp"
             android:src="@drawable/qr_icon" />
@@ -82,16 +82,17 @@
             android:layout_marginBottom="15dp"
             android:paddingBottom="30dp"
             android:paddingTop="10dp"
-            android:paddingLeft="10dp"
-            android:paddingRight="10dp"
-            android:layout_marginRight="15dp"
-            android:layout_marginLeft="10dp"
+
+            android:layout_marginRight="5dp"
+            android:layout_marginLeft="5dp"
             app:cardBackgroundColor="#FFFFFF">
 
             <EditText
                 android:id="@+id/value"
                 android:layout_width="match_parent"
-                android:minHeight="130dp"
+                android:minHeight="55dp"
+
+                android:maxHeight="200dp"
                 android:gravity="left|top"
                 android:layout_marginStart="6dp"
                 android:layout_marginTop="3dp"
@@ -111,14 +112,15 @@
                 android:hint="@string/your_comment" />
             <org.dev_alex.mojo_qa.mojo.custom_views.CustomImageView
                 android:id="@+id/micro1"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
                 android:src="@drawable/micro"
+                android:padding="10dp"
 
                 android:layout_gravity="right|bottom"
                 android:clickable="true"
-                android:layout_marginBottom="5dp"
-                android:layout_marginRight="10dp" />
+                android:layout_marginBottom="-5dp"
+                android:layout_marginRight="0dp" />
         </androidx.cardview.widget.CardView>
 </FrameLayout>
 

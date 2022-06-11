@@ -1024,7 +1024,6 @@ public class TemplateFragment extends Fragment {
                     final EditText etFact = ((EditText) ((ViewGroup) ((ViewGroup) ((ViewGroup) moneyContainer.getChildAt(1)).getChildAt(0)).getChildAt(1)).getChildAt(1));
 
                     final View btQrCode = ((ViewGroup) moneyContainer.getChildAt(1)).getChildAt(1);
-                    final View btBarcode = ((ViewGroup) moneyContainer.getChildAt(1)).getChildAt(2);
 
 
                     final TextView captionLabel = ((TextView) ((ViewGroup) moneyContainer.getChildAt(0)).getChildAt(0));
@@ -1047,7 +1046,6 @@ public class TemplateFragment extends Fragment {
                     if (isTaskFinished) {
                         etPlan.setEnabled(false);
                         etFact.setEnabled(false);
-                        btBarcode.setVisibility(View.GONE);
                         btQrCode.setVisibility(View.GONE);
                     } else {
                         etPlan.addTextChangedListener(new TextWatcher() {
@@ -1107,7 +1105,6 @@ public class TemplateFragment extends Fragment {
                             }
                         }
 
-                        btBarcode.setOnClickListener(view -> scanBarCode(captionLabel, value));
                         btQrCode.setOnClickListener(view -> scanQrCode(captionLabel, value));
                     }
                     container.addView(separator);
@@ -1725,7 +1722,6 @@ public class TemplateFragment extends Fragment {
     private void createSeekBar(final JSONObject value, LinearLayout container) throws Exception {
         final LinearLayout seekBarContainer = (LinearLayout) getActivity().getLayoutInflater().inflate(R.layout.slider, container, false);
         final View qrCodeBtn = ((ViewGroup) seekBarContainer.getChildAt(3)).getChildAt(1);
-        final View barcodeBtn = ((ViewGroup) seekBarContainer.getChildAt(3)).getChildAt(2);
         final TextView captionLabel = ((TextView) seekBarContainer.getChildAt(0));
         final EditText changeValue = (EditText) ((LinearLayout) ((LinearLayout) seekBarContainer.getChildAt(3)).getChildAt(0)).getChildAt(1);
         captionLabel.setText(value.getString("caption"));
@@ -1857,11 +1853,9 @@ public class TemplateFragment extends Fragment {
             seekBar.setEnabled(false);
             changeValue.setEnabled(false);
             qrCodeBtn.setVisibility(View.GONE);
-            barcodeBtn.setVisibility(View.GONE);
         }
 
         qrCodeBtn.setOnClickListener(view -> scanQrCode((TextView) captionLabel, value));
-        barcodeBtn.setOnClickListener(view -> scanBarCode(captionLabel, value));
     }
 
     private void createSignature(final JSONObject value, LinearLayout container) throws Exception {
