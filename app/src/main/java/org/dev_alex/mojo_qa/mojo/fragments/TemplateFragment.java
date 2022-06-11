@@ -1025,9 +1025,7 @@ public class TemplateFragment extends Fragment {
 
                     final View btQrCode = ((ViewGroup) moneyContainer.getChildAt(1)).getChildAt(1);
                     final View btBarcode = ((ViewGroup) moneyContainer.getChildAt(1)).getChildAt(2);
-                    if(value.has("is_required") && !value.getBoolean("is_required")){
-                        setBlockMarkedAsRequired(value.getString("id"));
-                    }
+
 
                     final TextView captionLabel = ((TextView) ((ViewGroup) moneyContainer.getChildAt(0)).getChildAt(0));
 
@@ -4043,7 +4041,7 @@ public class TemplateFragment extends Fragment {
                     break;
 
                 case "money":
-                    if (!value.has("_plan") && !value.has("_fact")) {
+                    if (!value.has("_plan") || !value.has("_fact")) {
                         totalResult = false;
                         setBlockMarkedAsRequired(value.getString("id"));
                     }
