@@ -3,12 +3,16 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/main_activity_background">
-
+    <FrameLayout
+        android:id="@+id/text1"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
     <ScrollView
         android:id="@+id/scroll_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_above="@+id/buttons_block">
+
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -84,6 +88,8 @@
             </FrameLayout>
         </RelativeLayout>
     </ScrollView>
+    </FrameLayout>
+
 
     <LinearLayout
         android:id="@+id/buttons_block"

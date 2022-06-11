@@ -7,6 +7,7 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
@@ -60,6 +61,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.CookieManager;
+import android.webkit.WebChromeClient;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -1177,6 +1179,28 @@ public class TemplateFragment extends Fragment {
 
                     if (value.has("html")) {
                         CustomWebview richEdit = new CustomWebview(getContext());
+                        FrameLayout customViewContainer = rootView.findViewById(R.id.text1);
+                        ScrollView scrollView = rootView.findViewById(R.id.scroll_view);
+
+
+                        richEdit.setWebChromeClient(new WebChromeClient() {
+                            View viewWeb;
+
+                            public void onShowCustomView(View view, WebChromeClient.CustomViewCallback callback) {
+                                super.onShowCustomView(view,callback);
+                                viewWeb = view;
+                                ((MainActivity) getContext()).setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+
+                                customViewContainer.addView(view);
+                            }
+                            public void onHideCustomView () {
+                                super.onHideCustomView();
+                                ((MainActivity) getContext()).setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+
+
+                                customViewContainer.removeView(viewWeb);
+                            }
+                        });
                         LinearLayout.LayoutParams richEditLayoutParams = new LinearLayout.LayoutParams
                                 (ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
 
@@ -4267,6 +4291,7 @@ public class TemplateFragment extends Fragment {
     @Override
     public void onStop() {
         super.onStop();
+        ((MainActivity) getContext()).setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
         if (isFromLink) {
             SharedPreferences pos = App.getContext().getSharedPreferences("templates", Context.MODE_PRIVATE);

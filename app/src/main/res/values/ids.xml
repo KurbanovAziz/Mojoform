@@ -5,9 +5,7 @@
     <item name="back_card" type="id"/>
     <item name="text1" type="id"/>
     <item name="point1" type="id"/>
-
-
-
+    <item name="for_web_container" type="id" />
 
 
 </resources>
