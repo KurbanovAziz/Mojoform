@@ -165,6 +165,7 @@ import io.reactivex.annotations.NonNull;
 import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
+import lecho.lib.hellocharts.model.Line;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.FormBody;
@@ -1176,6 +1177,11 @@ public class TemplateFragment extends Fragment {
                         CustomWebview richEdit = new CustomWebview(getContext());
                         FrameLayout customViewContainer = rootView.findViewById(R.id.text1);
                         ScrollView scrollView = rootView.findViewById(R.id.scroll_view);
+                        LinearLayout buttonsBlock = rootView.findViewById(R.id.main_buttons_block);
+                        RelativeLayout pageTitleBlock = rootView.findViewById(R.id.page_title_block);
+                        LinearLayout mainLayoutHead1 = getActivity().findViewById(R.id.main_menu_buttons_block);
+                        ImageView mainLayoutHead2 = getActivity().findViewById(R.id.header_background);
+
 
 
                         richEdit.setWebChromeClient(new WebChromeClient() {
@@ -1185,6 +1191,10 @@ public class TemplateFragment extends Fragment {
                                 super.onShowCustomView(view,callback);
                                 viewWeb = view;
                                 ((MainActivity) getContext()).setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+                                buttonsBlock.setVisibility(View.GONE);
+                                pageTitleBlock.setVisibility(View.GONE);
+                                mainLayoutHead1.setVisibility(View.GONE);
+                                mainLayoutHead2.setVisibility(View.GONE);
 
                                 customViewContainer.addView(view);
                             }
@@ -1192,7 +1202,10 @@ public class TemplateFragment extends Fragment {
                                 super.onHideCustomView();
                                 ((MainActivity) getContext()).setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
-
+                                buttonsBlock.setVisibility(View.VISIBLE);
+                                pageTitleBlock.setVisibility(View.VISIBLE);
+                                mainLayoutHead1.setVisibility(View.VISIBLE);
+                                mainLayoutHead2.setVisibility(View.VISIBLE);
                                 customViewContainer.removeView(viewWeb);
                             }
                         });

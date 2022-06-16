@@ -85,7 +85,7 @@
     <string name="no_data">Нет данных</string>
     <string name="skip">Пропустить</string>
     <string name="hi_">Привет!</string>
-    <string name="thanks_for_download">Спасибо, что скачал меня.\nНачнём?</string>
+    <string name="thanks_for_download">Спасибо, что скачали меня.\nНачнём?</string>
     <string name="swipe_to_continue">Смахни экран, чтобы узнать больше</string>
 
     <string name="onboarding_2_title">Ты можешь исполнять\nзадачи. Для этого они\nдолжны быть назначены\nтебе на платформе.</string>
