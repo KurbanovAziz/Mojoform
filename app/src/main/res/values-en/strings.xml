@@ -241,6 +241,16 @@
     <string name="search_period">Select Period</string>
     <string name="to_organization">By Organization</string>
     <string name="results_of_work">Results of execution</string>
+    <string name="first_page1">The application helps employees perform their organization\'s tasks more efficiently.</string>
+    <string name="first_page2">Smack the screen and learn more</string>
+    <string name="second_page2">When the tasks are completed, the data will automatically go to the analytics section and update personal, group or general indicators</string>
+    <string name="second_page3">The results of the completed tasks will be included in the production logs with reference to the report for each individual execution</string>
+    <string name="second_page4">Application users perform tasks on regulations from the management system of their organization</string>
+    <string name="further">Next</string>
+    <string name="three_page1">Periodic and one-time tasks, they have deadlines for completion\nPermanent and link tasks are performed according to the situation\n\nThe tasks consist of:\nBlocks with information\nCheck boxes for marks\nQuestions with choice of answers\nAdd photos, videos, and files\nData Installation Sliders\nMake Comments Fields\nPlan and Fact Entry Windows\n\nIf necessary, the task can be postponed and completed later</string>
+    <string name="four_page1">Under Documents, read, view, and listen to available content/n/nThe Notifications section receives reports on the results of completed tasks and signals of violation of deadlines/n/nThe Results section shows Indicators with data dynamics for the day, week, month and year, they can be commented on and analyzed reports/n/nUnder Task Manager, you can edit and assign new tasks to employees/n/n
+    </string>
+    <string name="start">Start</string>
 
     <string-array name="day_names">
         <item>Su</item>

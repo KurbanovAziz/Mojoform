@@ -7,19 +7,29 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:scaleType="fitXY"
-        android:src="@drawable/onboarding_page_2" />
-
+        android:src="@drawable/onboarding_page_3" />
+    <ImageView
+        android:id="@+id/logo"
+        android:layout_width="70dp"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="50dp"
+        android:adjustViewBounds="true"
+        android:src="@drawable/logo_notification" />
     <TextView
         android:id="@+id/title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="55dp"
+        android:layout_below="@+id/logo"
+        android:layout_marginTop="25dp"
         android:gravity="center_horizontal"
-        android:text="@string/onboarding_2_title"
+        android:text="@string/second_page2"
         android:textAlignment="center"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
         android:textColor="@android:color/white"
-        android:textSize="18.5sp" />
+        android:textSize="18sp" />
 
     <TextView
         android:id="@+id/sub_title"
@@ -30,10 +40,12 @@
         android:layout_marginTop="22dp"
         android:gravity="center_horizontal"
         android:lineSpacingExtra="15dp"
-        android:text="@string/onboarding_2_subtitle"
+        android:layout_marginStart="25dp"
+        android:layout_marginEnd="25dp"
+        android:text="@string/second_page3"
         android:textAlignment="center"
         android:textColor="@android:color/white"
-        android:textSize="16sp" />
+        android:textSize="18sp" />
 
     <TextView
         android:id="@+id/main_part"
@@ -44,22 +56,23 @@
         android:layout_marginTop="18dp"
         android:gravity="center_horizontal"
         android:lineSpacingExtra="20dp"
-        android:text="@string/onboarding_2_main_part"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        android:text="@string/second_page4"
         android:textAlignment="center"
         android:textColor="@android:color/white"
-        android:textSize="15sp" />
+        android:textSize="18sp" />
 
     <TextView
-        android:id="@+id/bottom_part"
+        android:id="@+id/skip"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/main_part"
+        android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="30dp"
-        android:gravity="center_horizontal"
-        android:text="@string/onboarding_2_finish"
-        android:textAlignment="center"
+        android:layout_marginBottom="90dp"
+        android:padding="8dp"
+        android:text="@string/further"
         android:textColor="@android:color/white"
-        android:textSize="15sp" />
+        android:textSize="20sp" />
 
 </RelativeLayout>

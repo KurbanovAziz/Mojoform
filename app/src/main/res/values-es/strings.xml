@@ -242,6 +242,15 @@
     <string name="search_period">Seleccionar periodo</string>
     <string name="to_organization">Por organización</string>
     <string name="results_of_work">Resultados de ejecución</string>
+    <string name="first_page1">La aplicación ayuda a los empleados a cumplir con más eficacia las tareas de la organización.</string>
+    <string name="first_page2">Golpear la pantalla y aprender más</string>
+    <string name="second_page2">Cuando finalice las tareas, los datos entrarán automáticamente en la sección de análisis y actualizarán los indicadores personales, de grupo o generales</string>
+    <string name="second_page3">Los resultados de las tareas completadas entrarán en los registros de producción con referencia al informe de cada ejecución</string>
+    <string name="second_page4">Los usuarios de la aplicación realizan tareas de reglamentación desde el sistema de gestión de su organización</string>
+    <string name="further">Siguiente</string>
+    <string name="three_page1">Tareas periódicas y ocasionales que tienen un plazo de ejecución\nLas tareas permanentes y enlazadas se realizan por situación\n\nLas tareas consisten en:\nBloques de información\nCheque box para marcas\nPreguntas de respuesta\nAgregar fotos, vídeos y archivos\nDiapositivas de instalación de datos\nCampos de comentario\nVentanas de entrada de plan y hecho\n\nSi es necesario, se puede aplazar y completar la tarea más adelante.</string>
+    <string name="four_page1">En Documentos, lea, consulte y escuche el material disponible\n\nEn la sección Notificaciones se presentan informes sobre los resultados de las tareas terminadas y señales de incumplimiento de plazos\n\nEn la sección Resultados se muestran Indicadores con datos dinámicos de día, semana, mes y año, que pueden ser comentados y analizados\n\nEn Administración de tareas, puede editar y asignar nuevas tareas a los empleados\n\n</string>
+    <string name="start">Comenzar</string>
 
     <string-array name="day_names">
         <item>Do</item>

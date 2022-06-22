@@ -42,10 +42,6 @@ public class OnboardingPageFragment extends Fragment {
         switch (pageNumber) {
             case 0:
                 rootView = inflater.inflate(R.layout.fragment_onboarding_first_page, container, false);
-                ((TextView) rootView.findViewById(R.id.hi)).setTypeface(tfBold);
-                ((TextView) rootView.findViewById(R.id.main)).setTypeface(tfMedium);
-                ((TextView) rootView.findViewById(R.id.swipe)).setTypeface(tfMedium);
-                ((TextView) rootView.findViewById(R.id.skip)).setTypeface(tfMedium);
 
                 rootView.findViewById(R.id.skip).setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -57,25 +53,17 @@ public class OnboardingPageFragment extends Fragment {
 
             case 1:
                 rootView = inflater.inflate(R.layout.fragment_onboarding_second_page, container, false);
-                ((TextView) rootView.findViewById(R.id.title)).setTypeface(tfBold);
-                ((TextView) rootView.findViewById(R.id.sub_title)).setTypeface(tfMedium);
-                ((TextView) rootView.findViewById(R.id.main_part)).setTypeface(tfThin);
-                ((TextView) rootView.findViewById(R.id.bottom_part)).setTypeface(tfMedium);
                 break;
 
             case 2:
                 rootView = inflater.inflate(R.layout.fragment_onboarding_three_page, container, false);
-                ((TextView) rootView.findViewById(R.id.title)).setTypeface(tfBold);
-                ((TextView) rootView.findViewById(R.id.main_part)).setTypeface(tfMedium);
+
                 break;
 
             case 3:
                 rootView = inflater.inflate(R.layout.fragment_onboarding_four_page, container, false);
-                ((TextView) rootView.findViewById(R.id.title)).setTypeface(tfBold);
-                ((TextView) rootView.findViewById(R.id.main_part)).setTypeface(tfMedium);
-                ((TextView) rootView.findViewById(R.id.finish)).setTypeface(tfBold);
 
-                rootView.findViewById(R.id.finish).setOnClickListener(new View.OnClickListener() {
+                rootView.findViewById(R.id.start).setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         EventBus.getDefault().post(new OnboardingFinishedEvent());
