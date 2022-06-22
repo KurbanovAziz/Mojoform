@@ -256,7 +256,7 @@ public class MainActivity extends AppCompatActivity {
         User currentUser = LoginHistoryService.getCurrentUser();
 
         if (TextUtils.isEmpty(currentUser.firstName) && TextUtils.isEmpty(currentUser.lastName)){
-            ((TextView) headerView.findViewById(R.id.user_name)).setText(currentUser.username);
+            ((TextView) headerView.findViewById(R.id.user_name)).setText(currentUser.username.replace(" ", "\n"));
             ((TextView) headerView.findViewById(R.id.position)).setText(currentUser.description);
 
         }
