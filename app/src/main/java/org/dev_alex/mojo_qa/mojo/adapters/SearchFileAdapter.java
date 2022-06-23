@@ -2,7 +2,7 @@ package org.dev_alex.mojo_qa.mojo.adapters;
 
 
 import android.content.res.Resources;
-import android.graphics.Bitmap;
+
 import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -78,7 +78,7 @@ public class SearchFileAdapter extends RecyclerView.Adapter<SearchFileAdapter.Fi
                     viewHolder.fileIcon.setImageResource(R.drawable.icon_analytics);
                     break;
                 default:
-                    viewHolder.fileIcon.setImageResource(R.drawable.icon_mojo_file);
+                    viewHolder.fileIcon.setImageResource(R.drawable.icon_mojo_file2);
                     break;
             }
 

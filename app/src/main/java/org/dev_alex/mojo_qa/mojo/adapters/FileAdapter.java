@@ -22,13 +22,10 @@ import android.widget.Toast;
 
 import org.dev_alex.mojo_qa.mojo.R;
 import org.dev_alex.mojo_qa.mojo.fragments.DocumentsFragment;
-import org.dev_alex.mojo_qa.mojo.models.Content;
 import org.dev_alex.mojo_qa.mojo.models.File;
-import org.dev_alex.mojo_qa.mojo.models.Indicator;
 import org.dev_alex.mojo_qa.mojo.services.LoginHistoryService;
 import org.dev_alex.mojo_qa.mojo.services.RequestService;
 import org.dev_alex.mojo_qa.mojo.services.Utils;
-import org.json.JSONException;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -167,7 +164,7 @@ public class FileAdapter extends RecyclerView.Adapter<FileAdapter.FileViewHolder
                 viewHolder.fileIcon.setImageResource(R.drawable.icon_analytics);
                 break;
             default:
-                viewHolder.fileIcon.setImageResource(R.drawable.icon_mojo_file);
+                viewHolder.fileIcon.setImageResource(R.drawable.icon_mojo_file2);
                 break;
         }
 
