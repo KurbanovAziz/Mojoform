@@ -21,7 +21,6 @@ import java.util.ArrayList;
 public class SearchFileAdapter extends RecyclerView.Adapter<SearchFileAdapter.FileViewHolder> {
     private SearchFragment parentFragment;
     private ArrayList<File> files;
-
     static class FileViewHolder extends RecyclerView.ViewHolder {
         TextView fileName;
         ImageView fileIcon;
