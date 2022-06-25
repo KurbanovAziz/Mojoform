@@ -117,10 +117,17 @@ public class MainActivity extends AppCompatActivity {
     public void openTask(String id) {
             if (id != null) {
                 getSupportFragmentManager().popBackStack(null, 0);
+                try {
+                    Long.parseLong(id);
+                    getSupportFragmentManager().beginTransaction()
+                            .replace(R.id.container, TemplateFragment.newInstance(Long.parseLong(id), false)).addToBackStack(null).commit();
+                }
+                catch (Exception e){
                 getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.container, TemplateFragment.newInstance(Long.parseLong(id), false)).addToBackStack(null).commit();
+                        .replace(R.id.container, TemplateFragment.newInstance(id, true, true)).addToBackStack(null).commit();} //разобраться  с fromlink
             }
     }
+
     public void openFromLinkInApp(String data) {
         if(data.contains("task") && !data.contains("reports")){
             String taskId = data.substring(data.lastIndexOf("/") + 1);

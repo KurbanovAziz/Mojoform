@@ -105,6 +105,7 @@ import com.github.mikephil.charting.utils.Transformer;
 import com.github.mikephil.charting.utils.ViewPortHandler;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
+import com.google.firebase.crashlytics.buildtools.reloc.org.apache.commons.logging.LogFactory;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 import com.journeyapps.barcodescanner.CaptureActivity;
@@ -142,8 +143,13 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.net.HttpURLConnection;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -212,8 +218,8 @@ public class TemplateFragment extends Fragment {
     public int xPosition = 0;
     public int yPosition = 100;
     public long documentId;
-    public  boolean isFromLink = false;
-    public  boolean isReport = false;
+    public boolean isFromLink = false;
+    public boolean isReport = false;
 
 
     private View rootView;
@@ -236,6 +242,7 @@ public class TemplateFragment extends Fragment {
     public boolean isTaskFinished;
     private ProgressDialog progressDialog;
     private Handler handler;
+    private boolean isNextTemlpateURL = false;
 
     View separator;
 
@@ -253,6 +260,7 @@ public class TemplateFragment extends Fragment {
         Bundle args = new Bundle();
         args.putLong("task_id", taskId);
         args.putBoolean("is_finished", isTaskFinished);
+
 
         TemplateFragment fragment = new TemplateFragment();
         fragment.setArguments(args);
@@ -735,7 +743,6 @@ public class TemplateFragment extends Fragment {
             mSettings = App.getContext().getSharedPreferences("templates", Context.MODE_PRIVATE);
             SharedPreferences.Editor editor = mSettings.edit();
             editor.putString(taskId + LoginHistoryService.getCurrentUser().username, template.toString());
-            editor.putString("lastTemplate", String.valueOf(taskId));
             editor.apply();
             SharedPreferences position;
             position = App.getContext().getSharedPreferences("yTemplates", Context.MODE_PRIVATE);
@@ -746,6 +753,85 @@ public class TemplateFragment extends Fragment {
         } catch (Exception exc) {
             exc.printStackTrace();
         }
+    }
+    private void saveTemplateOfLast() {
+        try {
+
+            if (isTaskFinished )
+                return;
+
+            SharedPreferences mSettings;
+            mSettings = App.getContext().getSharedPreferences("templates", Context.MODE_PRIVATE);
+            SharedPreferences.Editor editor = mSettings.edit();
+            ArrayList<String> lastTemplates;
+            lastTemplates = (ArrayList<String>) ObjectSerializer.deserialize(mSettings.getString("lastTemplate", ObjectSerializer.serialize(new ArrayList<String>())));
+            if (lastTemplates == null) lastTemplates = new ArrayList<>();
+            if(taskId == 0){
+                lastTemplates.add(taskUUID);
+
+            }
+            else {
+            lastTemplates.add(String.valueOf(taskId));}
+            editor.putString("lastTemplate", ObjectSerializer.serialize(lastTemplates));
+            editor.apply();
+
+
+        } catch (Exception exc) {
+            exc.printStackTrace();
+        }
+    }
+
+    public static class ObjectSerializer {
+
+
+        public static String serialize(Serializable obj) throws IOException {
+            if (obj == null) return "";
+            try {
+                ByteArrayOutputStream serialObj = new ByteArrayOutputStream();
+                ObjectOutputStream objStream = new ObjectOutputStream(serialObj);
+                objStream.writeObject(obj);
+                objStream.close();
+                return encodeBytes(serialObj.toByteArray());
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+
+        public static Object deserialize(String str) throws IOException {
+            if (str == null || str.length() == 0) return null;
+            try {
+                ByteArrayInputStream serialObj = new ByteArrayInputStream(decodeBytes(str));
+                ObjectInputStream objStream = new ObjectInputStream(serialObj);
+                return objStream.readObject();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+
+        public static String encodeBytes(byte[] bytes) {
+            StringBuffer strBuf = new StringBuffer();
+
+            for (int i = 0; i < bytes.length; i++) {
+                strBuf.append((char) (((bytes[i] >> 4) & 0xF) + ((int) 'a')));
+                strBuf.append((char) (((bytes[i]) & 0xF) + ((int) 'a')));
+            }
+
+            return strBuf.toString();
+        }
+
+        public static byte[] decodeBytes(String str) {
+            byte[] bytes = new byte[str.length() / 2];
+            for (int i = 0; i < str.length(); i += 2) {
+                char c = str.charAt(i);
+                bytes[i / 2] = (byte) ((c - 'a') << 4);
+                c = str.charAt(i + 1);
+                bytes[i / 2] += (c - 'a');
+            }
+            return bytes;
+        }
+
     }
 
     private void renderTemplate() {
@@ -1183,12 +1269,11 @@ public class TemplateFragment extends Fragment {
                         ImageView mainLayoutHead2 = getActivity().findViewById(R.id.header_background);
 
 
-
                         richEdit.setWebChromeClient(new WebChromeClient() {
                             View viewWeb;
 
                             public void onShowCustomView(View view, WebChromeClient.CustomViewCallback callback) {
-                                super.onShowCustomView(view,callback);
+                                super.onShowCustomView(view, callback);
                                 viewWeb = view;
                                 ((MainActivity) getContext()).setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
                                 buttonsBlock.setVisibility(View.GONE);
@@ -1198,7 +1283,8 @@ public class TemplateFragment extends Fragment {
 
                                 customViewContainer.addView(view);
                             }
-                            public void onHideCustomView () {
+
+                            public void onHideCustomView() {
                                 super.onHideCustomView();
                                 ((MainActivity) getContext()).setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
@@ -1249,9 +1335,10 @@ public class TemplateFragment extends Fragment {
                             @Override
                             public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
                                 String link = request.getUrl().toString();
-                                if(link.contains("mojo-qa.dev-alex.org") || link.contains("mojoform.com")){
-                                ((MainActivity) Objects.requireNonNull(getContext())).openFromLinkInApp(request.getUrl().toString());}
-                                else {
+                                if (link.contains("mojo-qa.dev-alex.org") || link.contains("mojoform.com")) {
+                                    isNextTemlpateURL = true;
+                                    ((MainActivity) Objects.requireNonNull(getContext())).openFromLinkInApp(request.getUrl().toString());
+                                } else {
                                     ((MainActivity) Objects.requireNonNull(getContext())).openURL(request.getUrl());
                                 }
                                 return true;
@@ -4298,13 +4385,28 @@ public class TemplateFragment extends Fragment {
         super.onStop();
         ((MainActivity) getContext()).setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
+        if(isNextTemlpateURL){
+    saveTemplateOfLast();
+
+}
+else {
         if (isFromLink) {
             SharedPreferences pos = App.getContext().getSharedPreferences("templates", Context.MODE_PRIVATE);
-            String id = pos.getString("lastTemplate", "");
-            if (!id.equals("")) {
-                ((MainActivity)getContext()).openTask(id);
+            ArrayList<String> list = null;
+            try {
+                list = (ArrayList<String>) ObjectSerializer.deserialize(pos.getString("lastTemplate", ObjectSerializer.serialize(new ArrayList<String>())));
+                if (list != null && !(list.size()== 0)) {
+                    ((MainActivity) getContext()).openTask(list.get(list.size() - 1));
+                    list.remove(list.get(list.size()-1));
+                }
+                SharedPreferences.Editor editor = pos.edit();
+                editor.putString("lastTemplate", ObjectSerializer.serialize(list));
+                editor.apply();
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-        }
-        saveTemplateState();
+
+        }}
+ saveTemplateState();
     }
 }
