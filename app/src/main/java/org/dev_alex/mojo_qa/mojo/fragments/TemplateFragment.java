@@ -243,6 +243,7 @@ public class TemplateFragment extends Fragment {
     private ProgressDialog progressDialog;
     private Handler handler;
     private boolean isNextTemlpateURL = false;
+    private boolean isNextStartActivityForResult = false;
 
     View separator;
 
@@ -645,11 +646,15 @@ public class TemplateFragment extends Fragment {
                 .autoDismiss(true)
                 .positiveText(R.string.camera)
                 .negativeText(R.string.gallery)
-                .onPositive((dialog, which) -> CustomCamera2Activity.startForResult(TemplateFragment.this, PHOTO_REQUEST_CODE))
+                .onPositive((dialog, which) -> {
+                        CustomCamera2Activity.startForResult(TemplateFragment.this, PHOTO_REQUEST_CODE);                    isNextStartActivityForResult = true;
+                    isNextStartActivityForResult = true;
+                })
                 .onNegative((dialog, which) -> {
                     Intent intent = new Intent(getContext(), AlbumSelectActivity.class);
                     intent.putExtra(Constants.INTENT_EXTRA_LIMIT, 10);
                     startActivityForResult(intent, Constants.REQUEST_CODE);
+                    isNextStartActivityForResult = true;
                 })
                 .build()
                 .show();
@@ -1728,6 +1733,8 @@ public class TemplateFragment extends Fragment {
                 @Override
                 protected void startActivityForResult(Intent intent, int code) {
                     TemplateFragment.this.startActivityForResult(intent, SCAN_CODE_REQUEST_CODE); // REQUEST_CODE override
+                    isNextStartActivityForResult = true;
+
                 }
             };
 
@@ -2089,6 +2096,7 @@ public class TemplateFragment extends Fragment {
                         try {
                             currentMediaBlock = new Pair<>(mediaLayout, value);
                             showGalleryOrPhotoPickDialog();
+
                             /*
                             Pair<Intent, File> intentFilePair = BitmapService.getPickImageIntent(getContext());
                             cameraImagePath = intentFilePair.second.getAbsolutePath();
@@ -2111,6 +2119,8 @@ public class TemplateFragment extends Fragment {
                             Pair<Intent, File> intentFilePair = BitmapService.getPickVideoIntent(getContext());
                             cameraVideoPath = intentFilePair.second.getAbsolutePath();
                             startActivityForResult(intentFilePair.first, VIDEO_REQUEST_CODE);
+                            isNextStartActivityForResult = true;
+
                         } catch (Exception exc) {
                             Toast.makeText(getContext(), R.string.no_camera, Toast.LENGTH_SHORT).show();
                         }
@@ -2132,6 +2142,8 @@ public class TemplateFragment extends Fragment {
                             //startActivityForResult(intent, AUDIO_REQUEST_CODE);
                             Intent intent1 = new Intent(getContext(), RecordAudio.class);
                             startActivityForResult(intent1, AUDIO_REQUEST_CODE);
+                            isNextStartActivityForResult = true;
+
 
                         } catch (Exception exc) {
                             exc.printStackTrace();
@@ -2171,6 +2183,8 @@ public class TemplateFragment extends Fragment {
                                 chooserIntent = Intent.createChooser(intent, getString(R.string.to_select_file));
 
                             startActivityForResult(chooserIntent, DOCUMENT_REQUEST_CODE);
+                            isNextStartActivityForResult = true;
+
 
                         } catch (Exception exc) {
                             Toast.makeText(getContext(), R.string.no_file_manager, Toast.LENGTH_SHORT).show();
@@ -2635,6 +2649,7 @@ public class TemplateFragment extends Fragment {
 
                     showPhotoIntent.putExtra("images", imageSrc.toString());
                     startActivityForResult(showPhotoIntent, IMAGE_SHOW_REQUEST_CODE);
+                    isNextStartActivityForResult = true;
                     currentMediaBlock = new Pair<>(currentLayout, currentValue);
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -4396,6 +4411,7 @@ public class TemplateFragment extends Fragment {
 
 }
 else {
+    if (!isNextStartActivityForResult){
         if (isFromLink) {
             SharedPreferences pos = App.getContext().getSharedPreferences("templates", Context.MODE_PRIVATE);
             ArrayList<String> list = null;
@@ -4413,6 +4429,7 @@ else {
             }
 
         }}
+else isNextStartActivityForResult = false;}
  saveTemplateState();
     }
 }

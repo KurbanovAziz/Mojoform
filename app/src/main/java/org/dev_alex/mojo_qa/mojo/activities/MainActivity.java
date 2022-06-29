@@ -114,9 +114,10 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
     }
+
     public void openTask(String id) {
             if (id != null) {
-                getSupportFragmentManager().popBackStack(null, 0);
+                  getSupportFragmentManager().popBackStack(null, 0);
                 try {
                     Long.parseLong(id);
                     getSupportFragmentManager().beginTransaction()
