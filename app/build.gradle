@@ -16,8 +16,8 @@ android {
         multiDexEnabled true
 
 
-        versionCode 77
-        versionName "2.0.7"
+        versionCode 78
+        versionName "2.0.8"
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
     }
     buildTypes {
