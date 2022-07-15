@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
+import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
@@ -78,6 +79,7 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.afollestad.materialdialogs.BuildConfig;
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.GravityEnum;
 import com.afollestad.materialdialogs.MaterialDialog;
@@ -115,7 +117,6 @@ import net.cachapa.expandablelayout.ExpandableLayout;
 import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent;
 
 import org.dev_alex.mojo_qa.mojo.App;
-import org.dev_alex.mojo_qa.mojo.BuildConfig;
 import org.dev_alex.mojo_qa.mojo.Data;
 import org.dev_alex.mojo_qa.mojo.R;
 import org.dev_alex.mojo_qa.mojo.activities.AuthActivity;
@@ -3619,7 +3620,13 @@ public class TemplateFragment extends Fragment {
 
                 TimeZone timeZone = TimeZone.getDefault();
                 resultJson.put("timezone", timeZone.getID());
-                resultJson.put("client_id", "android v." + Build.VERSION.CODENAME + " app v. " + BuildConfig.VERSION_NAME);
+                try {
+                    PackageInfo pInfo = getContext().getPackageManager().getPackageInfo(getContext().getPackageName(), 0);
+                    String version = pInfo.versionName;
+                    resultJson.put("client_id", "android v." + Build.VERSION.CODENAME + " app v. " + version);
+                } catch (PackageManager.NameNotFoundException e) {
+                    e.printStackTrace();
+                }
 
                 Log.d("mojo-log", "result template: " + resultJson.toString());
             } catch (Exception exc) {

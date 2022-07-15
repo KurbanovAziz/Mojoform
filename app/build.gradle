@@ -134,7 +134,6 @@ dependencies {
 
 
     // Firebase
-    implementation 'com.google.android.gms:play-services-base:11.8.0'
     implementation 'com.google.android.gms:play-services-gcm:11.8.0'
     implementation 'com.google.android.gms:play-services-location:11.8.0'
     implementation 'com.google.firebase:firebase-messaging:11.8.0'
