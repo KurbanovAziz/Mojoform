@@ -220,7 +220,6 @@ public class TemplateFragment extends Fragment {
     public boolean isFromLink = false;
     public boolean isReport = false;
 
-
     private View rootView;
     public ScrollView scrollView;
     private ProgressDialog loopDialog;
@@ -239,6 +238,7 @@ public class TemplateFragment extends Fragment {
     @State
     public String cameraVideoPath;
     public boolean isTaskFinished;
+    public boolean isTaskStop = false;
     private ProgressDialog progressDialog;
     private Handler handler;
     private boolean isNextTemlpateURL = false;
@@ -733,9 +733,10 @@ public class TemplateFragment extends Fragment {
     private void saveTemplateState() {
         try {
 
-            if (isTaskFinished || isOpenLink)
+            if (isTaskFinished || isTaskStop)
                 return;
 
+            if (!isOpenLink){
             if (!template.has("StartTime"))
                 template.put("StartTime", isoDateFormat.format(new Date()));
             SharedPreferences mSettings;
@@ -747,7 +748,21 @@ public class TemplateFragment extends Fragment {
             position = App.getContext().getSharedPreferences("yTemplates", Context.MODE_PRIVATE);
             SharedPreferences.Editor editor1 = position.edit();
             editor1.putInt(taskId + LoginHistoryService.getCurrentUser().username, scrollView.getScrollY());
-            editor1.apply();
+            editor1.apply();}
+            else {
+                if (!template.has("StartTime"))
+                    template.put("StartTime", isoDateFormat.format(new Date()));
+                SharedPreferences mSettings;
+                mSettings = App.getContext().getSharedPreferences("templates", Context.MODE_PRIVATE);
+                SharedPreferences.Editor editor = mSettings.edit();
+                editor.putString(taskUUID + LoginHistoryService.getCurrentUser().username, template.toString());
+                editor.apply();
+                SharedPreferences position;
+                position = App.getContext().getSharedPreferences("yTemplates", Context.MODE_PRIVATE);
+                SharedPreferences.Editor editor1 = position.edit();
+                editor1.putInt(taskUUID + LoginHistoryService.getCurrentUser().username, scrollView.getScrollY());
+                editor1.apply();
+            }
 
         } catch (Exception exc) {
             exc.printStackTrace();
@@ -3232,6 +3247,15 @@ public class TemplateFragment extends Fragment {
                         yPosition = pos.getInt(taskId + LoginHistoryService.getCurrentUser().username, 100);
                         scrollView.scrollTo(xPosition, yPosition);
                     }
+                    else {
+                        SharedPreferences mSettings;
+                        mSettings = App.getContext().getSharedPreferences("templates", Context.MODE_PRIVATE);
+                        templateJson = mSettings.getString(taskUUID + LoginHistoryService.getCurrentUser().username, "");
+                        SharedPreferences pos;
+                        pos = App.getContext().getSharedPreferences("yTemplates", Context.MODE_PRIVATE);
+                        yPosition = pos.getInt(taskUUID + LoginHistoryService.getCurrentUser().username, 100);
+                        scrollView.scrollTo(xPosition, yPosition);
+                    }
 
                     if (templateJson != null && !templateJson.equals("")) {
                         template = new JSONObject(templateJson);
@@ -3640,6 +3664,7 @@ public class TemplateFragment extends Fragment {
                     startActivity(new Intent(getContext(), AuthActivity.class));
                     getActivity().finish();
                 } else if (responseCode == 200) {
+                    isTaskStop =true;
                     if (!isOpenLink) {
                         SharedPreferences mSettings;
                         mSettings = App.getContext().getSharedPreferences("templates", Context.MODE_PRIVATE);
@@ -3650,6 +3675,18 @@ public class TemplateFragment extends Fragment {
                         position = App.getContext().getSharedPreferences("yTemplates", Context.MODE_PRIVATE);
                         SharedPreferences.Editor editor1 = position.edit();
                         editor1.putInt(taskId + LoginHistoryService.getCurrentUser().username, 100);
+                        editor1.apply();
+                    }
+                    else {
+                        SharedPreferences mSettings;
+                        mSettings = App.getContext().getSharedPreferences("templates", Context.MODE_PRIVATE);
+                        SharedPreferences.Editor editor = mSettings.edit();
+                        editor.putString(taskUUID + LoginHistoryService.getCurrentUser().username, "");
+                        editor.apply();
+                        SharedPreferences position;
+                        position = App.getContext().getSharedPreferences("yTemplates", Context.MODE_PRIVATE);
+                        SharedPreferences.Editor editor1 = position.edit();
+                        editor1.putInt(taskUUID + LoginHistoryService.getCurrentUser().username, 100);
                         editor1.apply();
                     }
 
@@ -3664,8 +3701,31 @@ public class TemplateFragment extends Fragment {
                     }
 
                 } else if (responseCode == 404) {
-                    removeTemplate();
-                    if (getActivity() != null && getActivity().getSupportFragmentManager().findFragmentByTag("tasks") != null) {
+                    isTaskStop = true;
+                    if (!isOpenLink) {
+                        SharedPreferences mSettings;
+                        mSettings = App.getContext().getSharedPreferences("templates", Context.MODE_PRIVATE);
+                        SharedPreferences.Editor editor = mSettings.edit();
+                        editor.putString(taskId + LoginHistoryService.getCurrentUser().username, "");
+                        editor.apply();
+                        SharedPreferences position;
+                        position = App.getContext().getSharedPreferences("yTemplates", Context.MODE_PRIVATE);
+                        SharedPreferences.Editor editor1 = position.edit();
+                        editor1.putInt(taskId + LoginHistoryService.getCurrentUser().username, 100);
+                        editor1.apply();
+                    }
+                    else {
+                        SharedPreferences mSettings;
+                        mSettings = App.getContext().getSharedPreferences("templates", Context.MODE_PRIVATE);
+                        SharedPreferences.Editor editor = mSettings.edit();
+                        editor.putString(taskUUID + LoginHistoryService.getCurrentUser().username, "");
+                        editor.apply();
+                        SharedPreferences position;
+                        position = App.getContext().getSharedPreferences("yTemplates", Context.MODE_PRIVATE);
+                        SharedPreferences.Editor editor1 = position.edit();
+                        editor1.putInt(taskUUID + LoginHistoryService.getCurrentUser().username, 100);
+                        editor1.apply();
+                    }                    if (getActivity() != null && getActivity().getSupportFragmentManager().findFragmentByTag("tasks") != null) {
                         ((TasksFragment) getActivity().getSupportFragmentManager().findFragmentByTag("tasks")).needUpdate = true;
                         if (getActivity() instanceof MainActivity) {
                             ((MainActivity) getActivity()).drawer.getDrawerLayout().setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
@@ -3685,9 +3745,7 @@ public class TemplateFragment extends Fragment {
     }
 
     private void removeTemplate() {
-        if (isOpenLink) {
-            return;
-        }
+
 
         SharedPreferences mSettings;
         mSettings = App.getContext().getSharedPreferences("templates", Context.MODE_PRIVATE);
