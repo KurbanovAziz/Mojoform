@@ -585,10 +585,13 @@ public class TasksFragment extends Fragment {
                     }
 
                     response = RequestService.createGetRequest(url);
+                    Response allResponse = RequestService.createGetRequest("/api/tasks/active");
                     Log.d("mojo-response", "url = " + url);
 
                     if (response.code() == 200) {
                         JSONArray tasksJson = new JSONArray(response.body().string());
+                        JSONArray allTasksJson = new JSONArray(allResponse.body().string());
+
                         Log.d("mojo-response", "tasks size = " + tasksJson.length());
                         Log.d("mojo-response", "tasks = " + tasksJson.toString());
 
@@ -600,8 +603,7 @@ public class TasksFragment extends Fragment {
                             Log.d("mojo-response", "finished tasks size = " + finishedTasks.size());
                         } else {
                             if (i == 1) {
-                                busyTasks = new ObjectMapper().readValue(tasksJson.toString(), new TypeReference<ArrayList<Task>>() {
-                                });
+                                busyTasks = new ObjectMapper().readValue(tasksJson.toString(), new TypeReference<ArrayList<Task>>() {});
                                 for (Task task : busyTasks)
                                     task.fixTime();
                             } else {

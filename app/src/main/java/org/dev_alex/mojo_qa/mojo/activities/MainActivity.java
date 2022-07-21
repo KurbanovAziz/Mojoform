@@ -114,10 +114,12 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
     }
-
     public void openTask(String id) {
             if (id != null) {
-                  getSupportFragmentManager().popBackStack(null, 0);
+                try {
+
+
+                getSupportFragmentManager().popBackStack(null, 0);
                 try {
                     Long.parseLong(id);
                     getSupportFragmentManager().beginTransaction()
@@ -126,6 +128,9 @@ public class MainActivity extends AppCompatActivity {
                 catch (Exception e){
                 getSupportFragmentManager().beginTransaction()
                         .replace(R.id.container, TemplateFragment.newInstance(id, true, true)).addToBackStack(null).commit();} //разобраться  с fromlink
+            }
+                catch (Exception e){
+                e.printStackTrace();}
             }
     }
 

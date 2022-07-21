@@ -8,7 +8,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
-import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
@@ -79,7 +78,6 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.afollestad.materialdialogs.BuildConfig;
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.GravityEnum;
 import com.afollestad.materialdialogs.MaterialDialog;
@@ -117,6 +115,7 @@ import net.cachapa.expandablelayout.ExpandableLayout;
 import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent;
 
 import org.dev_alex.mojo_qa.mojo.App;
+import org.dev_alex.mojo_qa.mojo.BuildConfig;
 import org.dev_alex.mojo_qa.mojo.Data;
 import org.dev_alex.mojo_qa.mojo.R;
 import org.dev_alex.mojo_qa.mojo.activities.AuthActivity;
@@ -243,7 +242,6 @@ public class TemplateFragment extends Fragment {
     private ProgressDialog progressDialog;
     private Handler handler;
     private boolean isNextTemlpateURL = false;
-    private boolean isNextStartActivityForResult = false;
 
     View separator;
 
@@ -646,15 +644,11 @@ public class TemplateFragment extends Fragment {
                 .autoDismiss(true)
                 .positiveText(R.string.camera)
                 .negativeText(R.string.gallery)
-                .onPositive((dialog, which) -> {
-                        CustomCamera2Activity.startForResult(TemplateFragment.this, PHOTO_REQUEST_CODE);                    isNextStartActivityForResult = true;
-                    isNextStartActivityForResult = true;
-                })
+                .onPositive((dialog, which) -> CustomCamera2Activity.startForResult(TemplateFragment.this, PHOTO_REQUEST_CODE))
                 .onNegative((dialog, which) -> {
                     Intent intent = new Intent(getContext(), AlbumSelectActivity.class);
                     intent.putExtra(Constants.INTENT_EXTRA_LIMIT, 10);
                     startActivityForResult(intent, Constants.REQUEST_CODE);
-                    isNextStartActivityForResult = true;
                 })
                 .build()
                 .show();
@@ -1733,8 +1727,6 @@ public class TemplateFragment extends Fragment {
                 @Override
                 protected void startActivityForResult(Intent intent, int code) {
                     TemplateFragment.this.startActivityForResult(intent, SCAN_CODE_REQUEST_CODE); // REQUEST_CODE override
-                    isNextStartActivityForResult = true;
-
                 }
             };
 
@@ -2096,7 +2088,6 @@ public class TemplateFragment extends Fragment {
                         try {
                             currentMediaBlock = new Pair<>(mediaLayout, value);
                             showGalleryOrPhotoPickDialog();
-
                             /*
                             Pair<Intent, File> intentFilePair = BitmapService.getPickImageIntent(getContext());
                             cameraImagePath = intentFilePair.second.getAbsolutePath();
@@ -2119,8 +2110,6 @@ public class TemplateFragment extends Fragment {
                             Pair<Intent, File> intentFilePair = BitmapService.getPickVideoIntent(getContext());
                             cameraVideoPath = intentFilePair.second.getAbsolutePath();
                             startActivityForResult(intentFilePair.first, VIDEO_REQUEST_CODE);
-                            isNextStartActivityForResult = true;
-
                         } catch (Exception exc) {
                             Toast.makeText(getContext(), R.string.no_camera, Toast.LENGTH_SHORT).show();
                         }
@@ -2142,8 +2131,6 @@ public class TemplateFragment extends Fragment {
                             //startActivityForResult(intent, AUDIO_REQUEST_CODE);
                             Intent intent1 = new Intent(getContext(), RecordAudio.class);
                             startActivityForResult(intent1, AUDIO_REQUEST_CODE);
-                            isNextStartActivityForResult = true;
-
 
                         } catch (Exception exc) {
                             exc.printStackTrace();
@@ -2183,8 +2170,6 @@ public class TemplateFragment extends Fragment {
                                 chooserIntent = Intent.createChooser(intent, getString(R.string.to_select_file));
 
                             startActivityForResult(chooserIntent, DOCUMENT_REQUEST_CODE);
-                            isNextStartActivityForResult = true;
-
 
                         } catch (Exception exc) {
                             Toast.makeText(getContext(), R.string.no_file_manager, Toast.LENGTH_SHORT).show();
@@ -2649,7 +2634,6 @@ public class TemplateFragment extends Fragment {
 
                     showPhotoIntent.putExtra("images", imageSrc.toString());
                     startActivityForResult(showPhotoIntent, IMAGE_SHOW_REQUEST_CODE);
-                    isNextStartActivityForResult = true;
                     currentMediaBlock = new Pair<>(currentLayout, currentValue);
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -3620,13 +3604,7 @@ public class TemplateFragment extends Fragment {
 
                 TimeZone timeZone = TimeZone.getDefault();
                 resultJson.put("timezone", timeZone.getID());
-                try {
-                    PackageInfo pInfo = getContext().getPackageManager().getPackageInfo(getContext().getPackageName(), 0);
-                    String version = pInfo.versionName;
-                    resultJson.put("client_id", "android v." + Build.VERSION.CODENAME + " app v. " + version);
-                } catch (PackageManager.NameNotFoundException e) {
-                    e.printStackTrace();
-                }
+                resultJson.put("client_id", "android v." + Build.VERSION.CODENAME + " app v. " + BuildConfig.VERSION_NAME);
 
                 Log.d("mojo-log", "result template: " + resultJson.toString());
             } catch (Exception exc) {
@@ -4411,7 +4389,6 @@ public class TemplateFragment extends Fragment {
 
 }
 else {
-    if (!isNextStartActivityForResult){
         if (isFromLink) {
             SharedPreferences pos = App.getContext().getSharedPreferences("templates", Context.MODE_PRIVATE);
             ArrayList<String> list = null;
@@ -4429,7 +4406,6 @@ else {
             }
 
         }}
-else isNextStartActivityForResult = false;}
  saveTemplateState();
     }
 }
