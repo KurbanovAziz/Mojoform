@@ -14,6 +14,7 @@ import android.widget.TextView;
 
 import org.dev_alex.mojo_qa.mojo.App;
 import org.dev_alex.mojo_qa.mojo.R;
+import org.dev_alex.mojo_qa.mojo.activities.MainActivity;
 import org.dev_alex.mojo_qa.mojo.fragments.TasksFragment;
 import org.dev_alex.mojo_qa.mojo.models.Task;
 import org.dev_alex.mojo_qa.mojo.services.LoginHistoryService;
@@ -106,14 +107,22 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
             viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    parentFragment.showTemplateWindow(task.id, true);
+                    if (task.taskUUID != null){
+                        ((MainActivity) parentFragment.getActivity()).openTask(task.taskUUID, true);
+                    }
+                    else {
+                        parentFragment.showTemplateWindow(task.id, true);}
                 }
             });
         } else {
             viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    parentFragment.showTemplateWindow(task.id, false);
+                    if (task.taskUUID != null){
+                        ((MainActivity) parentFragment.getActivity()).openTask(task.taskUUID, false);
+                    }
+                    else {
+                    parentFragment.showTemplateWindow(task.id, false);}
                 }
             });
 

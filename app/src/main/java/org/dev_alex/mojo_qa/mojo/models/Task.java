@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Task {
     public long id;
+    public String taskUUID;
     public long document_id;
     public Ref ref;
     public boolean suspended;

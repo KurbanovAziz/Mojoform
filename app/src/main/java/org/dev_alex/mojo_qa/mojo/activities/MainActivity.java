@@ -114,7 +114,7 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
     }
-    public void openTask(String id) {
+    public void openTask(String id, boolean fromLink) {
             if (id != null) {
                 try {
 
@@ -127,7 +127,7 @@ public class MainActivity extends AppCompatActivity {
                 }
                 catch (Exception e){
                 getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.container, TemplateFragment.newInstance(id, true, true)).addToBackStack(null).commit();} //разобраться  с fromlink
+                        .replace(R.id.container, TemplateFragment.newInstance(id, true, fromLink)).addToBackStack(null).commit();} //разобраться  с fromlink
             }
                 catch (Exception e){
                 e.printStackTrace();}

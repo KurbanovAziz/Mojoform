@@ -57,6 +57,7 @@ import org.dev_alex.mojo_qa.mojo.models.Task;
 import org.dev_alex.mojo_qa.mojo.services.LoginHistoryService;
 import org.dev_alex.mojo_qa.mojo.services.RequestService;
 import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.text.DateFormatSymbols;
 import java.text.SimpleDateFormat;
@@ -64,6 +65,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
+import java.util.Map;
 
 import okhttp3.Response;
 
@@ -594,6 +596,7 @@ public class TasksFragment extends Fragment {
 
                         Log.d("mojo-response", "tasks size = " + tasksJson.length());
                         Log.d("mojo-response", "tasks = " + tasksJson.toString());
+                       ArrayList<Task> allTasks = new ObjectMapper().readValue(allTasksJson.toString(), new TypeReference<ArrayList<Task>>() {});
 
                         if (i == 0) {
                             finishedTasks = new ObjectMapper().readValue(tasksJson.toString(), new TypeReference<ArrayList<Task>>() {
@@ -604,6 +607,37 @@ public class TasksFragment extends Fragment {
                         } else {
                             if (i == 1) {
                                 busyTasks = new ObjectMapper().readValue(tasksJson.toString(), new TypeReference<ArrayList<Task>>() {});
+
+                                    SharedPreferences mSettings = App.getContext().getSharedPreferences("templates", Context.MODE_PRIVATE);
+                                    SharedPreferences pos = App.getContext().getSharedPreferences("templates", Context.MODE_PRIVATE);
+                                    Map<String,?> keys = pos.getAll();
+                                    for(Map.Entry<String,?> entry : keys.entrySet()){
+                                        if (entry.getKey().contains(LoginHistoryService.getCurrentUser().username)){
+                                            String str = entry.getValue().toString();
+                                            try {
+                                                JSONObject template = new JSONObject(str);
+                                                Task task = new Task();
+                                                task.ref = new Task.Ref();
+                                                task.ref.name = template.getString("name");
+                                                task.taskUUID = entry.getKey().replace(LoginHistoryService.getCurrentUser().username, "");
+                                                busyTasks.add(task);
+                                            }
+                                            catch (Exception e){
+                                                e.printStackTrace();
+                                            }
+
+
+
+                                           // Log.e("map values",entry.getKey() + ": " + entry.getValue().toString());
+
+
+
+                                            //Log.e("map values",entry.getKey() + ": " + entry.getValue().toString());
+
+                                        }
+                                    }
+                                    // String templateJson = mSettings.getString(task.id + LoginHistoryService.getCurrentUser().username, "");
+
                                 for (Task task : busyTasks)
                                     task.fixTime();
                             } else {

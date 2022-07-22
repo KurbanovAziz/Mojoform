@@ -4453,7 +4453,7 @@ else {
             try {
                 list = (ArrayList<String>) ObjectSerializer.deserialize(pos.getString("lastTemplate", ObjectSerializer.serialize(new ArrayList<String>())));
                 if (list != null && !(list.size()== 0)) {
-                    ((MainActivity) getContext()).openTask(list.get(list.size() - 1));
+                    ((MainActivity) getContext()).openTask(list.get(list.size() - 1), true);
                     list.remove(list.get(list.size()-1));
                 }
                 SharedPreferences.Editor editor = pos.edit();
