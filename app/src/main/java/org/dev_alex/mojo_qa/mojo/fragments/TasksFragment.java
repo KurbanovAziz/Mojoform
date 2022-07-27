@@ -605,11 +605,17 @@ public class TasksFragment extends Fragment {
                                     JSONObject template = new JSONObject(str);
                                     Task task = new Task();
                                     task.ref = new Task.Ref();
+                                    task.suspended = true;
+
                                     task.taskUUID = entry.getKey().replace(LoginHistoryService.getCurrentUser().username, "");
                                     try {
                                         task.ref.id = template.getLong("longId");
+                                        task.ref.type = template.getString("typeTask");
                                         task.ref.name = template.getString("nameTask");
-                                        task.suspended = true;
+                                        try {
+                                            task.complete_time = template.getLong("CompleteTime");
+                                        }
+                                        catch (Exception ignored){}
                                     } catch (Exception ignored) {
                                         task.id = 0;
                                         task.ref.name = template.getString("name");
@@ -645,6 +651,20 @@ public class TasksFragment extends Fragment {
                                 permanentTasks = new ObjectMapper().readValue(tasksJson.toString(), new TypeReference<ArrayList<Task>>() {
                                 });
                                 for (Task lastT : lastTasks) {
+                                    for (Task permanentT : permanentTasks){
+                                        Log.d("1", lastT.id + "");
+                                        Log.d("1", lastT.ref.id + "");
+                                        Log.d("1", lastT.ref.name + "");
+                                        Log.d("2", permanentT.id + "");
+                                        Log.d("2", permanentT.ref.id + "");
+                                        Log.d("2", permanentT.ref.name + "");
+                                    }
+                                }
+
+
+
+                                for (Task lastT : lastTasks) {
+                                    permanentTasks.removeIf(permanentT -> lastT.ref.id == permanentT.id);
                                     permanentTasks.removeIf(permanentT -> lastT.ref.id == permanentT.ref.id);
                                 }
                                 for (Task task : permanentTasks)

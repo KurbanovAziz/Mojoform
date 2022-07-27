@@ -23,6 +23,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Locale;
+import java.util.Objects;
 
 
 public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder> {
@@ -75,6 +76,7 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
             if (task.complete_time != null) {
                 viewHolder.taskDate.setVisibility(View.VISIBLE);
                 viewHolder.taskDate.setText(sdf.format(new Date(task.complete_time)));
+                viewHolder.taskDate.setTextColor(Color.parseColor("#ffcc0000"));
             } else
                 viewHolder.taskDate.setVisibility(View.INVISIBLE);
         } else {
@@ -91,8 +93,17 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
                 viewHolder.taskActiveCircle.setVisibility(View.INVISIBLE);
             }
         }
-
-        viewHolder.taskIcon.setImageResource(R.drawable.file_icon);
+        if (Objects.equals(task.ref.type, "openlinks") || Objects.equals(task.ref.type, "openlinks_group")) {
+            viewHolder.taskIcon.setImageResource(R.drawable.ic_open_link);
+        } else if (Objects.equals(task.ref.type, "closedlinks") || Objects.equals(task.ref.type, "closedlinks_group")) {
+            viewHolder.taskIcon.setImageResource(R.drawable.ic_close_link);
+        } else if (Objects.equals(task.ref.type, "constantly") || Objects.equals(task.ref.type, "constantly_group")) {
+            viewHolder.taskIcon.setImageResource(R.drawable.file_icon);
+        } else if (Objects.equals(task.ref.type, "periodic") || Objects.equals(task.ref.type, "periodic_group")){
+            viewHolder.taskIcon.setImageResource(R.drawable.ic_periodical);
+        } else if (Objects.equals(task.ref.type, "oneshot") || Objects.equals(task.ref.type, "oneshot_group")) {
+            viewHolder.taskIcon.setImageResource(R.drawable.ic_oneshot);
+        }
         viewHolder.moreBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -104,6 +115,9 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
 
 
         if (task.suspended) {
+           // viewHolder.moreBtn.setVisibility(View.VISIBLE);
+            viewHolder.delayed.setVisibility( View.VISIBLE );
+
             viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {

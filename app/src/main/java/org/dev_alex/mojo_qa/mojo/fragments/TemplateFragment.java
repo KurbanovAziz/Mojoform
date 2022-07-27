@@ -738,6 +738,8 @@ public class TemplateFragment extends Fragment {
             if (isTaskFinished || isTaskStop)
                 return;
 
+            template.put("CompleteTime", new Date().getTime());
+
             if (!isOpenLink){
             if (!template.has("StartTime"))
                 template.put("StartTime", isoDateFormat.format(new Date()));
@@ -3277,12 +3279,12 @@ public class TemplateFragment extends Fragment {
                             template = responseJson.getJSONObject("template");
                             long taskId1 = 0;
                             String nameTask = "";
+                            String typeTask = "";
                             try {
                                 taskId1 = responseJson.getJSONObject("ref").getLong("id");
                                 nameTask = responseJson.getJSONObject("ref").getString("name");
-
+                                typeTask =  responseJson.getJSONObject("ref").getString("type");
                                 ((TextView) getActivity().findViewById(R.id.title)).setText(responseJson.getJSONObject("ref").getString("name"));
-
                             }
                             catch (Exception e){
                                 e.printStackTrace();
@@ -3292,6 +3294,7 @@ public class TemplateFragment extends Fragment {
                                 taskId = taskId1;}
                                 template.put("nameTask", nameTask);
                                 template.put("longId", taskId);
+                                template.put("typeTask", typeTask);
 
                             }
 
