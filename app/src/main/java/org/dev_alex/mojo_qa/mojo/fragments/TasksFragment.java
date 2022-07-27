@@ -98,7 +98,6 @@ public class TasksFragment extends Fragment {
     private final int SCAN_CODE_REQUEST_CODE = 0x0000c0de;
 
 
-
     public static TasksFragment newInstance() {
         Bundle args = new Bundle();
         TasksFragment fragment = new TasksFragment();
@@ -325,10 +324,14 @@ public class TasksFragment extends Fragment {
 
                     case R.id.busy:
                         updateTaskAdapter(new TaskAdapter(TasksFragment.this, busyTasks), CurrentAdapterType.BUSY);
+                        updateDate(true);
+
                         break;
 
                     case R.id.permanent:
                         updateTaskAdapter(new TaskAdapter(TasksFragment.this, permanentTasks), CurrentAdapterType.PERMANENT);
+                        updateDate(true);
+
                         break;
                 }
             }
@@ -591,12 +594,36 @@ public class TasksFragment extends Fragment {
                     Log.d("mojo-response", "url = " + url);
 
                     if (response.code() == 200) {
+                        ArrayList<Task> lastTasks = new ArrayList<>();
                         JSONArray tasksJson = new JSONArray(response.body().string());
-                        JSONArray allTasksJson = new JSONArray(allResponse.body().string());
-
+                        SharedPreferences pos = App.getContext().getSharedPreferences("templates", Context.MODE_PRIVATE);
+                        Map<String, ?> keys = pos.getAll();
+                        for (Map.Entry<String, ?> entry : keys.entrySet()) {
+                            if (entry.getKey().contains(LoginHistoryService.getCurrentUser().username)) {
+                                String str = entry.getValue().toString();
+                                try {
+                                    JSONObject template = new JSONObject(str);
+                                    Task task = new Task();
+                                    task.ref = new Task.Ref();
+                                    task.taskUUID = entry.getKey().replace(LoginHistoryService.getCurrentUser().username, "");
+                                    try {
+                                        task.ref.id = template.getLong("longId");
+                                        task.ref.name = template.getString("nameTask");
+                                        task.suspended = true;
+                                    } catch (Exception ignored) {
+                                        task.id = 0;
+                                        task.ref.name = template.getString("name");
+                                    }
+                                    lastTasks.add(task);
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                }
+                                // Log.e("map values",entry.getKey() + ": " + entry.getValue().toString());
+                                //Log.e("map values",entry.getKey() + ": " + entry.getValue().toString());
+                            }
+                        }
                         Log.d("mojo-response", "tasks size = " + tasksJson.length());
-                        Log.d("mojo-response", "tasks = " + tasksJson.toString());
-                       ArrayList<Task> allTasks = new ObjectMapper().readValue(allTasksJson.toString(), new TypeReference<ArrayList<Task>>() {});
+                        Log.d("mojo-response", "tasks = " + tasksJson);
 
                         if (i == 0) {
                             finishedTasks = new ObjectMapper().readValue(tasksJson.toString(), new TypeReference<ArrayList<Task>>() {
@@ -606,44 +633,20 @@ public class TasksFragment extends Fragment {
                             Log.d("mojo-response", "finished tasks size = " + finishedTasks.size());
                         } else {
                             if (i == 1) {
-                                busyTasks = new ObjectMapper().readValue(tasksJson.toString(), new TypeReference<ArrayList<Task>>() {});
+                                busyTasks = new ObjectMapper().readValue(tasksJson.toString(), new TypeReference<ArrayList<Task>>() {
+                                });
+                                busyTasks.addAll(lastTasks);
 
-                                    SharedPreferences mSettings = App.getContext().getSharedPreferences("templates", Context.MODE_PRIVATE);
-                                    SharedPreferences pos = App.getContext().getSharedPreferences("templates", Context.MODE_PRIVATE);
-                                    Map<String,?> keys = pos.getAll();
-                                    for(Map.Entry<String,?> entry : keys.entrySet()){
-                                        if (entry.getKey().contains(LoginHistoryService.getCurrentUser().username)){
-                                            String str = entry.getValue().toString();
-                                            try {
-                                                JSONObject template = new JSONObject(str);
-                                                Task task = new Task();
-                                                task.ref = new Task.Ref();
-                                                task.ref.name = template.getString("name");
-                                                task.taskUUID = entry.getKey().replace(LoginHistoryService.getCurrentUser().username, "");
-                                                busyTasks.add(task);
-                                            }
-                                            catch (Exception e){
-                                                e.printStackTrace();
-                                            }
-
-
-
-                                           // Log.e("map values",entry.getKey() + ": " + entry.getValue().toString());
-
-
-
-                                            //Log.e("map values",entry.getKey() + ": " + entry.getValue().toString());
-
-                                        }
-                                    }
-                                    // String templateJson = mSettings.getString(task.id + LoginHistoryService.getCurrentUser().username, "");
+                                // String templateJson = mSettings.getString(task.id + LoginHistoryService.getCurrentUser().username, "");
 
                                 for (Task task : busyTasks)
                                     task.fixTime();
                             } else {
                                 permanentTasks = new ObjectMapper().readValue(tasksJson.toString(), new TypeReference<ArrayList<Task>>() {
                                 });
-
+                                for (Task lastT : lastTasks) {
+                                    permanentTasks.removeIf(permanentT -> lastT.ref.id == permanentT.ref.id);
+                                }
                                 for (Task task : permanentTasks)
                                     task.fixTime();
                             }
@@ -684,10 +687,12 @@ public class TasksFragment extends Fragment {
                         case FINISHED:
                             ((RadioButton) rootView.findViewById(R.id.ended)).setChecked(true);
                             updateTaskAdapter(new TaskAdapter(TasksFragment.this, finishedTasks), CurrentAdapterType.FINISHED);
+
                             break;
                         case PERMANENT:
                             ((RadioButton) rootView.findViewById(R.id.permanent)).setChecked(true);
                             updateTaskAdapter(new TaskAdapter(TasksFragment.this, permanentTasks), CurrentAdapterType.PERMANENT);
+
                             break;
                     }
 

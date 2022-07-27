@@ -231,6 +231,8 @@ public class TemplateFragment extends Fragment {
     public int currentPagePos;
     public JSONObject template;
 
+    boolean isResulted = false;
+
     public TextView scanTo = null;
     public JSONObject scanToObj = null;
 
@@ -259,8 +261,6 @@ public class TemplateFragment extends Fragment {
         Bundle args = new Bundle();
         args.putLong("task_id", taskId);
         args.putBoolean("is_finished", isTaskFinished);
-
-
         TemplateFragment fragment = new TemplateFragment();
         fragment.setArguments(args);
         fragment.isFromLink = false;
@@ -305,7 +305,8 @@ public class TemplateFragment extends Fragment {
         } else {
             taskUUID = getArguments().getString("task_uuid");
             isOpenLink = true;
-            isReportOpenLink = getArguments().getBoolean("is_report_open_link", false);
+            isReportOpenLink = getArguments().getBoolean("is_report_open_link", true);
+            //isReportOpenLink = true;//Глянуть по поводу закртых ссылок
         }
         isTaskFinished = getArguments().getBoolean("is_finished");
     }
@@ -424,6 +425,7 @@ public class TemplateFragment extends Fragment {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         Log.e("aaa", "Aaa");
+        isResulted = true;
 
         if (requestCode == Constants.REQUEST_CODE && resultCode == RESULT_OK && data != null) {
             ArrayList<Image> images = data.getParcelableArrayListExtra(Constants.INTENT_EXTRA_IMAGES);
@@ -539,7 +541,8 @@ public class TemplateFragment extends Fragment {
     public void onResume() {
         super.onResume();
         Data.currentTaskId = taskId;
-        scrollView.scrollTo(xPosition, yPosition);
+        if (!isResulted){
+        scrollView.scrollTo(xPosition, yPosition);}
 
     }
 
@@ -1361,7 +1364,9 @@ public class TemplateFragment extends Fragment {
                             @Override
 
                             public void onPageFinished(WebView view, String url) {
-                                scrollView.scrollTo(xPosition, yPosition);
+                                if (!isResulted){
+
+                                    scrollView.scrollTo(xPosition, yPosition);}
                             }
                         });
 
@@ -3259,10 +3264,12 @@ public class TemplateFragment extends Fragment {
 
                     if (templateJson != null && !templateJson.equals("")) {
                         template = new JSONObject(templateJson);
+                        
                         return HttpURLConnection.HTTP_OK;
                     } else {
                         String linkPath = isReportOpenLink ? "closedlink" : "openlink";
                         String url = isOpenLink ? "/api/" + linkPath + "/" + taskUUID : "/api/tasks/" + taskId;
+
                         Response response = RequestService.createGetRequest(url);
 
                         if (response.code() == 200) {
@@ -3270,6 +3277,26 @@ public class TemplateFragment extends Fragment {
                             JSONObject responseJson = new JSONObject(responseStr);
 
                             template = responseJson.getJSONObject("template");
+                            long taskId1 = 0;
+                            String nameTask = "";
+                            try {
+                                taskId1 = responseJson.getJSONObject("ref").getLong("id");
+                                nameTask = responseJson.getJSONObject("ref").getString("name");
+
+                                ((TextView) getActivity().findViewById(R.id.title)).setText(responseJson.getJSONObject("ref").getString("name"));
+
+                            }
+                            catch (Exception e){
+                                e.printStackTrace();
+                            }
+                            if(taskId1 != 0){
+                                taskId = taskId1;
+                                template.put("nameTask", nameTask);
+                                template.put("longId", taskId);
+
+                            }
+
+
                             template.put("StartTime", isoDateFormat.format(new Date()));
                             if (responseJson.has("expire_time"))
                                 template.put("DueTime", isoDateFormat.format(new Date(responseJson.getLong("expire_time"))));

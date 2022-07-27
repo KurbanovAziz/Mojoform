@@ -1,5 +1,7 @@
 package org.dev_alex.mojo_qa.mojo.models;
 
+import androidx.annotation.Nullable;
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -12,6 +14,15 @@ public class Task {
     public Long expire_time;
     public Long start_time;
     public Long complete_time;
+
+    @Override
+    public boolean equals(@Nullable Object obj) {
+        Task task2 = (Task) obj;
+        if (task2 != null) {
+            return id == task2.id;
+        }
+        return false;
+    }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static class Ref {
