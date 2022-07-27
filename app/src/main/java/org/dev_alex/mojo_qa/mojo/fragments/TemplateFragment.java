@@ -305,8 +305,7 @@ public class TemplateFragment extends Fragment {
         } else {
             taskUUID = getArguments().getString("task_uuid");
             isOpenLink = true;
-            isReportOpenLink = getArguments().getBoolean("is_report_open_link", true);
-            //isReportOpenLink = true;//Глянуть по поводу закртых ссылок
+            isReportOpenLink = getArguments().getBoolean("is_report_open_link", false);
         }
         isTaskFinished = getArguments().getBoolean("is_finished");
     }
@@ -1364,9 +1363,8 @@ public class TemplateFragment extends Fragment {
                             @Override
 
                             public void onPageFinished(WebView view, String url) {
-                                if (!isResulted){
 
-                                    scrollView.scrollTo(xPosition, yPosition);}
+                                scrollView.scrollTo(xPosition, yPosition);
                             }
                         });
 
@@ -3290,7 +3288,8 @@ public class TemplateFragment extends Fragment {
                                 e.printStackTrace();
                             }
                             if(taskId1 != 0){
-                                taskId = taskId1;
+                                if (taskId == 0){
+                                taskId = taskId1;}
                                 template.put("nameTask", nameTask);
                                 template.put("longId", taskId);
 

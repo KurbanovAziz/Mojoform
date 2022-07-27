@@ -718,7 +718,6 @@ public class GraphFragment extends Fragment implements ResultGraphAdapter.GraphC
                 JSONObject jsonObjectComplex = new JSONObject(responseStr);
                 if (jsonObjectComplex.has("complex_info")) {
                     JSONArray panelsJsonComplex = jsonObjectComplex.getJSONObject("complex_info").getJSONArray("components");
-
                     ArrayList<Panel> panels1 = new ObjectMapper().readValue(panelsJsonComplex.toString(), new TypeReference<ArrayList<Panel>>() {
                     });
                     panels = panels1;
@@ -730,7 +729,7 @@ public class GraphFragment extends Fragment implements ResultGraphAdapter.GraphC
                     }
                 } else {
                     JSONArray panelsJsonComplex = jsonObjectComplex.getJSONArray("values");
-                    String resultName = jsonObjectComplex.getJSONObject("template_info").getJSONObject("template").getString("name");
+                    String resultName = jsonObjectComplex.getJSONObject("template_info").getJSONObject("reference").getString("name");
                     ArrayList<Panel> panels1 = new ObjectMapper().readValue(panelsJsonComplex.toString(), new TypeReference<ArrayList<Panel>>() {
                     });
 
