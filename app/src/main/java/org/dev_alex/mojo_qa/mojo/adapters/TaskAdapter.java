@@ -75,7 +75,7 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
 
             if (task.complete_time != null) {
                 viewHolder.taskDate.setVisibility(View.VISIBLE);
-                viewHolder.taskDate.setText(sdf.format(new Date(task.complete_time)));
+                viewHolder.taskDate.setText(sdf.format(new Date(task.complete_time / 1000)));
                 viewHolder.taskDate.setTextColor(Color.parseColor("#ffcc0000"));
             } else
                 viewHolder.taskDate.setVisibility(View.INVISIBLE);
