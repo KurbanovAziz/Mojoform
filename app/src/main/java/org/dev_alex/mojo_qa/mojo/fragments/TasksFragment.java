@@ -163,6 +163,7 @@ public class TasksFragment extends Fragment {
                         .replace(R.id.container, TemplateFragment.newInstance(UUID, isReport)).addToBackStack(null).commit();
             } else {
                 super.onActivityResult(requestCode, resultCode, data);
+                super.onActivityResult(requestCode, resultCode, data);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -641,6 +642,15 @@ public class TasksFragment extends Fragment {
                             if (i == 1) {
                                 busyTasks = new ObjectMapper().readValue(tasksJson.toString(), new TypeReference<ArrayList<Task>>() {
                                 });
+                                for (Task lastT : lastTasks) {
+                                    permanentTasks.removeIf(permanentT -> lastT.ref.id == permanentT.id);
+                                    permanentTasks.removeIf(permanentT -> lastT.ref.id == permanentT.ref.id);
+                                    permanentTasks.removeIf(permanentT -> lastT.id == permanentT.id);
+                                    permanentTasks.removeIf(permanentT -> lastT.id == permanentT.ref.id);
+
+
+                                }
+
                                 busyTasks.addAll(lastTasks);
 
                                 // String templateJson = mSettings.getString(task.id + LoginHistoryService.getCurrentUser().username, "");
