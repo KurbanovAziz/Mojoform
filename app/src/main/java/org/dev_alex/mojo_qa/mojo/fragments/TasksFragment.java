@@ -643,10 +643,8 @@ public class TasksFragment extends Fragment {
                                 busyTasks = new ObjectMapper().readValue(tasksJson.toString(), new TypeReference<ArrayList<Task>>() {
                                 });
                                 for (Task lastT : lastTasks) {
-                                    permanentTasks.removeIf(permanentT -> lastT.ref.id == permanentT.id);
-                                    permanentTasks.removeIf(permanentT -> lastT.ref.id == permanentT.ref.id);
-                                    permanentTasks.removeIf(permanentT -> lastT.id == permanentT.id);
-                                    permanentTasks.removeIf(permanentT -> lastT.id == permanentT.ref.id);
+                                    busyTasks.removeIf(permanentT -> lastT.ref.id == permanentT.id);
+                                    busyTasks.removeIf(permanentT -> lastT.ref.id == permanentT.ref.id);
 
 
                                 }
@@ -670,8 +668,6 @@ public class TasksFragment extends Fragment {
                                         Log.d("2", permanentT.ref.name + "");
                                     }
                                 }
-
-
 
                                 for (Task lastT : lastTasks) {
                                     permanentTasks.removeIf(permanentT -> lastT.ref.id == permanentT.id);
