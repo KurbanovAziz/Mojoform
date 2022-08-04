@@ -642,9 +642,11 @@ public class TasksFragment extends Fragment {
                             if (i == 1) {
                                 busyTasks = new ObjectMapper().readValue(tasksJson.toString(), new TypeReference<ArrayList<Task>>() {
                                 });
-                                for (Task lastT : lastTasks) {
-                                    busyTasks.removeIf(permanentT -> lastT.ref.id == permanentT.id);
-                                    busyTasks.removeIf(permanentT -> lastT.ref.id == permanentT.ref.id);
+                                for (Task busyTask : busyTasks) {
+                                    lastTasks.removeIf(permanentT -> permanentT.ref.id == busyTask.id);
+                                    lastTasks.removeIf(permanentT -> permanentT.ref.id == busyTask.ref.id);
+                                    lastTasks.removeIf(permanentT -> permanentT.id == busyTask.ref.id);
+
 
 
                                 }

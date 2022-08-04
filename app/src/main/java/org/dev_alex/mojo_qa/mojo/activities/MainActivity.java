@@ -8,11 +8,14 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
 import android.os.PersistableBundle;
 import android.text.TextUtils;
 import android.util.Log;
@@ -69,6 +72,7 @@ import java.util.Locale;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SwitchCompat;
+import androidx.cardview.widget.CardView;
 import androidx.core.content.FileProvider;
 import androidx.core.view.MenuItemCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -78,6 +82,7 @@ import okio.Okio;
 //
 public class MainActivity extends AppCompatActivity {
     public Drawer drawer;
+    CardView noConnectionCV;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -100,6 +105,17 @@ public class MainActivity extends AppCompatActivity {
         }
         AppointmentsModel.INSTANCE.selfUpdate();
         checkLinkTask();
+        noConnectionCV = findViewById(R.id.nowifi);
+        Handler h = new Handler();
+        Runnable run = new Runnable() {
+
+            @Override
+            public void run() {
+                isOnline(MainActivity.this);
+                h.postDelayed(this, 1000);
+            }
+        };
+        run.run();
     }
 
     private void checkLinkTask() {
@@ -113,6 +129,19 @@ public class MainActivity extends AppCompatActivity {
             }
             return;
         }
+    }
+    public boolean isOnline(Context context)
+    {
+        ConnectivityManager cm =
+                (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo netInfo = cm.getActiveNetworkInfo();
+        if (netInfo != null && netInfo.isConnectedOrConnecting())
+        {
+            noConnectionCV.setVisibility(View.INVISIBLE);
+            return true;
+        }
+        noConnectionCV.setVisibility(View.VISIBLE);
+        return false;
     }
     public void openTask(String id, boolean fromLink) {
             if (id != null) {
