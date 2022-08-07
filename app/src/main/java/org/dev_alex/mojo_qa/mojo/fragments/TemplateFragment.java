@@ -2311,7 +2311,7 @@ public class TemplateFragment extends Fragment {
                                 JSONObject optional = optionals.getJSONObject(i).getJSONObject("optional");
                                 if (optional.has("keys") &&
                                         value.has("values")
-                                        && Utils.containsAllValues(value.getJSONArray("values"), optional.getJSONArray("keys"))) {
+                                        && Utils.containsSomeValues(value.getJSONArray("values"), optional.getJSONArray("keys"))) {
                                     if (!optional.isNull("caption")) { //хрень здесь
                                         TextView caption = new TextView(getContext());
                                         caption.setText(optional.getString("caption"));
@@ -2372,7 +2372,7 @@ public class TemplateFragment extends Fragment {
                 for (int i = 0; i < optionals.length(); i++) {
                     JSONObject optional = optionals.getJSONObject(i).getJSONObject("optional");
                     if (optional.has("keys") && optional.getJSONArray("keys").length() > 0 && value.has("values")
-                            && Utils.containsAllValues(optional.getJSONArray("keys"), value.getJSONArray("values"))) {
+                            && Utils.containsSomeValues(optional.getJSONArray("keys"), value.getJSONArray("values"))) {
                         fillContainer(optionalContainer, optional.getJSONArray("items"), offset + 1);
                     }
                 }
@@ -4158,7 +4158,7 @@ public class TemplateFragment extends Fragment {
                         for (int j = 0; j < optionals.length(); j++) {
                             JSONObject optional = optionals.getJSONObject(j).getJSONObject("optional");
                             if (optional.has("keys") && optional.getJSONArray("keys").length() > 0 && value.has("values")
-                                    && Utils.containsAllValues(optional.getJSONArray("keys"), value.getJSONArray("values"))) {
+                                    && Utils.containsSomeValues(optional.getJSONArray("keys"), value.getJSONArray("values"))) {
 
                                 Pair<Boolean, ArrayList<JSONObject>> optionalResult = checkIfContainerIsFilled(optional.getJSONArray("items"), offset + 1);
                                 if (!optionalResult.first) {
@@ -4321,7 +4321,7 @@ public class TemplateFragment extends Fragment {
                             for (int j = 0; j < optionals.length(); j++) {
                                 JSONObject optional = optionals.getJSONObject(j).getJSONObject("optional");
                                 if (optional.has("keys") && optional.getJSONArray("keys").length() > 0 && value.has("values")
-                                        && Utils.containsAllValues(optional.getJSONArray("keys"), value.getJSONArray("values"))) {
+                                        && Utils.containsSomeValues(optional.getJSONArray("keys"), value.getJSONArray("values"))) {
 
                                     JSONArray optionalValues = getContainerElementValues(optional.getJSONArray("items"));
                                     containerValues = Utils.addAllItemsToJson(containerValues, optionalValues);

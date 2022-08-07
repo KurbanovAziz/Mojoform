@@ -134,6 +134,17 @@ public class Utils {
             return false;
         }
     }
+    public static boolean containsSomeValues(JSONArray jsonArray, JSONArray checkValues) {
+        try {
+            for (int j = 0; j < checkValues.length(); j++)
+                if (containsValue(jsonArray, checkValues.getString(j)))
+                    return true;
+            return false;
+        } catch (Exception exc) {
+            exc.printStackTrace();
+            return false;
+        }
+    }
 
     public static void copy(File src, File dst) throws IOException {
         InputStream in = new FileInputStream(src);

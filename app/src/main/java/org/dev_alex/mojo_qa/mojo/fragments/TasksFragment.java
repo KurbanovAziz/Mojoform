@@ -646,10 +646,7 @@ public class TasksFragment extends Fragment {
                                     lastTasks.removeIf(permanentT -> permanentT.ref.id == busyTask.id);
                                     lastTasks.removeIf(permanentT -> permanentT.ref.id == busyTask.ref.id);
                                     lastTasks.removeIf(permanentT -> permanentT.id == busyTask.ref.id);
-
-
-
-                                }
+                                    }
 
                                 busyTasks.addAll(lastTasks);
 
