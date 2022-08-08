@@ -138,7 +138,7 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
                     GradientDrawable gd = new GradientDrawable();
                     gd.setColor(Color.parseColor("#00000000"));
                     gd.setCornerRadius(8);
-                    gd.setStroke(4, Color.parseColor(notification.color));
+                    gd.setStroke(3, Color.parseColor(notification.color));
                     viewHolder.notificationNewBorder.setBackgroundDrawable(gd);}
                 viewHolder.notificationNewBorder.setVisibility(View.GONE);
                 notification.is_readed = true;
@@ -174,7 +174,7 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
             GradientDrawable gd = new GradientDrawable();
             gd.setColor(Color.parseColor("#00000000"));
             gd.setCornerRadius(12);
-            gd.setStroke(7, Color.parseColor(notification.color));
+            gd.setStroke(3, Color.parseColor(notification.color));
             viewHolder.notificationNewBorder.setBackgroundDrawable(gd);}
         viewHolder.notificationNewBorder.setVisibility(notification.is_readed ? View.GONE : View.VISIBLE);
     }
