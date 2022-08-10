@@ -36,10 +36,10 @@ import io.reactivex.internal.observers.EmptyCompletableObserver;
 public class ResultGraphAdapter extends RecyclerView.Adapter<ResultGraphAdapter.ResultViewHolder> {
     private List<Indicator> indicators;
     private List<Employee> employees;
+    String name;
 
     private GraphClickListener onPanelClickListener;
     private SimpleDateFormat sdf = new SimpleDateFormat("dd MMMM yyyy | HH:mm", Locale.getDefault());
-
 
     static class ResultViewHolder extends RecyclerView.ViewHolder {
         TextView panelName;
@@ -83,10 +83,11 @@ public class ResultGraphAdapter extends RecyclerView.Adapter<ResultGraphAdapter.
     }
 
 
-    public ResultGraphAdapter(List<Indicator> indicators, GraphClickListener onPanelClickListener, List<Employee> employees) {
+    public ResultGraphAdapter(List<Indicator> indicators, GraphClickListener onPanelClickListener, List<Employee> employees, String name) {
         this.indicators = indicators;
         this.onPanelClickListener = onPanelClickListener;
         this.employees = employees;
+        this.name = name;
     }
 
     @Override
@@ -152,8 +153,7 @@ public class ResultGraphAdapter extends RecyclerView.Adapter<ResultGraphAdapter.
             viewHolder.btDownloadPdf.setOnClickListener(v -> onPanelClickListener.onDownloadPdfClick(notification));
             viewHolder.btDownloadDoc.setOnClickListener(v -> onPanelClickListener.onDownloadDocClick(notification));
             viewHolder.btClose.setOnClickListener(v -> viewHolder.expandableLayout.collapse(true)); viewHolder.panelIcon.setImageResource(R.drawable.result); viewHolder.panelIcon.setColorFilter(Color.parseColor("#4E3F60"));
-
-            viewHolder.panelName.setText(indicator.name);
+            viewHolder.panelName.setText(name);
             viewHolder.notificationDate.setText(sdf.format(new Date(indicator.timestamp)));
 
             Context context = viewHolder.itemView.getContext();
@@ -168,8 +168,6 @@ public class ResultGraphAdapter extends RecyclerView.Adapter<ResultGraphAdapter.
                         context.getString(R.string.points) + ": <b>" + notification.val + "</b><br/>" + context.getString(R.string.percent) + ": <b>" + notification.prc + "%</b><br/><br/>" +
                         executorPart +
                         context.getString(R.string.finish_time) + ":<br/><b>" + sdf.format(new Date(indicator.timestamp)) + "</b>";
-
-
             viewHolder.informationTV.setText(Html.fromHtml(notificationDescription));
 }
 
@@ -178,7 +176,7 @@ public class ResultGraphAdapter extends RecyclerView.Adapter<ResultGraphAdapter.
 if(viewHolder.panelStats != null){
                     viewHolder.panelStats.setText(
                             new StringBuilder().append(indicator.val).append(" | ").append(indicator.prc).append("%").toString());
-                viewHolder.panelName.setText(indicator.name);}
+                viewHolder.panelName.setText(name);}
 
 
 

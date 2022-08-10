@@ -217,7 +217,7 @@ public class GraphFragment extends Fragment implements ResultGraphAdapter.GraphC
         Indicator indicator = new Indicator();
         indicators.add(0, indicator);
 
-        recyclerView.setAdapter(new ResultGraphAdapter(indicators, this, users));
+        recyclerView.setAdapter(new ResultGraphAdapter(indicators, this, users, name));
 
     }
 

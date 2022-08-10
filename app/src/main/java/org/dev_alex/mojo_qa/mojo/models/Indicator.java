@@ -18,6 +18,5 @@ import java.util.ArrayList;
         public long userID;
         public double val;
         public String name;
-
     }
 
