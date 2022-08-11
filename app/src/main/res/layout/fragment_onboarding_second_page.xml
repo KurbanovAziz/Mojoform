@@ -8,28 +8,30 @@
         android:layout_height="match_parent"
         android:scaleType="fitXY"
         android:src="@drawable/onboarding_page_3" />
+
     <ImageView
         android:id="@+id/logo"
         android:layout_width="70dp"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="50dp"
+        android:layout_marginTop="40dp"
         android:adjustViewBounds="true"
         android:src="@drawable/logo_notification" />
+
     <TextView
         android:id="@+id/title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
         android:layout_below="@+id/logo"
+        android:layout_centerHorizontal="true"
+        android:layout_marginStart="16dp"
         android:layout_marginTop="25dp"
+        android:layout_marginEnd="16dp"
         android:gravity="center_horizontal"
         android:text="@string/second_page2"
         android:textAlignment="center"
-        android:layout_marginStart="20dp"
-        android:layout_marginEnd="20dp"
         android:textColor="@android:color/white"
-        android:textSize="18dp" />
+        android:textSize="16dp" />
 
     <TextView
         android:id="@+id/sub_title"
@@ -37,15 +39,14 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/title"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="22dp"
-        android:gravity="center_horizontal"
-        android:lineSpacingExtra="15dp"
         android:layout_marginStart="25dp"
+        android:layout_marginTop="22dp"
         android:layout_marginEnd="25dp"
+        android:gravity="center_horizontal"
         android:text="@string/second_page3"
         android:textAlignment="center"
         android:textColor="@android:color/white"
-        android:textSize="18dp" />
+        android:textSize="16dp" />
 
     <TextView
         android:id="@+id/main_part"
@@ -53,15 +54,14 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/sub_title"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="18dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
         android:gravity="center_horizontal"
-        android:lineSpacingExtra="20dp"
-        android:layout_marginStart="20dp"
-        android:layout_marginEnd="20dp"
         android:text="@string/second_page4"
         android:textAlignment="center"
         android:textColor="@android:color/white"
-        android:textSize="18dp" />
+        android:textSize="16dp" />
 
     <TextView
         android:id="@+id/skip"
@@ -69,10 +69,12 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginBottom="90dp"
+        android:layout_below="@+id/main_part"
+        android:layout_marginTop="30dp"
+
         android:padding="8dp"
         android:text="@string/further"
         android:textColor="@android:color/white"
-        android:textSize="20dp" />
+        android:textSize="16dp" />
 
 </RelativeLayout>
