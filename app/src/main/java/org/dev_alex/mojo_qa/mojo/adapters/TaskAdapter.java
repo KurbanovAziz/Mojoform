@@ -6,6 +6,8 @@ import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
 import androidx.recyclerview.widget.RecyclerView;
+
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -30,6 +32,8 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
     SimpleDateFormat sdf = new SimpleDateFormat("dd MMMM yyyy | HH:mm", Locale.getDefault());
     private ArrayList<Task> tasks;
     private TasksFragment parentFragment;
+    private static boolean isFinished = false;
+
 
     static class TaskViewHolder extends RecyclerView.ViewHolder {
         TextView taskTitle;
@@ -54,6 +58,12 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
     public TaskAdapter(TasksFragment parentFragment, ArrayList<Task> tasks) {
         this.parentFragment = parentFragment;
         this.tasks = tasks;
+        isFinished = false;
+    }
+    public TaskAdapter(TasksFragment parentFragment, ArrayList<Task> tasks, boolean isFinish) {
+        this.parentFragment = parentFragment;
+        this.tasks = tasks;
+        isFinished = true;
     }
 
     @Override
@@ -65,16 +75,20 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
     @Override
     public void onBindViewHolder(TaskViewHolder viewHolder, int i) {
         final Task task = tasks.get(i);
-
-        viewHolder.delayed.setVisibility(View.GONE);
+        SharedPreferences mSettings;
+        mSettings = App.getContext().getSharedPreferences("templates", Context.MODE_PRIVATE);
+        String templateJson = mSettings.getString(task.id + LoginHistoryService.getCurrentUser().username, "");
+        viewHolder.delayed.setVisibility((task.suspended || templateJson.equals("")) ? View.GONE : View.VISIBLE);
+        viewHolder.moreBtn.setVisibility((task.suspended || templateJson.equals("")) ? View.GONE : View.VISIBLE);
         viewHolder.taskActiveCircle.setVisibility((task.suspended) ? View.INVISIBLE : View.VISIBLE);
+        Log.e("f", isFinished + "");
 
-        viewHolder.moreBtn.setVisibility(View.GONE);
-        if (task.suspended) {
+        if (task.suspended && !isFinished) {
             viewHolder.taskActiveCircle.setVisibility(View.INVISIBLE);
-
             if (task.complete_time != null) {
                 viewHolder.taskDate.setVisibility(View.VISIBLE);
+                viewHolder.delayed.setVisibility(View.VISIBLE);
+
                 viewHolder.taskDate.setText(sdf.format(new Date(task.complete_time / 1000)));
                 viewHolder.taskDate.setTextColor(Color.parseColor("#ffcc0000"));
             } else
@@ -115,9 +129,7 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
 
 
         if (task.suspended) {
-           // viewHolder.moreBtn.setVisibility(View.VISIBLE);
-            viewHolder.delayed.setVisibility( View.VISIBLE );
-
+           // viewHolder.moreBtn.setVisibility(View.VISIBLE)
             viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -140,15 +152,10 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
                 }
             });
 
-            SharedPreferences mSettings;
-            mSettings = App.getContext().getSharedPreferences("templates", Context.MODE_PRIVATE);
-            String templateJson = mSettings.getString(task.id + LoginHistoryService.getCurrentUser().username, "");
-
-            viewHolder.delayed.setVisibility((task.suspended || templateJson.equals("")) ? View.GONE : View.VISIBLE);
-            viewHolder.moreBtn.setVisibility((task.suspended || templateJson.equals("")) ? View.GONE : View.VISIBLE);
+}
         }
 
-    }
+
 
     @Override
     public int getItemCount() {

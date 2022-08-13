@@ -301,7 +301,7 @@ public class TasksFragment extends Fragment {
                 currentTaskList = busyTasks;
                 break;
         }
-        recyclerView.setAdapter(new TaskAdapter(this, currentTaskList));
+        //recyclerView.setAdapter(new TaskAdapter(this, currentTaskList));
     }
 
     private void updateTaskAdapter(TaskAdapter taskAdapter, CurrentAdapterType type) {
@@ -320,7 +320,7 @@ public class TasksFragment extends Fragment {
             public void onCheckedChanged(RadioGroup group, @IdRes int checkedId) {
                 switch (checkedId) {
                     case R.id.ended:
-                        updateTaskAdapter(new TaskAdapter(TasksFragment.this, finishedTasks), CurrentAdapterType.FINISHED);
+                        updateTaskAdapter(new TaskAdapter(TasksFragment.this, finishedTasks, true), CurrentAdapterType.FINISHED);
                         break;
 
                     case R.id.busy:
@@ -711,7 +711,7 @@ public class TasksFragment extends Fragment {
                             break;
                         case FINISHED:
                             ((RadioButton) rootView.findViewById(R.id.ended)).setChecked(true);
-                            updateTaskAdapter(new TaskAdapter(TasksFragment.this, finishedTasks), CurrentAdapterType.FINISHED);
+                            updateTaskAdapter(new TaskAdapter(TasksFragment.this, finishedTasks, true), CurrentAdapterType.FINISHED);
 
                             break;
                         case PERMANENT:
