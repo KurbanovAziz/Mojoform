@@ -2,6 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     package="org.dev_alex.mojo_qa.mojo">
+
     <queries>
         <intent>
             <action android:name="android.speech.RecognitionService" />
@@ -10,12 +11,13 @@
 
     <uses-permission
         android:name="android.permission.WRITE_EXTERNAL_STORAGE"
-        tools:remove="android:maxSdkVersion"/>
+        tools:remove="android:maxSdkVersion" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
-    <uses-permission android:name="android.permission.RECORD_AUDIO"
-        tools:remove="android:maxSdkVersion"/>
+    <uses-permission
+        android:name="android.permission.RECORD_AUDIO"
+        tools:remove="android:maxSdkVersion" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.GET_TASKS" />
@@ -34,14 +36,16 @@
         android:icon="${appIcon}"
         android:label="@string/app_name"
         android:largeHeap="true"
-
         android:requestLegacyExternalStorage="true"
         android:screenOrientation="portrait"
         android:theme="@style/Theme.AppCompat.Light.NoActionBar.FullScreen"
         android:usesCleartextTraffic="true"
         tools:replace="android:allowBackup,android:icon"
         tools:targetApi="q">
-        <activity android:name=".activities.RecordAudio"></activity>
+        <activity android:name=".activities.RecordAudio" />
+        <activity android:name=".activities.WebActivity"
+            android:theme="@style/Theme.AppCompat.NoActionBar"/>
+
         <activity
             android:name=".activities.AuthActivity"
             android:configChanges="orientation|keyboardHidden|keyboard"
@@ -115,7 +119,7 @@
             android:largeHeap="true"
             android:launchMode="singleTop"
             android:theme="@style/AppTheme.ActionBar.Transparent"
-            android:windowSoftInputMode="adjustPan"></activity>
+            android:windowSoftInputMode="adjustPan" />
         <activity
             android:name=".activities.OpenLinkActivity"
             android:configChanges="orientation|keyboardHidden|keyboard"
@@ -124,7 +128,19 @@
             android:windowSoftInputMode="adjustPan" />
         <activity
             android:name=".activities.PlayerActivity"
-            android:configChanges="keyboard|keyboardHidden|orientation|screenSize|screenLayout|smallestScreenSize|uiMode"></activity>
+            android:configChanges="keyboard|keyboardHidden|orientation|screenSize|screenLayout|smallestScreenSize|uiMode">
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:host="z.mojoform.com"
+                    android:pathPrefix="/tasks"
+                    android:scheme="https" />
+            </intent-filter>
+        </activity>
         <activity
             android:name=".activities.PickExecutorsActivity"
             android:configChanges="orientation|keyboardHidden|keyboard"
@@ -152,8 +168,8 @@
         <activity
             android:name="com.journeyapps.barcodescanner.CaptureActivity"
             android:screenOrientation="portrait"
-            tools:replace="android:screenOrientation"
-            android:stateNotNeeded="true"/>
+            android:stateNotNeeded="true"
+            tools:replace="android:screenOrientation" />
 
         <service android:name=".gcm.MyFirebaseMessagingService">
             <intent-filter>
@@ -172,7 +188,6 @@
         <meta-data
             android:name="com.rollbar.android.ACCESS_TOKEN"
             android:value="3401a27630db49dea6bf34559d77c45d" />
-
     </application>
 
 </manifest>

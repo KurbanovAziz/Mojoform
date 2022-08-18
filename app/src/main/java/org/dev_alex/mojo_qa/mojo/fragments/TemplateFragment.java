@@ -123,6 +123,7 @@ import org.dev_alex.mojo_qa.mojo.activities.ImageViewActivity;
 import org.dev_alex.mojo_qa.mojo.activities.MainActivity;
 import org.dev_alex.mojo_qa.mojo.activities.OpenLinkActivity;
 import org.dev_alex.mojo_qa.mojo.activities.RecordAudio;
+import org.dev_alex.mojo_qa.mojo.activities.WebActivity;
 import org.dev_alex.mojo_qa.mojo.custom_views.CustomImageView;
 import org.dev_alex.mojo_qa.mojo.custom_views.CustomWebview;
 import org.dev_alex.mojo_qa.mojo.custom_views.camera.CustomCamera2Activity;
@@ -1357,7 +1358,10 @@ public class TemplateFragment extends Fragment {
                                     isNextTemlpateURL = true;
                                     ((MainActivity) Objects.requireNonNull(getContext())).openFromLinkInApp(request.getUrl().toString());
                                 } else {
-                                    ((MainActivity) Objects.requireNonNull(getContext())).openURL(request.getUrl());
+                                    //((MainActivity) Objects.requireNonNull(getContext())).openURL(request.getUrl());
+                                    Intent intent = new Intent(getActivity(), WebActivity.class);
+                                    intent.putExtra("link", link);
+                                    startActivity(intent);
                                 }
                                 return true;
                             }
