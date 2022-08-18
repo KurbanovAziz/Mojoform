@@ -13,7 +13,7 @@ import android.webkit.WebViewClient;
 import org.dev_alex.mojo_qa.mojo.R;
 
 public class WebActivity extends AppCompatActivity {
-WebView webView;
+    WebView webView;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
