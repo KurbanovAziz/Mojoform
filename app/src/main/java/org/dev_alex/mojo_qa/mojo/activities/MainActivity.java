@@ -371,9 +371,7 @@ public class MainActivity extends AppCompatActivity {
                         .withIcon(R.drawable.bell),
                 new CustomDrawerItem(15, 0).withIdentifier(3).withName(R.string.exit).withIcon(R.drawable.exit),
                 new DividerDrawerItem(),
-                new CustomDrawerItem(15, 0).withIdentifier(4).withName(R.string.about_app).withIcon(R.drawable.question),
-                new DividerDrawerItem(),
-                new CustomDrawerItem(15, 0).withIdentifier(6).withName(R.string.change_seq).withIcon(R.drawable.drag_icon)
+                new CustomDrawerItem(15, 0).withIdentifier(4).withName(R.string.about_app).withIcon(R.drawable.question)
         );
 
         drawer = builder.withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {

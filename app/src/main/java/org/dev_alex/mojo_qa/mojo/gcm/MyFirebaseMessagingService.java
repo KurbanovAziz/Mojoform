@@ -20,6 +20,8 @@ import org.dev_alex.mojo_qa.mojo.activities.AuthActivity;
 import java.util.Map;
 import java.util.Random;
 
+import me.leolin.shortcutbadger.ShortcutBadger;
+
 public class MyFirebaseMessagingService extends FirebaseMessagingService {
     public static final String CHANNEL_ID = "mojo_channel_1";
     private static final String TAG = "MyFirebaseMsgService";
@@ -28,6 +30,12 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
     public final static String NOTIFY_ID = "notifyID";
 
     @Override
+    public void onCreate() {
+        super.onCreate();
+    }
+
+
+
     public void onMessageReceived(RemoteMessage remoteMessage) {
         if (remoteMessage == null || remoteMessage.getNotification() == null) {
             return;
@@ -36,8 +44,15 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         String title = remoteMessage.getNotification().getTitle();
         String body = remoteMessage.getNotification().getBody();
         Map<String, String> data = remoteMessage.getData();
+
         if (data == null) {
             return;
+        }
+
+        if (data.size() != 0){
+        ShortcutBadger.applyCount(MyFirebaseMessagingService.this, data.size());}
+        else {
+            ShortcutBadger.removeCount(MyFirebaseMessagingService.this);
         }
 
         try {

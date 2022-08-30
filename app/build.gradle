@@ -164,6 +164,8 @@ dependencies {
     implementation 'com.github.lecho:hellocharts-library:1.5.8@aar'
     implementation 'com.journeyapps:zxing-android-embedded:3.4.0'
     implementation 'com.jakewharton.threetenabp:threetenabp:1.2.0'
+    implementation "me.leolin:ShortcutBadger:1.1.22@aar"
+
 }
 apply plugin: 'com.google.gms.google-services'
 
