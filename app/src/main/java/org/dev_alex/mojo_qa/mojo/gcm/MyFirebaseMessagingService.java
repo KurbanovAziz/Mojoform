@@ -46,6 +46,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         Map<String, String> data = remoteMessage.getData();
 
         if (data == null) {
+            ShortcutBadger.removeCount(MyFirebaseMessagingService.this);
             return;
         }
 
