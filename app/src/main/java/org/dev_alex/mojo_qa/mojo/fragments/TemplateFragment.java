@@ -1354,7 +1354,7 @@ public class TemplateFragment extends Fragment {
                             @Override
                             public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
                                 String link = request.getUrl().toString();
-                                if (link.contains("mojo-qa.dev-alex.org") || link.contains("mojoform.com")) {
+                                if ((link.contains("mojo-qa.dev-alex.org") || link.contains("mojoform.com" )) && !link.contains("help.mojoform.com")) {
                                     isNextTemlpateURL = true;
                                     ((MainActivity) Objects.requireNonNull(getContext())).openFromLinkInApp(request.getUrl().toString());
                                 } else {
