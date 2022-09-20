@@ -42,6 +42,7 @@ import com.mikepenz.materialdrawer.model.SecondaryDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import com.woxthebox.draglistview.DragListView;
 
+import org.dev_alex.mojo_qa.mojo.App;
 import org.dev_alex.mojo_qa.mojo.AppointmentsModel;
 import org.dev_alex.mojo_qa.mojo.Data;
 import org.dev_alex.mojo_qa.mojo.R;
@@ -56,7 +57,9 @@ import org.dev_alex.mojo_qa.mojo.fragments.TemplateFragment;
 import org.dev_alex.mojo_qa.mojo.fragments.appointment.AppointmentListFragment;
 import org.dev_alex.mojo_qa.mojo.gcm.MyFirebaseMessagingService;
 import org.dev_alex.mojo_qa.mojo.models.Notification;
+import org.dev_alex.mojo_qa.mojo.models.Task;
 import org.dev_alex.mojo_qa.mojo.models.User;
+import org.dev_alex.mojo_qa.mojo.models.file.Entry;
 import org.dev_alex.mojo_qa.mojo.services.LoginHistoryService;
 import org.dev_alex.mojo_qa.mojo.services.RequestService;
 import org.dev_alex.mojo_qa.mojo.services.TokenService;
@@ -68,6 +71,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -76,6 +80,8 @@ import androidx.cardview.widget.CardView;
 import androidx.core.content.FileProvider;
 import androidx.core.view.MenuItemCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
+
+import me.leolin.shortcutbadger.ShortcutBadger;
 import okhttp3.Response;
 import okio.BufferedSink;
 import okio.Okio;
@@ -95,6 +101,19 @@ public class MainActivity extends AppCompatActivity {
         initDrawer();
         if (drawer == null) {
             return;
+        }
+        SharedPreferences pos = App.getContext().getSharedPreferences("templates", Context.MODE_PRIVATE);
+        Map<String, ?> keys = pos.getAll();
+        int i = 0;
+        for (Map.Entry<String, ?> entry : keys.entrySet()){
+            if (entry.getKey().contains(LoginHistoryService.getCurrentUser().username)) {
+                i++;
+            }
+        }
+        if ( i != 0){
+            ShortcutBadger.applyCount(MainActivity.this,  i);}
+        else {
+            ShortcutBadger.removeCount(MainActivity.this);
         }
         drawer.setSelectionAtPosition(1, true);
         checkData(getIntent());

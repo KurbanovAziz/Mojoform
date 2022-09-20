@@ -5,17 +5,22 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 
+import org.dev_alex.mojo_qa.mojo.App;
 import org.dev_alex.mojo_qa.mojo.R;
 import org.dev_alex.mojo_qa.mojo.activities.AuthActivity;
+import org.dev_alex.mojo_qa.mojo.activities.MainActivity;
+import org.dev_alex.mojo_qa.mojo.services.LoginHistoryService;
 
 import java.util.Map;
 import java.util.Random;
@@ -49,9 +54,16 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
             ShortcutBadger.removeCount(MyFirebaseMessagingService.this);
             return;
         }
-
-        if (data.size() != 0){
-        ShortcutBadger.applyCount(MyFirebaseMessagingService.this, data.size());}
+        SharedPreferences pos = App.getContext().getSharedPreferences("templates", Context.MODE_PRIVATE);
+        Map<String, ?> keys = pos.getAll();
+        int i = 0;
+        for (Map.Entry<String, ?> entry : keys.entrySet()){
+            if (entry.getKey().contains(LoginHistoryService.getCurrentUser().username)) {
+                i++;
+            }
+        }
+        if (data.size() + i != 0){
+        ShortcutBadger.applyCount(MyFirebaseMessagingService.this, data.size() + i);}
         else {
             ShortcutBadger.removeCount(MyFirebaseMessagingService.this);
         }
