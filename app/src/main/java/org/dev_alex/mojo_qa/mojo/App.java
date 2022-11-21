@@ -31,22 +31,29 @@ public class App extends Application {
             case "release_flavor":
                 host = "https://system.mojoform.com";
                 host = "https://system.mojoform.com";
+                host = "https://system.mojo2.ru";
                 break;
 
             case "debug_flavor":
                 host = "https://mojo-qa.dev-alex.org";
                 host = "https://system.mojoform.com";
+                host = "https://system.mojo2.ru";
+
 
                 break;
 
             case "demo_flavor":
                 host = "https://demo.mojoform.com";
                 host = "https://system.mojoform.com";
+                host = "https://system.mojo2.ru";
+
 
                 break;
 
             default:
                 host = "https://system.mojoform.com";
+                host = "https://system.mojo2.ru";
+
                 break;
         }
 
