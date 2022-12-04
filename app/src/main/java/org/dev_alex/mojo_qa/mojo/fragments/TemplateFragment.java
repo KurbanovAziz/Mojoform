@@ -141,6 +141,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import org.w3c.dom.Text;
 
 
 import java.io.ByteArrayInputStream;
@@ -1844,9 +1845,9 @@ public class TemplateFragment extends Fragment {
 
     private void createSeekBar(final JSONObject value, LinearLayout container) throws Exception {
         final LinearLayout seekBarContainer = (LinearLayout) getActivity().getLayoutInflater().inflate(R.layout.slider, container, false);
-        final View qrCodeBtn = ((ViewGroup) seekBarContainer.getChildAt(3)).getChildAt(1);
-        final TextView captionLabel = ((TextView) seekBarContainer.getChildAt(0));
-        final EditText changeValue = (EditText) ((LinearLayout) ((LinearLayout) seekBarContainer.getChildAt(3)).getChildAt(0)).getChildAt(1);
+        final View qrCodeBtn = seekBarContainer.findViewById(R.id.qr_btn);
+        final TextView captionLabel = seekBarContainer.findViewById(R.id.labelTV);
+        final EditText changeValue = seekBarContainer.findViewById(R.id.resultET);
         captionLabel.setText(value.getString("caption"));
 
 
@@ -1860,7 +1861,7 @@ public class TemplateFragment extends Fragment {
         }
 
         if (value.has("measure"))
-            ((TextView) ((LinearLayout) ((LinearLayout) seekBarContainer.getChildAt(3)).getChildAt(0)).getChildAt(2)).setText(value.getString("measure"));
+            seekBarContainer.findViewById(R.id.measureTV);
 
         final SeekBar seekBar = ((SeekBar) seekBarContainer.getChildAt(1));
 
@@ -1878,8 +1879,8 @@ public class TemplateFragment extends Fragment {
 
         final int digitsOffset = (int) Math.pow(10, digitsAfterPoint);
 
-        ((TextView) ((RelativeLayout) seekBarContainer.getChildAt(2)).getChildAt(0)).setText(formatFloat(minValue));
-        ((TextView) ((RelativeLayout) seekBarContainer.getChildAt(2)).getChildAt(1)).setText(formatFloat(maxValue));
+        ((TextView)seekBarContainer.findViewById(R.id.minTV)).setText(formatFloat(minValue));
+        ((TextView)seekBarContainer.findViewById(R.id.maxTV)).setText(formatFloat(maxValue));
 
         final int increment = (int) (step * digitsOffset);
         final int max = (int) (((maxValue - minValue) * digitsOffset) / increment);

@@ -6,22 +6,34 @@
     android:layout_height="wrap_content"
     android:layout_marginLeft="10dp"
     android:layout_marginRight="10dp"
-    android:background="@drawable/white_rounded_rectangle"
     android:orientation="vertical"
     android:paddingLeft="10dp"
     android:paddingTop="15dp"
     android:paddingRight="10dp"
     android:paddingBottom="15dp">
 
-
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal">
+    <ImageView
+        android:id="@+id/qr_btn"
+        android:layout_width="45dp"
+        android:layout_height="45dp"
+        android:layout_marginLeft="10dp"
+        android:layout_gravity="center"
+        android:src="@drawable/qr_icon" />
     <TextView
+        android:id="@+id/labelTV"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginRight="5dp"
+        android:layout_gravity="center"
+android:layout_marginHorizontal="10dp"
+        android:textColor="@color/textGrey"
         android:gravity="center"
         android:textAlignment="center"
         android:textSize="20sp" />
+</LinearLayout>
 
     <SeekBar
         android:id="@+id/seekBar"
@@ -41,12 +53,14 @@
         android:layout_marginRight="8dp">
 
         <TextView
+            android:id="@+id/minTV"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
             android:text="0" />
 
         <TextView
+            android:id="@+id/maxTV"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
@@ -68,17 +82,11 @@
             android:layout_weight="1"
             android:orientation="vertical">
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="25dp"
-                android:gravity="center_vertical"
-                android:text="@string/change_value"
-                android:textColor="#ff4c3d5f"
-                android:textSize="16sp" />
-
             <EditText
-                android:layout_width="match_parent"
+                android:id="@+id/resultET"
+                android:layout_width="100dp"
                 android:layout_height="45dp"
+                android:layout_gravity="center"
                 android:background="@drawable/seekbar_block_text_background"
                 android:digits="0123456789"
                 android:gravity="center_vertical"
@@ -87,6 +95,7 @@
                 android:paddingRight="10dp" />
 
             <TextView
+                android:id="@+id/measureTV"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
@@ -96,12 +105,7 @@
                 android:textSize="16sp" />
         </LinearLayout>
 
-        <ImageView
-            android:layout_width="45dp"
-            android:layout_height="45dp"
-            android:layout_marginLeft="10dp"
-            android:layout_marginTop="25dp"
-            android:src="@drawable/qr_icon" />
+
 
     </LinearLayout>
 </LinearLayout>

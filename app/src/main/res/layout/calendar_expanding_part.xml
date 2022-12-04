@@ -3,19 +3,19 @@
     android:layout_width="match_parent"
     android:layout_height="310dp">
 
-    <ImageView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:scaleType="fitXY"
-        android:src="@drawable/calendar_background" />
+
 
     <com.prolificinteractive.materialcalendarview.MaterialCalendarView
         xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:backgroundTint="@color/lightBlue"
         android:id="@+id/calendarView"
         android:layout_width="match_parent"
         android:layout_height="310dp"
         app:mcv_firstDayOfWeek="monday"
-        app:mcv_selectionColor="#ff26c373"
+        app:mcv_selectionColor="@color/accent"
+        app:mcv_arrowColor="@color/textGrey"
+        app:mcv_dateTextAppearance="@color/textGrey"
+        app:mcv_weekDayTextAppearance="@color/textGrey"
         app:mcv_showOtherDates="none"
         app:mcv_tileHeight="0dp"
         app:mcv_tileWidth="0dp" />

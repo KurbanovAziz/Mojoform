@@ -8,14 +8,14 @@
     <org.dev_alex.mojo_qa.mojo.custom_views.LinearLayoutWithExpandingCalendar xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@drawable/main_activity_background"
+        android:background="#F0F9FD"
         android:orientation="vertical">
 
         <RelativeLayout
             android:id="@+id/calendar_control_panel"
             android:layout_width="match_parent"
             android:layout_height="45dp"
-            android:background="#95699e">
+            android:background="#F0F9FD">
 
             <LinearLayout
                 android:layout_width="wrap_content"
@@ -29,8 +29,9 @@
                     android:layout_height="match_parent"
                     android:layout_gravity="center_vertical"
                     android:adjustViewBounds="true"
-                    android:paddingBottom="15dp"
                     android:paddingTop="15dp"
+                    app:tint="#5E5E5E"
+                    android:paddingBottom="15dp"
                     android:rotation="180"
                     android:src="@drawable/calendar_right_arrow" />
 
@@ -42,7 +43,7 @@
                     android:layout_marginLeft="10dp"
                     android:layout_marginRight="10dp"
                     android:text="Апрель 2017"
-                    android:textColor="@android:color/white"
+                    android:textColor="#5E5E5E"
                     android:textSize="16sp" />
 
                 <ImageView
@@ -51,9 +52,10 @@
                     android:layout_height="match_parent"
                     android:layout_gravity="center_vertical"
                     android:adjustViewBounds="true"
-                    android:paddingBottom="15dp"
                     android:paddingTop="15dp"
-                    android:src="@drawable/calendar_right_arrow" />
+                    android:paddingBottom="15dp"
+                    android:src="@drawable/calendar_right_arrow"
+                    app:tint="#5E5E5E" />
             </LinearLayout>
 
             <ImageView
@@ -64,8 +66,8 @@
                 android:layout_gravity="center_vertical"
                 android:layout_marginRight="20dp"
                 android:adjustViewBounds="true"
-                android:paddingBottom="15dp"
                 android:paddingTop="15dp"
+                android:paddingBottom="15dp"
                 android:src="@drawable/close_icon"
                 android:visibility="gone" />
         </RelativeLayout>
@@ -85,14 +87,13 @@
             android:layout_width="match_parent"
             android:layout_height="60dp"
             android:layout_marginLeft="8dp"
-            android:layout_marginRight="8dp"
             android:layout_marginTop="15dp"
-            android:background="@drawable/task_switch_background"
+            android:layout_marginRight="8dp"
             android:orientation="horizontal"
-            android:paddingBottom="18dp"
             android:paddingLeft="10dp"
+            android:paddingTop="4dp"
             android:paddingRight="10dp"
-            android:paddingTop="4dp">
+            android:paddingBottom="18dp">
 
             <RadioButton
                 android:id="@+id/ended"
@@ -100,6 +101,7 @@
                 android:layout_height="match_parent"
                 android:layout_weight="1.1"
                 android:background="@drawable/task_switch_button_background"
+                android:layout_marginEnd="10dp"
                 android:button="@null"
                 android:gravity="center"
                 android:text="@string/ended"
@@ -121,6 +123,8 @@
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
+                android:layout_marginStart="10dp"
+                android:paddingHorizontal="-10dp"
                 android:background="@drawable/task_switch_button_background"
                 android:button="@null"
                 android:gravity="center"

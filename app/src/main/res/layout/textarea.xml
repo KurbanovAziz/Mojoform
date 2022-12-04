@@ -42,6 +42,14 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal">
+            <ImageView
+                android:id="@+id/btScanQr"
+                android:layout_width="45dp"
+                android:layout_marginRight="10dp"
+                android:layout_height="45dp"
+                android:layout_gravity="center_vertical"
+                android:layout_marginTop="1dp"
+                android:src="@drawable/qr_icon" />
             <TextView
                 android:id="@+id/caption"
                 android:layout_width="0dp"
@@ -49,19 +57,11 @@
                 android:layout_gravity="center_vertical"
                 android:layout_weight="1"
                 android:layout_marginEnd="8dp"
-                android:layout_marginStart="12dp"
+                android:layout_marginStart="4dp"
                 android:text="Заголовок ввода"
-                android:textColor="#ff4c3d5f"
+                android:textColor="@color/textGrey"
                 android:textSize="18sp" />
-        <ImageView
-            android:id="@+id/btScanQr"
 
-            android:layout_width="45dp"
-            android:layout_marginRight="20dp"
-            android:layout_height="45dp"
-            android:layout_gravity="center_vertical"
-            android:layout_marginTop="1dp"
-            android:src="@drawable/qr_icon" />
 
 
         </LinearLayout>
@@ -74,13 +74,13 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
         <androidx.cardview.widget.CardView
-            android:layout_marginTop="10dp"
+            android:layout_marginTop="20dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:cardCornerRadius="10dp"
             android:layout_weight="1"
             android:layout_marginBottom="15dp"
-            android:paddingBottom="30dp"
+            android:paddingBottom="10dp"
             android:paddingTop="10dp"
 
             android:layout_marginRight="5dp"

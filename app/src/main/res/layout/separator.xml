@@ -7,8 +7,8 @@
     xmlns:android="http://schemas.android.com/apk/res/android">
     <View
         android:layout_width="match_parent"
-        android:layout_height="2dp"
-        android:background="#95699E"
+        android:layout_height="1dp"
+        android:background="@color/light_grey"
         android:layout_marginTop="10dp"
         android:layout_marginLeft="12dp"
         android:layout_marginRight="12dp" />

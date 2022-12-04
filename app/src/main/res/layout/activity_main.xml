@@ -19,7 +19,7 @@
             android:layout_width="match_parent"
             android:layout_height="78dp"
             android:scaleType="fitXY"
-            android:src="@drawable/main_activity_header_background" />
+            android:src="@color/white" />
 
 
         <LinearLayout
@@ -51,6 +51,7 @@
                 android:layout_gravity="bottom"
                 android:layout_marginRight="22dp"
                 android:layout_marginBottom="7.6dp"
+                app:tint="@color/grey"
                 android:background="@drawable/grey_search_block"
                 android:orientation="horizontal"
                 android:paddingLeft="15dp"
@@ -105,6 +106,7 @@
                     android:layout_height="20dp"
                     android:layout_gravity="bottom|center_horizontal"
                     android:adjustViewBounds="true"
+                    app:tint="@color/grey"
                     android:src="@drawable/back_arrow_icon" />
             </FrameLayout>
 
@@ -117,8 +119,10 @@
                 <ImageView
                     android:layout_width="20dp"
                     android:layout_height="20dp"
+
                     android:layout_gravity="bottom|center_horizontal"
                     android:adjustViewBounds="true"
+                    app:tint="@color/grey"
                     android:src="@drawable/sandwich_icon" />
 
                 <View
@@ -150,7 +154,7 @@
                     android:maxLines="1"
                     android:text="@string/documents"
                     android:textAllCaps="true"
-                    android:textColor="@android:color/white"
+                    android:textColor="@color/grey"
                     android:textSize="18sp" />
 
                 <TextView
@@ -162,7 +166,7 @@
                     android:ellipsize="end"
                     android:maxLines="3"
                     android:textAllCaps="true"
-                    android:textColor="@android:color/white"
+                    android:textColor="@color/grey"
                     android:textSize="12sp"
                     android:visibility="gone" />
             </FrameLayout>
@@ -177,6 +181,7 @@
                     android:id="@+id/list_grid_icon"
                     android:layout_width="20dp"
                     android:layout_height="20dp"
+                    app:tint="@color/grey"
                     android:layout_gravity="bottom|right"
                     android:adjustViewBounds="true"
                     android:src="@drawable/grid_icon" />
@@ -191,6 +196,7 @@
                 <ImageView
                     android:layout_width="20dp"
                     android:layout_height="20dp"
+                    app:tint="@color/grey"
                     android:layout_gravity="bottom|right"
                     android:adjustViewBounds="true"
                     android:src="@drawable/search_icon" />
@@ -209,8 +215,7 @@
                     android:layout_gravity="bottom|right"
                     android:adjustViewBounds="true"
                     android:src="@drawable/bell"
-                    android:tint="@android:color/white" />
-
+                    app:tint="@color/grey" />
                 <View
                     android:id="@+id/vNotificationButtonBadge"
                     android:layout_width="6dp"
@@ -230,6 +235,7 @@
                 <ImageView
                     android:layout_width="20dp"
                     android:layout_height="19dp"
+                    app:tint="@color/grey"
                     android:layout_gravity="bottom|right"
                     android:adjustViewBounds="true"
                     android:src="@drawable/download_icon" />
@@ -245,12 +251,14 @@
             <FrameLayout
                 android:id="@+id/qr_btn"
                 android:layout_width="40dp"
+                app:tint="@color/grey"
                 android:layout_height="match_parent"
                 android:paddingBottom="12dp">
 
                 <ImageView
                     android:layout_width="20dp"
                     android:layout_height="20dp"
+                    app:tint="@color/grey"
                     android:layout_gravity="bottom|right"
                     android:layout_marginHorizontal="5dp"
                     android:adjustViewBounds="true"
@@ -280,12 +288,12 @@
                 app:cardBackgroundColor="#EDEDED"
                 app:cardCornerRadius="15dp"
                 android:layout_height="wrap_content">
-            <ImageView
-                android:layout_width="150dp"
-                android:layout_height="50dp"
-                android:layout_gravity="top"
-                android:layout_marginHorizontal="5dp"
-                android:src="@drawable/nowifi" />
+                <ImageView
+                    android:layout_width="150dp"
+                    android:layout_height="50dp"
+                    android:layout_gravity="top"
+                    android:layout_marginHorizontal="5dp"
+                    android:src="@drawable/nowifi" />
             </androidx.cardview.widget.CardView>
         </FrameLayout>
 

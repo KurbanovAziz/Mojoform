@@ -10,6 +10,9 @@
         android:layout_alignLeft="@id/tvButton"
         android:layout_alignTop="@+id/tvButton"
         android:layout_alignRight="@+id/tvButton"
+        android:scaleY="0.7"
+        android:scaleX="0.9"
+
         android:layout_alignBottom="@+id/tvButton"
         android:background="@drawable/select_btn_only_shadow"
         android:button="@null" />
@@ -21,10 +24,10 @@
         android:layout_alignTop="@+id/tvButton"
         android:layout_alignRight="@+id/tvButton"
         android:layout_alignBottom="@+id/tvButton"
+        android:scaleY="0.7"
+        android:scaleX="0.9"
         android:layout_marginLeft="15dp"
-        android:layout_marginTop="5.1dp"
         android:layout_marginRight="15dp"
-        android:layout_marginBottom="22dp"
         android:background="@drawable/shape_white_oval"
         android:visibility="visible" />
 
@@ -37,7 +40,7 @@
         android:gravity="center"
         android:paddingHorizontal="16dp"
         android:paddingTop="12dp"
-        android:paddingBottom="33dp"
+        android:paddingVertical="15dp"
         android:textColor="#4c3e60"
         android:textSize="16sp" />
 </RelativeLayout>
