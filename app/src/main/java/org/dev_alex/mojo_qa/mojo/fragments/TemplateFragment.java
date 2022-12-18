@@ -65,6 +65,7 @@ import android.webkit.WebChromeClient;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
@@ -1126,12 +1127,10 @@ public class TemplateFragment extends Fragment {
                 case "money":
                     final LinearLayout moneyContainer = (LinearLayout) getActivity().getLayoutInflater().inflate(R.layout.text_plan, container, false);
                     ((ViewGroup) moneyContainer.getChildAt(0)).getChildAt(1).setVisibility((value.has("is_required") && !value.getBoolean("is_required")) ? View.GONE : View.VISIBLE);
-                    final EditText etPlan = ((EditText) ((ViewGroup) ((ViewGroup) ((ViewGroup) moneyContainer.getChildAt(1)).getChildAt(0)).getChildAt(1)).getChildAt(0));
-                    final View tvPlanLabel = ((ViewGroup) ((ViewGroup) ((ViewGroup) moneyContainer.getChildAt(1)).getChildAt(0)).getChildAt(0)).getChildAt(0);
-                    final EditText etFact = ((EditText) ((ViewGroup) ((ViewGroup) ((ViewGroup) moneyContainer.getChildAt(1)).getChildAt(0)).getChildAt(1)).getChildAt(1));
-
-                    final View btQrCode = ((ViewGroup) moneyContainer.getChildAt(1)).getChildAt(1);
-
+                    final EditText etPlan = moneyContainer.findViewById(R.id.planET);
+                    final View tvPlanLabel = moneyContainer.findViewById(R.id.headTV);
+                    final EditText etFact = moneyContainer.findViewById(R.id.factET);
+                  //  final View btQrCode = moneyContainer.findViewById(R.id.qr_btn);
 
                     final TextView captionLabel = ((TextView) ((ViewGroup) moneyContainer.getChildAt(0)).getChildAt(0));
 
@@ -1153,7 +1152,7 @@ public class TemplateFragment extends Fragment {
                     if (isTaskFinished) {
                         etPlan.setEnabled(false);
                         etFact.setEnabled(false);
-                        btQrCode.setVisibility(View.GONE);
+                       // btQrCode.setVisibility(View.GONE);
                     } else {
                         etPlan.addTextChangedListener(new TextWatcher() {
                             @Override
@@ -1212,7 +1211,7 @@ public class TemplateFragment extends Fragment {
                             }
                         }
 
-                        btQrCode.setOnClickListener(view -> scanQrCode(captionLabel, value));
+                        //btQrCode.setOnClickListener(view -> scanQrCode(captionLabel, value));
                     }
                     container.addView(separator);
 
@@ -1222,14 +1221,17 @@ public class TemplateFragment extends Fragment {
 
                 case "checkbox":
                     LinearLayout checkBoxContainer = (LinearLayout) getActivity().getLayoutInflater().inflate(R.layout.checkbox, container, false);
+                    TextView captionTV = checkBoxContainer.findViewById(R.id.captionTV);
+                    CheckBox checkBox = checkBoxContainer.findViewById(R.id.checkBox);
+
 
                     if (value.has("caption"))
-                        ((TextView) checkBoxContainer.getChildAt(1)).setText(value.getString("caption"));
+                        captionTV.setText(value.getString("caption"));
                     else
-                        ((TextView) checkBoxContainer.getChildAt(1)).setText(R.string.no_text);
+                        captionTV.setText(R.string.no_text);
 
                     if (!isTaskFinished)
-                        ((CheckBox) checkBoxContainer.getChildAt(0)).setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                       checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                             @Override
                             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                                 try {
@@ -1240,16 +1242,15 @@ public class TemplateFragment extends Fragment {
                             }
                         });
                     else
-                        checkBoxContainer.getChildAt(0).setEnabled(false);
+                        checkBox.setEnabled(false);
 
                     if (value.has("value"))
-                        ((CheckBox) checkBoxContainer.getChildAt(0)).setChecked(value.getBoolean("value"));
+                       checkBox.setChecked(value.getBoolean("value"));
                     else {
-                        ((CheckBox) checkBoxContainer.getChildAt(0)).setChecked(true);
-                        ((CheckBox) checkBoxContainer.getChildAt(0)).setChecked(false);
+                        checkBox.setChecked(true);
+                        checkBox.setChecked(false);
                     }
                     container.addView(separator);
-
                     container.addView(boxInContainerWithId(checkBoxContainer, value.getString("id")));
 
                     break;
@@ -1781,33 +1782,8 @@ public class TemplateFragment extends Fragment {
     }
 
     private void createCategory(JSONObject value, LinearLayout container, int offset) throws Exception {
-        int color;
-        switch (offset) {
-            case 0:
-                color = Color.parseColor("#B7B5EC");
-                break;
-            case 1:
-                color = Color.parseColor("#C3E1FE");
-                break;
-            case 2:
-                color = Color.parseColor("#DBF5D8");
-                break;
-            case 3:
-                color = Color.parseColor("#F3D8F5");
-                break;
-            case 4:
-                color = Color.parseColor("#F4EAD8");
-                break;
-
-            default:
-                color = Color.parseColor("#F4EAD8");
-                break;
-        }
-
         LinearLayout categoryHeader = (LinearLayout) getActivity().getLayoutInflater().inflate(R.layout.category_header, container, false);
-
         categoryHeader.setTag(value.getString("id") + "_head");
-        ((LayerDrawable) categoryHeader.getBackground()).findDrawableByLayerId(R.id.background).setColorFilter(color, PorterDuff.Mode.SRC_IN);
         if (value.has("name"))
             ((TextView) categoryHeader.getChildAt(1)).setText(value.getString("name"));
         else
@@ -1815,8 +1791,6 @@ public class TemplateFragment extends Fragment {
 
         LinearLayout expandableContent = (LinearLayout) getActivity().getLayoutInflater().inflate(R.layout.expandable_content, container, false);
         expandableContent.setTag(value.getString("id") + "_cont");
-        ((LayerDrawable) expandableContent.getBackground()).findDrawableByLayerId(R.id.background).setColorFilter(color, PorterDuff.Mode.SRC_IN);
-
         fillContainer(expandableContent, value.getJSONArray("items"), offset + 1);
 
 
@@ -1861,9 +1835,8 @@ public class TemplateFragment extends Fragment {
         }
 
         if (value.has("measure"))
-            seekBarContainer.findViewById(R.id.measureTV);
-
-        final SeekBar seekBar = ((SeekBar) seekBarContainer.getChildAt(1));
+            ((TextView)seekBarContainer.findViewById(R.id.measureTV)).setText(value.getString("measure"));
+        final SeekBar seekBar = seekBarContainer.findViewById(R.id.seekBar);
 
         final float minValue = (float) value.getDouble("min_value");
         final float maxValue = (float) value.getDouble("max_value");
@@ -1984,15 +1957,19 @@ public class TemplateFragment extends Fragment {
 
     private void createSignature(final JSONObject value, LinearLayout container) throws Exception {
         final LinearLayout signatureContainer = (LinearLayout) getActivity().getLayoutInflater().inflate(R.layout.signature_layout, container, false);
-        final SignaturePad signaturePad = (SignaturePad) signatureContainer.getChildAt(1);
+        final SignaturePad signaturePad = signatureContainer.findViewById(R.id.signature_pad);
+        final Button clearBTN = signatureContainer.findViewById(R.id.clearBTN);
+        final TextView captionTV = signatureContainer.findViewById(R.id.captionTV);
+        final ImageView starIV = signatureContainer.findViewById(R.id.red_star);
 
-        ((ViewGroup) signatureContainer.getChildAt(0)).getChildAt(1).setVisibility((value.has("is_required") && !value.getBoolean("is_required")) ? View.GONE : View.VISIBLE);
+
+        starIV.setVisibility((value.has("is_required") && !value.getBoolean("is_required")) ? View.GONE : View.VISIBLE);
         if (value.has("caption"))
-            ((TextView) ((ViewGroup) signatureContainer.getChildAt(0)).getChildAt(0)).setText(value.getString("caption"));
+            captionTV.setText(value.getString("caption"));
         else
-            ((TextView) ((ViewGroup) signatureContainer.getChildAt(0)).getChildAt(0)).setText("Нет текста");
+            captionTV.setText("Нет текста");
 
-        ((ViewGroup) signatureContainer.getChildAt(2)).getChildAt(1).setOnClickListener(new View.OnClickListener() {
+        clearBTN.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 signaturePad.clear();
@@ -2038,7 +2015,7 @@ public class TemplateFragment extends Fragment {
 
         if (isTaskFinished) {
             signaturePad.setEnabled(false);
-            ((ViewGroup) signatureContainer.getChildAt(2)).getChildAt(1).setVisibility(View.GONE);
+            clearBTN.setVisibility(View.GONE);
         }
     }
 

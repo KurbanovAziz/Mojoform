@@ -13,7 +13,7 @@
         android:layout_height="25dp"
         android:layout_gravity="center_vertical"
         android:adjustViewBounds="true"
-        android:src="@drawable/folder_hd_icon" />
+        android:src="@drawable/folder_icon" />
 
     <TextView
         android:layout_width="match_parent"
@@ -23,6 +23,6 @@
         android:paddingBottom="6dp"
         android:paddingTop="6dp"
         android:text="Заголовок каегории"
-        android:textColor="@android:color/black"
+        android:textColor="@color/textGrey"
         android:textSize="18sp"              />
 </LinearLayout>

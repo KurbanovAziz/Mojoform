@@ -46,7 +46,6 @@ public class LoginHistoryFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         if (rootView == null) {
             rootView = inflater.inflate(R.layout.fragment_login_history, container, false);
-
             recyclerView = (RecyclerView) rootView.findViewById(R.id.recycler_view);
             recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
             recyclerView.setAdapter(new UserAdapter(this, LoginHistoryService.getLastLoggedUsers()));

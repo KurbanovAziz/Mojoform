@@ -24,7 +24,7 @@
             android:layout_height="25dp"
             android:layout_gravity="center_vertical"
             android:adjustViewBounds="true"
-            android:src="@drawable/folder_icon" />
+            android:src="@drawable/category_icon" />
 
         <ImageView
             android:id="@+id/selected_tick"

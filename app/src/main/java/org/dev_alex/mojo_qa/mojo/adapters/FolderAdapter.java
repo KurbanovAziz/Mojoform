@@ -122,7 +122,7 @@ public class FolderAdapter extends RecyclerView.Adapter<FolderAdapter.FolderView
             });
 
 
-        viewHolder.folderIcon.setImageResource(folder.nodeType.equals("cm:org") ? R.drawable.organization_icon : R.drawable.folder_icon);
+        viewHolder.folderIcon.setImageResource(folder.nodeType.equals("cm:org") ? R.drawable.organization_icon : R.drawable.category_icon);
 
         viewHolder.moreBtn.setVisibility(folder.nodeType.equals("cm:org") ? View.INVISIBLE : View.VISIBLE);
 

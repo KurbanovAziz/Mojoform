@@ -13,15 +13,17 @@
         android:orientation="horizontal">
 
         <TextView
+            android:id="@+id/captionTV"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
             android:layout_weight="1"
             android:text=""
-            android:textColor="#ff4c3d5f"
+            android:textColor="@color/textGrey"
             android:textSize="16sp" />
 
         <ImageView
+            android:id="@+id/red_star"
             android:layout_width="15dp"
             android:layout_height="15dp"
             android:layout_gravity="center_vertical"
@@ -41,29 +43,22 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
+        android:gravity="center"
         android:orientation="horizontal">
 
-        <androidx.legacy.widget.Space
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="0.55" />
 
         <Button
-            android:layout_width="0dp"
-            android:layout_height="54dp"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginBottom="7dp"
-            android:layout_weight="1"
-            android:background="@drawable/clear_btn"
-            android:paddingBottom="12dp"
+            android:id="@+id/clearBTN"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:paddingHorizontal="20dp"
+            android:paddingVertical="-20dp"
+            android:background="@drawable/blue_mark_btn"
             android:text="@string/clear"
             android:textAllCaps="false"
-            android:textColor="#979797"
-            android:textSize="16sp" />
+            android:textColor="@color/textGrey"
+            android:textSize="16dp" />
 
-        <androidx.legacy.widget.Space
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="0.55" />
     </LinearLayout>
 </LinearLayout>

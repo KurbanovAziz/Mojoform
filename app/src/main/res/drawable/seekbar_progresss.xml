@@ -10,7 +10,7 @@
     </item>
     <item android:id="@android:id/progress">
         <scale
-            android:drawable="@drawable/seekbar_progress"
+            android:drawable="@color/colorAccent"
             android:scaleWidth="100%" />
     </item>
 

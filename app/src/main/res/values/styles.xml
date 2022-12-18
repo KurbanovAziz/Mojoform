@@ -6,7 +6,7 @@
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
-
+        <item name="android:windowLightStatusBar">false</item>
         <item name="material_drawer_background">@color/drawer_background</item>
         <item name="material_drawer_primary_text">@color/drawer_text_color</item>
         <item name="material_drawer_secondary_text">@color/drawer_text_color</item>

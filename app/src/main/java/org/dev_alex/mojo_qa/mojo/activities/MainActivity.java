@@ -1,5 +1,7 @@
 package org.dev_alex.mojo_qa.mojo.activities;
 
+import static android.view.WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS;
+
 import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
@@ -95,6 +97,10 @@ public class MainActivity extends AppCompatActivity {
 
         super.onCreate(null);
         setContentView(R.layout.activity_main);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            getWindow().getDecorView().getWindowInsetsController().setSystemBarsAppearance(APPEARANCE_LIGHT_STATUS_BARS, APPEARANCE_LIGHT_STATUS_BARS);
+        }
+
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
             getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);

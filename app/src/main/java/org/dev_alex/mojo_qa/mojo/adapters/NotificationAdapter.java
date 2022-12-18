@@ -5,6 +5,7 @@ import android.content.Context;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.content.res.AppCompatResources;
+import androidx.core.content.ContextCompat;
 import androidx.core.graphics.drawable.DrawableCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -47,8 +48,8 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
         TextView notificationDescription;
         ImageView moreBtn;
         ImageView notification_bell;
-        Button btDownloadPdf;
-        Button btDownloadDoc;
+        ImageView btDownloadPdf;
+        ImageView btDownloadDoc;
         View vButtonsBlock;
         View unread_line;
 
@@ -94,12 +95,12 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
 
 
         if(notification.color != null){
-            viewHolder.notification_bell.setImageResource(R.drawable.bell_image);
+            viewHolder.notification_bell.setImageResource(R.drawable.bell);
             viewHolder.notification_bell.setColorFilter(Color.parseColor(notification.color));
             }
         else {
-            viewHolder.notification_bell.setImageResource(R.drawable.bell_task);
-            viewHolder.notification_bell.setColorFilter(Color.parseColor("#4E3F60"));
+            viewHolder.notification_bell.setImageResource(R.drawable.bell);
+            viewHolder.notification_bell.setColorFilter(Color.parseColor("#CECECE"));
         }
 
 

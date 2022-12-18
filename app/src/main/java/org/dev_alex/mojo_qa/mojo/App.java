@@ -27,6 +27,7 @@ public class App extends Application {
         mContext = new WeakReference<>(this);
         displayMetrics = getResources().getDisplayMetrics();
 
+
         switch (BuildConfig.FLAVOR) {
             case "release_flavor":
                 host = "https://system.mojoform.com";
