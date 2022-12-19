@@ -246,7 +246,7 @@ class CreateTaskInfoFragment : Fragment() {
         val renderTitle = { title: String ->
             TextView(context).apply {
                 text = title
-                setTextColor(Color.parseColor("#726583"))
+                setTextColor(Color.parseColor("@color/textGrey"))
                 setTextSize(TypedValue.COMPLEX_UNIT_SP, 16f)
             }
         }

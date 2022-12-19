@@ -184,7 +184,7 @@ LOCAL(void)
 emit_dht (j_compress_ptr cinfo, int index, boolean is_ac)
 /* Emit a DHT marker */
 {
-  JHUFF_TBL * htbl;
+  fJHUFF_TBL * htbl;
   int length, i;
   
   if (is_ac) {

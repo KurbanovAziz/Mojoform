@@ -1,41 +1,43 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/main_activity_background"
+    android:background="@color/lightBlue"
     android:orientation="vertical">
 
     <FrameLayout
         android:id="@+id/calendar_control_panel"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:gravity="right"
-        android:background="#0095699E">
+        android:background="@color/lightBlue"
+        android:gravity="right">
 
 
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recycler_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clipToPadding="false"
+            android:background="@color/lightBlue"
+            android:paddingLeft="10dp"
+            android:paddingTop="10dp"
+            android:paddingRight="10dp"
+            android:paddingBottom="10dp" />
 
-
-
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recycler_view"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:clipToPadding="false"
-        android:paddingBottom="10dp"
-        android:paddingLeft="10dp"
-        android:paddingRight="10dp"
-        android:paddingTop="10dp" />
-        <CheckBox
+        <androidx.appcompat.widget.SwitchCompat
             android:id="@+id/all_analytics_switch"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:gravity="right"
-            android:layout_marginTop="4dp"
-            android:layout_gravity="right"
-            android:button="@drawable/switcher_background"
             android:layout_centerVertical="true"
-            android:layout_marginRight="10dp" />
+            android:layout_gravity="right"
+            android:layout_marginTop="4dp"
+            android:layout_marginRight="10dp"
+            android:gravity="right"
+            android:scaleX="1.1"
+            android:scaleY="0.8"
+            android:thumb="@drawable/custom_thumb"
+            app:track="@drawable/custom_track" />
     </FrameLayout>
 
 </LinearLayout>

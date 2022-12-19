@@ -111,12 +111,12 @@ public class FileAdapter extends RecyclerView.Adapter<FileAdapter.FileViewHolder
 
         SimpleDateFormat sdf = new SimpleDateFormat("dd MMMM yyyy | HH.mm", Locale.getDefault());
 
-        if (isGrid) {
-            if (selectionModeEnabled)
-                viewHolder.card.setBackgroundResource(selectedIds.contains(file.id) ?
-                        R.drawable.file_card_grid_selection_checked : R.drawable.file_card_grid_selection_unchecked);
-            else
-                viewHolder.card.setBackgroundResource(R.drawable.file_card_grid_background);
+       if (isGrid) {
+//            if (selectionModeEnabled)
+//                viewHolder.card.setBackgroundResource(selectedIds.contains(file.id) ?
+//                        R.drawable.file_card_grid_selection_checked : R.drawable.file_card_grid_selection_unchecked);
+//            else
+//                viewHolder.card.setBackgroundResource(R.drawable.file_card_grid_background);
 
             FrameLayout.LayoutParams imageLayoutParams = (FrameLayout.LayoutParams) viewHolder.filePreview.getLayoutParams();
             if (parentFragment.bitmapCacheService.hasThumbnailInMemCache(file.id)) {
@@ -132,11 +132,11 @@ public class FileAdapter extends RecyclerView.Adapter<FileAdapter.FileViewHolder
             viewHolder.filePreview.setLayoutParams(imageLayoutParams);
         } else {
             viewHolder.fileDate.setText(sdf.format(file.createdAt));
-            if (selectionModeEnabled)
-                viewHolder.card.setBackgroundResource(selectedIds.contains(file.id) ?
-                        R.drawable.file_card_selection_checked : R.drawable.file_card_selection_unchecked);
-            else
-                viewHolder.card.setBackgroundResource(R.drawable.task_card_background);
+//            if (selectionModeEnabled)
+//                viewHolder.card.setBackgroundResource(selectedIds.contains(file.id) ?
+//                        R.drawable.file_card_selection_checked : R.drawable.file_card_selection_unchecked);
+//            else
+//                viewHolder.card.setBackgroundResource(R.drawable.task_card_background);
         }
 
         String mimeType = file.nodeType;

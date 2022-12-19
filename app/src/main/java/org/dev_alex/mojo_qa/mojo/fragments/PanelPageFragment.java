@@ -265,7 +265,6 @@ public class PanelPageFragment extends Fragment {
             dataSet.setColor(Color.parseColor("#AFA8DC"));
 
             dataSet.setDrawFilled(true);
-            dataSet.setFillDrawable(ContextCompat.getDrawable(getContext(), R.drawable.spline_gradient_bg));
 
             LineData lineData = new LineData(dataSet);
             lineData.setDrawValues(false);

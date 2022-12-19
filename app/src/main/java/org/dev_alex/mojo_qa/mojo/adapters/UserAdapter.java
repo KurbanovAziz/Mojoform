@@ -17,6 +17,7 @@ import org.dev_alex.mojo_qa.mojo.services.LoginHistoryService;
 
 import java.util.ArrayList;
 import java.util.Locale;
+import java.util.Objects;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -80,7 +81,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
         viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                parentFragment.getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.container, UserLoginFragment.newInstance(user)).addToBackStack(null).commit();
+                Objects.requireNonNull(parentFragment.getActivity()).getSupportFragmentManager().beginTransaction().replace(R.id.container, UserLoginFragment.newInstance(user)).addToBackStack(null).commit();
             }
         });
     }

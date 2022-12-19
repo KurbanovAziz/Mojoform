@@ -1,11 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.cardview.widget.CardView
     android:id="@+id/card"
     android:layout_width="match_parent"
-    android:layout_height="90dp"
-    android:layout_marginBottom="-14dp"
-    android:layout_marginTop="13dp"
-    android:background="@drawable/notification_card_background"
+    android:layout_height="70dp"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    app:cardCornerRadius="5dp"
+    android:layout_marginBottom="8dp"
+    android:layout_marginTop="5dp"
+>
+<LinearLayout
+    android:layout_height="match_parent"
+    android:layout_width="match_parent"
     android:orientation="horizontal">
 
     <LinearLayout
@@ -17,6 +23,7 @@
         android:orientation="horizontal">
 
         <RelativeLayout
+            android:layout_gravity="center"
             android:layout_width="30dp"
             android:layout_height="30dp">
 
@@ -52,7 +59,7 @@
                 android:gravity="center_vertical"
                 android:maxLines="1"
                 android:text="Отчет о состоянии дел везде и"
-                android:textColor="#4c3d5f"
+                android:textColor="@color/textGrey"
                 android:textSize="15sp" />
 
             <TextView
@@ -63,7 +70,7 @@
                 android:gravity="center_vertical"
                 android:maxLines="1"
                 android:text="16 марта 2017 | 17:00"
-                android:textColor="#4c3d5f"
+                android:textColor="@color/textGrey"
                 android:textSize="14sp" />
 
         </LinearLayout>
@@ -80,5 +87,7 @@
         android:adjustViewBounds="true"
         android:paddingBottom="10dp"
         android:paddingTop="10dp"
+        android:visibility="gone"
         android:src="@drawable/more_icon" />
 </LinearLayout>
+</androidx.cardview.widget.CardView>

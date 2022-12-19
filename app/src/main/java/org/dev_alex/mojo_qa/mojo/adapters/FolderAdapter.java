@@ -61,11 +61,12 @@ public class FolderAdapter extends RecyclerView.Adapter<FolderAdapter.FolderView
     @Override
     public FolderViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
         View v;
-        if (isGrid)
-            v = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.card_folder_grid, viewGroup, false);
-        else
-            v = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.card_folder, viewGroup, false);
-
+//        if (isGrid)
+//            v = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.card_folder_grid, viewGroup, false);
+//        else
+//            v = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.card_folder, viewGroup, false);
+        //это вроде бесполезная хрень, но на всякий оставлю. Хотя до этого вроде 2 одинаковых xml было
+        v = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.card_folder, viewGroup, false);
         return new FolderViewHolder(v);
     }
 
@@ -74,19 +75,19 @@ public class FolderAdapter extends RecyclerView.Adapter<FolderAdapter.FolderView
         final File folder = folders.get(i);
         viewHolder.folderName.setText(folder.name);
 
-        if (isGrid)
-            if (selectionModeEnabled)
-                viewHolder.card.setBackgroundResource(selectedIds.contains(folder.id) ?
-                        R.drawable.folder_card_grid_selection_checked : R.drawable.folder_card_grid_selection_unchecked);
-            else
-                viewHolder.card.setBackgroundResource(R.drawable.folder_card_grid_background);
-        else {
-            if (selectionModeEnabled)
-                viewHolder.card.setBackgroundResource(selectedIds.contains(folder.id) ?
-                        R.drawable.folder_card_selection_checked : R.drawable.folder_card_selection_unchecked);
-            else
-                viewHolder.card.setBackgroundResource(R.drawable.folder_card_background);
-        }
+//        if (isGrid)
+//            if (selectionModeEnabled)
+//                viewHolder.card.setBackgroundResource(selectedIds.contains(folder.id) ?
+//                        R.drawable.folder_card_grid_selection_checked : R.drawable.folder_card_grid_selection_unchecked);
+//            else
+//                viewHolder.card.setBackgroundResource(R.drawable.folder_card_grid_background);
+//        else {
+//            if (selectionModeEnabled)
+//                viewHolder.card.setBackgroundResource(selectedIds.contains(folder.id) ?
+//                        R.drawable.folder_card_selection_checked : R.drawable.folder_card_selection_unchecked);
+//            else
+//                viewHolder.card.setBackgroundResource(R.drawable.folder_card_background);
+//        }
 
 
         viewHolder.selectedTick.setVisibility(selectionModeEnabled && selectedIds.contains(folder.id) ? View.VISIBLE : View.GONE);

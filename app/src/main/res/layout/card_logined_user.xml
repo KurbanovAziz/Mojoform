@@ -2,11 +2,13 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical">
 
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="10dp"
         android:orientation="horizontal">
 
         <RelativeLayout
@@ -17,15 +19,11 @@
                 android:layout_width="68dp"
                 android:layout_height="68dp"
                 android:layout_centerHorizontal="true"
+                app:tint="@color/accent"
                 android:background="@drawable/image_ring" />
 
 
-            <ImageView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:adjustViewBounds="true"
-                android:src="@drawable/avatar_shadow" />
+
             
             <de.hdodenhof.circleimageview.CircleImageView
                 android:id="@+id/profile_image"
@@ -46,7 +44,7 @@
                 android:layout_marginTop="4dp"
                 android:gravity="center"
                 android:text="ЮЕ"
-                android:textColor="#ff5b3d8c"
+                android:textColor="@color/white"
                 android:textSize="22sp" />
 
         </RelativeLayout>
@@ -60,8 +58,8 @@
             android:layout_marginTop="-5dp"
             android:paddingRight="9dp"
             android:text="Юрий Ельцов"
-            android:textColor="@android:color/white"
-            android:textSize="22sp" />
+            android:textColor="@color/textGrey"
+            android:textSize="16dp" />
 
     </LinearLayout>
 
@@ -69,5 +67,5 @@
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:layout_marginBottom="8dp"
-        android:background="#ffcdbbd7" />
+        android:background="@color/textGrey" />
 </LinearLayout>

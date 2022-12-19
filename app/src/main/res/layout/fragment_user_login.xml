@@ -11,7 +11,7 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:scaleType="centerCrop"
-        android:src="@drawable/auth_background"
+        android:src="@color/lightBlue"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintLeft_toLeftOf="parent"
@@ -52,24 +52,9 @@
             android:layout_width="102dp"
             android:layout_height="102dp"
             android:layout_centerHorizontal="true"
+            app:tint="@color/accent"
             android:background="@drawable/image_ring" />
 
-
-        <ImageView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="6dp"
-            android:adjustViewBounds="true"
-            android:src="@drawable/avatar_shadow" />
-
-        <!--     <de.hdodenhof.circleimageview.CircleImageView
-                 android:id="@+id/profile_image"
-                 android:layout_width="90dp"
-                 android:layout_height="90dp"
-                 android:layout_alignParentTop="true"
-                 android:layout_centerHorizontal="true"
-                 android:layout_marginTop="6dp"
-                 android:src="@drawable/test_avatar" />-->
 
         <TextView
             android:id="@+id/user_initials"
@@ -79,6 +64,7 @@
             android:layout_centerHorizontal="true"
             android:layout_marginTop="6dp"
             android:gravity="center"
+            android:textColor="@color/textGrey"
             android:text="ИИ"
             android:textSize="22sp" />
     </RelativeLayout>
@@ -93,7 +79,7 @@
         android:layout_marginTop="0dp"
         android:maxLines="1"
         android:text="Юрий Ельцов"
-        android:textColor="@android:color/white"
+        android:textColor="@color/textGrey"
         android:textSize="18sp"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
@@ -149,7 +135,7 @@
         android:layout_marginLeft="0dp"
         android:layout_marginRight="0dp"
         android:layout_marginTop="24dp"
-        android:background="@drawable/white_rounded_rectangle"
+        android:background="@drawable/input_text_background_gray_border"
         android:ems="10"
         android:hint="@string/password"
         android:inputType="textPassword"
@@ -167,6 +153,7 @@
         android:layout_marginTop="11dp"
         android:adjustViewBounds="true"
         android:padding="20dp"
+        app:tint="@color/textGrey"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toTopOf="@+id/background"
         app:srcCompat="@drawable/back_arrow_icon" />

@@ -1,21 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.cardview.widget.CardView android:layout_width="match_parent"
     android:id="@+id/card"
-    android:layout_width="match_parent"
     android:layout_height="70dp"
-    android:layout_marginBottom="-18dp"
-    android:layout_marginTop="10dp"
-    android:background="@drawable/folder_card_background"
-    android:orientation="horizontal"
-    android:paddingBottom="15dp"
-    android:paddingLeft="28dp"
-    android:paddingRight="7dp"
-    android:paddingTop="2dp">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    app:cardCornerRadius="5dp"
+android:layout_margin="5dp"
+    android:paddingStart="28dp"
+    android:paddingEnd="7dp"
+    android:paddingTop="2dp"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="horizontal">
 
 
     <RelativeLayout
         android:layout_width="30dp"
         android:layout_height="30dp"
+        android:layout_marginStart="20dp"
         android:layout_gravity="center_vertical">
 
         <ImageView
@@ -24,7 +27,8 @@
             android:layout_height="25dp"
             android:layout_gravity="center_vertical"
             android:adjustViewBounds="true"
-            android:src="@drawable/category_icon" />
+            android:src="@drawable/category_icon"
+            app:tint="@color/textGrey" />
 
         <ImageView
             android:id="@+id/selected_tick"
@@ -47,7 +51,7 @@
         android:ellipsize="end"
         android:maxLines="1"
         android:text="Прочее"
-        android:textColor="#4c3d5f"
+        android:textColor="@color/textGrey"
         android:textSize="17sp" />
 
     <ImageView
@@ -58,5 +62,7 @@
         android:adjustViewBounds="true"
         android:paddingBottom="10dp"
         android:paddingTop="10dp"
-        android:src="@drawable/more_icon" />
+        android:src="@drawable/more_icon"
+        app:tint="@color/white" />
 </LinearLayout>
+</androidx.cardview.widget.CardView>

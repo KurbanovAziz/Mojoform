@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:foreground="@drawable/shape_window_dim"
     android:layout_height="match_parent"
-    android:background="@drawable/main_activity_background">
+    android:background="@color/lightBlue">
 
     <androidx.core.widget.NestedScrollView
         android:id="@+id/scroll_view"
@@ -26,16 +26,10 @@
                 android:layout_height="45dp"
                 android:gravity="center_vertical"
                 android:paddingLeft="25dp"
-                android:text="@string/organizations"
-                android:textColor="#433A4D"
+                android:text="@string/folders"
+                android:textColor="@color/textGrey"
                 android:textSize="17sp" />
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="2dp"
-                android:background="#433A4D"
-                android:layout_marginTop="-10dp"
-                android:layout_marginLeft="12dp"
-                android:layout_marginRight="12dp" />
+
         </LinearLayout>
 
             <org.dev_alex.mojo_qa.mojo.custom_views.MaxHeightRecycleView
@@ -58,16 +52,10 @@
                 android:gravity="center_vertical"
                 android:paddingLeft="25dp"
                 android:text="@string/files"
-                android:textColor="#433A4D"
+                android:textColor="@color/textGrey"
                 android:textSize="17sp"
                 android:visibility="gone" />
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="2dp"
-                android:background="#433A4D"
-                android:layout_marginTop="1dp"
-                android:layout_marginLeft="12dp"
-                android:layout_marginRight="12dp" />
+
         </LinearLayout>
 
             <org.dev_alex.mojo_qa.mojo.custom_views.MaxHeightRecycleView

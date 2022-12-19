@@ -132,9 +132,8 @@ public class LoginFragment extends Fragment {
             }
         });
 
-        rootView.findViewById(R.id.btScanQr).setOnClickListener(this::scanСode);
+        //rootView.findViewById(R.id.btScanQr).setOnClickListener(this::scanСode);
 
-        rootView.findViewById(R.id.about_btn).setOnClickListener(v -> startActivity(new Intent(getContext(), OnboardingActivity.class)));
     }
 
 

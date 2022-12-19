@@ -2,6 +2,8 @@ package org.dev_alex.mojo_qa.mojo.custom_views;
 
 import android.content.Context;
 import androidx.recyclerview.widget.RecyclerView;
+
+import android.graphics.Color;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.Gravity;
@@ -45,6 +47,7 @@ public class CustomDrawerItem extends SecondaryDrawerItem {
         viewHolder.itemView.setLayoutParams(layoutParams);
 
         TextView text = ((TextView) viewHolder.itemView.findViewById(R.id.material_drawer_name));
+        text.setTextColor(Color.parseColor("#5E5E5E"));
         LinearLayout.LayoutParams textParams = (LinearLayout.LayoutParams) text.getLayoutParams();
         textParams.height = LinearLayout.LayoutParams.WRAP_CONTENT;
         text.setLayoutParams(textParams);

@@ -173,7 +173,6 @@ import io.reactivex.annotations.NonNull;
 import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
-import lecho.lib.hellocharts.model.Line;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.FormBody;
@@ -194,7 +193,6 @@ import static org.dev_alex.mojo_qa.mojo.services.Utils.setupCloseKeyboardUI;
 public class TemplateFragment extends Fragment {
     private static String NODE_FOR_TASKS = "229ed0ec-3592-4788-87f0-6b0616599166";
     private String NODE_FOR_FILES = "4899bb8e-0b0b-4889-82d6-eb16fcd6b90f";
-
     private final String MEDIA_PATH_JSON_ARRAY = "media_paths";
     private final String SIGNATURE_PREVIEW_JSON_ARRAY = "sign_state";
     private SimpleDateFormat isoDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ", Locale.getDefault());
@@ -255,7 +253,7 @@ public class TemplateFragment extends Fragment {
     private Location userLocation = null;
 
     private static final int REQUEST_EXTERNAL_STORAGE = 1;
-    private static String[] PERMISSIONS_STORAGE = {
+    private static final String[] PERMISSIONS_STORAGE = {
             Manifest.permission.READ_EXTERNAL_STORAGE,
             Manifest.permission.WRITE_EXTERNAL_STORAGE
     };
@@ -1495,7 +1493,7 @@ public class TemplateFragment extends Fragment {
                                     dataSet.setColor(Color.parseColor("#AFA8DC"));
 
                                     dataSet.setDrawFilled(true);
-                                    dataSet.setFillDrawable(ContextCompat.getDrawable(getContext(), R.drawable.spline_gradient_bg));
+                                    // dataSet.setFillDrawable(ContextCompat.getDrawable(getContext(), R.drawable.spline_gradient_bg));
 
                                     LineData lineData = new LineData(dataSet);
                                     lineData.setDrawValues(false);
@@ -2491,7 +2489,7 @@ public class TemplateFragment extends Fragment {
     }
 
     private boolean checkLocationPermissions() {
-        int permissionCoarse = ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION);
+        int permissionCoarse = ContextCompat.checkSelfPermission(Objects.requireNonNull(getContext()), Manifest.permission.ACCESS_COARSE_LOCATION);
         int permissionFine = ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION);
         return (permissionCoarse == PackageManager.PERMISSION_GRANTED && permissionFine == PackageManager.PERMISSION_GRANTED);
     }
@@ -3944,7 +3942,7 @@ public class TemplateFragment extends Fragment {
                 if (response.code() == 200) {
 
                     BufferedSink sink = Okio.buffer(Okio.sink(resultFile));
-                    sink.writeAll(response.body().source());
+                    sink.writeAll(Objects.requireNonNull(response.body()).source());
                     sink.close();
                 }
                 response.body().close();

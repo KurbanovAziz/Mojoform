@@ -7,13 +7,9 @@
     android:layout_width="match_parent"
     android:paddingBottom="20dp"
 
-    app:cardCornerRadius="10dp"
+    app:cardCornerRadius="5dp"
     android:layout_marginTop="10dp"
-    app:cardBackgroundColor="#F3F0F0"
-    app:cardElevation="200dp"
-    android:outlineAmbientShadowColor="@color/colorAccent"
-    android:outlineSpotShadowColor="@color/colorAccent"
-app:cardMaxElevation="20dp"    >
+    app:cardBackgroundColor="@color/blueGrey">
 <LinearLayout
     android:id="@+id/card"
 android:layout_marginTop="30dp"
@@ -26,12 +22,13 @@ android:layout_marginTop="30dp"
 
     <ImageView
         android:id="@+id/panel_icon_image"
-        android:layout_width="25dp"
-        android:layout_height="25dp"
+        android:layout_width="21dp"
+        android:layout_height="22dp"
         android:layout_gravity="center_vertical"
         android:layout_marginBottom="14dp"
         android:adjustViewBounds="true"
-        android:src="@drawable/analystics_icon" />
+        android:src="@drawable/graphs_icon"
+        app:tint="@color/textGrey" />
     <lecho.lib.hellocharts.view.PieChartView
         android:id="@+id/point"
         android:layout_width="30dp"
@@ -50,7 +47,7 @@ android:layout_marginBottom="14dp"        android:layout_gravity="center_vertica
             android:ellipsize="end"
             android:layout_marginBottom="-3dp"
             android:text="вмпва \n авммавм \n dfgd \n fsgvs"
-            android:textColor="#4c3d5f"
+            android:textColor="@color/textGrey"
             android:textSize="17sp" />
 
         <TextView
@@ -62,7 +59,7 @@ android:layout_marginBottom="14dp"        android:layout_gravity="center_vertica
             android:layout_marginRight="15dp"
             android:layout_marginBottom="12dp"
             android:text="kkkkkkkk"
-            android:textColor="#4c3d5f"
+            android:textColor="@color/textGrey"
             android:textSize="15sp" />
     </LinearLayout>
 </LinearLayout>

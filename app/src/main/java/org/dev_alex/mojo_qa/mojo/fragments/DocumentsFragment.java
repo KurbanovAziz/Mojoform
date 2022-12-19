@@ -483,9 +483,9 @@ public class DocumentsFragment extends Fragment implements FileAdapter.DocumentC
                 minSizeK = 0;
         }
         filesRecyclerView.setMinimumHeight((int) (getResources().getDisplayMetrics().heightPixels * minSizeK));
+        ((TextView) rootView.findViewById(R.id.folders_block)).setVisibility(
+                (foldersStack != null && foldersStack.size() > 1) ? View.VISIBLE : View.GONE);
 
-        ((TextView) rootView.findViewById(R.id.folders_block)).setText(
-                (foldersStack != null && foldersStack.size() > 1) ? R.string.folders : R.string.organizations);
 
         if (files == null || files.isEmpty()) {
             rootView.findViewById(R.id.files_block).setVisibility(View.GONE);

@@ -2,7 +2,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     package="org.dev_alex.mojo_qa.mojo">
-
     <queries>
         <intent>
             <action android:name="android.speech.RecognitionService" />
@@ -50,7 +49,7 @@
             android:name=".activities.AuthActivity"
             android:configChanges="orientation|keyboardHidden|keyboard"
             android:screenOrientation="portrait"
-            android:theme="@style/Theme.AppCompat.Light.NoActionBar.FullScreen">
+            android:theme="@style/AppTheme.ActionBar.Transparent">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <action android:name="android.intent.action.MAIN" />

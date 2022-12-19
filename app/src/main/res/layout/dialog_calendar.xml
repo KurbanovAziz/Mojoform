@@ -8,7 +8,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:scaleType="fitXY"
-        android:src="@drawable/calendar_background" />
+        android:src="@color/lightBlue" />
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -17,7 +17,7 @@
             android:id="@+id/month"
             android:layout_width="120dp"
             android:layout_height="wrap_content"
-            android:textColor="#EBE1E1E1"
+            android:textColor="@color/textGrey"
             android:gravity="center"
             android:textSize="20dp"
             android:text="Месяц"
@@ -29,7 +29,8 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:mcv_firstDayOfWeek="monday"
-        app:mcv_selectionColor="#ff26c373"
+        app:mcv_selectionColor="@color/accent"
+        app:mcv_arrowColor="@color/textGrey"
         app:mcv_showOtherDates="none"
         app:mcv_tileHeight="0dp"
         app:mcv_tileWidth="0dp" />
@@ -43,6 +44,7 @@
         android:textSize="17dp"
         android:background="@drawable/rounded_view"
         android:text="@string/choose"
+
         android:layout_gravity="bottom|center"/>
 
 </FrameLayout>

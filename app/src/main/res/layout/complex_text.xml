@@ -3,12 +3,13 @@
 <LinearLayout android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
+    android:background="@color/lightBlue"
     xmlns:android="http://schemas.android.com/apk/res/android">
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/complex_result"
-        android:textColor="@color/multiple_image_select_primaryDark"
+        android:textColor="@color/textGrey"
         android:textSize="20dp"
         android:layout_marginLeft="6dp" />
 </LinearLayout>

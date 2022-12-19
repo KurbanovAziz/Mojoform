@@ -63,6 +63,7 @@ import java.util.Locale;
 import java.util.UUID;
 
 import androidx.annotation.Nullable;
+import androidx.cardview.widget.CardView;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
@@ -206,7 +207,7 @@ public class NotificationsFragment extends Fragment implements NotificationAdapt
                 LinearLayout calendarLL = filterDialog.findViewById(R.id.calendarLL);
                 RadioGroup readGroup = filterDialog.findViewById(R.id.read_group);
                 RadioGroup orderGroup = filterDialog.findViewById(R.id.orderGroup);
-                ImageView okeyBTN = filterDialog.findViewById(R.id.okeyBTN);
+                CardView okeyBTN = filterDialog.findViewById(R.id.okeyBTN);
                 ImageView kresticBTN = filterDialog.findViewById(R.id.krestik);
                 kresticBTN.setOnClickListener(new View.OnClickListener() {
                     @Override

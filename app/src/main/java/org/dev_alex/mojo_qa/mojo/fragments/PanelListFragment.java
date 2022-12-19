@@ -4,6 +4,7 @@ import android.app.ProgressDialog;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import androidx.annotation.Nullable;
+import androidx.appcompat.widget.SwitchCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -49,7 +50,7 @@ public class PanelListFragment extends Fragment {
     private View rootView;
     private ProgressDialog loopDialog;
     private RecyclerView recyclerView;
-    private CheckBox allAnalyticsSwitch;
+    private SwitchCompat allAnalyticsSwitch;
     JSONObject jsonObject;
     public List<Panel> panels;
     public List<Organisation> organisations = new ArrayList<>();

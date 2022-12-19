@@ -4,72 +4,54 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/lightBlue"
     tools:context="org.dev_alex.mojo_qa.mojo.activities.AuthActivity">
 
-    <ImageView
-        android:id="@+id/imageView2"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:scaleType="centerCrop"
-        android:src="@drawable/auth_background"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.0"
-        tools:layout_constraintBottom_creator="1"
-        tools:layout_constraintLeft_creator="1"
-        tools:layout_constraintRight_creator="1"
-        tools:layout_constraintTop_creator="1" />
 
     <FrameLayout
         android:id="@+id/frameLayout"
         android:layout_width="0dp"
         android:layout_height="50dp"
         android:layout_marginTop="16dp"
+        android:background="@drawable/input_text_background_gray_border"
+
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintLeft_toLeftOf="@+id/left_guideline"
         app:layout_constraintRight_toLeftOf="@+id/right_guideline"
         app:layout_constraintTop_toBottomOf="@+id/frameLayout2">
 
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:alpha="0.55"
-            android:background="@drawable/input_text_background_purple_border" />
 
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
 
-            <ImageView
-                android:id="@+id/password_icon"
-                android:layout_width="20dp"
-                android:layout_height="20dp"
-                android:layout_centerVertical="true"
-                android:layout_marginLeft="13dp"
-                android:adjustViewBounds="true"
-                android:scaleType="fitCenter"
-                android:src="@drawable/key_icon" />
 
             <EditText
                 android:id="@+id/password"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_centerVertical="true"
-                android:layout_marginLeft="10dp"
                 android:layout_marginRight="15dp"
                 android:layout_toRightOf="@id/password_icon"
-                android:background="@android:color/transparent"
+                android:background="@null"
+                android:layout_marginStart="50dp"
                 android:gravity="center_vertical"
                 android:hint="@string/password"
                 android:inputType="textPassword"
-                android:paddingLeft="5dp"
                 android:paddingBottom="3dp"
+
                 android:textColorHint="@android:color/white"
                 android:textCursorDrawable="@null" />
-        </RelativeLayout>
+
+
+        <ImageView
+            android:id="@+id/password_icon"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="13dp"
+            android:adjustViewBounds="true"
+            android:layout_gravity="center_vertical"
+            app:tint="@color/textGrey"
+            android:scaleType="fitCenter"
+            android:src="@drawable/key_icon" />
     </FrameLayout>
 
     <androidx.constraintlayout.widget.Guideline
@@ -85,6 +67,8 @@
         android:id="@+id/frameLayout2"
         android:layout_width="0dp"
         android:layout_height="50dp"
+        android:background="@drawable/input_text_background_gray_border"
+
         android:layout_marginLeft="0dp"
         android:layout_marginTop="0dp"
         android:layout_marginRight="0dp"
@@ -92,43 +76,35 @@
         app:layout_constraintRight_toLeftOf="@+id/right_guideline"
         app:layout_constraintTop_toTopOf="@+id/horizontal_guideline">
 
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:alpha="0.55"
-            android:background="@drawable/input_text_background_purple_border" />
 
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
 
-            <ImageView
-                android:id="@+id/email_icon"
-                android:layout_width="20dp"
-                android:layout_height="20dp"
-                android:layout_centerVertical="true"
-                android:layout_marginLeft="13dp"
-                android:adjustViewBounds="true"
-                android:scaleType="fitCenter"
-                android:src="@drawable/email" />
 
             <EditText
                 android:id="@+id/username"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_centerVertical="true"
-                android:layout_marginLeft="10dp"
                 android:layout_marginRight="15dp"
                 android:layout_toRightOf="@id/email_icon"
-                android:background="@android:color/transparent"
                 android:gravity="center_vertical"
                 android:hint="@string/username"
                 android:inputType="textVisiblePassword"
-                android:paddingLeft="5dp"
+android:layout_marginStart="50dp"
                 android:paddingBottom="3dp"
+                android:background="@null"
                 android:textColorHint="@android:color/white"
                 android:textCursorDrawable="@null" />
-        </RelativeLayout>
+        <ImageView
+            android:id="@+id/email_icon"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_gravity="center_vertical"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="13dp"
+            android:adjustViewBounds="true"
+            app:tint="@color/textGrey"
+            android:scaleType="fitCenter"
+            android:src="@drawable/email" />
     </FrameLayout>
 
     <androidx.constraintlayout.widget.Guideline
@@ -152,19 +128,7 @@
         android:orientation="horizontal"
         app:layout_constraintGuide_percent="0.9" />
 
-    <Button
-        android:id="@+id/about_btn"
-        android:layout_width="0dp"
-        android:layout_height="40dp"
-        android:layout_marginBottom="15dp"
-        android:background="@drawable/blue_button_inverted"
-        android:gravity="center"
-        android:text="@string/about_app"
-        android:textColor="@android:color/white"
-        app:layout_constraintBottom_toTopOf="@+id/login_btn"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintLeft_toLeftOf="@+id/button_left_guideline"
-        app:layout_constraintRight_toLeftOf="@+id/button_right_guideline" />
+
 
     <Button
         android:id="@+id/login_btn"
@@ -196,26 +160,6 @@
         android:orientation="vertical"
         app:layout_constraintGuide_percent="0.75" />
 
-    <LinearLayout
-        android:id="@+id/btScanQr"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="15dp"
-        android:gravity="center"
-        android:orientation="horizontal"
-        android:paddingTop="5dp"
-        android:paddingBottom="5dp"
-        app:layout_constraintBottom_toTopOf="@+id/about_btn"
-        app:layout_constraintEnd_toStartOf="@+id/button_right_guideline"
-        app:layout_constraintStart_toStartOf="@+id/button_left_guideline">
-
-        <ImageView
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:src="@drawable/qr_button_icon" />
-
-
-    </LinearLayout>
 
     <TextView
         android:id="@+id/tvFirstLaunchHint"
@@ -224,7 +168,8 @@
         android:layout_marginBottom="16dp"
         android:gravity="center_horizontal"
         android:text="@string/first_launch_hint"
-        android:textColor="@android:color/white"
+        android:textColor="@color/accent"
+        app:layout_goneMarginBottom="30dp"
         android:textColorLink="@color/multiple_image_select_accent"
         android:textSize="14sp"
         android:visibility="visible"

@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/main_activity_background"
+    android:background="@color/lightBlue"
     android:orientation="vertical">
 
     <FrameLayout
@@ -26,7 +26,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="12dp"
                 android:text="@string/pick_executors"
-                android:textColor="#726583"
+                android:textColor="@color/textGrey"
                 android:textSize="16sp"
                 android:textStyle="bold" />
 
@@ -82,7 +82,7 @@
             android:layout_margin="8dp"
             android:padding="8dp"
             android:src="@drawable/delete_icon"
-            app:tint="#726583" />
+            app:tint="@color/textGrey" />
     </FrameLayout>
 
     <FrameLayout

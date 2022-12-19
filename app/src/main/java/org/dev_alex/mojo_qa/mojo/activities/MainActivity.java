@@ -87,6 +87,7 @@ import me.leolin.shortcutbadger.ShortcutBadger;
 import okhttp3.Response;
 import okio.BufferedSink;
 import okio.Okio;
+
 //
 public class MainActivity extends AppCompatActivity {
     public Drawer drawer;
@@ -111,14 +112,14 @@ public class MainActivity extends AppCompatActivity {
         SharedPreferences pos = App.getContext().getSharedPreferences("templates", Context.MODE_PRIVATE);
         Map<String, ?> keys = pos.getAll();
         int i = 0;
-        for (Map.Entry<String, ?> entry : keys.entrySet()){
+        for (Map.Entry<String, ?> entry : keys.entrySet()) {
             if (entry.getKey().contains(LoginHistoryService.getCurrentUser().username)) {
                 i++;
             }
         }
-        if ( i != 0){
-            ShortcutBadger.applyCount(MainActivity.this,  i);}
-        else {
+        if (i != 0) {
+            ShortcutBadger.applyCount(MainActivity.this, i);
+        } else {
             ShortcutBadger.removeCount(MainActivity.this);
         }
         drawer.setSelectionAtPosition(1, true);
@@ -144,33 +145,33 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void checkLinkTask() {
-        if (getIntent().hasExtra("task") ) {
+        if (getIntent().hasExtra("task")) {
             String taskIdStr = getIntent().getStringExtra("task");
             if (taskIdStr != null && !taskIdStr.isEmpty()) {
                 getSupportFragmentManager().beginTransaction()
                         .replace(R.id.container, TemplateFragment.newInstance(
-                                taskIdStr,  getIntent().getBooleanExtra("isReport", true), true))
+                                taskIdStr, getIntent().getBooleanExtra("isReport", true), true))
                         .addToBackStack(null).commit();
             }
             return;
         }
     }
-    public boolean isOnline(Context context)
-    {
+
+    public boolean isOnline(Context context) {
         ConnectivityManager cm =
                 (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo netInfo = cm.getActiveNetworkInfo();
-        if (netInfo != null && netInfo.isConnectedOrConnecting())
-        {
+        if (netInfo != null && netInfo.isConnectedOrConnecting()) {
             noConnectionCV.setVisibility(View.INVISIBLE);
             return true;
         }
         noConnectionCV.setVisibility(View.VISIBLE);
         return false;
     }
+
     public void openTask(String id, boolean fromLink) {
-            if (id != null) {
-                try {
+        if (id != null) {
+            try {
 
 
                 getSupportFragmentManager().popBackStack(null, 0);
@@ -178,54 +179,52 @@ public class MainActivity extends AppCompatActivity {
                     Long.parseLong(id);
                     getSupportFragmentManager().beginTransaction()
                             .replace(R.id.container, TemplateFragment.newInstance(Long.parseLong(id), false)).addToBackStack(null).commit();
-                }
-                catch (Exception e){
-                getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.container, TemplateFragment.newInstance(id, true, fromLink)).addToBackStack(null).commit();} //разобраться  с fromlink
+                } catch (Exception e) {
+                    getSupportFragmentManager().beginTransaction()
+                            .replace(R.id.container, TemplateFragment.newInstance(id, true, fromLink)).addToBackStack(null).commit();
+                } //разобраться  с fromlink
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-                catch (Exception e){
-                e.printStackTrace();}
-            }
+        }
     }
 
     public void openFromLinkInApp(String data) {
-        if(data.contains("task") && !data.contains("reports")){
+        if (data.contains("task") && !data.contains("reports")) {
             String taskId = data.substring(data.lastIndexOf("/") + 1);
             getSupportFragmentManager().popBackStack(null, 0);
 
             getSupportFragmentManager().beginTransaction()
                     .replace(R.id.container, TemplateFragment.newInstance(
-                            taskId,  false, true))
+                            taskId, false, true))
                     .addToBackStack(null).commit();
 
-        }
-        else if(data.contains("reports")){
+        } else if (data.contains("reports")) {
             String taskId = data.substring(data.lastIndexOf("/") + 1);
             getSupportFragmentManager().popBackStack(null, 0);
 
             getSupportFragmentManager().beginTransaction()
                     .replace(R.id.container, TemplateFragment.newInstance(
-                            taskId,  true, true))
+                            taskId, true, true))
                     .addToBackStack(null).commit();
             return;
-        }
-        else {
+        } else {
             Thread thread = new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    try  {
+                    try {
                         String attachmentId = data.substring(data.lastIndexOf("/") + 1);
-                        String info = "/api/file/info/"+attachmentId + "?auth_token=" + TokenService.getToken();
+                        String info = "/api/file/info/" + attachmentId + "?auth_token=" + TokenService.getToken();
                         Response response = RequestService.createGetRequest(info);
                         JSONObject tasksJson = new JSONObject(response.body().string());
 
                         Log.d("aaa", tasksJson.toString());
                         String type = tasksJson.getString("mimeType");
-                        if(type.equals("video/mp4")){
+                        if (type.equals("video/mp4")) {
                             Intent intentP = new Intent(MainActivity.this, PlayerActivity.class);
                             intentP.putExtra("video", data);
-                            startActivity(intentP);}
-                        else {
+                            startActivity(intentP);
+                        } else {
                             Toast.makeText(MainActivity.this, "Данный тип файла пока не поддерживается приложением", Toast.LENGTH_SHORT).show();
                         }
                     } catch (Exception e) {
@@ -239,7 +238,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-        public void openURL(Uri url) {
+    public void openURL(Uri url) {
         startActivity(new Intent(Intent.ACTION_VIEW, url));
 
 
@@ -278,7 +277,7 @@ public class MainActivity extends AppCompatActivity {
                 return;
             }
 
-            if (getIntent().hasExtra(MyFirebaseMessagingService.TASK_ID) ) {
+            if (getIntent().hasExtra(MyFirebaseMessagingService.TASK_ID)) {
                 String taskIdStr = getIntent().getStringExtra(MyFirebaseMessagingService.TASK_ID);
                 if (taskIdStr != null && !taskIdStr.isEmpty()) {
                     getSupportFragmentManager().beginTransaction()
@@ -288,24 +287,25 @@ public class MainActivity extends AppCompatActivity {
                             .addToBackStack(null).commit();
                 }
 
-        }
-
-        Uri data = intent.getData();
-        if (data != null) {
-            if (data.getPath().contains("pdf/view/")) {
-                long documentId = Long.parseLong(data.getPath().substring(data.getPath().lastIndexOf("/") + 1));
-                String name = "document_pdf_" + documentId;
-                new DownloadPdfTask(documentId, name).execute();
             }
 
-            if (data.getPath().contains("task/view/")) {
-                long taskId = Long.parseLong(data.getPath().substring(data.getPath().lastIndexOf("/") + 1));
-                getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.container, TemplateFragment.newInstance(
-                                taskId, true)).addToBackStack(null).commit();
+            Uri data = intent.getData();
+            if (data != null) {
+                if (data.getPath().contains("pdf/view/")) {
+                    long documentId = Long.parseLong(data.getPath().substring(data.getPath().lastIndexOf("/") + 1));
+                    String name = "document_pdf_" + documentId;
+                    new DownloadPdfTask(documentId, name).execute();
+                }
+
+                if (data.getPath().contains("task/view/")) {
+                    long taskId = Long.parseLong(data.getPath().substring(data.getPath().lastIndexOf("/") + 1));
+                    getSupportFragmentManager().beginTransaction()
+                            .replace(R.id.container, TemplateFragment.newInstance(
+                                    taskId, true)).addToBackStack(null).commit();
+                }
             }
         }
-    }}
+    }
 
     @Override
     protected void onNewIntent(Intent intent) {
@@ -322,19 +322,18 @@ public class MainActivity extends AppCompatActivity {
         View headerView = getLayoutInflater().inflate(R.layout.drawer_header, null);
         User currentUser = LoginHistoryService.getCurrentUser();
 
-        if (TextUtils.isEmpty(currentUser.firstName) && TextUtils.isEmpty(currentUser.lastName)){
+        if (TextUtils.isEmpty(currentUser.firstName) && TextUtils.isEmpty(currentUser.lastName)) {
             ((TextView) headerView.findViewById(R.id.user_name)).setText(currentUser.username.replace(" ", "\n"));
             ((TextView) headerView.findViewById(R.id.position)).setText(currentUser.description);
 
-        }
-        else
+        } else
             ((TextView) headerView.findViewById(R.id.user_name)).setText(String.format(Locale.getDefault(),
                     "%s %s", TextUtils.isEmpty(currentUser.lastName) ? "" : currentUser.lastName,
                     TextUtils.isEmpty(currentUser.firstName) ? "" : currentUser.firstName));
         ((TextView) headerView.findViewById(R.id.position)).setText(currentUser.description);
 
 
-        CheckBox swPush = headerView.findViewById(R.id.checkBox);
+        SwitchCompat swPush = headerView.findViewById(R.id.checkBox);
         TextView textView = headerView.findViewById(R.id.work_or_notwork);
 
         swPush.setOnCheckedChangeListener((buttonView, isChecked) -> {
@@ -342,27 +341,26 @@ public class MainActivity extends AppCompatActivity {
             if (isChecked) {
                 textView.setText("На смене");
             } else {
-                textView.setText("отдыхаю");
+                textView.setText("Отдыхаю");
             }
 
             new UpdatePushInfoTask(!isChecked).execute();
         });
         swPush.setChecked(!currentUser.push_disabled);
-        if (currentUser.push_disabled){
-            textView.setText("отдыхаю");
+        if (currentUser.push_disabled) {
+            textView.setText("Отдыхаю");
 
         }
-
 
 
         ArrayList<SecondaryDrawerItem> mainDraggableItems = new ArrayList<>();
         for (String str : getDrawerMenuSequence()) {
             if (str.equals("tasks"))
-                mainDraggableItems.add(new CustomDrawerItem(15, mainDraggableItems.isEmpty() ? -48 : 0).withIdentifier(1).withName(R.string.tasks).withIcon(R.drawable.tasks));
+                mainDraggableItems.add(new CustomDrawerItem(15, mainDraggableItems.isEmpty() ? -48 : 0).withIdentifier(1).withName(R.string.tasks).withIcon(R.drawable.tasks_icon));
             if (str.equals("docs"))
-                mainDraggableItems.add(new CustomDrawerItem(15, mainDraggableItems.isEmpty() ? -48 : 0).withIdentifier(2).withName(R.string.documents).withIcon(R.drawable.documents));
+                mainDraggableItems.add(new CustomDrawerItem(15, mainDraggableItems.isEmpty() ? -48 : 0).withIdentifier(2).withName(R.string.documents).withIcon(R.drawable.documents_icon));
             if (str.equals("analytics"))
-                mainDraggableItems.add(new CustomDrawerItem(15, mainDraggableItems.isEmpty() ? -48 : 0).withIdentifier(5).withName(R.string.analystics).withIcon(R.drawable.analystics_icon));
+                mainDraggableItems.add(new CustomDrawerItem(15, mainDraggableItems.isEmpty() ? -48 : 0).withIdentifier(5).withName(R.string.analystics).withIcon(R.drawable.graphs_icon));
         }
 
         DrawerBuilder builder = new DrawerBuilder()
@@ -371,8 +369,8 @@ public class MainActivity extends AppCompatActivity {
                 .withHeader(headerView);
 
         builder.addDrawerItems(
-                mainDraggableItems.get(0),
-                new DividerDrawerItem()
+                mainDraggableItems.get(0)
+                //new DividerDrawerItem()
         );
 
         if (mainDraggableItems.size() > 1) {
@@ -385,7 +383,7 @@ public class MainActivity extends AppCompatActivity {
 
         if ((currentUser.is_orgowner != null && currentUser.is_orgowner) || (currentUser.is_manager != null && currentUser.is_manager)) {
             builder.addDrawerItems(
-                    new CustomDrawerItem(15, 0).withIdentifier(15).withName(R.string.task_manager).withIcon(R.drawable.ic_task_manager)
+                    new CustomDrawerItem(15, 0).withIdentifier(15).withName(R.string.task_manager).withIcon(R.drawable.manager_icon)
             );
         }
 
@@ -394,10 +392,10 @@ public class MainActivity extends AppCompatActivity {
                         .withIdentifier(11)
                         .withName(R.string.notifications)
                         .withIcon(R.drawable.bell),
-                new CustomDrawerItem(15, 0).withIdentifier(3).withName(R.string.exit).withIcon(R.drawable.exit),
-                new DividerDrawerItem(),
-                new CustomDrawerItem(15, 0).withIdentifier(4).withName(R.string.about_app).withIcon(R.drawable.question)
+                new CustomDrawerItem(15, 0).withIdentifier(3).withName(R.string.exit).withIcon(R.drawable.exit_icon),
+                new CustomDrawerItem(15, 0).withIdentifier(4).withName(R.string.about_app).withIcon(R.drawable.about_icon)
         );
+
 
         drawer = builder.withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
             @Override

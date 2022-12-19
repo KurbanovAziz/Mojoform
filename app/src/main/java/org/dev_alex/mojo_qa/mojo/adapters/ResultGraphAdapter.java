@@ -7,7 +7,6 @@ import android.content.res.Resources;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.graphics.Color;
-import android.graphics.drawable.GradientDrawable;
 import android.text.Html;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
@@ -49,14 +48,10 @@ public class ResultGraphAdapter extends RecyclerView.Adapter<ResultGraphAdapter.
         TextView notificationDate;
         TextView notificationDescription;
         TextView informationTV;
-
         ImageView moreBtn;
-        ImageView panel_icon;
         Button btDownloadPdf;
         Button btDownloadDoc;
         View vButtonsBlock;
-        View unread_line;
-
         ExpandableLayout expandableLayout;
         View btClose;
         View mainNotificationView;

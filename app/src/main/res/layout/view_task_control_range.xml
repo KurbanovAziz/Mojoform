@@ -26,7 +26,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/from"
-            android:textColor="#726583"
+            android:textColor="@color/textGrey"
             android:textSize="16sp" />
 
         <androidx.appcompat.widget.AppCompatSpinner
@@ -43,7 +43,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="5dp"
             android:text="@string/to"
-            android:textColor="#726583"
+            android:textColor="@color/textGrey"
             android:textSize="16sp" />
 
         <androidx.appcompat.widget.AppCompatSpinner
@@ -83,7 +83,7 @@
             android:layout_marginStart="5dp"
             android:layout_marginBottom="4dp"
             android:text="@string/user"
-            android:textColor="#726583"
+            android:textColor="@color/textGrey"
             android:textSize="16sp" />
     </LinearLayout>
 
@@ -112,7 +112,7 @@
             android:layout_marginStart="5dp"
             android:layout_marginBottom="4dp"
             android:text="@string/add_email"
-            android:textColor="#726583"
+            android:textColor="@color/textGrey"
             android:textSize="16sp" />
     </LinearLayout>
 
@@ -136,5 +136,5 @@
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:layout_marginTop="10dp"
-        android:background="#726583" />
+        android:background="@color/textGrey" />
 </LinearLayout>

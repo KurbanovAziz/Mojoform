@@ -114,9 +114,10 @@
                 android:layout_weight="1"
                 android:background="@drawable/task_switch_button_background"
                 android:button="@null"
+                android:textColor="@color/toggle_button_text_color"
                 android:gravity="center"
                 android:text="@string/busy"
-                android:textColor="@color/toggle_button_text_color" />
+/>
 
             <RadioButton
                 android:id="@+id/permanent"

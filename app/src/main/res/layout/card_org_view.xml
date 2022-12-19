@@ -20,7 +20,7 @@
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="6dp"
         android:layout_weight="1"
-        android:textColor="#726583"
+        android:textColor="@color/textGrey"
         android:textSize="16sp" />
 
     <ImageView
@@ -29,5 +29,5 @@
         android:layout_height="24dp"
         android:layout_marginRight="10dp"
         android:src="@drawable/ic_expand_arrow"
-        app:tint="#726583" />
+        app:tint="@color/textGrey" />
 </LinearLayout>
