@@ -262,4 +262,11 @@
         <item>Sá</item>
     </string-array>
 
+    <string name="dialog_attach_file_title">Especificar el tipo\nde archivo a adjuntar</string>
+    <string name="dialog_attach_file_menu_camera">Cámara</string>
+    <string name="dialog_attach_file_menu_gallery">Galería</string>
+    <string name="dialog_attach_file_menu_docs">Los documentos</string>
+    <string name="dialog_attach_file_menu_audio">Audio</string>
+    <string name="dialog_attach_file_menu_close">Cerrar</string>
+
 </resources>

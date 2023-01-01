@@ -1,5 +1,10 @@
 package org.dev_alex.mojo_qa.mojo.fragments;
 
+import static android.Manifest.permission.RECORD_AUDIO;
+import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
+import static android.app.Activity.RESULT_OK;
+import static org.dev_alex.mojo_qa.mojo.services.Utils.setupCloseKeyboardUI;
+
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -31,17 +36,6 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.provider.MediaStore;
-
-import androidx.annotation.Nullable;
-import androidx.core.app.ActivityCompat;
-import androidx.fragment.app.Fragment;
-import androidx.core.content.ContextCompat;
-import androidx.core.content.FileProvider;
-import androidx.core.util.Pair;
-import androidx.drawerlayout.widget.DrawerLayout;
-import androidx.legacy.widget.Space;
-import androidx.appcompat.widget.PopupMenu;
-
 import android.provider.Settings;
 import android.speech.RecognitionListener;
 import android.speech.RecognizerIntent;
@@ -79,6 +73,16 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.Nullable;
+import androidx.appcompat.widget.PopupMenu;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.core.content.FileProvider;
+import androidx.core.util.Pair;
+import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.fragment.app.Fragment;
+import androidx.legacy.widget.Space;
+
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.GravityEnum;
 import com.afollestad.materialdialogs.MaterialDialog;
@@ -111,7 +115,6 @@ import com.google.zxing.integration.android.IntentResult;
 import com.journeyapps.barcodescanner.CaptureActivity;
 import com.lalongooo.videocompressor.video.MediaController;
 
-
 import net.cachapa.expandablelayout.ExpandableLayout;
 import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent;
 
@@ -142,8 +145,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
-import org.w3c.dom.Text;
-
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -184,11 +185,6 @@ import okhttp3.Response;
 import okhttp3.ResponseBody;
 import okio.BufferedSink;
 import okio.Okio;
-
-import static android.Manifest.permission.RECORD_AUDIO;
-import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
-import static android.app.Activity.RESULT_OK;
-import static org.dev_alex.mojo_qa.mojo.services.Utils.setupCloseKeyboardUI;
 
 public class TemplateFragment extends Fragment {
     private static String NODE_FOR_TASKS = "229ed0ec-3592-4788-87f0-6b0616599166";
@@ -1257,7 +1253,6 @@ public class TemplateFragment extends Fragment {
                     container.addView(separator);
 
                     createSeekBar(value, container);
-
 
                     break;
 
@@ -3244,7 +3239,7 @@ public class TemplateFragment extends Fragment {
 
                     if (templateJson != null && !templateJson.equals("")) {
                         template = new JSONObject(templateJson);
-                        
+
                         return HttpURLConnection.HTTP_OK;
                     } else {
                         String linkPath = isReportOpenLink ? "closedlink" : "openlink";

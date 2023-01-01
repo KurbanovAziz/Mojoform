@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/bg_corners_round"
+    android:clickable="true"
+    android:focusable="true"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:background="@drawable/bg_corners_round"
+        android:backgroundTint="@color/white"
+        android:divider="@drawable/divider_dialog_attach_file"
+        android:orientation="vertical"
+        android:paddingTop="40dp"
+        android:showDividers="middle">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginStart="70dp"
+            android:layout_marginEnd="70dp"
+            android:layout_marginBottom="50dp"
+            android:fontFamily="@font/sf_ui_medium"
+            android:gravity="center"
+            android:text="@string/dialog_attach_file_title"
+            android:textColor="@color/textGrey"
+            android:textSize="20sp" />
+
+
+        <TextView
+            style="@style/Dialog.AttachFile.Menu.TextView"
+            android:text="@string/dialog_attach_file_menu_camera" />
+
+        <TextView
+            style="@style/Dialog.AttachFile.Menu.TextView"
+            android:text="@string/dialog_attach_file_menu_gallery" />
+
+        <TextView
+            style="@style/Dialog.AttachFile.Menu.TextView"
+            android:text="@string/dialog_attach_file_menu_docs" />
+
+        <TextView
+            style="@style/Dialog.AttachFile.Menu.TextView"
+            android:text="@string/dialog_attach_file_menu_audio" />
+
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp"
+        android:background="@drawable/bg_corners_round"
+        android:backgroundTint="@color/white"
+        android:gravity="center">
+
+        <TextView
+            style="@style/Dialog.AttachFile.Menu.TextView"
+            android:fontFamily="@font/sf_ui_medium"
+            android:text="@string/dialog_attach_file_menu_close" />
+
+    </LinearLayout>
+
+</LinearLayout>

@@ -261,4 +261,12 @@
         <item>Fr</item>
         <item>Sa</item>
     </string-array>
+
+    <string name="dialog_attach_file_title">Specify the type\nof file to attach</string>
+    <string name="dialog_attach_file_menu_camera">Camera</string>
+    <string name="dialog_attach_file_menu_gallery">Gallery</string>
+    <string name="dialog_attach_file_menu_docs">Documents</string>
+    <string name="dialog_attach_file_menu_audio">Audio</string>
+    <string name="dialog_attach_file_menu_close">Close</string>
+
 </resources>

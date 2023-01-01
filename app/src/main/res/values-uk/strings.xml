@@ -261,5 +261,12 @@
         <item>Сб</item>
     </string-array>
 
+    <string name="dialog_attach_file_title">Вкажіть тип файлу\nдля прикріплення</string>
+    <string name="dialog_attach_file_menu_camera">Камера</string>
+    <string name="dialog_attach_file_menu_gallery">Галерея</string>
+    <string name="dialog_attach_file_menu_docs">Документи</string>
+    <string name="dialog_attach_file_menu_audio">Аудіо</string>
+    <string name="dialog_attach_file_menu_close">Закрити</string>
+
 
 </resources>

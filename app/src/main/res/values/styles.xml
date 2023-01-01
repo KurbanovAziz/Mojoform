@@ -63,6 +63,7 @@
         <item name="android:textSize">16sp</item>
         <item name="android:textColor">@android:color/white</item>
     </style>
+
     <style name="CalenderViewCustom" parent="Theme.AppCompat">
         <item name="colorAccent">@color/accent</item>
         <item name="colorPrimary">@color/white</item>
@@ -75,6 +76,21 @@
 
     <style name="CalenderViewWeekCustomText" parent="android:TextAppearance.DeviceDefault.Small">
         <item name="android:textColor">@color/textGrey</item>
+    </style>
+
+    <style name="Dialog.AttachFile.Menu.TextView" parent="Widget.MaterialComponents.TextView">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:gravity">center</item>
+        <item name="android:layout_gravity">center</item>
+        <item name="android:background">?attr/selectableItemBackground</item>
+        <item name="android:clickable">true</item>
+        <item name="android:focusable">true</item>
+        <item name="android:paddingTop">10dp</item>
+        <item name="android:paddingBottom">10dp</item>
+        <item name="android:fontFamily">@font/sf_ui_medium</item>
+        <item name="android:textSize">24sp</item>
+        <item name="android:textColor">@color/colorAccent</item>
     </style>
 
 </resources>
