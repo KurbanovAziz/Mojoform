@@ -5,7 +5,9 @@ import android.app.Dialog;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.view.View;
 import android.widget.TextView;
 
@@ -20,7 +22,8 @@ import org.dev_alex.mojo_qa.mojo.custom_views.camerax.CameraActivity;
 
 public class FileAttachDialog extends DialogFragment {
 
-    private static final int REQUEST_CODE = 1;
+    private static final int REQUEST_CODE_CAMERA = 1;
+    private static final int REQUEST_CODE_GALLERY = 2;
 
     private TextView menuTvCamera;
     private TextView menuTvGallery;
@@ -28,6 +31,11 @@ public class FileAttachDialog extends DialogFragment {
     private TextView menuTvAudio;
     private TextView menuTvClose;
 
+    private OnResultListener onResultListener;
+
+    public FileAttachDialog(OnResultListener onResultListener) {
+        this.onResultListener = onResultListener;
+    }
 
     @NonNull
     @Override
@@ -45,12 +53,13 @@ public class FileAttachDialog extends DialogFragment {
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == REQUEST_CODE) {
+        if (requestCode == REQUEST_CODE_CAMERA || requestCode == REQUEST_CODE_GALLERY) {
             switch (resultCode) {
                 case Activity.RESULT_CANCELED:
                     dismiss();
                     break;
                 case Activity.RESULT_OK:
+                    if (data != null) onResultListener.onFileSaved(data.getData());
                     dismiss();
                     break;
             }
@@ -70,10 +79,22 @@ public class FileAttachDialog extends DialogFragment {
     }
 
     private void setViewsListeners() {
-        if (menuTvCamera != null) menuTvCamera.setOnClickListener(v -> openCamera());
+        if (menuTvCamera != null) menuTvCamera.setOnClickListener(v -> pickImageFromCamera());
+        if (menuTvGallery != null) menuTvGallery.setOnClickListener(v -> pickImageFromGallery());
+        if (menuTvClose != null) menuTvClose.setOnClickListener(v -> dismiss());
     }
 
-    private void openCamera() {
-        startActivityForResult(new Intent(requireActivity(), CameraActivity.class), REQUEST_CODE);
+    private void pickImageFromCamera() {
+        startActivityForResult(new Intent(requireActivity(), CameraActivity.class), REQUEST_CODE_CAMERA);
+    }
+
+    private void pickImageFromGallery() {
+        Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        intent.setType("image/*");
+        startActivityForResult(intent, REQUEST_CODE_GALLERY);
+    }
+
+    public interface OnResultListener {
+        void onFileSaved(Uri data);
     }
 }

@@ -82,6 +82,7 @@ import androidx.core.util.Pair;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 import androidx.legacy.widget.Space;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.GravityEnum;
@@ -128,6 +129,7 @@ import org.dev_alex.mojo_qa.mojo.activities.MainActivity;
 import org.dev_alex.mojo_qa.mojo.activities.OpenLinkActivity;
 import org.dev_alex.mojo_qa.mojo.activities.RecordAudio;
 import org.dev_alex.mojo_qa.mojo.activities.WebActivity;
+import org.dev_alex.mojo_qa.mojo.adapters.MediaFilesAdapter;
 import org.dev_alex.mojo_qa.mojo.custom_views.CustomImageView;
 import org.dev_alex.mojo_qa.mojo.custom_views.CustomWebview;
 import org.dev_alex.mojo_qa.mojo.custom_views.camera.CustomCamera2Activity;
@@ -4476,6 +4478,11 @@ else {
         final LinearLayout mediaLayout = (LinearLayout) requireActivity().getLayoutInflater().inflate(R.layout.media_layout_renewed, container, false);
         ImageView starIv = mediaLayout.findViewById(R.id.media_layout_renewed_iv_star);
         TextView captionTv = mediaLayout.findViewById(R.id.media_layout_renewed_tv_caption);
+        RecyclerView previewRv = mediaLayout.findViewById(R.id.media_layout_renewed_rv);
+
+        MediaFilesAdapter mediaFilesAdapter = new MediaFilesAdapter();
+
+        previewRv.setAdapter(mediaFilesAdapter);
 
         boolean required = false;
 
@@ -4489,13 +4496,13 @@ else {
             captionTv.setText(value.getString("caption"));
         }
 
-        captionTv.setOnClickListener(v -> showAttachFileDialog());
+        captionTv.setOnClickListener(v -> startAttachFileDialogForResult(mediaFilesAdapter::add));
 
         container.addView(boxInContainerWithId(mediaLayout, value.getString("id")));
     }
 
-    private void showAttachFileDialog() {
-        new FileAttachDialog().show(getChildFragmentManager(), null);
+    private void startAttachFileDialogForResult(FileAttachDialog.OnResultListener onResultListener) {
+        new FileAttachDialog(onResultListener).show(getChildFragmentManager(), null);
     }
 
 }

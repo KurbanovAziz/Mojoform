@@ -1,5 +1,6 @@
 package org.dev_alex.mojo_qa.mojo.adapters;
 
+import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -8,9 +9,16 @@ import android.widget.ImageView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.imageview.ShapeableImageView;
+
 import org.dev_alex.mojo_qa.mojo.R;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class MediaFilesAdapter extends RecyclerView.Adapter<MediaFilesAdapter.MediaFileViewHolder> {
+
+    private List<Uri> mediaUriList = new ArrayList<>();
 
     @NonNull
     @Override
@@ -21,17 +29,25 @@ public class MediaFilesAdapter extends RecyclerView.Adapter<MediaFilesAdapter.Me
 
     @Override
     public void onBindViewHolder(@NonNull MediaFileViewHolder holder, int position) {
-
+        Uri uri = mediaUriList.get(position);
+        holder.bind(uri);
     }
 
     @Override
     public int getItemCount() {
-        return 0;
+        return mediaUriList.size();
+    }
+
+    public void add(Uri uri) {
+        if (uri != null) {
+            mediaUriList.add(uri);
+            notifyItemChanged(mediaUriList.size() - 1);
+        }
     }
 
     public class MediaFileViewHolder extends RecyclerView.ViewHolder {
 
-        protected ImageView iconIv;
+        protected ShapeableImageView iconIv;
         protected ImageView deleteIv;
 
         public MediaFileViewHolder(@NonNull View itemView) {
@@ -41,8 +57,8 @@ public class MediaFilesAdapter extends RecyclerView.Adapter<MediaFilesAdapter.Me
             deleteIv = itemView.findViewById(R.id.media_list_item_iv_delete);
         }
 
-        protected void bind() {
-
+        protected void bind(Uri uri) {
+            iconIv.setImageURI(uri);
         }
     }
 }
