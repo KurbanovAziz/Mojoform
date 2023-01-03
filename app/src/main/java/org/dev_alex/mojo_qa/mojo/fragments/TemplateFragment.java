@@ -132,6 +132,7 @@ import org.dev_alex.mojo_qa.mojo.custom_views.CustomImageView;
 import org.dev_alex.mojo_qa.mojo.custom_views.CustomWebview;
 import org.dev_alex.mojo_qa.mojo.custom_views.camera.CustomCamera2Activity;
 import org.dev_alex.mojo_qa.mojo.custom_views.indicator.IndicatorLayout;
+import org.dev_alex.mojo_qa.mojo.dialogs.FileAttachDialog;
 import org.dev_alex.mojo_qa.mojo.models.IndicatorModel;
 import org.dev_alex.mojo_qa.mojo.models.Page;
 import org.dev_alex.mojo_qa.mojo.models.User;
@@ -1259,7 +1260,7 @@ public class TemplateFragment extends Fragment {
                 case "photo":
                     container.addView(separator);
 
-                    createMediaBlock(value, container);
+                    createMediaBlockRenewed(value, container);
 
                     break;
 
@@ -4470,4 +4471,31 @@ else {
         }}
  saveTemplateState();
     }
+
+    private void createMediaBlockRenewed(final JSONObject value, LinearLayout container) throws Exception {
+        final LinearLayout mediaLayout = (LinearLayout) requireActivity().getLayoutInflater().inflate(R.layout.media_layout_renewed, container, false);
+        ImageView starIv = mediaLayout.findViewById(R.id.media_layout_renewed_iv_star);
+        TextView captionTv = mediaLayout.findViewById(R.id.media_layout_renewed_tv_caption);
+
+        boolean required = false;
+
+        if (value.has("is_required")) {
+            required = value.getBoolean("is_required");
+        }
+
+        starIv.setVisibility(required ? View.VISIBLE : View.GONE);
+
+        if (value.has("caption")) {
+            captionTv.setText(value.getString("caption"));
+        }
+
+        captionTv.setOnClickListener(v -> showAttachFileDialog());
+
+        container.addView(boxInContainerWithId(mediaLayout, value.getString("id")));
+    }
+
+    private void showAttachFileDialog() {
+        new FileAttachDialog().show(getChildFragmentManager(), null);
+    }
+
 }

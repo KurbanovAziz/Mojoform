@@ -33,18 +33,22 @@
 
 
         <TextView
+            android:id="@+id/dialog_attach_file_tv_camera"
             style="@style/Dialog.AttachFile.Menu.TextView"
             android:text="@string/dialog_attach_file_menu_camera" />
 
         <TextView
+            android:id="@+id/dialog_attach_file_tv_gallery"
             style="@style/Dialog.AttachFile.Menu.TextView"
             android:text="@string/dialog_attach_file_menu_gallery" />
 
         <TextView
+            android:id="@+id/dialog_attach_file_tv_documents"
             style="@style/Dialog.AttachFile.Menu.TextView"
             android:text="@string/dialog_attach_file_menu_docs" />
 
         <TextView
+            android:id="@+id/dialog_attach_file_tv_audio"
             style="@style/Dialog.AttachFile.Menu.TextView"
             android:text="@string/dialog_attach_file_menu_audio" />
 
@@ -61,6 +65,7 @@
         android:gravity="center">
 
         <TextView
+            android:id="@+id/dialog_attach_file_tv_close"
             style="@style/Dialog.AttachFile.Menu.TextView"
             android:fontFamily="@font/sf_ui_medium"
             android:text="@string/dialog_attach_file_menu_close" />

@@ -169,6 +169,7 @@
             android:screenOrientation="portrait"
             android:stateNotNeeded="true"
             tools:replace="android:screenOrientation" />
+        <activity android:name=".custom_views.camerax.CameraActivity" />
 
         <service android:name=".gcm.MyFirebaseMessagingService">
             <intent-filter>
