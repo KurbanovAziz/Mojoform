@@ -7,7 +7,6 @@ import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.view.View;
 import android.widget.TextView;
 
@@ -22,8 +21,10 @@ import org.dev_alex.mojo_qa.mojo.custom_views.camerax.CameraActivity;
 
 public class FileAttachDialog extends DialogFragment {
 
-    private static final int REQUEST_CODE_CAMERA = 1;
-    private static final int REQUEST_CODE_GALLERY = 2;
+    private static final int REQUEST_CODE = 1;
+    public static final String MIME_IMAGE = "image/*";
+    public static final String MIME_DOCS = "application/*";
+    public static final String MIME_AUDIO = "audio/*";
 
     private TextView menuTvCamera;
     private TextView menuTvGallery;
@@ -53,7 +54,7 @@ public class FileAttachDialog extends DialogFragment {
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == REQUEST_CODE_CAMERA || requestCode == REQUEST_CODE_GALLERY) {
+        if (requestCode == REQUEST_CODE) {
             switch (resultCode) {
                 case Activity.RESULT_CANCELED:
                     dismiss();
@@ -79,19 +80,21 @@ public class FileAttachDialog extends DialogFragment {
     }
 
     private void setViewsListeners() {
-        if (menuTvCamera != null) menuTvCamera.setOnClickListener(v -> pickImageFromCamera());
-        if (menuTvGallery != null) menuTvGallery.setOnClickListener(v -> pickImageFromGallery());
-        if (menuTvClose != null) menuTvClose.setOnClickListener(v -> dismiss());
+        if (menuTvCamera != null)    menuTvCamera.setOnClickListener(v -> pickImageFromCamera());
+        if (menuTvGallery != null)   menuTvGallery.setOnClickListener(v -> pickFile(MIME_IMAGE));
+        if (menuTvDocuments != null) menuTvDocuments.setOnClickListener(v -> pickFile(MIME_DOCS));
+        if (menuTvAudio != null)     menuTvAudio.setOnClickListener(v -> pickFile(MIME_AUDIO));
+        if (menuTvClose != null)     menuTvClose.setOnClickListener(v -> dismiss());
     }
 
     private void pickImageFromCamera() {
-        startActivityForResult(new Intent(requireActivity(), CameraActivity.class), REQUEST_CODE_CAMERA);
+        startActivityForResult(new Intent(requireActivity(), CameraActivity.class), REQUEST_CODE);
     }
 
-    private void pickImageFromGallery() {
-        Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-        intent.setType("image/*");
-        startActivityForResult(intent, REQUEST_CODE_GALLERY);
+    private void pickFile(String mimeType) {
+        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+        intent.setType(mimeType);
+        startActivityForResult(intent, REQUEST_CODE);
     }
 
     public interface OnResultListener {

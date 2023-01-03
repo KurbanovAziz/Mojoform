@@ -9,10 +9,13 @@
         android:id="@+id/media_list_item_iv_icon"
         android:layout_width="73dp"
         android:layout_height="73dp"
-        android:scaleType="centerCrop"
-        app:shapeAppearanceOverlay="@style/ShapeableImageView.Rounded"
+        android:padding="1dp"
+        android:scaleType="center"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
+        app:shapeAppearanceOverlay="@style/ShapeableImageView.Rounded"
+        app:strokeColor="@color/colorAccent"
+        app:strokeWidth="1dp"
         tools:srcCompat="@drawable/ic_list_item_media_audio" />
 
     <ImageView
