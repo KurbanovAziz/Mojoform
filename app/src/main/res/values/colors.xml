@@ -29,4 +29,6 @@
     <color name="simpletooltip_arrow">#A14C3D5F</color>
 
     <color name="shutter_bg">#88ff00ff</color>
+
+    <color name="dialog_bg_dark">#1D1D1D</color>
 </resources>
