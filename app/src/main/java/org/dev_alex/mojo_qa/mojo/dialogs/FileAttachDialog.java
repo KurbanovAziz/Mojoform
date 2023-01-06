@@ -83,7 +83,10 @@ public class FileAttachDialog extends DialogFragment {
         if (menuTvCamera != null)    menuTvCamera.setOnClickListener(v -> pickImageFromCamera());
         if (menuTvGallery != null)   menuTvGallery.setOnClickListener(v -> pickFile(MIME_IMAGE));
         if (menuTvDocuments != null) menuTvDocuments.setOnClickListener(v -> pickFile(MIME_DOCS));
-        if (menuTvAudio != null)     menuTvAudio.setOnClickListener(v -> showRecordAudioDialog());
+        if (menuTvAudio != null) menuTvAudio.setOnClickListener(v -> {
+            showRecordAudioDialog();
+            dismiss();
+        });
         if (menuTvClose != null)     menuTvClose.setOnClickListener(v -> dismiss());
     }
 
@@ -98,7 +101,7 @@ public class FileAttachDialog extends DialogFragment {
     }
 
     private void showRecordAudioDialog() {
-        new AudioRecordDialog().show(getChildFragmentManager(), null);
+        new AudioRecordDialog().show(getParentFragmentManager(), null);
     }
 
     public interface OnResultListener {
