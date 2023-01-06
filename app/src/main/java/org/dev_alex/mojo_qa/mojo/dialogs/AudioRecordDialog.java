@@ -9,6 +9,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Chronometer;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -24,7 +26,12 @@ public class AudioRecordDialog extends BottomSheetDialogFragment {
 
     private static final int REQUEST_CODE_PERMISSIONS = 1;
 
+    private TextView cancelTv;
+    private TextView recordTv;
+    private TextView saveTv;
     private Chronometer chronometer;
+    private ImageView recordIv;
+    private ImageView recordControlIv;
 
     @Override
     public int getTheme() {
@@ -43,7 +50,7 @@ public class AudioRecordDialog extends BottomSheetDialogFragment {
         View view = inflater.inflate(R.layout.dialog_record_audio, container, false);
         setDialogParams();
         initViews(view);
-        setViewsParams();
+        setViewsListeners();
         return view;
     }
 
@@ -77,11 +84,16 @@ public class AudioRecordDialog extends BottomSheetDialogFragment {
     }
 
     private void initViews(View view) {
+        cancelTv = view.findViewById(R.id.dialog_record_audio_tv_cancel);
+        recordTv = view.findViewById(R.id.dialog_record_audio_tv_record);
+        saveTv = view.findViewById(R.id.dialog_record_audio_tv_save);
         chronometer = view.findViewById(R.id.dialog_record_audio_chronometer);
+        recordIv = view.findViewById(R.id.dialog_record_audio_iv_record);
+        recordControlIv = view.findViewById(R.id.dialog_record_audio_iv_control);
     }
 
-    private void setViewsParams() {
-        chronometer.setFormat("HH:mm:ss");
+    private void setViewsListeners() {
+        if (cancelTv != null) cancelTv.setOnClickListener(v -> dismiss());
     }
 
     private void showToastMessage(String message) {
