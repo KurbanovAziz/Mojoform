@@ -268,5 +268,8 @@
     <string name="dialog_attach_file_menu_audio">Аудіо</string>
     <string name="dialog_attach_file_menu_close">Закрити</string>
 
+    <string name="dialog_record_audio_cancel">Скасувати</string>
+    <string name="dialog_record_audio_record">Запис</string>
+    <string name="dialog_record_audio_save">Зберегти</string>
 
 </resources>

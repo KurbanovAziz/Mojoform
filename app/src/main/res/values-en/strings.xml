@@ -269,4 +269,7 @@
     <string name="dialog_attach_file_menu_audio">Audio</string>
     <string name="dialog_attach_file_menu_close">Close</string>
 
+    <string name="dialog_record_audio_cancel">Cancel</string>
+    <string name="dialog_record_audio_record">Record</string>
+    <string name="dialog_record_audio_save">Save</string>
 </resources>

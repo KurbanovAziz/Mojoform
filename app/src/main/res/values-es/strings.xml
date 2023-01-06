@@ -269,4 +269,8 @@
     <string name="dialog_attach_file_menu_audio">Audio</string>
     <string name="dialog_attach_file_menu_close">Cerrar</string>
 
+    <string name="dialog_record_audio_cancel">Cancelar</string>
+    <string name="dialog_record_audio_record">Registro</string>
+    <string name="dialog_record_audio_save">Salvar</string>
+
 </resources>
