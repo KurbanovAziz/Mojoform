@@ -34,7 +34,7 @@ import java.util.concurrent.ExecutionException;
 public class CameraActivity extends AppCompatActivity {
 
     private static final int REQUEST_CODE = 1;
-    public static final String FILENAME_FORMAT = "yyyy_MM_dd_HH_mm_ss_SSS";
+    private static final String FILENAME_FORMAT = "yyyy_MM_dd_HH_mm_ss_SSS";
 
     private PreviewView previewView;
     private FrameLayout takePhotoLayout;

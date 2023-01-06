@@ -274,4 +274,6 @@
     <string name="dialog_record_audio_record">Запись</string>
     <string name="dialog_record_audio_save">Сохранить</string>
 
+    <string name="dialog_record_audio_chronometer" translatable="false">%1$s:%2$s.%3$s</string>
+
 </resources>

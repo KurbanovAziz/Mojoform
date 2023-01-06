@@ -12,6 +12,10 @@ public class AudioRecordController {
     private static MediaPlayer mediaPlayer;
     private static String filePath;
 
+    public static String getAudioRecordPath() {
+        return filePath;
+    }
+
     private static void initMediaRecorder() {
         mediaRecorder = new MediaRecorder();
         mediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
@@ -36,26 +40,52 @@ public class AudioRecordController {
         }
     }
 
+    public static void pauseRecording() {
+        if (mediaRecorder != null) {
+            mediaRecorder.pause();
+        }
+    }
+
     public static void stopRecording() {
         if (mediaRecorder != null) {
-            mediaRecorder.stop();
+            try {
+                mediaRecorder.stop();
+            } catch (IllegalStateException e) {
+                Log.e("MojoApp", "Error when stop recording audio " + e);
+            }
             mediaRecorder.release();
             mediaRecorder = null;
         }
     }
 
-    public static void recordToFile(String filePath) {
+    public static void releaseMediaResources() {
+        stopPlaying();
+        stopRecording();
+    }
+
+    public static void startRecordingToFile(String filePath) {
         AudioRecordController.filePath = filePath;
         startRecording();
     }
 
-    public static void startPlaying() {
+    public static void resumeRecording() {
+        if (mediaRecorder != null) {
+            mediaRecorder.resume();
+        }
+    }
+
+    public static void resetRecording() {
+        if (mediaRecorder != null) mediaRecorder.reset();
+    }
+
+    public static void startPlaying(MediaPlayer.OnCompletionListener listener) {
         if (mediaPlayer == null) initMediaPlayer();
         try {
             mediaPlayer.setDataSource(filePath);
             mediaPlayer.prepare();
+            mediaPlayer.setOnCompletionListener(listener);
             mediaPlayer.start();
-        } catch (IOException e) {
+        } catch (Exception e) {
             Log.e("MojoApp", "Error when trying to play recorded audio " + e);
         }
     }
