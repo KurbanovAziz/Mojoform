@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ripple xmlns:android="http://schemas.android.com/apk/res/android"
+    android:color="@color/bg_bottom_sheet_dark">
+    <item android:id="@android:id/mask">
+        <vector
+            android:width="24dp"
+            android:height="28dp"
+            android:viewportWidth="24"
+            android:viewportHeight="28">
+            <path
+                android:fillColor="@color/white"
+                android:pathData="M22.5,11.402C24.5,12.557 24.5,15.443 22.5,16.598L4.5,26.99C2.5,28.145 0,26.702 0,24.392L0,3.608C0,1.298 2.5,-0.145 4.5,1.01L22.5,11.402Z" />
+        </vector>
+    </item>
+    <item android:drawable="@drawable/ic_record_play" />
+</ripple>

@@ -78,7 +78,7 @@
         <item name="android:textColor">@color/textGrey</item>
     </style>
 
-    <style name="Dialog.AttachFile.Menu.TextView" parent="Widget.AppCompat.TextView">
+    <style name="AppTheme.Dialog.AttachFile.Menu.TextView" parent="Widget.AppCompat.TextView">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:gravity">center</item>
@@ -93,12 +93,12 @@
         <item name="android:textColor">@color/colorAccent</item>
     </style>
 
-    <style name="ShapeableImageView.Rounded" parent="">
+    <style name="AppTheme.ShapeableImageView.Rounded" parent="">
         <item name="cornerFamily">rounded</item>
         <item name="cornerSize">5dp</item>
     </style>
 
-    <style name="Dialog.RecordAudio.Menu.TextView" parent="Widget.AppCompat.TextView">
+    <style name="AppTheme.Dialog.RecordAudio.Menu.TextView" parent="Widget.AppCompat.TextView">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:background">?attr/selectableItemBackground</item>
@@ -108,6 +108,25 @@
         <item name="android:textColor">@color/selector_white_gray</item>
         <item name="android:clickable">true</item>
         <item name="android:focusable">true</item>
+        <item name="colorControlHighlight">@color/white</item>
+        <item name="android:colorControlHighlight">@color/white</item>
+    </style>
+
+    <style name="AppTheme.BottomSheetDialog.Dark" parent="ThemeOverlay.MaterialComponents.BottomSheetDialog">
+        <item name="bottomSheetStyle">@style/AppTheme.BottomSheet.Dark.Rounded</item>
+    </style>
+
+    <style name="AppTheme.BottomSheet.Dark.Rounded" parent="Widget.MaterialComponents.BottomSheet">
+        <item name="backgroundTint">@color/bg_bottom_sheet_dark</item>
+        <item name="shapeAppearance">@style/AppTheme.BottomSheetDialog.ShapeAppearance.Rounded
+        </item>
+        <item name="behavior_hideable">true</item>
+        <item name="behavior_peekHeight">300dp</item>
+    </style>
+
+    <style name="AppTheme.BottomSheetDialog.ShapeAppearance.Rounded" parent="ShapeAppearance.MaterialComponents.LargeComponent">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">12dp</item>
     </style>
 
 </resources>

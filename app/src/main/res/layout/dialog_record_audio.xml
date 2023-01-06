@@ -3,8 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/bg_corners_round"
-    android:backgroundTint="@color/dialog_bg_dark">
+    android:padding="16dp">
 
     <LinearLayout
         android:id="@+id/dialog_record_audio_container_buttons"
@@ -16,28 +15,33 @@
 
         <TextView
             android:id="@+id/dialog_record_audio_tv_cancel"
-            style="@style/Dialog.RecordAudio.Menu.TextView"
+            style="@style/AppTheme.Dialog.RecordAudio.Menu.TextView"
+            android:layout_width="0dp"
             android:layout_weight="1"
-            android:text="@string/dialog_record_audio_cancel" />
+            android:text="@string/dialog_record_audio_cancel"
+            android:theme="@style/AppTheme.Dialog.RecordAudio.Menu.TextView" />
 
         <TextView
             android:id="@+id/dialog_record_audio_tv_record"
-            style="@style/Dialog.RecordAudio.Menu.TextView"
+            style="@style/AppTheme.Dialog.RecordAudio.Menu.TextView"
+            android:layout_width="0dp"
             android:layout_weight="1"
-            android:text="@string/dialog_record_audio_record" />
+            android:text="@string/dialog_record_audio_record"
+            android:theme="@style/AppTheme.Dialog.RecordAudio.Menu.TextView" />
 
         <TextView
             android:id="@+id/dialog_record_audio_tv_save"
-            style="@style/Dialog.RecordAudio.Menu.TextView"
-            android:layout_height="match_parent"
+            style="@style/AppTheme.Dialog.RecordAudio.Menu.TextView"
+            android:layout_width="0dp"
             android:layout_weight="1"
-            android:text="@string/dialog_record_audio_save" />
+            android:text="@string/dialog_record_audio_save"
+            android:theme="@style/AppTheme.Dialog.RecordAudio.Menu.TextView" />
 
     </LinearLayout>
 
     <LinearLayout
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="200dp"
         android:gravity="center"
         android:orientation="vertical"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -68,7 +72,11 @@
                 android:layout_weight="1"
                 android:clickable="true"
                 android:focusable="true"
-                android:src="@drawable/ic_record" />
+                android:src="@drawable/ic_record_ripple" />
+
+            <androidx.legacy.widget.Space
+                android:layout_width="10dp"
+                android:layout_height="match_parent" />
 
             <ImageView
                 android:id="@+id/dialog_record_audio_iv_control"
@@ -77,7 +85,7 @@
                 android:layout_weight="1"
                 android:clickable="true"
                 android:focusable="true"
-                android:src="@drawable/ic_record_play" />
+                android:src="@drawable/ic_record_play_ripple" />
 
         </LinearLayout>
 

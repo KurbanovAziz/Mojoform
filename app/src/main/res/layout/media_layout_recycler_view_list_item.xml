@@ -13,7 +13,7 @@
         android:scaleType="center"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:shapeAppearanceOverlay="@style/ShapeableImageView.Rounded"
+        app:shapeAppearanceOverlay="@style/AppTheme.ShapeableImageView.Rounded"
         app:strokeColor="@color/colorAccent"
         app:strokeWidth="1dp"
         tools:srcCompat="@drawable/ic_list_item_media_audio" />

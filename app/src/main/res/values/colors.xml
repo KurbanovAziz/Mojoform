@@ -30,5 +30,5 @@
 
     <color name="shutter_bg">#88ff00ff</color>
 
-    <color name="dialog_bg_dark">#1D1D1D</color>
+    <color name="bg_bottom_sheet_dark">#1D1D1D</color>
 </resources>
