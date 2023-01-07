@@ -9,6 +9,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -60,7 +61,13 @@ public class FileAttachDialog extends DialogFragment {
                     dismiss();
                     break;
                 case Activity.RESULT_OK:
-                    if (data != null) onResultListener.onFileSaved(data.getData());
+                    if (data != null) {
+                        Uri uri = data.getData();
+                        if (uri != null)
+                            onResultListener.onFileSaved(data.getData());
+                        else
+                            Toast.makeText(requireActivity(), "Файл не найден", Toast.LENGTH_SHORT).show();
+                    }
                     dismiss();
                     break;
             }
@@ -101,7 +108,7 @@ public class FileAttachDialog extends DialogFragment {
     }
 
     private void showRecordAudioDialog() {
-        new AudioRecordDialog().show(getParentFragmentManager(), null);
+        new AudioRecordDialog(onResultListener).show(getParentFragmentManager(), null);
     }
 
     public interface OnResultListener {

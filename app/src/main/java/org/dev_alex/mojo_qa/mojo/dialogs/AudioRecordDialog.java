@@ -4,6 +4,7 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.pm.PackageManager;
 import android.media.MediaPlayer;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.util.Log;
@@ -20,11 +21,13 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.FileProvider;
 
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 
+import org.dev_alex.mojo_qa.mojo.BuildConfig;
 import org.dev_alex.mojo_qa.mojo.R;
 import org.dev_alex.mojo_qa.mojo.audio.AudioRecordController;
 
@@ -46,6 +49,12 @@ public class AudioRecordDialog extends BottomSheetDialogFragment implements Medi
     private ImageView recordControlIv;
 
     AlphaAnimation alphaAnimation = new AlphaAnimation(.5f, 1f);
+
+    private FileAttachDialog.OnResultListener onResultListener;
+
+    public AudioRecordDialog(FileAttachDialog.OnResultListener onResultListener) {
+        this.onResultListener = onResultListener;
+    }
 
 
     @Override
@@ -128,6 +137,7 @@ public class AudioRecordDialog extends BottomSheetDialogFragment implements Medi
         if (saveTv != null) saveTv.setOnClickListener(v -> {
             Toast.makeText(requireActivity(), "Запись успешно сохранена", Toast.LENGTH_SHORT).show();
             releaseMedia();
+            saveAudioFileUri();
             dismiss();
         });
         if (chronometer != null) chronometer.setOnChronometerTickListener(chronometer -> {
@@ -281,5 +291,13 @@ public class AudioRecordDialog extends BottomSheetDialogFragment implements Medi
     public void onCompletion(MediaPlayer mp) {
         stopPlayingRecordedAudio();
         setViewsStateRecordPlayingStopped();
+    }
+
+    private void saveAudioFileUri() {
+        if (AudioRecordController.getAudioRecordPath() != null) {
+            File file = new File(AudioRecordController.getAudioRecordPath());
+            Uri uri = FileProvider.getUriForFile(requireActivity(), BuildConfig.APPLICATION_ID + ".provider", file);
+            onResultListener.onFileSaved(uri);
+        }
     }
 }

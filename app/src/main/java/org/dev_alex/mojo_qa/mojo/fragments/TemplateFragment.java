@@ -4496,7 +4496,9 @@ else {
             captionTv.setText(value.getString("caption"));
         }
 
-        captionTv.setOnClickListener(v -> startAttachFileDialogForResult(mediaFilesAdapter::add));
+        captionTv.setOnClickListener(v -> {
+            startAttachFileDialogForResult(mediaFilesAdapter::add);
+        });
 
         container.addView(boxInContainerWithId(mediaLayout, value.getString("id")));
     }
