@@ -2,31 +2,22 @@ package org.dev_alex.mojo_qa.mojo.custom_views;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnCancelListener;
-import android.content.DialogInterface.OnMultiChoiceClickListener;
 import android.graphics.Color;
 import android.util.AttributeSet;
-import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.CheckedTextView;
 import android.widget.ImageView;
-import android.widget.RelativeLayout;
-import android.widget.Spinner;
-import android.widget.TextView;
+import android.widget.LinearLayout;
 
-import androidx.annotation.Dimension;
 import androidx.core.content.ContextCompat;
-import androidx.fragment.app.FragmentActivity;
 
 import org.dev_alex.mojo_qa.mojo.R;
 import org.dev_alex.mojo_qa.mojo.models.Organisation;
@@ -152,6 +143,7 @@ public class MultiSpinner extends androidx.appcompat.widget.AppCompatSpinner imp
         positive_button.setBackground(ContextCompat.getDrawable(getContext(), R.drawable.rounded_view));
        // positive_button.setHeight(30);
         positive_button.setTextColor(Color.parseColor("#f0f8ff"));
+        positive_button.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT, .2f));
         return true;}
         catch (Exception e){
             e.printStackTrace();
