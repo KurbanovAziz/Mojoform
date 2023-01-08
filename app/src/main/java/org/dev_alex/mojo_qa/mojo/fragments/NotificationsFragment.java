@@ -1,7 +1,6 @@
 package org.dev_alex.mojo_qa.mojo.fragments;
 
 import android.Manifest;
-import android.app.Activity;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -19,10 +18,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
-import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RadioGroup;
@@ -30,9 +29,19 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.Nullable;
+import androidx.cardview.widget.CardView;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.core.content.FileProvider;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.OrientationHelper;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
+
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.android.exoplayer2.C;
 import com.prolificinteractive.materialcalendarview.CalendarDay;
 import com.prolificinteractive.materialcalendarview.DayViewDecorator;
 import com.prolificinteractive.materialcalendarview.DayViewFacade;
@@ -40,7 +49,6 @@ import com.prolificinteractive.materialcalendarview.MaterialCalendarView;
 import com.prolificinteractive.materialcalendarview.OnMonthChangedListener;
 
 import org.dev_alex.mojo_qa.mojo.R;
-import org.dev_alex.mojo_qa.mojo.SortUtil;
 import org.dev_alex.mojo_qa.mojo.activities.AuthActivity;
 import org.dev_alex.mojo_qa.mojo.activities.MainActivity;
 import org.dev_alex.mojo_qa.mojo.adapters.NotificationAdapter;
@@ -62,16 +70,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
 
-import androidx.annotation.Nullable;
-import androidx.cardview.widget.CardView;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-import androidx.core.content.FileProvider;
-import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.OrientationHelper;
-import androidx.recyclerview.widget.RecyclerView;
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import okhttp3.Response;
 import okio.BufferedSink;
 import okio.Okio;
@@ -260,8 +258,10 @@ public class NotificationsFragment extends Fragment implements NotificationAdapt
                     @Override
                     public void onClick(View v) {
                         final Dialog calendarDialog = new Dialog(getContext());
+                        View calendarDialogView = LayoutInflater.from(getContext()).inflate(R.layout.dialog_calendar, null, false);
                         calendarDialog.getWindow().requestFeature(Window.FEATURE_NO_TITLE);
-                        calendarDialog.setContentView(LayoutInflater.from(getContext()).inflate(R.layout.dialog_calendar, null, false));
+                        calendarDialog.setContentView(calendarDialogView);
+                        calendarDialog.getWindow().setLayout(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT);
                         calendarDialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
                         calendarDialog.show();
                         MaterialCalendarView calendarView = (MaterialCalendarView) calendarDialog.findViewById(R.id.calendarView);
