@@ -29,6 +29,8 @@
             android:id="@+id/calendarView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            app:mcv_weekDayLabels="@color/textGrey"
+            app:mcv_dateTextAppearance="@color/textGrey"
             app:mcv_arrowColor="@color/textGrey"
             app:mcv_firstDayOfWeek="monday"
             app:mcv_selectionColor="@color/accent"
