@@ -67,7 +67,7 @@ android {
             applicationId 'com.mojoform.Mojoform'
             resValue "string", "app_name", "Mojoform"
             manifestPlaceholders = [
-                    appIcon: "@drawable/app_logo"
+                    appIcon: "@drawable/app_logo.png"
             ]
         }
 
