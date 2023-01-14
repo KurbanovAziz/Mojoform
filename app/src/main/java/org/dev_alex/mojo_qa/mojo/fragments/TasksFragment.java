@@ -126,6 +126,7 @@ public class TasksFragment extends Fragment {
 
             initDialog();
             setListeners();
+
             new Handler().postDelayed(new Runnable() {
                 @Override
                 public void run() {
@@ -316,16 +317,19 @@ public class TasksFragment extends Fragment {
             public void onCheckedChanged(RadioGroup group, @IdRes int checkedId) {
                 switch (checkedId) {
                     case R.id.ended:
+                        hideCalendarView();
                         updateTaskAdapter(new TaskAdapter(TasksFragment.this, finishedTasks, true), CurrentAdapterType.FINISHED);
                         break;
 
                     case R.id.busy:
+                        hideCalendarView();
                         updateTaskAdapter(new TaskAdapter(TasksFragment.this, busyTasks, TaskAdapter.TaskType.BUSY), CurrentAdapterType.BUSY);
                         updateDate(true);
 
                         break;
 
                     case R.id.permanent:
+                        showCalendarView();
                         updateTaskAdapter(new TaskAdapter(TasksFragment.this, permanentTasks, TaskAdapter.TaskType.PERMANENT), CurrentAdapterType.PERMANENT);
                         updateDate(true);
 
@@ -396,6 +400,7 @@ public class TasksFragment extends Fragment {
             }
         });
 
+
         rootView.findViewById(R.id.calendar_control_panel).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -419,6 +424,16 @@ public class TasksFragment extends Fragment {
                 startSearch();
             }
         });
+    }
+
+    private void hideCalendarView() {
+        View calendarView = rootView.findViewById(R.id.calendar_control_panel);
+        if (calendarView != null) calendarView.setVisibility(View.GONE);
+    }
+
+    private void showCalendarView() {
+        View calendarView = rootView.findViewById(R.id.calendar_control_panel);
+        if (calendarView != null) calendarView.setVisibility(View.VISIBLE);
     }
 
     private void updateDate(boolean needUpdate) {
@@ -702,15 +717,18 @@ public class TasksFragment extends Fragment {
                         currentAdapterType = CurrentAdapterType.BUSY;
                     switch (currentAdapterType) {
                         case BUSY:
+                            hideCalendarView();
                             ((RadioButton) rootView.findViewById(R.id.busy)).setChecked(true);
                             updateTaskAdapter(new TaskAdapter(TasksFragment.this, busyTasks, TaskAdapter.TaskType.BUSY), CurrentAdapterType.BUSY);
                             break;
                         case FINISHED:
+                            hideCalendarView();
                             ((RadioButton) rootView.findViewById(R.id.ended)).setChecked(true);
                             updateTaskAdapter(new TaskAdapter(TasksFragment.this, finishedTasks, true), CurrentAdapterType.FINISHED);
 
                             break;
                         case PERMANENT:
+                            showCalendarView();
                             ((RadioButton) rootView.findViewById(R.id.permanent)).setChecked(true);
                             updateTaskAdapter(new TaskAdapter(TasksFragment.this, permanentTasks, TaskAdapter.TaskType.PERMANENT), CurrentAdapterType.PERMANENT);
 
