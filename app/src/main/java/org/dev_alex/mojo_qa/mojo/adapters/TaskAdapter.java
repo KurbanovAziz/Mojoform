@@ -218,7 +218,7 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
             }
         }
 
-        viewHolder.taskDelete.setOnClickListener(v -> removeTask(task));
+        viewHolder.taskDelete.setOnClickListener(v -> removeTask(task, i));
     }
 
 
@@ -228,8 +228,7 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
     }
 
 
-    private void removeTask(Task task) {
-        int position = tasks.indexOf(task);
+    private void removeTask(Task task, int position) {
         tasks.remove(task);
         notifyItemRemoved(position);
         notifyItemRangeChanged(position, getItemCount() - position);
