@@ -3,20 +3,27 @@ package org.dev_alex.mojo_qa.mojo.adapters;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.res.Resources;
 import android.graphics.Color;
+import android.graphics.Point;
 import android.graphics.drawable.GradientDrawable;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.cardview.widget.CardView;
+import androidx.recyclerview.widget.RecyclerView;
 
 import org.dev_alex.mojo_qa.mojo.App;
 import org.dev_alex.mojo_qa.mojo.R;
 import org.dev_alex.mojo_qa.mojo.activities.MainActivity;
+import org.dev_alex.mojo_qa.mojo.custom_views.scroll.LockableHorizontalScrollView;
 import org.dev_alex.mojo_qa.mojo.fragments.TasksFragment;
 import org.dev_alex.mojo_qa.mojo.models.Task;
 import org.dev_alex.mojo_qa.mojo.services.LoginHistoryService;
@@ -34,23 +41,61 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
     private TasksFragment parentFragment;
     private static boolean isFinished = false;
 
+    private static final float CARD_OFFSET_DP = 16.0f;
+
+    public enum TaskType {
+        ENDED,
+        BUSY,
+        PERMANENT
+    }
+
+    private TaskType currentTaskType = null;
 
     static class TaskViewHolder extends RecyclerView.ViewHolder {
+        View taskItemContainer;
+        CardView taskCard;
         TextView taskTitle;
         TextView taskDate;
         TextView delayed;
         View taskActiveCircle;
         ImageView taskIcon;
         ImageView moreBtn;
+        View taskDelete;
 
         TaskViewHolder(View itemView) {
             super(itemView);
+            taskItemContainer = itemView.findViewById(R.id.task_item_container);
+            taskCard = itemView.findViewById(R.id.task_card);
             taskDate = itemView.findViewById(R.id.task_date);
             taskTitle = itemView.findViewById(R.id.task_title);
             delayed = itemView.findViewById(R.id.delayed);
             taskActiveCircle = itemView.findViewById(R.id.task_active);
             taskIcon = itemView.findViewById(R.id.task_icon);
             moreBtn = itemView.findViewById(R.id.more_btn);
+            taskDelete = itemView.findViewById(R.id.task_delete);
+
+            int offset = (int) getPxFromDp(itemView.getResources(), CARD_OFFSET_DP);
+            setViewPadding(taskItemContainer, offset);
+            setupViewWidth(itemView.getContext(), taskCard, offset);
+
+        }
+
+        private void setViewPadding(@NonNull View view, int padding) {
+            view.setPadding(padding, 0, 0, 0);
+        }
+
+        private void setupViewWidth(@NonNull Context context, @NonNull View view, int widthOffsetEnd) {
+            WindowManager windowManager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
+            if (windowManager != null) {
+                Point point = new Point();
+                windowManager.getDefaultDisplay().getSize(point);
+                widthOffsetEnd *= 2;
+                view.setMinimumWidth(point.x - widthOffsetEnd);
+            }
+        }
+
+        private float getPxFromDp(@NonNull Resources resources, float margin) {
+            return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, margin, resources.getDisplayMetrics());
         }
     }
 
@@ -60,10 +105,19 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
         this.tasks = tasks;
         isFinished = false;
     }
+
     public TaskAdapter(TasksFragment parentFragment, ArrayList<Task> tasks, boolean isFinish) {
         this.parentFragment = parentFragment;
         this.tasks = tasks;
         isFinished = true;
+        currentTaskType = TaskType.ENDED;
+    }
+
+    public TaskAdapter(TasksFragment parentFragment, ArrayList<Task> tasks, TaskType taskType) {
+        this.parentFragment = parentFragment;
+        this.tasks = tasks;
+        isFinished = false;
+        currentTaskType = taskType;
     }
 
     @Override
@@ -113,7 +167,7 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
             viewHolder.taskIcon.setImageResource(R.drawable.ic_close_link);
         } else if (Objects.equals(task.ref.type, "constantly") || Objects.equals(task.ref.type, "constantly_group")) {
             viewHolder.taskIcon.setImageResource(R.drawable.file_icon);
-        } else if (Objects.equals(task.ref.type, "periodic") || Objects.equals(task.ref.type, "periodic_group")){
+        } else if (Objects.equals(task.ref.type, "periodic") || Objects.equals(task.ref.type, "periodic_group")) {
             viewHolder.taskIcon.setImageResource(R.drawable.ic_periodical);
         } else if (Objects.equals(task.ref.type, "oneshot") || Objects.equals(task.ref.type, "oneshot_group")) {
             viewHolder.taskIcon.setImageResource(R.drawable.ic_oneshot);
@@ -127,39 +181,58 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
 
         viewHolder.taskTitle.setText(task.ref.name);
 
+        try {
+            ((LockableHorizontalScrollView) viewHolder.itemView).scrollTo(0, 0);
+        } catch (ClassCastException e) {
+        }
 
         if (task.suspended) {
-           // viewHolder.moreBtn.setVisibility(View.VISIBLE)
-            viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
+            // viewHolder.moreBtn.setVisibility(View.VISIBLE)
+            viewHolder.taskCard.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if (task.taskUUID != null){
+                    if (task.taskUUID != null) {
                         ((MainActivity) parentFragment.getActivity()).openTask(task.taskUUID, true);
+                    } else {
+                        parentFragment.showTemplateWindow(task.id, true);
                     }
-                    else {
-                        parentFragment.showTemplateWindow(task.id, true);}
                 }
             });
         } else {
-            viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
+            viewHolder.taskCard.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if (task.taskUUID != null){
+                    if (task.taskUUID != null) {
                         ((MainActivity) parentFragment.getActivity()).openTask(task.taskUUID, false);
+                    } else {
+                        parentFragment.showTemplateWindow(task.id, false);
                     }
-                    else {
-                    parentFragment.showTemplateWindow(task.id, false);}
                 }
             });
-
-}
         }
 
+        if (currentTaskType != TaskType.BUSY) {
+            try {
+                ((LockableHorizontalScrollView) viewHolder.itemView).setScrollingEnabled(false);
+            } catch (ClassCastException e) {
+            }
+        }
+
+        viewHolder.taskDelete.setOnClickListener(v -> removeTask(task));
+    }
 
 
     @Override
     public int getItemCount() {
         return tasks.size();
+    }
+
+
+    private void removeTask(Task task) {
+        int position = tasks.indexOf(task);
+        tasks.remove(task);
+        notifyItemRemoved(position);
+        notifyItemRangeChanged(position, getItemCount() - position);
     }
 
 }

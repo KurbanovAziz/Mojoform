@@ -272,4 +272,7 @@
     <string name="dialog_record_audio_cancel">Cancel</string>
     <string name="dialog_record_audio_record">Record</string>
     <string name="dialog_record_audio_save">Save</string>
+
+    <string name="task_delete">Delete</string>
+
 </resources>

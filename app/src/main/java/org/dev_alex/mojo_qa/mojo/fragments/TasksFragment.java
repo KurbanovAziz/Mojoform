@@ -5,20 +5,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
-
-import androidx.annotation.IdRes;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-import androidx.core.content.ContextCompat;
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -32,6 +21,15 @@ import android.widget.RadioGroup;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.annotation.IdRes;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -68,8 +66,6 @@ import java.util.Locale;
 import java.util.Map;
 
 import okhttp3.Response;
-
-import static android.app.Activity.RESULT_OK;
 
 public class TasksFragment extends Fragment {
 
@@ -324,13 +320,13 @@ public class TasksFragment extends Fragment {
                         break;
 
                     case R.id.busy:
-                        updateTaskAdapter(new TaskAdapter(TasksFragment.this, busyTasks), CurrentAdapterType.BUSY);
+                        updateTaskAdapter(new TaskAdapter(TasksFragment.this, busyTasks, TaskAdapter.TaskType.BUSY), CurrentAdapterType.BUSY);
                         updateDate(true);
 
                         break;
 
                     case R.id.permanent:
-                        updateTaskAdapter(new TaskAdapter(TasksFragment.this, permanentTasks), CurrentAdapterType.PERMANENT);
+                        updateTaskAdapter(new TaskAdapter(TasksFragment.this, permanentTasks, TaskAdapter.TaskType.PERMANENT), CurrentAdapterType.PERMANENT);
                         updateDate(true);
 
                         break;
@@ -615,8 +611,8 @@ public class TasksFragment extends Fragment {
                                         task.ref.name = template.getString("nameTask");
                                         try {
                                             task.complete_time = template.getLong("CompleteTime");
+                                        } catch (Exception ignored) {
                                         }
-                                        catch (Exception ignored){}
                                     } catch (Exception ignored) {
                                         task.id = 0;
                                         task.ref.name = template.getString("name");
@@ -646,7 +642,7 @@ public class TasksFragment extends Fragment {
                                     lastTasks.removeIf(permanentT -> permanentT.ref.id == busyTask.id);
                                     lastTasks.removeIf(permanentT -> permanentT.ref.id == busyTask.ref.id);
                                     lastTasks.removeIf(permanentT -> permanentT.id == busyTask.ref.id);
-                                    }
+                                }
 
                                 busyTasks.addAll(lastTasks);
 
@@ -658,7 +654,7 @@ public class TasksFragment extends Fragment {
                                 permanentTasks = new ObjectMapper().readValue(tasksJson.toString(), new TypeReference<ArrayList<Task>>() {
                                 });
                                 for (Task lastT : lastTasks) {
-                                    for (Task permanentT : permanentTasks){
+                                    for (Task permanentT : permanentTasks) {
                                         Log.d("1", lastT.id + "");
                                         Log.d("1", lastT.ref.id + "");
                                         Log.d("1", lastT.ref.name + "");
@@ -707,7 +703,7 @@ public class TasksFragment extends Fragment {
                     switch (currentAdapterType) {
                         case BUSY:
                             ((RadioButton) rootView.findViewById(R.id.busy)).setChecked(true);
-                            updateTaskAdapter(new TaskAdapter(TasksFragment.this, busyTasks), CurrentAdapterType.BUSY);
+                            updateTaskAdapter(new TaskAdapter(TasksFragment.this, busyTasks, TaskAdapter.TaskType.BUSY), CurrentAdapterType.BUSY);
                             break;
                         case FINISHED:
                             ((RadioButton) rootView.findViewById(R.id.ended)).setChecked(true);
@@ -716,7 +712,7 @@ public class TasksFragment extends Fragment {
                             break;
                         case PERMANENT:
                             ((RadioButton) rootView.findViewById(R.id.permanent)).setChecked(true);
-                            updateTaskAdapter(new TaskAdapter(TasksFragment.this, permanentTasks), CurrentAdapterType.PERMANENT);
+                            updateTaskAdapter(new TaskAdapter(TasksFragment.this, permanentTasks, TaskAdapter.TaskType.PERMANENT), CurrentAdapterType.PERMANENT);
 
                             break;
                     }
