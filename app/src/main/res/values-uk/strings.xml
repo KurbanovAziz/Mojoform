@@ -272,4 +272,6 @@
     <string name="dialog_record_audio_record">Запис</string>
     <string name="dialog_record_audio_save">Зберегти</string>
 
+    <string name="task_delete">Видалити</string>
+
 </resources>

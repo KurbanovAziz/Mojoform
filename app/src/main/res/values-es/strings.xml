@@ -273,4 +273,6 @@
     <string name="dialog_record_audio_record">Registro</string>
     <string name="dialog_record_audio_save">Salvar</string>
 
+    <string name="task_delete">Eliminar</string>
+
 </resources>

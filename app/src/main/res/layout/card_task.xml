@@ -1,109 +1,166 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="80dp"
+<org.dev_alex.mojo_qa.mojo.custom_views.scroll.LockableHorizontalScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_marginBottom="10dp"
-    app:cardBackgroundColor="@color/blueGrey"
-    app:cardCornerRadius="8dp">
-<FrameLayout
-android:layout_height="80dp"
-android:layout_width="match_parent"
-android:paddingRight="15dp">
-
-<LinearLayout
-    android:layout_height="match_parent"
     android:layout_width="match_parent"
-    android:orientation="horizontal">
+    android:layout_height="100dp"
+    android:layout_marginBottom="10dp"
+    android:fillViewport="true"
+    android:scrollbars="none">
 
     <LinearLayout
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="8dp"
-        android:layout_marginTop="15dp"
-        android:layout_weight="1"
-        android:layout_width="0dp"
+        android:id="@+id/task_item_container"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:gravity="center"
         android:orientation="horizontal">
 
-        <FrameLayout
-            android:layout_height="25dp"
-            android:layout_width="wrap_content">
+        <androidx.cardview.widget.CardView
+            android:id="@+id/task_card"
+            android:layout_width="wrap_content"
+            android:layout_height="80dp"
+            app:cardBackgroundColor="@color/blueGrey"
+            app:cardCornerRadius="8dp">
 
-            <View
-                android:background="@drawable/green_circle"
-                android:id="@+id/task_active"
-                android:layout_gravity="center"
-                android:layout_height="5dp"
-                android:layout_width="5dp" />
-        </FrameLayout>
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:paddingRight="15dp">
 
-        <ImageView
-            android:adjustViewBounds="true"
-            android:id="@+id/task_icon"
-            android:layout_height="25dp"
-            android:layout_marginLeft="8dp"
-            android:layout_width="25dp"
-            android:src="@drawable/profile_icon"
-            app:tint="@color/textGrey" />
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal">
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="8dp"
+                        android:layout_marginTop="15dp"
+                        android:layout_weight="1"
+                        android:orientation="horizontal">
+
+                        <FrameLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="25dp">
+
+                            <View
+                                android:id="@+id/task_active"
+                                android:layout_width="5dp"
+                                android:layout_height="5dp"
+                                android:layout_gravity="center"
+                                android:background="@drawable/green_circle" />
+                        </FrameLayout>
+
+                        <ImageView
+                            android:id="@+id/task_icon"
+                            android:layout_width="25dp"
+                            android:layout_height="25dp"
+                            android:layout_marginLeft="8dp"
+                            android:adjustViewBounds="true"
+                            android:src="@drawable/profile_icon"
+                            app:tint="@color/textGrey" />
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="15dp"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:id="@+id/task_title"
+                                android:layout_width="wrap_content"
+                                android:layout_height="25dp"
+                                android:ellipsize="end"
+                                android:gravity="center_vertical"
+                                android:maxLines="1"
+                                android:text="Моя задача на все веремна всегда и везде"
+                                android:textColor="@color/textGrey"
+                                android:textSize="15sp" />
+
+                            <LinearLayout
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="right"
+                                android:orientation="horizontal">
+
+                                <TextView
+                                    android:id="@+id/delayed"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_gravity="right"
+                                    android:layout_marginTop="4dp"
+                                    android:layout_marginEnd="10dp"
+                                    android:text="@string/delayed"
+                                    android:textColor="@android:color/holo_red_dark"
+                                    android:textSize="14sp"
+                                    android:visibility="visible" />
+
+                                <TextView
+                                    android:id="@+id/task_date"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:ellipsize="end"
+                                    android:gravity="center_vertical"
+                                    android:maxLines="1"
+                                    android:text="16 марта 2017 | 17:00"
+                                    android:textColor="@color/textGrey"
+                                    android:textSize="14sp" />
+                            </LinearLayout>
+
+                        </LinearLayout>
+                    </LinearLayout>
+
+                    <ImageView
+                        android:id="@+id/more_btn"
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:layout_gravity="center_vertical"
+                        android:layout_marginTop="-5dp"
+                        android:adjustViewBounds="true"
+                        android:src="@drawable/more_icon"
+                        android:visibility="gone" />
+
+                </LinearLayout>
+
+            </FrameLayout>
+
+
+        </androidx.cardview.widget.CardView>
+
+        <androidx.legacy.widget.Space
+            android:layout_width="16dp"
+            android:layout_height="match_parent" />
 
         <LinearLayout
-            android:layout_height="wrap_content"
-            android:layout_marginStart="15dp"
-            android:layout_width="match_parent"
-            android:orientation="vertical">
+            android:id="@+id/task_delete"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:background="@drawable/ic_trash_bg"
+            android:clickable="true"
+            android:focusable="true"
+            android:gravity="center|top"
+            android:orientation="vertical"
+            android:padding="5dp"
+            android:weightSum="1">
+
+            <ImageView
+                android:layout_width="30dp"
+                android:layout_height="0dp"
+                android:layout_weight=".7"
+                android:adjustViewBounds="true"
+                android:src="@drawable/ic_trash" />
 
             <TextView
-                android:ellipsize="end"
-                android:gravity="center_vertical"
-                android:id="@+id/task_title"
-                android:layout_height="25dp"
-                android:layout_width="wrap_content"
-                android:maxLines="1"
-                android:text="Моя задача на все веремна всегда и везде"
-                android:textColor="@color/textGrey"
-                android:textSize="15sp" />
-            <LinearLayout
-                android:layout_height="wrap_content"
-                android:layout_width="wrap_content"
-                android:layout_gravity="right"
-                android:orientation="horizontal">
-            <TextView
-                android:id="@+id/delayed"
-                android:layout_gravity="right"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:layout_width="wrap_content"
-                android:text="@string/delayed"
-                android:textColor="@android:color/holo_red_dark"
-                android:textSize="14sp"
-                android:layout_marginEnd="10dp"
-                android:visibility="visible" />
-            <TextView
-                android:ellipsize="end"
-                android:gravity="center_vertical"
-                android:id="@+id/task_date"
-                android:layout_height="wrap_content"
-                android:layout_width="wrap_content"
-                android:maxLines="1"
-                android:text="16 марта 2017 | 17:00"
-                android:textColor="@color/textGrey"
-                android:textSize="14sp" />
-            </LinearLayout>
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight=".3"
+                android:gravity="center|bottom"
+                android:text="@string/task_delete"
+                android:textColor="@android:color/white"
+                android:textSize="16sp" />
 
         </LinearLayout>
+
     </LinearLayout>
 
-    <ImageView
-        android:adjustViewBounds="true"
-        android:id="@+id/more_btn"
-        android:layout_gravity="center_vertical"
-        android:layout_height="20dp"
-        android:layout_marginTop="-5dp"
-        android:layout_width="20dp"
-        android:src="@drawable/more_icon"
-        android:visibility="gone" />
-</LinearLayout>
-
-
-</FrameLayout>
-</androidx.cardview.widget.CardView>
+</org.dev_alex.mojo_qa.mojo.custom_views.scroll.LockableHorizontalScrollView>
