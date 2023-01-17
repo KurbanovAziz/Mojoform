@@ -261,6 +261,7 @@
         <item>Сб</item>
     </string-array>
 
+    <!--    Вікно 'Прикріплення файлів'-->
     <string name="dialog_attach_file_title">Вкажіть тип файлу\nдля прикріплення</string>
     <string name="dialog_attach_file_menu_camera">Камера</string>
     <string name="dialog_attach_file_menu_gallery">Галерея</string>
@@ -268,10 +269,20 @@
     <string name="dialog_attach_file_menu_audio">Аудіо</string>
     <string name="dialog_attach_file_menu_close">Закрити</string>
 
+    <!--    Вікно 'Запис аудіо'-->
     <string name="dialog_record_audio_cancel">Скасувати</string>
     <string name="dialog_record_audio_record">Запис</string>
     <string name="dialog_record_audio_save">Зберегти</string>
 
+    <!--    Кнопка 'Видалення завдання' (горизонтальний скролл)-->
     <string name="task_delete">Видалити</string>
+
+    <!--    Меню 'Статус завдання'-->
+    <string name="menu_task_status_title">Вкажіть статус!</string>
+    <string name="menu_task_status_transfer">Передати іншому виконавцю</string>
+    <string name="menu_task_status_ready">Все готово</string>
+    <string name="menu_task_status_do_cant">Не можу зробити</string>
+    <string name="menu_task_status_do_but_not_all">Зробив, але не все</string>
+    <string name="menu_task_status_do_basic_only">Зробив лише головне</string>
 
 </resources>

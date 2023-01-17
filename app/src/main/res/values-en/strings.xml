@@ -262,6 +262,7 @@
         <item>Sa</item>
     </string-array>
 
+    <!--    File attach dialog-->
     <string name="dialog_attach_file_title">Specify the type\nof file to attach</string>
     <string name="dialog_attach_file_menu_camera">Camera</string>
     <string name="dialog_attach_file_menu_gallery">Gallery</string>
@@ -269,10 +270,20 @@
     <string name="dialog_attach_file_menu_audio">Audio</string>
     <string name="dialog_attach_file_menu_close">Close</string>
 
+    <!--    Audio record dialog-->
     <string name="dialog_record_audio_cancel">Cancel</string>
     <string name="dialog_record_audio_record">Record</string>
     <string name="dialog_record_audio_save">Save</string>
 
+    <!--    Task delete button (horizontal scroll)-->
     <string name="task_delete">Delete</string>
+
+    <!--    Menu 'Task status'-->
+    <string name="menu_task_status_title">Specify the status!</string>
+    <string name="menu_task_status_transfer">Transfer to another performer</string>
+    <string name="menu_task_status_ready">All is ready</string>
+    <string name="menu_task_status_do_cant">Can\'t do</string>
+    <string name="menu_task_status_do_but_not_all">Did but not all</string>
+    <string name="menu_task_status_do_basic_only">Made only the main</string>
 
 </resources>

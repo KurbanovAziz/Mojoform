@@ -151,4 +151,18 @@
         <item name="strokeColor">@null</item>
     </style>
 
+    <style name="AppTheme.TextView.TaskStatus" parent="Widget.AppCompat.TextView">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:gravity">center</item>
+        <item name="android:background">?android:attr/selectableItemBackground</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:textColor">@color/textGrey</item>
+        <item name="android:fontFamily">@font/sf_ui_medium</item>
+    </style>
+
+    <style name="AppTheme.TextView.TaskStatus.Title" parent="AppTheme.TextView.TaskStatus">
+        <item name="android:textStyle">bold</item>
+    </style>
+
 </resources>
