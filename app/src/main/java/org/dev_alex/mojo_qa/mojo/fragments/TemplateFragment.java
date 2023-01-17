@@ -713,18 +713,18 @@ public class TemplateFragment extends Fragment {
             if (currentPagePos == pages.size() - 1) {
                 /*rootView.findViewById(R.id.left_space).setVisibility(View.GONE);
                 rootView.findViewById(R.id.right_space).setVisibility(View.GONE);*/
-                rootView.findViewById(R.id.finish_btn_container).setVisibility(View.VISIBLE);
+                rootView.findViewById(R.id.finish_btn).setVisibility(View.VISIBLE);
             } else {
                 if (!isTaskFinished) {
                    /* rootView.findViewById(R.id.left_space).setVisibility(View.VISIBLE);
                     rootView.findViewById(R.id.right_space).setVisibility(View.VISIBLE);*/
-                    rootView.findViewById(R.id.finish_btn_container).setVisibility(View.GONE);
+                    rootView.findViewById(R.id.finish_btn).setVisibility(View.GONE);
                 }
             }
         } else {
          /*   rootView.findViewById(R.id.left_space).setVisibility(View.GONE);
             rootView.findViewById(R.id.right_space).setVisibility(View.GONE);*/
-            rootView.findViewById(R.id.finish_btn_container).setVisibility(View.VISIBLE);
+            rootView.findViewById(R.id.finish_btn).setVisibility(View.VISIBLE);
 
 
             rootView.findViewById(R.id.left_arrow).setVisibility(View.INVISIBLE);
