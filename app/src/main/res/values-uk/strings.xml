@@ -285,4 +285,7 @@
     <string name="menu_task_status_do_but_not_all">Зробив, але не все</string>
     <string name="menu_task_status_do_basic_only">Зробив лише головне</string>
 
+    <!--    Попередження-->
+    <string name="err_task_status_not_set">Вкажіть статус завдання</string>
+
 </resources>

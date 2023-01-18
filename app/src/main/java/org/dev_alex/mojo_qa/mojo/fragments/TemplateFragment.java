@@ -111,6 +111,7 @@ import com.github.mikephil.charting.utils.Transformer;
 import com.github.mikephil.charting.utils.ViewPortHandler;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.material.button.MaterialButton;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 import com.journeyapps.barcodescanner.CaptureActivity;
@@ -290,6 +291,7 @@ public class TemplateFragment extends Fragment {
         fragment.isReport = isReportMode;
         return fragment;
     }
+
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -540,8 +542,9 @@ public class TemplateFragment extends Fragment {
     public void onResume() {
         super.onResume();
         Data.currentTaskId = taskId;
-        if (!isResulted){
-        scrollView.scrollTo(xPosition, yPosition);}
+        if (!isResulted) {
+            scrollView.scrollTo(xPosition, yPosition);
+        }
 
     }
 
@@ -589,8 +592,11 @@ public class TemplateFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 if (pages != null && !pages.isEmpty())
-                    if (currentPagePos > 0)
+                    if (currentPagePos > 0) {
+                        hideTaskStatusMenu();
+                        setFinishButtonListenerDefault();
                         setPage(pages.get(currentPagePos - 1));
+                    }
             }
         });
 
@@ -610,15 +616,7 @@ public class TemplateFragment extends Fragment {
             }
         });
 
-        rootView.findViewById(R.id.finish_btn).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (userLocation == null) {
-                    requestLocation();
-                }
-                new WaitForMediaReadyTask().execute();
-            }
-        });
+        setFinishButtonListenerDefault();
     }
 
     private void initDialog() {
@@ -740,20 +738,20 @@ public class TemplateFragment extends Fragment {
 
             template.put("CompleteTime", new Date().getTime());
 
-            if (!isOpenLink){
-            if (!template.has("StartTime"))
-                template.put("StartTime", isoDateFormat.format(new Date()));
-            SharedPreferences mSettings;
-            mSettings = App.getContext().getSharedPreferences("templates", Context.MODE_PRIVATE);
-            SharedPreferences.Editor editor = mSettings.edit();
-            editor.putString(taskId + LoginHistoryService.getCurrentUser().username, template.toString());
-            editor.apply();
-            SharedPreferences position;
-            position = App.getContext().getSharedPreferences("yTemplates", Context.MODE_PRIVATE);
-            SharedPreferences.Editor editor1 = position.edit();
-            editor1.putInt(taskId + LoginHistoryService.getCurrentUser().username, scrollView.getScrollY());
-            editor1.apply();}
-            else {
+            if (!isOpenLink) {
+                if (!template.has("StartTime"))
+                    template.put("StartTime", isoDateFormat.format(new Date()));
+                SharedPreferences mSettings;
+                mSettings = App.getContext().getSharedPreferences("templates", Context.MODE_PRIVATE);
+                SharedPreferences.Editor editor = mSettings.edit();
+                editor.putString(taskId + LoginHistoryService.getCurrentUser().username, template.toString());
+                editor.apply();
+                SharedPreferences position;
+                position = App.getContext().getSharedPreferences("yTemplates", Context.MODE_PRIVATE);
+                SharedPreferences.Editor editor1 = position.edit();
+                editor1.putInt(taskId + LoginHistoryService.getCurrentUser().username, scrollView.getScrollY());
+                editor1.apply();
+            } else {
                 if (!template.has("StartTime"))
                     template.put("StartTime", isoDateFormat.format(new Date()));
                 SharedPreferences mSettings;
@@ -772,10 +770,11 @@ public class TemplateFragment extends Fragment {
             exc.printStackTrace();
         }
     }
+
     private void saveTemplateOfLast() {
         try {
 
-            if (isTaskFinished )
+            if (isTaskFinished)
                 return;
 
             SharedPreferences mSettings;
@@ -784,12 +783,12 @@ public class TemplateFragment extends Fragment {
             ArrayList<String> lastTemplates;
             lastTemplates = (ArrayList<String>) ObjectSerializer.deserialize(mSettings.getString("lastTemplate", ObjectSerializer.serialize(new ArrayList<String>())));
             if (lastTemplates == null) lastTemplates = new ArrayList<>();
-            if(taskId == 0){
+            if (taskId == 0) {
                 lastTemplates.add(taskUUID);
 
+            } else {
+                lastTemplates.add(String.valueOf(taskId));
             }
-            else {
-            lastTemplates.add(String.valueOf(taskId));}
             editor.putString("lastTemplate", ObjectSerializer.serialize(lastTemplates));
             editor.apply();
 
@@ -1127,7 +1126,7 @@ public class TemplateFragment extends Fragment {
                     final EditText etPlan = moneyContainer.findViewById(R.id.planET);
                     final View tvPlanLabel = moneyContainer.findViewById(R.id.headTV);
                     final EditText etFact = moneyContainer.findViewById(R.id.factET);
-                  //  final View btQrCode = moneyContainer.findViewById(R.id.qr_btn);
+                    //  final View btQrCode = moneyContainer.findViewById(R.id.qr_btn);
 
                     final TextView captionLabel = ((TextView) ((ViewGroup) moneyContainer.getChildAt(0)).getChildAt(0));
 
@@ -1149,7 +1148,7 @@ public class TemplateFragment extends Fragment {
                     if (isTaskFinished) {
                         etPlan.setEnabled(false);
                         etFact.setEnabled(false);
-                       // btQrCode.setVisibility(View.GONE);
+                        // btQrCode.setVisibility(View.GONE);
                     } else {
                         etPlan.addTextChangedListener(new TextWatcher() {
                             @Override
@@ -1228,7 +1227,7 @@ public class TemplateFragment extends Fragment {
                         captionTV.setText(R.string.no_text);
 
                     if (!isTaskFinished)
-                       checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                        checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                             @Override
                             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                                 try {
@@ -1242,7 +1241,7 @@ public class TemplateFragment extends Fragment {
                         checkBox.setEnabled(false);
 
                     if (value.has("value"))
-                       checkBox.setChecked(value.getBoolean("value"));
+                        checkBox.setChecked(value.getBoolean("value"));
                     else {
                         checkBox.setChecked(true);
                         checkBox.setChecked(false);
@@ -1352,7 +1351,7 @@ public class TemplateFragment extends Fragment {
                             @Override
                             public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
                                 String link = request.getUrl().toString();
-                                if ((link.contains("mojo-qa.dev-alex.org") || link.contains("mojoform.com" )) && !link.contains("help.mojoform.com")) {
+                                if ((link.contains("mojo-qa.dev-alex.org") || link.contains("mojoform.com")) && !link.contains("help.mojoform.com")) {
                                     isNextTemlpateURL = true;
                                     ((MainActivity) Objects.requireNonNull(getContext())).openFromLinkInApp(request.getUrl().toString());
                                 } else {
@@ -1831,7 +1830,7 @@ public class TemplateFragment extends Fragment {
         }
 
         if (value.has("measure"))
-            ((TextView)seekBarContainer.findViewById(R.id.measureTV)).setText(value.getString("measure"));
+            ((TextView) seekBarContainer.findViewById(R.id.measureTV)).setText(value.getString("measure"));
         final SeekBar seekBar = seekBarContainer.findViewById(R.id.seekBar);
 
         final float minValue = (float) value.getDouble("min_value");
@@ -1848,8 +1847,8 @@ public class TemplateFragment extends Fragment {
 
         final int digitsOffset = (int) Math.pow(10, digitsAfterPoint);
 
-        ((TextView)seekBarContainer.findViewById(R.id.minTV)).setText(formatFloat(minValue));
-        ((TextView)seekBarContainer.findViewById(R.id.maxTV)).setText(formatFloat(maxValue));
+        ((TextView) seekBarContainer.findViewById(R.id.minTV)).setText(formatFloat(minValue));
+        ((TextView) seekBarContainer.findViewById(R.id.maxTV)).setText(formatFloat(maxValue));
 
         final int increment = (int) (step * digitsOffset);
         final int max = (int) (((maxValue - minValue) * digitsOffset) / increment);
@@ -3229,8 +3228,7 @@ public class TemplateFragment extends Fragment {
                         pos = App.getContext().getSharedPreferences("yTemplates", Context.MODE_PRIVATE);
                         yPosition = pos.getInt(taskId + LoginHistoryService.getCurrentUser().username, 100);
                         scrollView.scrollTo(xPosition, yPosition);
-                    }
-                    else {
+                    } else {
                         SharedPreferences mSettings;
                         mSettings = App.getContext().getSharedPreferences("templates", Context.MODE_PRIVATE);
                         templateJson = mSettings.getString(taskUUID + LoginHistoryService.getCurrentUser().username, "");
@@ -3261,15 +3259,15 @@ public class TemplateFragment extends Fragment {
                             try {
                                 taskId1 = responseJson.getJSONObject("ref").getLong("id");
                                 nameTask = responseJson.getJSONObject("ref").getString("name");
-                                typeTask =  responseJson.getJSONObject("ref").getString("type");
+                                typeTask = responseJson.getJSONObject("ref").getString("type");
                                 ((TextView) getActivity().findViewById(R.id.title)).setText(responseJson.getJSONObject("ref").getString("name"));
-                            }
-                            catch (Exception e){
+                            } catch (Exception e) {
                                 e.printStackTrace();
                             }
-                            if(taskId1 != 0){
-                                if (taskId == 0){
-                                taskId = taskId1;}
+                            if (taskId1 != 0) {
+                                if (taskId == 0) {
+                                    taskId = taskId1;
+                                }
                                 template.put("nameTask", nameTask);
                                 template.put("longId", taskId);
                                 template.put("typeTask", typeTask);
@@ -3671,7 +3669,7 @@ public class TemplateFragment extends Fragment {
                     startActivity(new Intent(getContext(), AuthActivity.class));
                     getActivity().finish();
                 } else if (responseCode == 200) {
-                    isTaskStop =true;
+                    isTaskStop = true;
                     if (!isOpenLink) {
                         SharedPreferences mSettings;
                         mSettings = App.getContext().getSharedPreferences("templates", Context.MODE_PRIVATE);
@@ -3683,8 +3681,7 @@ public class TemplateFragment extends Fragment {
                         SharedPreferences.Editor editor1 = position.edit();
                         editor1.putInt(taskId + LoginHistoryService.getCurrentUser().username, 100);
                         editor1.apply();
-                    }
-                    else {
+                    } else {
                         SharedPreferences mSettings;
                         mSettings = App.getContext().getSharedPreferences("templates", Context.MODE_PRIVATE);
                         SharedPreferences.Editor editor = mSettings.edit();
@@ -3720,8 +3717,7 @@ public class TemplateFragment extends Fragment {
                         SharedPreferences.Editor editor1 = position.edit();
                         editor1.putInt(taskId + LoginHistoryService.getCurrentUser().username, 100);
                         editor1.apply();
-                    }
-                    else {
+                    } else {
                         SharedPreferences mSettings;
                         mSettings = App.getContext().getSharedPreferences("templates", Context.MODE_PRIVATE);
                         SharedPreferences.Editor editor = mSettings.edit();
@@ -3732,7 +3728,8 @@ public class TemplateFragment extends Fragment {
                         SharedPreferences.Editor editor1 = position.edit();
                         editor1.putInt(taskUUID + LoginHistoryService.getCurrentUser().username, 100);
                         editor1.apply();
-                    }                    if (getActivity() != null && getActivity().getSupportFragmentManager().findFragmentByTag("tasks") != null) {
+                    }
+                    if (getActivity() != null && getActivity().getSupportFragmentManager().findFragmentByTag("tasks") != null) {
                         ((TasksFragment) getActivity().getSupportFragmentManager().findFragmentByTag("tasks")).needUpdate = true;
                         if (getActivity() instanceof MainActivity) {
                             ((MainActivity) getActivity()).drawer.getDrawerLayout().setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
@@ -4449,29 +4446,29 @@ public class TemplateFragment extends Fragment {
         super.onStop();
         ((MainActivity) getContext()).setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
-        if(isNextTemlpateURL){
-    saveTemplateOfLast();
+        if (isNextTemlpateURL) {
+            saveTemplateOfLast();
 
-}
-else {
-        if (isFromLink) {
-            SharedPreferences pos = App.getContext().getSharedPreferences("templates", Context.MODE_PRIVATE);
-            ArrayList<String> list = null;
-            try {
-                list = (ArrayList<String>) ObjectSerializer.deserialize(pos.getString("lastTemplate", ObjectSerializer.serialize(new ArrayList<String>())));
-                if (list != null && !(list.size()== 0)) {
-                    ((MainActivity) getContext()).openTask(list.get(list.size() - 1), true);
-                    list.remove(list.get(list.size()-1));
+        } else {
+            if (isFromLink) {
+                SharedPreferences pos = App.getContext().getSharedPreferences("templates", Context.MODE_PRIVATE);
+                ArrayList<String> list = null;
+                try {
+                    list = (ArrayList<String>) ObjectSerializer.deserialize(pos.getString("lastTemplate", ObjectSerializer.serialize(new ArrayList<String>())));
+                    if (list != null && !(list.size() == 0)) {
+                        ((MainActivity) getContext()).openTask(list.get(list.size() - 1), true);
+                        list.remove(list.get(list.size() - 1));
+                    }
+                    SharedPreferences.Editor editor = pos.edit();
+                    editor.putString("lastTemplate", ObjectSerializer.serialize(list));
+                    editor.apply();
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
-                SharedPreferences.Editor editor = pos.edit();
-                editor.putString("lastTemplate", ObjectSerializer.serialize(list));
-                editor.apply();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
 
-        }}
- saveTemplateState();
+            }
+        }
+        saveTemplateState();
     }
 
     private void createMediaBlockRenewed(final JSONObject value, LinearLayout container) throws Exception {
@@ -4505,6 +4502,109 @@ else {
 
     private void startAttachFileDialogForResult(FileAttachDialog.OnResultListener onResultListener) {
         new FileAttachDialog(onResultListener).show(getChildFragmentManager(), null);
+    }
+
+    private void showTaskStatusMenu() {
+        if (rootView != null) {
+            View taskStatusView = rootView.findViewById(R.id.task_status_view);
+            View taskStatusMenuItemsContainer = taskStatusView.findViewById(R.id.layout_task_status_menu_items_container);
+            TextView taskStatusTitle = taskStatusView.findViewById(R.id.layout_task_status_menu_title);
+            TextView taskStatusTransfer = taskStatusView.findViewById(R.id.layout_task_status_menu_transfer);
+            TextView taskStatusDoCant = taskStatusView.findViewById(R.id.layout_task_status_menu_do_cant);
+            TextView taskStatusReady = taskStatusView.findViewById(R.id.layout_task_status_menu_ready);
+            TextView taskStatusDoButNotAll = taskStatusView.findViewById(R.id.layout_task_status_menu_do_but_not_all);
+            TextView taskStatusDoBasicOnly = taskStatusView.findViewById(R.id.layout_task_status_menu_do_basic_only);
+
+            setTaskStatusMenuListeners(
+                    taskStatusTitle,
+                    taskStatusMenuItemsContainer,
+                    taskStatusTransfer,
+                    taskStatusDoCant,
+                    taskStatusReady,
+                    taskStatusDoButNotAll,
+                    taskStatusDoBasicOnly);
+
+
+            taskStatusView.setVisibility(View.VISIBLE);
+
+        }
+    }
+
+    private void hideTaskStatusMenu() {
+        if (rootView != null) {
+            View taskStatusView = rootView.findViewById(R.id.task_status_view);
+            if (taskStatusView.getVisibility() == View.VISIBLE)
+                taskStatusView.setVisibility(View.GONE);
+        }
+    }
+
+    private void setTaskStatusMenuListeners(TextView title, View menuItemsContainer, TextView... menuItems) {
+
+        View.OnTouchListener selectedItemCancelListener = (v, event) -> {
+            if (event.getAction() == MotionEvent.ACTION_UP) {
+                if (event.getRawX() >= title.getRight() - title.getTotalPaddingRight()) {
+                    title.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_close_ripple, 0);
+                    title.setPressed(true);
+                    title.postDelayed(() -> {
+                        title.setPressed(false);
+                        title.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0);
+                        title.setText(R.string.menu_task_status_title);
+                        title.setOnTouchListener(null);
+                        menuItemsContainer.setVisibility(View.VISIBLE);
+                    }, 500);
+
+                    setFinishButtonListener(false);
+
+                    return false;
+                }
+            }
+            return false;
+        };
+
+        View.OnClickListener menuItemClickListener = v -> {
+            TextView selectedItem = (TextView) v;
+            if (title != null) {
+                title.setText(selectedItem.getText());
+                title.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_close, 0);
+                title.setOnTouchListener(selectedItemCancelListener);
+            }
+            if (menuItemsContainer != null) menuItemsContainer.setVisibility(View.GONE);
+
+            setFinishButtonListener(true);
+
+        };
+        for (View v : menuItems) {
+            v.setOnClickListener(menuItemClickListener);
+        }
+    }
+
+    private void setFinishButtonListener(boolean isTaskStatusSet) {
+        if (rootView != null) {
+            MaterialButton finishButton = rootView.findViewById(R.id.finish_btn);
+
+            if (isTaskStatusSet) finishButton.setOnClickListener(v ->
+                    new WaitForMediaReadyTask().execute());
+
+            else finishButton.setOnClickListener(v ->
+                    Toast.makeText(requireActivity(), R.string.err_task_status_not_set, Toast.LENGTH_SHORT).show());
+        }
+    }
+
+    private void setFinishButtonListenerDefault() {
+        if (rootView != null) {
+            MaterialButton finishButton = rootView.findViewById(R.id.finish_btn);
+            if (finishButton != null) finishButton.setOnClickListener(v -> {
+                if (userLocation == null) {
+                    requestLocation();
+                }
+
+                v.setOnClickListener(v1 -> {
+                    Toast.makeText(requireActivity(), R.string.err_task_status_not_set, Toast.LENGTH_SHORT).show();
+                });
+
+                showTaskStatusMenu();
+            });
+        }
     }
 
 }

@@ -98,57 +98,99 @@
     <LinearLayout
         android:id="@+id/buttons_block"
         android:layout_width="match_parent"
-        android:layout_height="69.5dp"
+        android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
+        android:animateLayoutChanges="true"
         android:background="@color/blueGrey"
         android:baselineAligned="false"
+        android:minHeight="69.5dp"
         android:orientation="horizontal"
+        android:padding="12dp"
         android:visibility="gone">
-
-
-        <FrameLayout
-            android:id="@+id/left_arrow"
-            android:layout_width="30dp"
-            android:layout_height="match_parent"
-            android:layout_gravity="center_vertical">
-
-            <ImageView
-                android:layout_width="22dp"
-                android:layout_height="22dp"
-                android:layout_gravity="right|center_vertical"
-                android:adjustViewBounds="true"
-                android:src="@drawable/left_arrow"
-                app:tint="@color/grey" />
-        </FrameLayout>
 
         <LinearLayout
             android:id="@+id/main_buttons_block"
             android:layout_width="wrap_content"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:baselineAligned="false"
-            android:gravity="center_horizontal"
-            android:orientation="horizontal"
-            android:paddingTop="12dp"
+            android:animateLayoutChanges="true"
+            android:gravity="center"
+            android:orientation="vertical"
             android:visibility="visible">
 
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:weightSum="1">
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/hold_task_btn"
-                style="@style/AppTheme.Button.Outlined.Stroked"
-                android:text="@string/hold"
-                android:textColor="@color/textGrey" />
+                <FrameLayout
+                    android:id="@+id/left_arrow"
+                    android:layout_width="30dp"
+                    android:layout_height="match_parent">
+
+                    <ImageView
+                        android:layout_width="22dp"
+                        android:layout_height="22dp"
+                        android:layout_gravity="center"
+                        android:adjustViewBounds="true"
+                        android:src="@drawable/left_arrow"
+                        app:tint="@color/grey" />
+
+                </FrameLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:orientation="horizontal">
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/hold_task_btn"
+                        style="@style/AppTheme.Button.Outlined.Stroked"
+                        android:text="@string/hold"
+                        android:textColor="@color/textGrey" />
+
+                    <androidx.legacy.widget.Space
+                        android:layout_width="10dp"
+                        android:layout_height="match_parent" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/finish_btn"
+                        style="@style/AppTheme.Button.Outlined.NoStroked"
+                        android:backgroundTint="@color/colorAccent"
+                        android:text="@string/finish"
+                        android:textColor="@android:color/white" />
+
+                </LinearLayout>
+
+                <FrameLayout
+                    android:id="@+id/right_arrow"
+                    android:layout_width="30dp"
+                    android:layout_height="match_parent">
+
+                    <ImageView
+                        android:layout_width="22dp"
+                        android:layout_height="22dp"
+                        android:layout_gravity="center"
+                        android:adjustViewBounds="true"
+                        android:rotation="180"
+                        android:src="@drawable/left_arrow"
+                        app:tint="@color/grey" />
+                </FrameLayout>
+
+            </LinearLayout>
 
             <androidx.legacy.widget.Space
-                android:layout_width="10dp"
-                android:layout_height="match_parent" />
+                android:layout_width="match_parent"
+                android:layout_height="10dp" />
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/finish_btn"
-                style="@style/AppTheme.Button.Outlined.NoStroked"
-                android:backgroundTint="@color/colorAccent"
-                android:text="@string/finish"
-                android:textColor="@android:color/white" />
+            <include
+                android:id="@+id/task_status_view"
+                layout="@layout/layout_task_status"
+                android:visibility="gone" />
 
         </LinearLayout>
 
@@ -209,21 +251,6 @@
             </FrameLayout>
         </LinearLayout>
 
-        <FrameLayout
-            android:id="@+id/right_arrow"
-            android:layout_width="30dp"
-            android:layout_height="match_parent"
-            android:layout_gravity="right">
-
-            <ImageView
-                android:layout_width="22dp"
-                android:layout_height="22dp"
-                android:layout_gravity="left|center_vertical"
-                android:adjustViewBounds="true"
-                android:rotation="180"
-                android:src="@drawable/left_arrow"
-                app:tint="@color/grey" />
-        </FrameLayout>
     </LinearLayout>
 
     <FrameLayout

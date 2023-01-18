@@ -286,4 +286,7 @@
     <string name="menu_task_status_do_but_not_all">Hizo pero no todos</string>
     <string name="menu_task_status_do_basic_only">Hecho solo el principal</string>
 
+    <!--    Advertencias-->
+    <string name="err_task_status_not_set">Especificar el estado de la tarea</string>
+
 </resources>

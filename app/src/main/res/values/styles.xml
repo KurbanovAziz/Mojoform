@@ -159,9 +159,16 @@
         <item name="android:textSize">16sp</item>
         <item name="android:textColor">@color/textGrey</item>
         <item name="android:fontFamily">@font/sf_ui_medium</item>
+        <item name="android:clickable">true</item>
+        <item name="android:focusable">true</item>
     </style>
 
     <style name="AppTheme.TextView.TaskStatus.Title" parent="AppTheme.TextView.TaskStatus">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:background">@null</item>
+        <item name="android:padding">5dp</item>
+        <item name="android:drawablePadding">10dp</item>
+        <item name="drawableTint">@color/cherry_red</item>
         <item name="android:textStyle">bold</item>
     </style>
 
