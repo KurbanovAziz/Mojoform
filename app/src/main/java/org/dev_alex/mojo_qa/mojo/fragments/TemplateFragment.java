@@ -112,6 +112,7 @@ import com.github.mikephil.charting.utils.ViewPortHandler;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.material.button.MaterialButton;
+import com.google.gson.Gson;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 import com.journeyapps.barcodescanner.CaptureActivity;
@@ -139,6 +140,7 @@ import org.dev_alex.mojo_qa.mojo.dialogs.FileAttachDialog;
 import org.dev_alex.mojo_qa.mojo.models.IndicatorModel;
 import org.dev_alex.mojo_qa.mojo.models.Page;
 import org.dev_alex.mojo_qa.mojo.models.User;
+import org.dev_alex.mojo_qa.mojo.models.task.TaskStatus;
 import org.dev_alex.mojo_qa.mojo.services.BitmapService;
 import org.dev_alex.mojo_qa.mojo.services.LoginHistoryService;
 import org.dev_alex.mojo_qa.mojo.services.RequestService;
@@ -616,7 +618,37 @@ public class TemplateFragment extends Fragment {
             }
         });
 
-        setFinishButtonListenerDefault();
+        rootView.findViewById(R.id.finish_btn).setOnClickListener(v -> {
+            if (userLocation == null) {
+                requestLocation();
+            }
+
+            List<TaskStatus> taskStatusList = getTaskStatusesList();
+
+            if (taskStatusList != null && !taskStatusList.isEmpty()) {
+                showTaskStatusMenu(taskStatusList);
+                Toast.makeText(requireActivity(), R.string.err_task_status_not_set, Toast.LENGTH_SHORT).show();
+            } else {
+                new WaitForMediaReadyTask().execute();
+            }
+        });
+    }
+
+    private List<TaskStatus> getTaskStatusesList() {
+        if (template != null && template.has("actions")) {
+            try {
+                List<TaskStatus> taskStatusList = new ArrayList<>();
+                JSONArray jsonArray = template.getJSONArray("actions");
+                for (int i = 0; i < jsonArray.length(); i++) {
+                    TaskStatus status = new Gson().fromJson(String.valueOf(jsonArray.getJSONObject(i)), TaskStatus.class);
+                    taskStatusList.add(status);
+                }
+                return taskStatusList;
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        return null;
     }
 
     private void initDialog() {
@@ -4504,26 +4536,27 @@ public class TemplateFragment extends Fragment {
         new FileAttachDialog(onResultListener).show(getChildFragmentManager(), null);
     }
 
-    private void showTaskStatusMenu() {
+    private void showTaskStatusMenu(List<TaskStatus> taskStatusList) {
+        if (taskStatusList == null || taskStatusList.isEmpty()) return;
         if (rootView != null) {
             View taskStatusView = rootView.findViewById(R.id.task_status_view);
-            View taskStatusMenuItemsContainer = taskStatusView.findViewById(R.id.layout_task_status_menu_items_container);
+
+            ViewGroup taskStatusMenuItemsContainer = taskStatusView.findViewById(R.id.layout_task_status_menu_items_container);
+            if (taskStatusMenuItemsContainer != null)
+                taskStatusMenuItemsContainer.setVisibility(View.VISIBLE);
+
             TextView taskStatusTitle = taskStatusView.findViewById(R.id.layout_task_status_menu_title);
-            TextView taskStatusTransfer = taskStatusView.findViewById(R.id.layout_task_status_menu_transfer);
-            TextView taskStatusDoCant = taskStatusView.findViewById(R.id.layout_task_status_menu_do_cant);
-            TextView taskStatusReady = taskStatusView.findViewById(R.id.layout_task_status_menu_ready);
-            TextView taskStatusDoButNotAll = taskStatusView.findViewById(R.id.layout_task_status_menu_do_but_not_all);
-            TextView taskStatusDoBasicOnly = taskStatusView.findViewById(R.id.layout_task_status_menu_do_basic_only);
+            taskStatusTitle.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0);
+            taskStatusTitle.setText(R.string.menu_task_status_title);
+            taskStatusTitle.setOnTouchListener(null);
 
-            setTaskStatusMenuListeners(
-                    taskStatusTitle,
-                    taskStatusMenuItemsContainer,
-                    taskStatusTransfer,
-                    taskStatusDoCant,
-                    taskStatusReady,
-                    taskStatusDoButNotAll,
-                    taskStatusDoBasicOnly);
+            for (TaskStatus taskStatus : taskStatusList) {
+                TextView tv = (TextView) getLayoutInflater().inflate(R.layout.task_status_item, null);
+                tv.setText(taskStatus.getName());
+                taskStatusMenuItemsContainer.addView(tv);
+            }
 
+            setTaskStatusMenuListeners(taskStatusTitle, taskStatusMenuItemsContainer);
 
             taskStatusView.setVisibility(View.VISIBLE);
 
@@ -4533,12 +4566,13 @@ public class TemplateFragment extends Fragment {
     private void hideTaskStatusMenu() {
         if (rootView != null) {
             View taskStatusView = rootView.findViewById(R.id.task_status_view);
-            if (taskStatusView.getVisibility() == View.VISIBLE)
-                taskStatusView.setVisibility(View.GONE);
+            ViewGroup taskStatusMenuItemsContainer = taskStatusView.findViewById(R.id.layout_task_status_menu_items_container);
+            if (taskStatusMenuItemsContainer != null) taskStatusMenuItemsContainer.removeAllViews();
+            if (taskStatusView != null) taskStatusView.setVisibility(View.GONE);
         }
     }
 
-    private void setTaskStatusMenuListeners(TextView title, View menuItemsContainer, TextView... menuItems) {
+    private void setTaskStatusMenuListeners(TextView title, ViewGroup menuItemsContainer) {
 
         View.OnTouchListener selectedItemCancelListener = (v, event) -> {
             if (event.getAction() == MotionEvent.ACTION_UP) {
@@ -4573,7 +4607,8 @@ public class TemplateFragment extends Fragment {
             setFinishButtonListener(true);
 
         };
-        for (View v : menuItems) {
+        for (int i = 0; i < menuItemsContainer.getChildCount(); i++) {
+            View v = menuItemsContainer.getChildAt(i);
             v.setOnClickListener(menuItemClickListener);
         }
     }
@@ -4598,11 +4633,15 @@ public class TemplateFragment extends Fragment {
                     requestLocation();
                 }
 
-                v.setOnClickListener(v1 -> {
-                    Toast.makeText(requireActivity(), R.string.err_task_status_not_set, Toast.LENGTH_SHORT).show();
-                });
+                List<TaskStatus> taskStatusList = getTaskStatusesList();
 
-                showTaskStatusMenu();
+                if (taskStatusList != null && !taskStatusList.isEmpty()) {
+                    showTaskStatusMenu(taskStatusList);
+                    Toast.makeText(requireActivity(), R.string.err_task_status_not_set, Toast.LENGTH_SHORT).show();
+                } else {
+                    new WaitForMediaReadyTask().execute();
+                }
+
             });
         }
     }

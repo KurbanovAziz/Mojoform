@@ -189,7 +189,7 @@
 
             <include
                 android:id="@+id/task_status_view"
-                layout="@layout/layout_task_status"
+                layout="@layout/task_status_layout"
                 android:visibility="gone" />
 
         </LinearLayout>

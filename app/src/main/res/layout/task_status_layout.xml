@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:animateLayoutChanges="true"
+    android:background="@android:color/transparent"
+    android:gravity="center"
+    android:maxHeight="170dp"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/layout_task_status_menu_title"
+        style="@style/AppTheme.TextView.TaskStatus.Title"
+        android:text="@string/menu_task_status_title" />
+
+    <androidx.legacy.widget.Space
+        android:layout_width="match_parent"
+        android:layout_height="10dp" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:fillViewport="true"
+        android:scrollbars="none">
+
+        <LinearLayout
+            android:id="@+id/layout_task_status_menu_items_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@android:color/white"
+            android:orientation="vertical" />
+
+    </ScrollView>
+
+</LinearLayout>
