@@ -164,9 +164,11 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Objects;
 import java.util.TimeZone;
 import java.util.UUID;
@@ -3355,6 +3357,16 @@ public class TemplateFragment extends Fragment {
     }
 
     private class WaitForMediaReadyTask extends AsyncTask<Void, Void, Void> {
+
+        private TaskStatus taskStatus = null;
+
+        public WaitForMediaReadyTask() {
+        }
+
+        public WaitForMediaReadyTask(TaskStatus selectedTaskStatus) {
+            taskStatus = selectedTaskStatus;
+        }
+
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
@@ -3382,19 +3394,26 @@ public class TemplateFragment extends Fragment {
             Pair<Boolean, ArrayList<JSONObject>> result = checkIfTemplateIsFilled(template);
 
             if (result.first) {
-                new SendMediaTask(result.second).execute();
-            } else
+                new SendMediaTask(result.second, taskStatus).execute();
+            } else {
                 Toast.makeText(getContext(), R.string.not_all_required_fields_are_filled, Toast.LENGTH_LONG).show();
+            }
         }
     }
 
     private class SendMediaTask extends AsyncTask<Void, Integer, Integer> {
         private final int SUCCESS = 0;
         private ArrayList<JSONObject> mediaObjects;
+        private TaskStatus taskStatus = null;
         private int successfullySentMediaCt, totalSize;
 
         SendMediaTask(ArrayList<JSONObject> mediaObjects) {
             this.mediaObjects = mediaObjects;
+        }
+
+        public SendMediaTask(ArrayList<JSONObject> mediaObjects, TaskStatus taskStatus) {
+            this.mediaObjects = mediaObjects;
+            this.taskStatus = taskStatus;
         }
 
 
@@ -3431,6 +3450,7 @@ public class TemplateFragment extends Fragment {
                     }
                 }
                 int sentCt = 0;
+
 
                 if (!isOpenLink) {
                     Response tokenResponse = RequestService.createGetRequest("/api/user/");
@@ -3570,7 +3590,7 @@ public class TemplateFragment extends Fragment {
 
                     Toast.makeText(getContext(), R.string.network_error, Toast.LENGTH_SHORT).show();
                 } else
-                    new CompleteTemplateTask().execute();
+                    new CompleteTemplateTask(taskStatus).execute();
             } catch (Exception exc) {
                 exc.printStackTrace();
             }
@@ -3646,6 +3666,14 @@ public class TemplateFragment extends Fragment {
 
     private class CompleteTemplateTask extends AsyncTask<Void, Integer, Integer> {
         private JSONObject resultJson;
+        private TaskStatus taskStatus;
+
+        public CompleteTemplateTask() {
+        }
+
+        public CompleteTemplateTask(TaskStatus taskStatus) {
+            this.taskStatus = taskStatus;
+        }
 
         @Override
         protected void onPreExecute() {
@@ -3666,6 +3694,9 @@ public class TemplateFragment extends Fragment {
                 TimeZone timeZone = TimeZone.getDefault();
                 resultJson.put("timezone", timeZone.getID());
                 resultJson.put("client_id", "android v." + Build.VERSION.CODENAME + " app v. " + BuildConfig.VERSION_NAME);
+
+                JSONObject taskStatusJson = formJsonTaskStatus(taskStatus);
+                if (taskStatusJson != null) resultJson.put("task_status", taskStatusJson);
 
                 Log.d("mojo-log", "result template: " + resultJson.toString());
             } catch (Exception exc) {
@@ -4550,13 +4581,18 @@ public class TemplateFragment extends Fragment {
             taskStatusTitle.setText(R.string.menu_task_status_title);
             taskStatusTitle.setOnTouchListener(null);
 
+            Map<TextView, TaskStatus> taskStatusMap = new HashMap<>();
+
             for (TaskStatus taskStatus : taskStatusList) {
                 TextView tv = (TextView) getLayoutInflater().inflate(R.layout.task_status_item, null);
                 tv.setText(taskStatus.getName());
-                taskStatusMenuItemsContainer.addView(tv);
+                if (taskStatusMenuItemsContainer != null) {
+                    taskStatusMenuItemsContainer.addView(tv);
+                    taskStatusMap.put(tv, taskStatus);
+                }
             }
 
-            setTaskStatusMenuListeners(taskStatusTitle, taskStatusMenuItemsContainer);
+            setTaskStatusMenuListeners(taskStatusTitle, taskStatusMenuItemsContainer, taskStatusMap);
 
             taskStatusView.setVisibility(View.VISIBLE);
 
@@ -4566,13 +4602,16 @@ public class TemplateFragment extends Fragment {
     private void hideTaskStatusMenu() {
         if (rootView != null) {
             View taskStatusView = rootView.findViewById(R.id.task_status_view);
-            ViewGroup taskStatusMenuItemsContainer = taskStatusView.findViewById(R.id.layout_task_status_menu_items_container);
-            if (taskStatusMenuItemsContainer != null) taskStatusMenuItemsContainer.removeAllViews();
-            if (taskStatusView != null) taskStatusView.setVisibility(View.GONE);
+            if (taskStatusView != null) {
+                ViewGroup taskStatusMenuItemsContainer = taskStatusView.findViewById(R.id.layout_task_status_menu_items_container);
+                if (taskStatusMenuItemsContainer != null)
+                    taskStatusMenuItemsContainer.removeAllViews();
+                taskStatusView.setVisibility(View.GONE);
+            }
         }
     }
 
-    private void setTaskStatusMenuListeners(TextView title, ViewGroup menuItemsContainer) {
+    private void setTaskStatusMenuListeners(TextView title, ViewGroup menuItemsContainer, Map<TextView, TaskStatus> taskStatusMap) {
 
         View.OnTouchListener selectedItemCancelListener = (v, event) -> {
             if (event.getAction() == MotionEvent.ACTION_UP) {
@@ -4584,10 +4623,11 @@ public class TemplateFragment extends Fragment {
                         title.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0);
                         title.setText(R.string.menu_task_status_title);
                         title.setOnTouchListener(null);
-                        menuItemsContainer.setVisibility(View.VISIBLE);
+                        if (menuItemsContainer != null)
+                            menuItemsContainer.setVisibility(View.VISIBLE);
                     }, 500);
 
-                    setFinishButtonListener(false);
+                    setFinishButtonListener(null);
 
                     return false;
                 }
@@ -4604,21 +4644,24 @@ public class TemplateFragment extends Fragment {
             }
             if (menuItemsContainer != null) menuItemsContainer.setVisibility(View.GONE);
 
-            setFinishButtonListener(true);
+            if (taskStatusMap.containsKey(selectedItem))
+                setFinishButtonListener(taskStatusMap.get(selectedItem));
 
         };
-        for (int i = 0; i < menuItemsContainer.getChildCount(); i++) {
-            View v = menuItemsContainer.getChildAt(i);
-            v.setOnClickListener(menuItemClickListener);
+        if (menuItemsContainer != null) {
+            for (int i = 0; i < menuItemsContainer.getChildCount(); i++) {
+                View v = menuItemsContainer.getChildAt(i);
+                v.setOnClickListener(menuItemClickListener);
+            }
         }
     }
 
-    private void setFinishButtonListener(boolean isTaskStatusSet) {
+    private void setFinishButtonListener(TaskStatus selectedTaskStatus) {
         if (rootView != null) {
             MaterialButton finishButton = rootView.findViewById(R.id.finish_btn);
 
-            if (isTaskStatusSet) finishButton.setOnClickListener(v ->
-                    new WaitForMediaReadyTask().execute());
+            if (selectedTaskStatus != null) finishButton.setOnClickListener(v ->
+                    new WaitForMediaReadyTask(selectedTaskStatus).execute());
 
             else finishButton.setOnClickListener(v ->
                     Toast.makeText(requireActivity(), R.string.err_task_status_not_set, Toast.LENGTH_SHORT).show());
@@ -4644,6 +4687,22 @@ public class TemplateFragment extends Fragment {
 
             });
         }
+    }
+
+    private JSONObject formJsonTaskStatus(TaskStatus taskStatus) {
+        if (taskStatus == null || template == null) return null;
+
+        JSONObject json = new JSONObject();
+
+        try {
+            json.put("id", template.getString("id"));
+            json.put("type", "status");
+            json.put("value", taskStatus.getId());
+            return json;
+        } catch (JSONException e) {
+            Log.e("MojoApp", "Error when formed json for task status " + e);
+        }
+        return null;
     }
 
 }
