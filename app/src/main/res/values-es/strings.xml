@@ -262,6 +262,7 @@
         <item>Sá</item>
     </string-array>
 
+    <!--    Cuadro de diálogo 'Adjuntar archivos'-->
     <string name="dialog_attach_file_title">Especificar el tipo\nde archivo a adjuntar</string>
     <string name="dialog_attach_file_menu_camera">Cámara</string>
     <string name="dialog_attach_file_menu_gallery">Galería</string>
@@ -269,10 +270,23 @@
     <string name="dialog_attach_file_menu_audio">Audio</string>
     <string name="dialog_attach_file_menu_close">Cerrar</string>
 
+    <!--    Cuadro de diálogo 'Grabar audio'-->
     <string name="dialog_record_audio_cancel">Cancelar</string>
     <string name="dialog_record_audio_record">Registro</string>
     <string name="dialog_record_audio_save">Salvar</string>
 
+    <!--    Botón Eliminar tarea (desplazamiento horizontal)-->
     <string name="task_delete">Eliminar</string>
+
+    <!--    Menú 'Estado de tareas'-->
+    <string name="menu_task_status_title">¡Especifique el estado!</string>
+    <string name="menu_task_status_transfer">Transferir a otro ejecutante</string>
+    <string name="menu_task_status_ready">Todo está listo</string>
+    <string name="menu_task_status_do_cant">No puedo hacerlo</string>
+    <string name="menu_task_status_do_but_not_all">Hizo pero no todos</string>
+    <string name="menu_task_status_do_basic_only">Hecho solo el principal</string>
+
+    <!--    Advertencias-->
+    <string name="err_task_status_not_set">Especificar el estado de la tarea</string>
 
 </resources>

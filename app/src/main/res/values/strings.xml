@@ -263,6 +263,7 @@
         <item>сб</item>
     </string-array>
 
+    <!--    Окно 'Прикрепление файлов'-->
     <string name="dialog_attach_file_title">Укажите тип файла\nдля присоединения</string>
     <string name="dialog_attach_file_menu_camera">Камера</string>
     <string name="dialog_attach_file_menu_gallery">Галерея</string>
@@ -270,12 +271,24 @@
     <string name="dialog_attach_file_menu_audio">Аудио</string>
     <string name="dialog_attach_file_menu_close">Закрыть</string>
 
+    <!--    Окно 'Запись аудио'-->
     <string name="dialog_record_audio_cancel">Отменить</string>
     <string name="dialog_record_audio_record">Запись</string>
     <string name="dialog_record_audio_save">Сохранить</string>
-
     <string name="dialog_record_audio_chronometer" translatable="false">%1$s:%2$s.%3$s</string>
 
+    <!--    Кнопка 'Удаление задачи' (горизонтальный скролл)-->
     <string name="task_delete">Удалить</string>
+
+    <!--    Меню 'Статус задачи'-->
+    <string name="menu_task_status_title">Укажите статус!</string>
+    <string name="menu_task_status_transfer">Передать другому исполнителю</string>
+    <string name="menu_task_status_ready">Все готово</string>
+    <string name="menu_task_status_do_cant">Не могу сделать</string>
+    <string name="menu_task_status_do_but_not_all">Сделал, но не все</string>
+    <string name="menu_task_status_do_basic_only">Сделал только главное</string>
+
+    <!--    Предупреждения-->
+    <string name="err_task_status_not_set">Укажите статус задачи</string>
 
 </resources>

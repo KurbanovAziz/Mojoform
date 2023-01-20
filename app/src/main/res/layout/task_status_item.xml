@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/layout_task_status_menu_ready"
+    style="@style/AppTheme.TextView.TaskStatus"
+    tools:text="@string/menu_task_status_ready" />

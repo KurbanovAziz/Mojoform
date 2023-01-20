@@ -1,179 +1,197 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="@color/lightBlue">
+
     <FrameLayout
         android:id="@+id/text1"
         android:layout_width="match_parent"
-        android:layout_marginBottom="69dp"
-        android:layout_height="match_parent">
-    <ScrollView
-        android:id="@+id/scroll_view"
-        android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@+id/buttons_block">
+        android:layout_marginBottom="69dp">
 
-
-        <RelativeLayout
+        <ScrollView
+            android:id="@+id/scroll_view"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="match_parent"
+            android:layout_above="@+id/buttons_block">
+
 
             <RelativeLayout
-                android:id="@+id/page_title_block"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="8dp"
-                android:layout_marginRight="8dp"
-                android:layout_marginTop="0dp">
+                android:layout_height="wrap_content">
 
-                <HorizontalScrollView
-                    android:layout_width="wrap_content"
+                <RelativeLayout
+                    android:id="@+id/page_title_block"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_alignParentLeft="true"
-                    android:layout_centerVertical="true"
-                    android:layout_toLeftOf="@+id/page_name"
-                    android:paddingLeft="5dp"
-                    android:paddingRight="5dp">
+                    android:layout_marginLeft="8dp"
+                    android:layout_marginTop="0dp"
+                    android:layout_marginRight="8dp">
 
-                    <TextView
-                        android:id="@+id/template_name"
+                    <HorizontalScrollView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_alignParentLeft="true"
+                        android:layout_centerVertical="true"
+                        android:layout_toLeftOf="@+id/page_name"
+                        android:paddingLeft="5dp"
+                        android:paddingRight="5dp">
+
+                        <TextView
+                            android:id="@+id/template_name"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:ellipsize="end"
+                            android:maxLines="1"
+                            android:text=""
+                            android:textColor="#ff4c3d5f"
+                            android:textSize="17sp" />
+                    </HorizontalScrollView>
+
+
+                    <TextView
+                        android:id="@+id/page_name"
+                        android:layout_width="wrap_content"
+                        android:layout_height="40dp"
+                        android:layout_alignParentRight="true"
+                        android:layout_centerVertical="true"
+                        android:background="@drawable/mark"
                         android:ellipsize="end"
+                        android:gravity="center"
+                        android:maxLength="18"
                         android:maxLines="1"
+                        android:paddingLeft="10dp"
+                        android:paddingRight="10dp"
                         android:text=""
                         android:textColor="#ff4c3d5f"
-                        android:textSize="17sp" />
-                </HorizontalScrollView>
+                        android:textSize="16sp" />
 
+                </RelativeLayout>
 
-                <TextView
-                    android:id="@+id/page_name"
-                    android:layout_width="wrap_content"
-                    android:layout_height="40dp"
-                    android:layout_alignParentRight="true"
-                    android:layout_centerVertical="true"
-                    android:background="@drawable/mark"
-                    android:ellipsize="end"
-                    android:gravity="center"
-                    android:maxLength="18"
-                    android:maxLines="1"
-                    android:paddingLeft="10dp"
-                    android:paddingRight="10dp"
-                    android:text=""
-                    android:textColor="#ff4c3d5f"
-                    android:textSize="16sp" />
+                <FrameLayout
+                    android:id="@+id/root_container"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/page_title_block"
+                    android:layout_marginLeft="8dp"
+                    android:layout_marginTop="12dp"
+                    android:layout_marginRight="8dp" />
 
+                <FrameLayout
+                    android:id="@+id/page_selector_block"
+                    android:layout_width="160dp"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/page_title_block"
+                    android:layout_alignRight="@+id/page_title_block">
+
+                    <include
+                        layout="@layout/page_selector_window"
+                        android:visibility="gone" />
+                </FrameLayout>
             </RelativeLayout>
-
-            <FrameLayout
-                android:id="@+id/root_container"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/page_title_block"
-                android:layout_marginLeft="8dp"
-                android:layout_marginRight="8dp"
-                android:layout_marginTop="12dp" />
-
-            <FrameLayout
-                android:id="@+id/page_selector_block"
-                android:layout_width="160dp"
-                android:layout_height="wrap_content"
-                android:layout_alignRight="@+id/page_title_block"
-                android:layout_below="@+id/page_title_block">
-
-                <include
-                    layout="@layout/page_selector_window"
-                    android:visibility="gone" />
-            </FrameLayout>
-        </RelativeLayout>
-    </ScrollView>
+        </ScrollView>
     </FrameLayout>
 
 
     <LinearLayout
         android:id="@+id/buttons_block"
         android:layout_width="match_parent"
-        android:layout_height="69.5dp"
-        android:background="@color/blueGrey"
+        android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
+        android:animateLayoutChanges="true"
+        android:background="@color/blueGrey"
         android:baselineAligned="false"
+        android:minHeight="69.5dp"
         android:orientation="horizontal"
+        android:padding="12dp"
         android:visibility="gone">
-
-
-        <FrameLayout
-            android:id="@+id/left_arrow"
-            android:layout_width="30dp"
-            android:layout_height="match_parent"
-            android:layout_gravity="center_vertical">
-
-            <ImageView
-                android:layout_width="22dp"
-                android:layout_height="22dp"
-                android:layout_gravity="right|center_vertical"
-                app:tint="@color/grey"
-                android:adjustViewBounds="true"
-                android:src="@drawable/left_arrow" />
-        </FrameLayout>
 
         <LinearLayout
             android:id="@+id/main_buttons_block"
             android:layout_width="wrap_content"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:baselineAligned="false"
-            android:gravity="center_horizontal"
-            android:orientation="horizontal"
+            android:animateLayoutChanges="true"
+            android:gravity="center"
+            android:orientation="vertical"
             android:visibility="visible">
 
-            <FrameLayout
-                android:layout_width="120dp"
-                android:layout_height="44dp"
-                android:layout_marginTop="12dp">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:weightSum="1">
 
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:background="@drawable/blue_mark_btn" />
+                <FrameLayout
+                    android:id="@+id/left_arrow"
+                    android:layout_width="30dp"
+                    android:layout_height="match_parent">
 
-                <TextView
-                    android:id="@+id/hold_task_btn"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_marginLeft="8dp"
-                    android:layout_marginRight="8dp"
+                    <ImageView
+                        android:layout_width="22dp"
+                        android:layout_height="22dp"
+                        android:layout_gravity="center"
+                        android:adjustViewBounds="true"
+                        android:src="@drawable/left_arrow"
+                        app:tint="@color/grey" />
+
+                </FrameLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
                     android:gravity="center"
-                    android:text="@string/hold"
-                    android:textColor="@color/textGrey"
-                    android:textSize="18dp" />
-            </FrameLayout>
+                    android:orientation="horizontal">
 
-            <FrameLayout
-                android:id="@+id/finish_btn_container"
-                android:layout_width="140dp"
-                android:layout_height="54dp"
-                android:layout_marginTop="12dp">
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/hold_task_btn"
+                        style="@style/AppTheme.Button.Outlined.Stroked"
+                        android:text="@string/hold"
+                        android:textColor="@color/textGrey" />
 
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="54dp"
-                    android:background="@drawable/green_btn_with_shadow" />
+                    <androidx.legacy.widget.Space
+                        android:layout_width="10dp"
+                        android:layout_height="match_parent" />
 
-                <TextView
-                    android:id="@+id/finish_btn"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_marginLeft="8dp"
-                    android:layout_marginRight="8dp"
-                    android:gravity="center"
-                    android:paddingBottom="13dp"
-                    android:text="@string/finish"
-                    android:textColor="@android:color/white"
-                    android:textSize="15.5sp" />
-            </FrameLayout>
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/finish_btn"
+                        style="@style/AppTheme.Button.Outlined.NoStroked"
+                        android:backgroundTint="@color/colorAccent"
+                        android:text="@string/finish"
+                        android:textColor="@android:color/white" />
+
+                </LinearLayout>
+
+                <FrameLayout
+                    android:id="@+id/right_arrow"
+                    android:layout_width="30dp"
+                    android:layout_height="match_parent">
+
+                    <ImageView
+                        android:layout_width="22dp"
+                        android:layout_height="22dp"
+                        android:layout_gravity="center"
+                        android:adjustViewBounds="true"
+                        android:rotation="180"
+                        android:src="@drawable/left_arrow"
+                        app:tint="@color/grey" />
+                </FrameLayout>
+
+            </LinearLayout>
+
+            <androidx.legacy.widget.Space
+                android:layout_width="match_parent"
+                android:layout_height="10dp" />
+
+            <include
+                android:id="@+id/task_status_view"
+                layout="@layout/task_status_layout"
+                android:visibility="gone" />
+
         </LinearLayout>
 
         <LinearLayout
@@ -233,28 +251,13 @@
             </FrameLayout>
         </LinearLayout>
 
-        <FrameLayout
-            android:id="@+id/right_arrow"
-            android:layout_width="30dp"
-            android:layout_height="match_parent"
-            android:layout_gravity="right">
-
-            <ImageView
-                android:layout_width="22dp"
-                android:layout_height="22dp"
-                android:layout_gravity="left|center_vertical"
-                android:adjustViewBounds="true"
-                android:rotation="180"
-                app:tint="@color/grey"
-                android:src="@drawable/left_arrow" />
-        </FrameLayout>
     </LinearLayout>
 
     <FrameLayout
         android:id="@+id/select_btn_popup"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
+        android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true" />
 </RelativeLayout>
