@@ -17,4 +17,18 @@ public class Value {
     public double min;
     public double prc;
     public double val;
+
+    @Override
+    public String toString() {
+        return "Value{" +
+                "from=" + from +
+                ", to=" + to +
+                ", id=" + id +
+                ", comments=" + comments +
+                ", max=" + max +
+                ", min=" + min +
+                ", prc=" + prc +
+                ", val=" + val +
+                '}';
+    }
 }

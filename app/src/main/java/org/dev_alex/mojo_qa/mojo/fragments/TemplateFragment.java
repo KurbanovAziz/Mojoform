@@ -4616,7 +4616,7 @@ public class TemplateFragment extends Fragment {
         View.OnTouchListener selectedItemCancelListener = (v, event) -> {
             if (event.getAction() == MotionEvent.ACTION_UP) {
                 if (event.getRawX() >= title.getRight() - title.getTotalPaddingRight()) {
-                    title.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_close_ripple, 0);
+                    title.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_close_ripple_red, 0);
                     title.setPressed(true);
                     title.postDelayed(() -> {
                         title.setPressed(false);

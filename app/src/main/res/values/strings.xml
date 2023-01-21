@@ -291,4 +291,8 @@
     <!--    Предупреждения-->
     <string name="err_task_status_not_set">Укажите статус задачи</string>
 
+    <!--    Окно 'Комменарии'-->
+    <string name="dialog_comments_time_year_addition">года</string>
+    <string name="dialog_comments_time_addition">в</string>
+
 </resources>

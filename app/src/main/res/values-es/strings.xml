@@ -289,4 +289,8 @@
     <!--    Advertencias-->
     <string name="err_task_status_not_set">Especificar el estado de la tarea</string>
 
+    <!--    Cuadro de diálogo 'Comentarios'-->
+    <string name="dialog_comments_time_year_addition">año</string>
+    <string name="dialog_comments_time_addition">a las</string>
+
 </resources>

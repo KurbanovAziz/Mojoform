@@ -11,6 +11,20 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Environment;
+import android.util.Log;
+import android.util.TypedValue;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.Window;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
@@ -19,26 +33,6 @@ import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
-import android.os.Environment;
-import android.text.Editable;
-import android.text.TextWatcher;
-import android.util.Log;
-import android.util.TypedValue;
-import android.view.KeyEvent;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.view.Window;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.FrameLayout;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.RatingBar;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -53,20 +47,17 @@ import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.formatter.IAxisValueFormatter;
 import com.github.mikephil.charting.highlight.Highlight;
 import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
+import com.google.android.material.button.MaterialButton;
 
 import org.dev_alex.mojo_qa.mojo.R;
-import org.dev_alex.mojo_qa.mojo.activities.MainActivity;
 import org.dev_alex.mojo_qa.mojo.adapters.CommentAdapter;
 import org.dev_alex.mojo_qa.mojo.adapters.ComplexGraphAdapter;
-import org.dev_alex.mojo_qa.mojo.adapters.IndicatorGraphAdapter;
 import org.dev_alex.mojo_qa.mojo.adapters.ResultGraphAdapter;
 import org.dev_alex.mojo_qa.mojo.models.Employee;
 import org.dev_alex.mojo_qa.mojo.models.GraphInfo;
 import org.dev_alex.mojo_qa.mojo.models.Indicator;
-import org.dev_alex.mojo_qa.mojo.models.Notification;
 import org.dev_alex.mojo_qa.mojo.models.Panel;
 import org.dev_alex.mojo_qa.mojo.models.Ranges;
-import org.dev_alex.mojo_qa.mojo.models.User;
 import org.dev_alex.mojo_qa.mojo.models.Value;
 import org.dev_alex.mojo_qa.mojo.services.RequestService;
 import org.dev_alex.mojo_qa.mojo.services.Utils;
@@ -116,8 +107,6 @@ public class GraphFragment extends Fragment implements ResultGraphAdapter.GraphC
     public static List<Ranges> ranges;
     LinearLayout chartContainer;
     ViewGroup container;
-    ImageView sendBTN;
-    EditText messageET;
     String message;
     long vid;
     long from;
@@ -400,50 +389,43 @@ public class GraphFragment extends Fragment implements ResultGraphAdapter.GraphC
                             }
                             final Dialog commentsDialog = new Dialog(getContext());
 
-                            commentsDialog.setContentView(LayoutInflater.from(getContext()).inflate(R.layout.comments_dialog, null, false));
+
+                            commentsDialog.setContentView(LayoutInflater.from(getContext()).inflate(R.layout.comments_dialog_updated, null, false));
                             commentsDialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
                             commentsDialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                            commentsDialog.getWindow().getDecorView().setPadding(20, 20, 20, 20);
 
-                            ImageView kresticIV = commentsDialog.findViewById(R.id.krestic);
-                            kresticIV.setOnClickListener(new View.OnClickListener() {
+                            ImageView closeIv = commentsDialog.findViewById(R.id.comments_dialog_updated_close_iv);
+                            closeIv.setOnClickListener(new View.OnClickListener() {
                                 @Override
                                 public void onClick(View v) {
                                     commentsDialog.cancel();
                                     graphDialog.cancel();
                                 }
                             });
-                            RecyclerView recyclerComment = commentsDialog.findViewById(R.id.recycler_view);
+                            RecyclerView recyclerComment = commentsDialog.findViewById(R.id.comments_dialog_updated_rv);
                             recyclerComment.setLayoutManager(new LinearLayoutManager(getContext()));
                             recyclerComment.setAdapter(new CommentAdapter(getActivity(), graphInfo.values.get((int) h.getX()).comments));
-                            sendBTN = (ImageView) commentsDialog.findViewById(R.id.send);
-                            messageET = (EditText) commentsDialog.findViewById(R.id.et_text_message);
-                            messageET.addTextChangedListener(new TextWatcher() {
-                                @Override
-                                public void onTextChanged(CharSequence s, int start, int before, int count) {
-                                    sendBTN.setVisibility(View.VISIBLE);
-                                }
-
-                                @Override
-                                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-                                }
-
-                                @Override
-                                public void afterTextChanged(Editable s) {
-
-                                }
-                            });
-                            TextView labelTV = commentsDialog.findViewById(R.id.label);
-                            TextView timeTV = commentsDialog.findViewById(R.id.time);
+                            EditText commentEt = (EditText) commentsDialog.findViewById(R.id.comments_dialog_updated_comment_et);
+                            TextView labelTV = commentsDialog.findViewById(R.id.comments_dialog_updated_title_tv);
+                            TextView timeTV = commentsDialog.findViewById(R.id.comments_dialog_updated_date_time_tv);
+                            MaterialButton saveBtn = commentsDialog.findViewById(R.id.comments_dialog_updated_save_btn);
                             labelTV.setText(name);
-                            SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy | HH:mm", Locale.getDefault());
+
+                            String dateTimePattern = String.format(
+                                    Locale.getDefault(),
+                                    "dd MMMM yyyy %1$s %2$s hh:mm a",
+                                    getString(R.string.dialog_comments_time_year_addition),
+                                    getString(R.string.dialog_comments_time_addition));
+
+                            SimpleDateFormat dateFormat = new SimpleDateFormat(dateTimePattern, Locale.getDefault());
                             String time = dateFormat.format(graphInfo.values.get((int) h.getX()).from);
                             timeTV.setText(time);
 
-                            sendBTN.setOnClickListener(new View.OnClickListener() {
+                            saveBtn.setOnClickListener(new View.OnClickListener() {
                                 @Override
                                 public void onClick(View v) {
-                                    message = messageET.getText().toString();
+                                    message = commentEt.getText().toString();
                                     vid = graphInfo.values.get((int) h.getX()).id;
                                     new SendComment().execute();
                                     commentsDialog.cancel();

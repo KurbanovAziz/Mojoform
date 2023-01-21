@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="10dp">
+
+    <TextView
+        android:id="@+id/comment_item_updated_message_tv"
+        style="@style/AppTheme.Dialog.Comments.TextView"
+        android:layout_gravity="center"
+        android:gravity="start"
+        tools:text="Менеджер читал фейсбук, пора принять меры. Предлагаю добавить задач, раз у линейных менеджеров есть свободные периоды." />
+
+    <androidx.legacy.widget.Space
+        android:layout_width="match_parent"
+        android:layout_height="10dp" />
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end|center"
+        android:gravity="center"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:layout_width="18dp"
+            android:layout_height="20dp"
+            android:layout_gravity="center"
+            android:src="@drawable/result"
+            app:tint="@color/light_grey" />
+
+        <androidx.legacy.widget.Space
+            android:layout_width="10dp"
+            android:layout_height="match_parent" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:gravity="start|center"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/comment_item_updated_author_tv"
+                style="@style/AppTheme.Dialog.Comments.TextView.Small.Light_2"
+                tools:text="Григорий АА, менеджер" />
+
+            <TextView
+                android:id="@+id/comment_item_updated_time_tv"
+                style="@style/AppTheme.Dialog.Comments.TextView.Small.Light_2"
+                tools:text="17 декабря 2019 года в 12:00 PM" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</LinearLayout>

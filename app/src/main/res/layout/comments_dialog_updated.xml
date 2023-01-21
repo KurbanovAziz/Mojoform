@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/bg_corners_round_3dp"
+    android:backgroundTint="@color/bg_dialog_comments"
+    android:padding="10dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/comments_dialog_updated_title_tv"
+                    style="@style/AppTheme.Dialog.Comments.TextView"
+                    android:text="Контроль наблюдения"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <ImageView
+                    android:id="@+id/comments_dialog_updated_close_iv"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:layout_gravity="end"
+                    android:layout_toEndOf="@id/comments_dialog_updated_title_tv"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:gravity="center"
+                    android:src="@drawable/ic_close_ripple_grey"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:tint="@color/light_grey" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <TextView
+                android:id="@+id/comments_dialog_updated_date_time_tv"
+                style="@style/AppTheme.Dialog.Comments.TextView.Small"
+                android:layout_marginBottom="10dp"
+                android:text="17 декабря 2019 года в 12:00 PM" />
+
+            <TextView
+                style="@style/AppTheme.Dialog.Comments.TextView"
+                android:text="@string/comments" />
+
+            <androidx.legacy.widget.Space
+                android:layout_width="match_parent"
+                android:layout_height="10dp" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/comments_dialog_updated_rv"
+                android:layout_width="match_parent"
+                android:layout_height="150dp"
+                android:background="@drawable/bg_corners_round_3dp"
+                android:backgroundTint="@color/white"
+                tools:listitem="@layout/comment_item_updated" />
+
+        </LinearLayout>
+
+        <androidx.legacy.widget.Space
+            android:layout_width="match_parent"
+            android:layout_height="10dp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="130dp"
+            android:background="@drawable/bg_corners_round_3dp"
+            android:backgroundTint="@color/white"
+            android:orientation="horizontal"
+            android:padding="5dp">
+
+            <EditText
+                android:id="@+id/comments_dialog_updated_comment_et"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@null"
+                android:fontFamily="@font/sf_ui_medium"
+                android:gravity="top"
+                android:hint="@string/your_comment"
+                android:imeOptions="actionDone"
+                android:inputType="textMultiLine"
+                android:maxLength="3000"
+                android:textColor="@color/textGrey"
+                android:textColorHint="@color/light_grey" />
+
+        </LinearLayout>
+
+        <androidx.legacy.widget.Space
+            android:layout_width="match_parent"
+            android:layout_height="20dp" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/comments_dialog_updated_save_btn"
+            style="@style/AppTheme.Button.Outlined.NoStroked"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:backgroundTint="@color/colorAccent"
+            android:elevation="5dp"
+            android:text="@string/save"
+            android:textColor="@color/white" />
+
+    </LinearLayout>
+
+</FrameLayout>

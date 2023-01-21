@@ -289,4 +289,8 @@
     <!--    Warnings-->
     <string name="err_task_status_not_set">Specify the task status</string>
 
+    <!--    Comments dialog-->
+    <string name="dialog_comments_time_year_addition">year</string>
+    <string name="dialog_comments_time_addition">at</string>
+
 </resources>
