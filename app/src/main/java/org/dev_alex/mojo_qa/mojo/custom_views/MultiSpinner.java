@@ -18,6 +18,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 
 import androidx.core.content.ContextCompat;
+import androidx.core.content.res.ResourcesCompat;
 
 import org.dev_alex.mojo_qa.mojo.R;
 import org.dev_alex.mojo_qa.mojo.models.Organisation;
@@ -56,9 +57,10 @@ public class MultiSpinner extends androidx.appcompat.widget.AppCompatSpinner imp
             textView.setText(items.get(position).getName());
             textView.setChecked(selected[position]);
             ImageView imageView = convertView.findViewById(R.id.point1);
-            if(items.get(position).getColor() != null){
-            imageView.setImageResource(R.drawable.point);
-            imageView.setColorFilter(Color.parseColor(items.get(position).getColor()));}
+            if (items.get(position).getColor() != null) {
+                imageView.setImageResource(R.drawable.point);
+                imageView.setColorFilter(Color.parseColor(items.get(position).getColor()));
+            }
 
 
             return convertView;
@@ -66,7 +68,7 @@ public class MultiSpinner extends androidx.appcompat.widget.AppCompatSpinner imp
     }
 
     private static MultiSpinnerListAdapter adapter;
-    private  Activity activity;
+    private Activity activity;
     private Context context;
     private static List<Organisation> items;
     private static boolean[] selected;
@@ -118,7 +120,7 @@ public class MultiSpinner extends androidx.appcompat.widget.AppCompatSpinner imp
         }
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(getContext(),
                 android.R.layout.simple_spinner_item,
-                new String[] { spinnerText });
+                new String[]{spinnerText});
         setAdapter(adapter);
         listener.onItemsSelected(selected);
     }
@@ -135,17 +137,21 @@ public class MultiSpinner extends androidx.appcompat.widget.AppCompatSpinner imp
                     }
                 });
         builder.setOnCancelListener(this);
-        try{
-        AlertDialog dialog = builder.create();
-        dialog.getListView().setOnItemClickListener(this);
-        dialog.show();
-        Button positive_button = dialog.getButton(DialogInterface.BUTTON_POSITIVE);
-        positive_button.setBackground(ContextCompat.getDrawable(getContext(), R.drawable.rounded_view));
-       // positive_button.setHeight(30);
-        positive_button.setTextColor(Color.parseColor("#f0f8ff"));
-        positive_button.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT, .2f));
-        return true;}
-        catch (Exception e){
+        try {
+            AlertDialog dialog = builder.create();
+            dialog.getListView().setOnItemClickListener(this);
+            dialog.show();
+            Button positive_button = dialog.getButton(DialogInterface.BUTTON_POSITIVE);
+            positive_button.setBackground(ContextCompat.getDrawable(getContext(), R.drawable.rounded_view));
+            // positive_button.setHeight(30);
+            positive_button.setTextColor(Color.WHITE);
+            positive_button.setTextSize(16f);
+            positive_button.setAllCaps(false);
+            positive_button.setPadding(5, 5, 5, 5);
+            positive_button.setTypeface(ResourcesCompat.getFont(getContext(), R.font.sf_ui_medium));
+            positive_button.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, 100, .2f));
+            return true;
+        } catch (Exception e) {
             e.printStackTrace();
             return false;
         }
@@ -165,7 +171,7 @@ public class MultiSpinner extends androidx.appcompat.widget.AppCompatSpinner imp
             selected[i] = true;
         // all text on the spinner
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(getContext(),
-                android.R.layout.simple_spinner_item, new String[] { allText });
+                android.R.layout.simple_spinner_item, new String[]{allText});
         setAdapter(adapter);
     }
 
