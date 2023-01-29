@@ -2,6 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     package="org.dev_alex.mojo_qa.mojo">
+
     <queries>
         <intent>
             <action android:name="android.speech.RecognitionService" />
@@ -29,7 +30,7 @@
         android:name=".App"
         android:allowBackup="false"
         android:allowClearUserData="true"
-        android:configChanges="orientation|keyboardHidden|keyboard"
+        android:configChanges="orientation|keyboardHidden|keyboard|locale"
         android:extractNativeLibs="true"
         android:hardwareAccelerated="true"
         android:icon="${appIcon}"
@@ -41,13 +42,17 @@
         android:usesCleartextTraffic="true"
         tools:replace="android:allowBackup,android:icon"
         tools:targetApi="q">
-        <activity android:name=".activities.RecordAudio" />
-        <activity android:name=".activities.WebActivity"
-            android:theme="@style/Theme.AppCompat.NoActionBar"/>
+        <activity
+            android:name=".activities.RecordAudio"
+            android:configChanges="orientation|keyboardHidden|keyboard|locale" />
+        <activity
+            android:name=".activities.WebActivity"
+            android:configChanges="orientation|keyboardHidden|keyboard|locale"
+            android:theme="@style/Theme.AppCompat.NoActionBar" />
 
         <activity
             android:name=".activities.AuthActivity"
-            android:configChanges="orientation|keyboardHidden|keyboard"
+            android:configChanges="orientation|keyboardHidden|keyboard|locale"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.ActionBar.Transparent">
             <intent-filter>
@@ -114,20 +119,20 @@
         </activity>
         <activity
             android:name=".activities.MainActivity"
-            android:configChanges="orientation|keyboardHidden|keyboard|screenSize"
+            android:configChanges="orientation|keyboardHidden|keyboard|screenSize|locale"
             android:largeHeap="true"
             android:launchMode="singleTop"
             android:theme="@style/AppTheme.ActionBar.Transparent"
             android:windowSoftInputMode="adjustPan" />
         <activity
             android:name=".activities.OpenLinkActivity"
-            android:configChanges="orientation|keyboardHidden|keyboard"
+            android:configChanges="orientation|keyboardHidden|keyboard|locale"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.ActionBar.Transparent"
             android:windowSoftInputMode="adjustPan" />
         <activity
             android:name=".activities.PlayerActivity"
-            android:configChanges="keyboard|keyboardHidden|orientation|screenSize|screenLayout|smallestScreenSize|uiMode">
+            android:configChanges="keyboard|keyboardHidden|orientation|screenSize|screenLayout|smallestScreenSize|uiMode|locale">
             <intent-filter android:autoVerify="true">
                 <action android:name="android.intent.action.VIEW" />
 
@@ -142,7 +147,7 @@
         </activity>
         <activity
             android:name=".activities.PickExecutorsActivity"
-            android:configChanges="orientation|keyboardHidden|keyboard"
+            android:configChanges="orientation|keyboardHidden|keyboard|locale"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.ActionBar.Transparent"
             android:windowSoftInputMode="adjustPan" />
@@ -159,17 +164,24 @@
 
         <activity
             android:name=".activities.ImageViewActivity"
-            android:configChanges="orientation|keyboardHidden|keyboard"
+            android:configChanges="orientation|keyboardHidden|keyboard|locale"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar.FullScreen" />
-        <activity android:name=".custom_views.camera.CustomCamera2Activity" />
-        <activity android:name=".activities.OnboardingActivity" />
+        <activity
+            android:name=".custom_views.camera.CustomCamera2Activity"
+            android:configChanges="orientation|keyboardHidden|keyboard|locale" />
+        <activity
+            android:name=".activities.OnboardingActivity"
+            android:configChanges="locale" />
         <activity
             android:name="com.journeyapps.barcodescanner.CaptureActivity"
+            android:configChanges="orientation|keyboardHidden|keyboard|locale"
             android:screenOrientation="portrait"
             android:stateNotNeeded="true"
             tools:replace="android:screenOrientation" />
-        <activity android:name=".custom_views.camerax.CameraActivity" />
+        <activity
+            android:name=".custom_views.camerax.CameraActivity"
+            android:configChanges="orientation|keyboardHidden|keyboard|locale" />
 
         <service android:name=".gcm.MyFirebaseMessagingService">
             <intent-filter>

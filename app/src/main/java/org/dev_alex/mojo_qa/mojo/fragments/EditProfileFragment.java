@@ -7,6 +7,7 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
@@ -17,7 +18,8 @@ import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
+import android.widget.Adapter;
+import android.widget.AdapterView;
 import android.widget.AutoCompleteTextView;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -41,6 +43,7 @@ import com.google.android.material.textfield.TextInputEditText;
 import org.dev_alex.mojo_qa.mojo.App;
 import org.dev_alex.mojo_qa.mojo.R;
 import org.dev_alex.mojo_qa.mojo.activities.MainActivity;
+import org.dev_alex.mojo_qa.mojo.adapters.LocaleAdapter;
 import org.dev_alex.mojo_qa.mojo.custom_views.camera.CustomCamera2Activity;
 import org.dev_alex.mojo_qa.mojo.models.User;
 import org.dev_alex.mojo_qa.mojo.services.BitmapService;
@@ -155,23 +158,28 @@ public class EditProfileFragment extends Fragment {
     private void setupDropDownList(AutoCompleteTextView view) {
         view.setInputType(InputType.TYPE_NULL);
         fillDropDownMenuWithValues(view);
-        setDefaultLanguageOnDropDown(view);
+        setLanguageOnDropDownDefault(view);
+        setDropDownItemClickListener(view);
     }
 
-    private void setDefaultLanguageOnDropDown(AutoCompleteTextView view) {
+    private void setLanguageOnDropDownDefault(AutoCompleteTextView view) {
         Locale locale = getResources().getConfiguration().getLocales().get(0);
+        setLanguageOnDropDown(view, locale);
+    }
+
+    private void setLanguageOnDropDown(AutoCompleteTextView view, Locale locale) {
         String localeName = locale.getDisplayLanguage(locale);
         String formatted = Character.toUpperCase(localeName.charAt(0)) + localeName.substring(1);
         view.setText(formatted, false);
     }
 
     private void fillDropDownMenuWithValues(AutoCompleteTextView view) {
-        String[] items = getLocaleSet().toArray(new String[]{});
-        view.setAdapter(new ArrayAdapter<>(requireActivity(), android.R.layout.simple_list_item_1, items));
+        Locale[] items = getLocalesNamesSet().toArray(new Locale[]{});
+        view.setAdapter(new LocaleAdapter(requireActivity(), android.R.layout.simple_list_item_1, items));
     }
 
-    private Set<String> getLocaleSet() {
-        Set<String> locales = new HashSet<>();
+    private Set<Locale> getLocalesNamesSet() {
+        Set<Locale> locales = new HashSet<>();
 
         for (Locale l : Locale.getAvailableLocales()) {
             if (l.toLanguageTag().equalsIgnoreCase(getString(R.string.locale_tag_1))
@@ -182,13 +190,34 @@ public class EditProfileFragment extends Fragment {
                     ||
                     l.toLanguageTag().equalsIgnoreCase(getString(R.string.locale_tag_4))) {
 
-                String language = l.getDisplayLanguage(l);
-                String capitalized = Character.toUpperCase(language.charAt(0)) + language.substring(1);
-
-                locales.add(capitalized);
+                locales.add(l);
             }
         }
+
         return locales;
+    }
+
+    private void setDropDownItemClickListener(AutoCompleteTextView view) {
+        view.setOnItemClickListener((parent, view1, position, id) -> {
+            onDropDownItemClick(view, parent, position);
+        });
+    }
+
+    private void onDropDownItemClick(AutoCompleteTextView view, AdapterView<?> parent, int position) {
+        Adapter adapter = parent.getAdapter();
+        if (adapter instanceof LocaleAdapter) {
+            Locale locale = ((LocaleAdapter) adapter).getItem(position);
+            changeLocale(locale);
+            setLanguageOnDropDown(view, locale);
+        }
+    }
+
+    private void changeLocale(Locale locale) {
+        Locale.setDefault(locale);
+        Configuration configuration = getResources().getConfiguration();
+        configuration.setLocale(locale);
+        configuration.setLayoutDirection(locale);
+        getResources().updateConfiguration(configuration, getResources().getDisplayMetrics());
     }
 
     private void updateAvatar() {
@@ -437,8 +466,9 @@ public class EditProfileFragment extends Fragment {
 
                     FragmentActivity activity = getActivity();
                     if (activity != null) {
-                        ((MainActivity) activity).initDrawer();
-                        activity.getSupportFragmentManager().popBackStack();
+                        activity.recreate();
+//                        ((MainActivity) activity).initDrawer();
+//                        activity.getSupportFragmentManager().popBackStack();
                     }
                 }
 
