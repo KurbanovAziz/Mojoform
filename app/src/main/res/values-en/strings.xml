@@ -251,6 +251,7 @@
     <string name="four_page1">Under Documents, read, view, and listen to available content/n/nThe Notifications section receives reports on the results of completed tasks and signals of violation of deadlines/n/nThe Results section shows Indicators with data dynamics for the day, week, month and year, they can be commented on and analyzed reports/n/nUnder Task Manager, you can edit and assign new tasks to employees/n/n
     </string>
     <string name="start">Start</string>
+    <string name="search">Search</string>
 
     <string-array name="day_names">
         <item>Su</item>
@@ -295,5 +296,8 @@
 
     <!--    'Edit profile' screen-->
     <string name="edit_profile_language_selection">Language selection</string>
+
+    <!--    Fragment 'Files'-->
+    <string name="warning_files_access">File access is granted by the\nadministrator of the organization</string>
 
 </resources>

@@ -8,8 +8,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Color;
-import android.graphics.PorterDuff;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
@@ -21,16 +19,18 @@ import android.os.Handler;
 import android.os.PersistableBundle;
 import android.text.TextUtils;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
-import android.widget.ArrayAdapter;
-import android.widget.CheckBox;
 import android.widget.ImageView;
-import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.SwitchCompat;
+import androidx.cardview.widget.CardView;
+import androidx.core.content.FileProvider;
+import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
@@ -39,7 +39,6 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mikepenz.materialdrawer.Drawer;
 import com.mikepenz.materialdrawer.DrawerBuilder;
-import com.mikepenz.materialdrawer.model.DividerDrawerItem;
 import com.mikepenz.materialdrawer.model.SecondaryDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import com.woxthebox.draglistview.DragListView;
@@ -59,9 +58,7 @@ import org.dev_alex.mojo_qa.mojo.fragments.TemplateFragment;
 import org.dev_alex.mojo_qa.mojo.fragments.appointment.AppointmentListFragment;
 import org.dev_alex.mojo_qa.mojo.gcm.MyFirebaseMessagingService;
 import org.dev_alex.mojo_qa.mojo.models.Notification;
-import org.dev_alex.mojo_qa.mojo.models.Task;
 import org.dev_alex.mojo_qa.mojo.models.User;
-import org.dev_alex.mojo_qa.mojo.models.file.Entry;
 import org.dev_alex.mojo_qa.mojo.services.LoginHistoryService;
 import org.dev_alex.mojo_qa.mojo.services.RequestService;
 import org.dev_alex.mojo_qa.mojo.services.TokenService;
@@ -74,14 +71,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.SwitchCompat;
-import androidx.cardview.widget.CardView;
-import androidx.core.content.FileProvider;
-import androidx.core.view.MenuItemCompat;
-import androidx.recyclerview.widget.LinearLayoutManager;
 
 import me.leolin.shortcutbadger.ShortcutBadger;
 import okhttp3.Response;
@@ -358,7 +347,7 @@ public class MainActivity extends AppCompatActivity {
             if (str.equals("tasks"))
                 mainDraggableItems.add(new CustomDrawerItem(15, mainDraggableItems.isEmpty() ? -48 : 0).withIdentifier(1).withName(R.string.tasks).withIcon(R.drawable.tasks_icon));
             if (str.equals("docs"))
-                mainDraggableItems.add(new CustomDrawerItem(15, mainDraggableItems.isEmpty() ? -48 : 0).withIdentifier(2).withName(R.string.documents).withIcon(R.drawable.documents_icon));
+                mainDraggableItems.add(new CustomDrawerItem(15, mainDraggableItems.isEmpty() ? -48 : 0).withIdentifier(2).withName(R.string.files).withIcon(R.drawable.documents_icon));
             if (str.equals("analytics"))
                 mainDraggableItems.add(new CustomDrawerItem(15, mainDraggableItems.isEmpty() ? -48 : 0).withIdentifier(5).withName(R.string.analystics).withIcon(R.drawable.graphs_icon));
         }

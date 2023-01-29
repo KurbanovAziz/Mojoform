@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main_content"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -28,7 +29,8 @@
             android:layout_height="50dp"
             android:layout_alignBottom="@+id/header_background"
             android:orientation="horizontal"
-            android:visibility="gone">
+            android:visibility="gone"
+            tools:visibility="visible">
 
             <FrameLayout
                 android:id="@+id/search_back_btn"
@@ -50,9 +52,9 @@
                 android:layout_height="30dp"
                 android:layout_gravity="bottom"
                 android:layout_marginRight="22dp"
+                android:gravity="center"
                 android:layout_marginBottom="7.6dp"
-                app:tint="@color/grey"
-                android:background="@drawable/grey_search_block"
+                android:background="@drawable/bg_search_block"
                 android:orientation="horizontal"
                 android:paddingLeft="15dp"
                 android:paddingRight="10dp">
@@ -66,17 +68,19 @@
                     android:ellipsize="end"
                     android:gravity="center_vertical"
                     android:inputType="text"
+                    android:hint="@string/search"
+                    android:textColorHint="@color/light_grey"
                     android:maxLines="1"
                     android:scrollHorizontally="true"
                     android:textSize="15sp" />
 
                 <ImageView
                     android:id="@+id/search_reset"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
                     android:adjustViewBounds="true"
-                    android:padding="7dp"
-                    android:src="@drawable/delete_icon" />
+                    app:tint="@color/light_grey"
+                    android:src="@drawable/ic_close_ripple_grey" />
 
             </LinearLayout>
         </LinearLayout>
@@ -106,8 +110,8 @@
                     android:layout_height="20dp"
                     android:layout_gravity="bottom|center_horizontal"
                     android:adjustViewBounds="true"
-                    app:tint="@color/grey"
-                    android:src="@drawable/back_arrow_icon" />
+                    android:src="@drawable/back_arrow_icon"
+                    app:tint="@color/grey" />
             </FrameLayout>
 
             <FrameLayout
@@ -122,8 +126,8 @@
 
                     android:layout_gravity="bottom|center_horizontal"
                     android:adjustViewBounds="true"
-                    app:tint="@color/grey"
-                    android:src="@drawable/sandwich_icon" />
+                    android:src="@drawable/sandwich_icon"
+                    app:tint="@color/grey" />
 
                 <View
                     android:id="@+id/vDrawerBadge"
@@ -152,7 +156,7 @@
                     android:layout_marginBottom="-0.8dp"
                     android:ellipsize="end"
                     android:maxLines="1"
-                    android:text="@string/documents"
+                    android:text="@string/files"
                     android:textAllCaps="true"
                     android:textColor="@color/grey"
                     android:textSize="18sp" />
@@ -181,10 +185,10 @@
                     android:id="@+id/list_grid_icon"
                     android:layout_width="20dp"
                     android:layout_height="20dp"
-                    app:tint="@color/grey"
                     android:layout_gravity="bottom|right"
                     android:adjustViewBounds="true"
-                    android:src="@drawable/grid_icon" />
+                    android:src="@drawable/grid_icon"
+                    app:tint="@color/grey" />
             </FrameLayout>
 
             <FrameLayout
@@ -196,10 +200,10 @@
                 <ImageView
                     android:layout_width="20dp"
                     android:layout_height="20dp"
-                    app:tint="@color/grey"
                     android:layout_gravity="bottom|right"
                     android:adjustViewBounds="true"
-                    android:src="@drawable/search_icon" />
+                    android:src="@drawable/search_icon"
+                    app:tint="@color/grey" />
             </FrameLayout>
 
             <FrameLayout
@@ -216,6 +220,7 @@
                     android:adjustViewBounds="true"
                     android:src="@drawable/bell"
                     app:tint="@color/grey" />
+
                 <View
                     android:id="@+id/vNotificationButtonBadge"
                     android:layout_width="6dp"
@@ -235,10 +240,10 @@
                 <ImageView
                     android:layout_width="20dp"
                     android:layout_height="19dp"
-                    app:tint="@color/grey"
                     android:layout_gravity="bottom|right"
                     android:adjustViewBounds="true"
-                    android:src="@drawable/download_icon" />
+                    android:src="@drawable/group_by_icon"
+                    app:tint="@color/grey" />
 
                 <org.dev_alex.mojo_qa.mojo.custom_views.MultiSpinner
                     android:id="@+id/spin"
@@ -251,18 +256,18 @@
             <FrameLayout
                 android:id="@+id/qr_btn"
                 android:layout_width="40dp"
-                app:tint="@color/grey"
                 android:layout_height="match_parent"
-                android:paddingBottom="12dp">
+                android:paddingBottom="12dp"
+                app:tint="@color/grey">
 
                 <ImageView
                     android:layout_width="20dp"
                     android:layout_height="20dp"
-                    app:tint="@color/grey"
                     android:layout_gravity="bottom|right"
                     android:layout_marginHorizontal="5dp"
                     android:adjustViewBounds="true"
-                    android:src="@drawable/qr_button_icon" />
+                    android:src="@drawable/qr_button_icon"
+                    app:tint="@color/grey" />
             </FrameLayout>
 
             <androidx.legacy.widget.Space
@@ -279,15 +284,17 @@
                 android:id="@+id/container"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent" />
+
             <androidx.cardview.widget.CardView
                 android:id="@+id/nowifi"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:layout_gravity="right"
                 android:layout_marginTop="20dp"
                 android:layout_marginRight="40dp"
-                android:layout_width="wrap_content"
                 app:cardBackgroundColor="#EDEDED"
-                app:cardCornerRadius="15dp"
-                android:layout_height="wrap_content">
+                app:cardCornerRadius="15dp">
+
                 <ImageView
                     android:layout_width="150dp"
                     android:layout_height="50dp"
@@ -302,6 +309,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:visibility="gone" />
+
     </RelativeLayout>
 
 
