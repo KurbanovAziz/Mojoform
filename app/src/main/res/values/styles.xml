@@ -195,4 +195,52 @@
         <item name="android:maxWidth">200dp</item>
     </style>
 
+    <style name="AppTheme.ShapeAppearanceOverlay.Rounded" parent="">
+        <item name="cornerSize">50%</item>
+    </style>
+
+    <style name="AppTheme.TextInputLayout" parent="Widget.MaterialComponents.TextInputLayout.FilledBox">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="hintEnabled">false</item>
+        <item name="boxStrokeWidth">0dp</item>
+        <item name="boxStrokeWidthFocused">0dp</item>
+    </style>
+
+    <style name="AppTheme.TextInputLayout.DropDown" parent="Widget.MaterialComponents.TextInputLayout.FilledBox.ExposedDropdownMenu">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="hintEnabled">false</item>
+        <item name="boxStrokeWidth">0dp</item>
+        <item name="boxStrokeWidthFocused">0dp</item>
+        <item name="endIconTint">@null</item>
+    </style>
+
+    <style name="AppTheme.TextInput" parent="">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">45dp</item>
+        <item name="android:padding">0dp</item>
+        <item name="android:textColor">@color/textGrey</item>
+        <item name="android:textSize">17sp</item>
+        <item name="android:fontFamily">@font/sf_ui_medium</item>
+    </style>
+
+    <style name="AppTheme.TextInputEditText" parent="AppTheme.TextInput">
+        <item name="android:inputType">text|textMultiLine</item>
+        <item name="android:textCursorDrawable">@drawable/cursor</item>
+    </style>
+
+    <style name="AppTheme.TextInput.DropDown" parent="AppTheme.TextInput">
+        <item name="android:background">@drawable/bg_stroked</item>
+        <item name="android:inputType">none</item>
+    </style>
+
+    <style name="AppTheme.TextInputEditText.Stroked.Top" parent="AppTheme.TextInputEditText">
+        <item name="android:background">@drawable/bg_stroked_top</item>
+    </style>
+
+    <style name="AppTheme.TextInputEditText.Stroked.Bottom" parent="AppTheme.TextInputEditText">
+        <item name="android:background">@drawable/bg_stroked_bottom</item>
+    </style>
+
 </resources>

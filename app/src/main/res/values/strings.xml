@@ -295,4 +295,13 @@
     <string name="dialog_comments_time_year_addition">года</string>
     <string name="dialog_comments_time_addition">в</string>
 
+    <!--    Экран 'Редактирование профиля'-->
+    <string name="edit_profile_language_selection">Выбор языка</string>
+
+    <!--    Interesting locales-->
+    <string name="locale_tag_1" translatable="false">en-US</string>
+    <string name="locale_tag_2" translatable="false">es</string>
+    <string name="locale_tag_3" translatable="false">ru</string>
+    <string name="locale_tag_4" translatable="false">uk</string>
+
 </resources>

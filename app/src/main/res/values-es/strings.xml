@@ -293,4 +293,7 @@
     <string name="dialog_comments_time_year_addition">año</string>
     <string name="dialog_comments_time_addition">a las</string>
 
+    <!--    Pantalla 'de edición de perfil'-->
+    <string name="edit_profile_language_selection">Selección de idioma</string>
+
 </resources>

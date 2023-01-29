@@ -292,4 +292,7 @@
     <string name="dialog_comments_time_year_addition">року</string>
     <string name="dialog_comments_time_addition">о</string>
 
+    <!--    Екран 'Редагування профілю'-->
+    <string name="edit_profile_language_selection">Вибір мови</string>
+
 </resources>
