@@ -41,8 +41,6 @@ public class RequestService {
         RequestBody body = RequestBody.create(JSON, jsonStr);
         Request.Builder requestBuilder = new Request.Builder().url(url).post(body)
                 .addHeader("Content-Type", "application/json");
-        //.addHeader("Authorization", Credentials.basic(Data.getTaskAuthLogin(), Data.taskAuthPass));
-
         Request request = requestBuilder.build();
         Log.d("mojo-log", "send file to server. request: " + request.toString());
         return client.newCall(request).execute();

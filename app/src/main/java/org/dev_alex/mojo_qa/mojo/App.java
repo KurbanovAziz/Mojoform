@@ -34,12 +34,14 @@ public class App extends Application {
                 host = "https://system.mojoform.com";
                 host = "https://system.mojoform.com";
                 host = "https://system.mojo2.ru";
+
                 break;
 
             case "debug_flavor":
                 host = "https://mojo-qa.dev-alex.org";
                 host = "https://system.mojoform.com";
                 host = "https://system.mojo2.ru";
+
 
                 break;
 
@@ -48,11 +50,13 @@ public class App extends Application {
                 host = "https://system.mojoform.com";
                 host = "https://system.mojo2.ru";
 
+
                 break;
 
             default:
                 host = "https://system.mojoform.com";
                 host = "https://system.mojo2.ru";
+
                 break;
         }
 

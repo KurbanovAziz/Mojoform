@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.media.Image;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.InputType;
@@ -32,9 +33,6 @@ import androidx.fragment.app.FragmentActivity;
 import com.afollestad.materialdialogs.GravityEnum;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.bumptech.glide.Glide;
-import com.darsh.multipleimageselect.activities.AlbumSelectActivity;
-import com.darsh.multipleimageselect.helpers.Constants;
-import com.darsh.multipleimageselect.models.Image;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.android.material.textfield.TextInputEditText;
 
@@ -63,6 +61,8 @@ public class EditProfileFragment extends Fragment {
 
     private View rootView;
     private ProgressDialog loopDialog;
+    private static final int REQUEST_CODE = 1;
+
 
     public static EditProfileFragment newInstance() {
         return new EditProfileFragment();
@@ -94,13 +94,6 @@ public class EditProfileFragment extends Fragment {
         super.onActivityResult(requestCode, resultCode, data);
 
         User currentUser = LoginHistoryService.getCurrentUser();
-        if (requestCode == Constants.REQUEST_CODE && resultCode == RESULT_OK && data != null) {
-            ArrayList<Image> images = data.getParcelableArrayListExtra(Constants.INTENT_EXTRA_IMAGES);
-            for (Image image : images) {
-                File resFile = processImageFile(new File(image.path));
-                new UpdateAvatarTask(resFile, currentUser.username).execute();
-            }
-        }
 
         if (requestCode == PHOTO_REQUEST_CODE && resultCode == RESULT_OK && data != null) {
             String photoPath = data.getStringExtra("photo_path");
@@ -108,6 +101,11 @@ public class EditProfileFragment extends Fragment {
             File resFile = processImageFile(new File(photoPath));
             new UpdateAvatarTask(resFile, currentUser.username).execute();
         }
+        else if (resultCode == RESULT_OK && data != null) {
+            new UpdateAvatarTask(new File(data.getData().getPath()), currentUser.username).execute();
+        }
+
+
     }
 
     @Override
@@ -121,7 +119,6 @@ public class EditProfileFragment extends Fragment {
     private void setupHeader() {
         ((TextView) getActivity().findViewById(R.id.title)).setText(getString(R.string.profile));
         getActivity().findViewById(R.id.back_btn).setVisibility(View.VISIBLE);
-
         getActivity().findViewById(R.id.grid_btn).setVisibility(View.GONE);
         getActivity().findViewById(R.id.sandwich_btn).setVisibility(View.GONE);
         getActivity().findViewById(R.id.group_by_btn).setVisibility(View.GONE);
@@ -253,9 +250,9 @@ public class EditProfileFragment extends Fragment {
                 .negativeText(R.string.gallery)
                 .onPositive((dialog, which) -> CustomCamera2Activity.startForResult(this, PHOTO_REQUEST_CODE))
                 .onNegative((dialog, which) -> {
-                    Intent intent = new Intent(getContext(), AlbumSelectActivity.class);
-                    intent.putExtra(Constants.INTENT_EXTRA_LIMIT, 1);
-                    startActivityForResult(intent, Constants.REQUEST_CODE);
+                    Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+                    intent.setType("image/*");
+                    startActivityForResult(intent, REQUEST_CODE);
                 })
                 .build()
                 .show();
