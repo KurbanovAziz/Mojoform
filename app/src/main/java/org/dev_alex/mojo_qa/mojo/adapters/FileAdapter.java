@@ -20,6 +20,9 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.core.content.FileProvider;
+import androidx.recyclerview.widget.RecyclerView;
+
 import org.dev_alex.mojo_qa.mojo.R;
 import org.dev_alex.mojo_qa.mojo.fragments.DocumentsFragment;
 import org.dev_alex.mojo_qa.mojo.models.File;
@@ -30,9 +33,6 @@ import org.dev_alex.mojo_qa.mojo.services.Utils;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Locale;
-
-import androidx.core.content.FileProvider;
-import androidx.recyclerview.widget.RecyclerView;
 
 import okhttp3.Response;
 import okio.BufferedSink;
@@ -52,7 +52,6 @@ public class FileAdapter extends RecyclerView.Adapter<FileAdapter.FileViewHolder
 
     static class FileViewHolder extends RecyclerView.ViewHolder {
         TextView fileName;
-        TextView fileDate;
         ImageView moreBtn;
         ImageView fileIcon;
         ImageView filePreview;
@@ -62,7 +61,6 @@ public class FileAdapter extends RecyclerView.Adapter<FileAdapter.FileViewHolder
         FileViewHolder(View itemView) {
             super(itemView);
             fileName = (TextView) itemView.findViewById(R.id.file_name);
-            fileDate = (TextView) itemView.findViewById(R.id.file_date);
             moreBtn = (ImageView) itemView.findViewById(R.id.more_btn);
             fileIcon = (ImageView) itemView.findViewById(R.id.file_icon);
             filePreview = (ImageView) itemView.findViewById(R.id.file_preview);
@@ -99,7 +97,7 @@ public class FileAdapter extends RecyclerView.Adapter<FileAdapter.FileViewHolder
         if (isGrid)
             v = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.card_file_grid, viewGroup, false);
         else
-            v = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.card_file, viewGroup, false);
+            v = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.card_file_updated, viewGroup, false);
 
         return new FileViewHolder(v);
     }
@@ -130,14 +128,14 @@ public class FileAdapter extends RecyclerView.Adapter<FileAdapter.FileViewHolder
                         parentFragment.getResources().getDisplayMetrics());
             }
             viewHolder.filePreview.setLayoutParams(imageLayoutParams);
-        } else {
-            viewHolder.fileDate.setText(sdf.format(file.createdAt));
+        }
+//       else {
 //            if (selectionModeEnabled)
 //                viewHolder.card.setBackgroundResource(selectedIds.contains(file.id) ?
 //                        R.drawable.file_card_selection_checked : R.drawable.file_card_selection_unchecked);
 //            else
 //                viewHolder.card.setBackgroundResource(R.drawable.task_card_background);
-        }
+//        }
 
         String mimeType = file.nodeType;
         switch (mimeType) {
@@ -209,9 +207,9 @@ public class FileAdapter extends RecyclerView.Adapter<FileAdapter.FileViewHolder
             return true;
         });
 
-        viewHolder.moreBtn.setVisibility(View.VISIBLE);
+        viewHolder.moreBtn.setVisibility(View.GONE);
         if ((LoginHistoryService.getCurrentUser().is_manager == null || !LoginHistoryService.getCurrentUser().is_manager) && (LoginHistoryService.getCurrentUser().is_orgowner == null || !LoginHistoryService.getCurrentUser().is_orgowner)) {
-            viewHolder.moreBtn.setVisibility(View.INVISIBLE);
+            viewHolder.moreBtn.setVisibility(View.GONE);
         }
     }
 

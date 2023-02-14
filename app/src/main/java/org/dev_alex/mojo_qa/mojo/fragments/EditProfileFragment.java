@@ -1,5 +1,7 @@
 package org.dev_alex.mojo_qa.mojo.fragments;
 
+import static android.app.Activity.RESULT_OK;
+
 import android.Manifest;
 import android.app.Activity;
 import android.app.ProgressDialog;
@@ -9,14 +11,23 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.text.InputType;
 import android.text.TextUtils;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.EditText;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
 
 import com.afollestad.materialdialogs.GravityEnum;
 import com.afollestad.materialdialogs.MaterialDialog;
@@ -25,6 +36,7 @@ import com.darsh.multipleimageselect.activities.AlbumSelectActivity;
 import com.darsh.multipleimageselect.helpers.Constants;
 import com.darsh.multipleimageselect.models.Image;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.android.material.textfield.TextInputEditText;
 
 import org.dev_alex.mojo_qa.mojo.App;
 import org.dev_alex.mojo_qa.mojo.R;
@@ -39,19 +51,12 @@ import org.json.JSONObject;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Locale;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentActivity;
+import java.util.Set;
 
 import okhttp3.MediaType;
 import okhttp3.Response;
-
-import static android.app.Activity.RESULT_OK;
 
 public class EditProfileFragment extends Fragment {
     private final int PHOTO_REQUEST_CODE = 11;
@@ -74,10 +79,10 @@ public class EditProfileFragment extends Fragment {
             initDialog();
             bindData();
             User currentUser = LoginHistoryService.getCurrentUser();
-            TextView textView = rootView.findViewById(R.id.position);
+            TextView textView = rootView.findViewById(R.id.fragment_edit_profile_position);
             textView.setText(currentUser.description);
             rootView.findViewById(R.id.btSave).setOnClickListener(v -> onSaveClick());
-            rootView.findViewById(R.id.btAvatar).setOnClickListener(v -> onChangeAvatarClick());
+            rootView.findViewById(R.id.fragment_edit_profile_avatar).setOnClickListener(v -> onChangeAvatarClick());
         }
 
         setupHeader();
@@ -140,17 +145,59 @@ public class EditProfileFragment extends Fragment {
         updateAvatar();
 
         User currentUser = LoginHistoryService.getCurrentUser();
-        ((EditText) rootView.findViewById(R.id.etName)).setText(currentUser.firstName);
-        ((EditText) rootView.findViewById(R.id.etSurName)).setText(currentUser.lastName);
+        ((TextInputEditText) rootView.findViewById(R.id.fragment_edit_profile_etName)).setText(currentUser.firstName);
+        ((TextInputEditText) rootView.findViewById(R.id.fragment_edit_profile_etSurName)).setText(currentUser.lastName);
+
+        AutoCompleteTextView languageSelectionView = rootView.findViewById(R.id.fragment_edit_profile_language_selection);
+        setupDropDownList(languageSelectionView);
+    }
+
+    private void setupDropDownList(AutoCompleteTextView view) {
+        view.setInputType(InputType.TYPE_NULL);
+        fillDropDownMenuWithValues(view);
+        setDefaultLanguageOnDropDown(view);
+    }
+
+    private void setDefaultLanguageOnDropDown(AutoCompleteTextView view) {
+        Locale locale = getResources().getConfiguration().getLocales().get(0);
+        String localeName = locale.getDisplayLanguage(locale);
+        String formatted = Character.toUpperCase(localeName.charAt(0)) + localeName.substring(1);
+        view.setText(formatted, false);
+    }
+
+    private void fillDropDownMenuWithValues(AutoCompleteTextView view) {
+        String[] items = getLocaleSet().toArray(new String[]{});
+        view.setAdapter(new ArrayAdapter<>(requireActivity(), android.R.layout.simple_list_item_1, items));
+    }
+
+    private Set<String> getLocaleSet() {
+        Set<String> locales = new HashSet<>();
+
+        for (Locale l : Locale.getAvailableLocales()) {
+            if (l.toLanguageTag().equalsIgnoreCase(getString(R.string.locale_tag_1))
+                    ||
+                    l.toLanguageTag().equalsIgnoreCase(getString(R.string.locale_tag_2))
+                    ||
+                    l.toLanguageTag().equalsIgnoreCase(getString(R.string.locale_tag_3))
+                    ||
+                    l.toLanguageTag().equalsIgnoreCase(getString(R.string.locale_tag_4))) {
+
+                String language = l.getDisplayLanguage(l);
+                String capitalized = Character.toUpperCase(language.charAt(0)) + language.substring(1);
+
+                locales.add(capitalized);
+            }
+        }
+        return locales;
     }
 
     private void updateAvatar() {
         User currentUser = LoginHistoryService.getCurrentUser();
 
         if (currentUser.has_avatar)
-            new DownloadUserAvatar((ImageView) rootView.findViewById(R.id.profile_image)).execute();
+            new DownloadUserAvatar(rootView.findViewById(R.id.fragment_edit_profile_avatar)).execute();
         else {
-            rootView.findViewById(R.id.profile_image).setVisibility(View.GONE);
+            rootView.findViewById(R.id.fragment_edit_profile_etSurName).setVisibility(View.GONE);
 
             String userInitials;
             if (TextUtils.isEmpty(currentUser.firstName) && TextUtils.isEmpty(currentUser.lastName))
@@ -160,13 +207,12 @@ public class EditProfileFragment extends Fragment {
                         "%s%s", TextUtils.isEmpty(currentUser.firstName) ? "" : currentUser.firstName.charAt(0),
                         TextUtils.isEmpty(currentUser.lastName) ? "" : currentUser.lastName.charAt(0));
 
-            ((TextView) rootView.findViewById(R.id.user_initials)).setText(userInitials);
         }
     }
 
     private void onSaveClick() {
-        String name = ((EditText) rootView.findViewById(R.id.etName)).getText().toString();
-        String surname = ((EditText) rootView.findViewById(R.id.etSurName)).getText().toString();
+        String name = ((TextInputEditText) rootView.findViewById(R.id.fragment_edit_profile_etName)).getText().toString();
+        String surname = ((TextInputEditText) rootView.findViewById(R.id.fragment_edit_profile_etSurName)).getText().toString();
         String userName = LoginHistoryService.getCurrentUser().username;
         new SaveUserDataTask(name, surname, userName).execute();
     }
@@ -302,7 +348,7 @@ public class EditProfileFragment extends Fragment {
             super.onPreExecute();
             Glide.with(getContext())
                     .load(avatar)
-                    .into(((ImageView) rootView.findViewById(R.id.profile_image)));
+                    .into(((ImageView) rootView.findViewById(R.id.fragment_edit_profile_etSurName)));
 
             loopDialog.show();
         }

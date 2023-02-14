@@ -12,10 +12,8 @@ import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
-import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -31,19 +29,28 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.core.content.FileProvider;
+import androidx.core.widget.NestedScrollView;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.dev_alex.mojo_qa.mojo.R;
 import org.dev_alex.mojo_qa.mojo.activities.AuthActivity;
 import org.dev_alex.mojo_qa.mojo.adapters.FileAdapter;
 import org.dev_alex.mojo_qa.mojo.adapters.FolderAdapter;
-import org.dev_alex.mojo_qa.mojo.adapters.ResultGraphAdapter;
 import org.dev_alex.mojo_qa.mojo.custom_views.MaxHeightRecycleView;
 import org.dev_alex.mojo_qa.mojo.custom_views.RelativeLayoutWithPopUp;
 import org.dev_alex.mojo_qa.mojo.fragments.create_task.CreateTaskInfoFragment;
 import org.dev_alex.mojo_qa.mojo.models.File;
 import org.dev_alex.mojo_qa.mojo.models.FileSystemStackEntry;
-import org.dev_alex.mojo_qa.mojo.models.Indicator;
 import org.dev_alex.mojo_qa.mojo.services.BitmapCacheService;
 import org.dev_alex.mojo_qa.mojo.services.BlurHelper;
 import org.dev_alex.mojo_qa.mojo.services.LoginHistoryService;
@@ -56,17 +63,6 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.Locale;
 import java.util.UUID;
-
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AlertDialog;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-import androidx.core.content.FileProvider;
-import androidx.core.widget.NestedScrollView;
-import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.GridLayoutManager;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
 import okhttp3.Response;
 import okio.BufferedSink;
@@ -229,13 +225,13 @@ public class DocumentsFragment extends Fragment implements FileAdapter.DocumentC
     }
 
     private void setupHeader() {
-        ((TextView) getActivity().findViewById(R.id.title)).setText(getString(R.string.documents));
+        ((TextView) getActivity().findViewById(R.id.title)).setText(getString(R.string.files));
         getActivity().findViewById(R.id.path_text).setVisibility(View.GONE);
         getActivity().findViewById(R.id.title).setVisibility(View.VISIBLE);
         getActivity().findViewById(R.id.back_btn).setVisibility(View.GONE);
         getActivity().findViewById(R.id.notification_btn).setVisibility(View.GONE);
         getActivity().findViewById(R.id.qr_btn).setVisibility(View.GONE);
-        getActivity().findViewById(R.id.grid_btn).setVisibility(View.VISIBLE);
+        getActivity().findViewById(R.id.grid_btn).setVisibility(View.GONE);
         getActivity().findViewById(R.id.sandwich_btn).setVisibility(View.VISIBLE);
         getActivity().findViewById(R.id.group_by_btn).setVisibility(View.VISIBLE);
         getActivity().findViewById(R.id.search_btn).setVisibility(View.VISIBLE);
@@ -270,6 +266,7 @@ public class DocumentsFragment extends Fragment implements FileAdapter.DocumentC
             }
         });
     }
+
     private void updateHeader() {
         if (getActivity() != null) {
             pathTexts.clear();
@@ -287,7 +284,7 @@ public class DocumentsFragment extends Fragment implements FileAdapter.DocumentC
                 getActivity().findViewById(R.id.sandwich_btn).setVisibility(View.GONE);
                 getActivity().findViewById(R.id.back_btn).setVisibility(View.VISIBLE);
             } else {
-                ((TextView) getActivity().findViewById(R.id.title)).setText(R.string.documents);
+                ((TextView) getActivity().findViewById(R.id.title)).setText(R.string.files);
                 getActivity().findViewById(R.id.title).setVisibility(View.VISIBLE);
                 getActivity().findViewById(R.id.path_text).setVisibility(View.GONE);
                 getActivity().findViewById(R.id.sandwich_btn).setVisibility(View.VISIBLE);
@@ -317,7 +314,7 @@ public class DocumentsFragment extends Fragment implements FileAdapter.DocumentC
             folderRecyclerView.setNestedScrollingEnabled(!scrollView.canScrollVertically(-1));
         });
 
-       //rootView.findViewById(R.id.create_dir_btn).setOnClickListener(v -> showCreateDirDialog());
+        //rootView.findViewById(R.id.create_dir_btn).setOnClickListener(v -> showCreateDirDialog());
 
         selectionMenu.findViewById(R.id.selection_close_btn).setOnClickListener(v -> stopSelectionMode());
 
@@ -401,9 +398,10 @@ public class DocumentsFragment extends Fragment implements FileAdapter.DocumentC
                 if (pathTexts.size() != 0) {
                     PopupMenu menu = new PopupMenu(getContext(), title);
                     int i = 0;
-                    for (String path : pathTexts){
-                    menu.getMenu().add(i, i, i, path);
-                    i++;}
+                    for (String path : pathTexts) {
+                        menu.getMenu().add(i, i, i, path);
+                        i++;
+                    }
                     menu.setOnDismissListener(new PopupMenu.OnDismissListener() {
                         @Override
                         public void onDismiss(PopupMenu menu) {
@@ -498,6 +496,11 @@ public class DocumentsFragment extends Fragment implements FileAdapter.DocumentC
             rootView.findViewById(R.id.files_recycler_view).setVisibility(View.VISIBLE);
         }
 
+        boolean isOrganization = false;
+        for (File f : folders) {
+            if (isOrganization = f.nodeType.equals("cm:org")) break;
+        }
+
         if (folders == null || folders.isEmpty()) {
             rootView.findViewById(R.id.folders_block).setVisibility(View.GONE);
             rootView.findViewById(R.id.folders_recycler_view).setVisibility(View.GONE);
@@ -505,7 +508,7 @@ public class DocumentsFragment extends Fragment implements FileAdapter.DocumentC
             ((MaxHeightRecycleView) filesRecyclerView).setMaxHeightEnabled(false);
             filesParams.height = (int) (getResources().getDisplayMetrics().heightPixels * 0.84);
         } else {
-            rootView.findViewById(R.id.folders_block).setVisibility(View.VISIBLE);
+            rootView.findViewById(R.id.folders_block).setVisibility(isOrganization ? View.GONE : View.VISIBLE);
             rootView.findViewById(R.id.folders_recycler_view).setVisibility(View.VISIBLE);
         }
 
@@ -623,9 +626,9 @@ public class DocumentsFragment extends Fragment implements FileAdapter.DocumentC
     }
 
 
-    private boolean popFileStack( int i) {
+    private boolean popFileStack(int i) {
         if (foldersStack != null && foldersStack.size() > 1) {
-            for (int j = 1; j < i; j++){
+            for (int j = 1; j < i; j++) {
                 foldersStack.remove(foldersStack.size() - 1);
             }
             updateHeader();

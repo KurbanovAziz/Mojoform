@@ -251,6 +251,7 @@
     <string name="three_page1">Tareas periódicas y ocasionales que tienen un plazo de ejecución\nLas tareas permanentes y enlazadas se realizan por situación\n\nLas tareas consisten en:\nBloques de información\nCheque box para marcas\nPreguntas de respuesta\nAgregar fotos, vídeos y archivos\nDiapositivas de instalación de datos\nCampos de comentario\nVentanas de entrada de plan y hecho\n\nSi es necesario, se puede aplazar y completar la tarea más adelante.</string>
     <string name="four_page1">En Documentos, lea, consulte y escuche el material disponible\n\nEn la sección Notificaciones se presentan informes sobre los resultados de las tareas terminadas y señales de incumplimiento de plazos\n\nEn la sección Resultados se muestran Indicadores con datos dinámicos de día, semana, mes y año, que pueden ser comentados y analizados\n\nEn Administración de tareas, puede editar y asignar nuevas tareas a los empleados\n\n</string>
     <string name="start">Comenzar</string>
+    <string name="search">Buscar</string>
 
     <string-array name="day_names">
         <item>Do</item>
@@ -288,5 +289,15 @@
 
     <!--    Advertencias-->
     <string name="err_task_status_not_set">Especificar el estado de la tarea</string>
+
+    <!--    Cuadro de diálogo 'Comentarios'-->
+    <string name="dialog_comments_time_year_addition">año</string>
+    <string name="dialog_comments_time_addition">a las</string>
+
+    <!--    Pantalla 'de edición de perfil'-->
+    <string name="edit_profile_language_selection">Selección de idioma</string>
+
+    <!--    Pantalla 'Archivos'-->
+    <string name="warning_files_access">El administrador de la organización\nconcede acceso a los archivos</string>
 
 </resources>

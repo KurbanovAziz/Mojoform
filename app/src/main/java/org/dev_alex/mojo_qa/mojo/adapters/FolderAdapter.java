@@ -7,6 +7,8 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.recyclerview.widget.RecyclerView;
+
 import org.dev_alex.mojo_qa.mojo.R;
 import org.dev_alex.mojo_qa.mojo.fragments.DocumentsFragment;
 import org.dev_alex.mojo_qa.mojo.models.File;
@@ -14,10 +16,12 @@ import org.dev_alex.mojo_qa.mojo.services.LoginHistoryService;
 
 import java.util.ArrayList;
 
-import androidx.recyclerview.widget.RecyclerView;
-
 
 public class FolderAdapter extends RecyclerView.Adapter<FolderAdapter.FolderViewHolder> {
+
+    private static final int VIEW_TYPE_ORG = 0;
+    private static final int VIEW_TYPE_FOLDER = 1;
+
     private DocumentsFragment parentFragment;
     private ArrayList<File> folders;
     private boolean isGrid;
@@ -59,14 +63,28 @@ public class FolderAdapter extends RecyclerView.Adapter<FolderAdapter.FolderView
     }
 
     @Override
-    public FolderViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
-        View v;
+    public int getItemViewType(int position) {
+        return folders.get(position).nodeType.equals("cm:org") ? 0 : 1;
+    }
+
+    @Override
+    public FolderViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
+        View v = null;
 //        if (isGrid)
 //            v = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.card_folder_grid, viewGroup, false);
 //        else
 //            v = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.card_folder, viewGroup, false);
         //это вроде бесполезная хрень, но на всякий оставлю. Хотя до этого вроде 2 одинаковых xml было
-        v = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.card_folder, viewGroup, false);
+
+        switch (viewType) {
+            case 0:
+                v = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.card_folder, viewGroup, false);
+                break;
+            case 1:
+                v = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.card_folder_updated, viewGroup, false);
+                break;
+        }
+
         return new FolderViewHolder(v);
     }
 

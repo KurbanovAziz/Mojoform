@@ -40,15 +40,13 @@
 
     </LinearLayout>
 
-    <Button
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/save"
-        android:layout_width="120dp"
-        android:layout_height="60dp"
+        style="@style/AppTheme.Button.Outlined.NoStroked"
+        android:layout_marginBottom="20dp"
         android:layout_gravity="bottom|center"
-        android:background="@drawable/rounded_view"
+        android:backgroundTint="@color/colorAccent"
         android:text="@string/choose"
-        android:textColor="#EBE1E1E1"
-
-        android:textSize="17dp" />
+        android:textColor="@color/white" />
 
 </FrameLayout>

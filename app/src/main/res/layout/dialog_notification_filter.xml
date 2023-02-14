@@ -1,41 +1,41 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    xmlns:tools="http://schemas.android.com/tools"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    android:layout_height="wrap_content">
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:layout_marginRight="10dp"
         android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
         android:orientation="vertical">
 
         <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
 
-            android:layout_marginEnd="20dp"
-            app:cardCornerRadius="10dp"
+            android:layout_gravity="center"
             android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"
             app:cardBackgroundColor="#FFFFFF"
-            android:layout_gravity="center">
+            app:cardCornerRadius="10dp">
 
             <LinearLayout
-                android:clickable="true"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_marginLeft="10dp"
                 android:layout_marginTop="10dp"
                 android:layout_marginRight="10dp"
-                android:orientation="vertical"
-                android:focusable="true">
+                android:clickable="true"
+                android:focusable="true"
+                android:orientation="vertical">
 
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
-                    android:orientation="horizontal"
-                    android:layout_height="wrap_content">
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
 
                     <TextView
                         android:id="@+id/label"
@@ -64,52 +64,52 @@
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
 
-
                 <EditText
                     android:layout_width="wrap_content"
                     android:layout_height="15dp"
                     android:text="@string/search_by_name"
-                    android:visibility="invisible"
                     android:textColor="#433A4D"
                     android:textSize="16dp"
-                    android:textStyle="bold" />
+                    android:textStyle="bold"
+                    android:visibility="invisible" />
+
                 <RadioGroup
                     android:id="@+id/read_group"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:gravity="left"
                     android:layout_marginBottom="10dp"
                     android:checkedButton="@+id/radio_all_read"
+                    android:gravity="left"
                     android:orientation="vertical">
 
                     <RadioButton
                         android:id="@+id/radio_not_read"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="@string/not_read"
                         android:layout_gravity="left"
-                        android:textColor="@color/textGrey"
+                        android:layout_weight="1"
                         android:buttonTint="@color/accent"
+                        android:text="@string/not_read"
 
-                        android:layout_weight="1" />
+                        android:textColor="@color/textGrey" />
 
                     <RadioButton
                         android:id="@+id/radio_read"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="@string/readed"
-                        android:textColor="@color/textGrey"
+                        android:layout_weight="1"
                         android:buttonTint="@color/accent"
-                        android:layout_weight="1" />
+                        android:text="@string/readed"
+                        android:textColor="@color/textGrey" />
 
                     <RadioButton
                         android:id="@+id/radio_all_read"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:textColor="@color/textGrey"
+                        android:layout_weight="1"
                         android:buttonTint="@color/accent"
                         android:text="@string/all"
-                        android:layout_weight="1" />
+                        android:textColor="@color/textGrey" />
                 </RadioGroup>
 
                 <View
@@ -117,6 +117,7 @@
                     android:layout_height="1dp"
                     android:layout_marginBottom="10dp"
                     android:background="@color/textGrey" />
+
                 <RadioGroup
                     android:id="@+id/orderGroup"
                     android:layout_width="match_parent"
@@ -130,25 +131,27 @@
                         android:id="@+id/radio_new"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="@string/new_before"
-                        android:textColor="@color/textGrey"
+                        android:layout_weight="1"
                         android:buttonTint="@color/accent"
-                        android:layout_weight="1" />
+                        android:text="@string/new_before"
+                        android:textColor="@color/textGrey" />
 
                     <RadioButton
                         android:id="@+id/radio_old"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="@string/old_before"
-                        android:textColor="@color/textGrey"
+                        android:layout_weight="1"
                         android:buttonTint="@color/accent"
-                        android:layout_weight="1" />
+                        android:text="@string/old_before"
+                        android:textColor="@color/textGrey" />
 
                 </RadioGroup>
+
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
                     android:background="#4D6A7F" />
+
                 <LinearLayout
                     android:id="@+id/calendarLL"
                     android:layout_width="match_parent"
@@ -156,22 +159,25 @@
                     android:layout_marginTop="10dp"
                     android:layout_marginBottom="10dp"
                     android:orientation="horizontal">
+
                     <ImageView
                         android:layout_width="20dp"
                         android:layout_height="20dp"
                         android:layout_gravity="center"
                         android:layout_marginLeft="5dp"
                         android:layout_marginRight="10dp"
-                        app:tint="@color/accent"
-                        android:src="@drawable/calendar"/>
+                        android:src="@drawable/calendar"
+                        app:tint="@color/accent" />
+
                     <TextView
                         android:id="@+id/calendarText"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
-                        android:textColor="@color/textGrey"
-                        android:text="@string/search_period"/>
+                        android:text="@string/search_period"
+                        android:textColor="@color/textGrey" />
                 </LinearLayout>
+
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
@@ -181,14 +187,16 @@
                     android:id="@+id/group_by_btn"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
+
                     <org.dev_alex.mojo_qa.mojo.custom_views.MultiSpinner
                         android:id="@+id/spin"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent" />
+
                     <View
                         android:layout_width="match_parent"
                         android:layout_height="40dp"
-                        android:background="#FFFFFF"/>
+                        android:background="#FFFFFF" />
 
                     <LinearLayout
                         android:layout_width="wrap_content"
@@ -196,22 +204,23 @@
                         android:layout_marginTop="10dp"
                         android:layout_marginBottom="10dp"
                         android:orientation="horizontal">
+
                         <ImageView
                             android:layout_width="20dp"
                             android:layout_height="20dp"
                             android:layout_marginLeft="5dp"
                             android:layout_marginRight="10dp"
-                            app:tint="@color/accent"
-                            android:src="@drawable/list_icon3" />
+                            android:src="@drawable/list_icon3"
+                            app:tint="@color/accent" />
+
                         <TextView
                             android:id="@+id/organisations_text"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_gravity="center"
-                            android:textColor="@color/textGrey"
-                            android:text="@string/to_organization"/>
+                            android:text="@string/to_organization"
+                            android:textColor="@color/textGrey" />
                     </LinearLayout>
-
 
 
                 </FrameLayout>
@@ -219,34 +228,25 @@
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
-                    android:background="@color/textGrey"
-                    android:layout_marginBottom="10dp"/>
-                <androidx.cardview.widget.CardView
-                    android:id="@+id/okeyBTN"
-                    android:layout_width="113dp"
-                    app:cardBackgroundColor="@color/accent"
-                    android:layout_height="30dp"
-                    app:cardCornerRadius="30dp"
-                    android:layout_gravity="center"
-                    android:src="@drawable/ok_button"
-                    android:clickable="true"
                     android:layout_marginBottom="10dp"
-                    android:focusable="true">
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:textColor="@color/white"
-                        android:layout_gravity="center"
-                        android:gravity="center"
-                        android:text="Показать"/>
-                </androidx.cardview.widget.CardView>
+                    android:background="@color/textGrey" />
 
-
-
-
-
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/okeyBTN"
+                    style="@style/AppTheme.Button.Outlined.NoStroked"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginBottom="10dp"
+                    android:gravity="center"
+                    android:text="Показать"
+                    android:textColor="@color/white"
+                    app:backgroundTint="@color/colorAccent" />
 
             </LinearLayout>
+
         </androidx.cardview.widget.CardView>
+
     </LinearLayout>
+
 </FrameLayout>

@@ -31,4 +31,6 @@
     <color name="shutter_bg">#88ff00ff</color>
 
     <color name="bg_bottom_sheet_dark">#1D1D1D</color>
+    <color name="bg_dialog_comments">#EAF2FA</color>
+
 </resources>

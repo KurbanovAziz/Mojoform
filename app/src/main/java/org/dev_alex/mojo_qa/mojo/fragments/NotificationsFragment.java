@@ -19,7 +19,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -30,7 +29,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
-import androidx.cardview.widget.CardView;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
@@ -42,6 +40,7 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.android.material.button.MaterialButton;
 import com.prolificinteractive.materialcalendarview.CalendarDay;
 import com.prolificinteractive.materialcalendarview.DayViewDecorator;
 import com.prolificinteractive.materialcalendarview.DayViewFacade;
@@ -205,7 +204,7 @@ public class NotificationsFragment extends Fragment implements NotificationAdapt
                 LinearLayout calendarLL = filterDialog.findViewById(R.id.calendarLL);
                 RadioGroup readGroup = filterDialog.findViewById(R.id.read_group);
                 RadioGroup orderGroup = filterDialog.findViewById(R.id.orderGroup);
-                CardView okeyBTN = filterDialog.findViewById(R.id.okeyBTN);
+                MaterialButton okeyBTN = filterDialog.findViewById(R.id.okeyBTN);
                 ImageView kresticBTN = filterDialog.findViewById(R.id.krestik);
                 kresticBTN.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -292,7 +291,7 @@ public class NotificationsFragment extends Fragment implements NotificationAdapt
                                 view.setBackgroundDrawable(ContextCompat.getDrawable(getContext(), R.drawable.image_ring));
                             }
                         });
-                        Button setCalendarBTN = calendarDialog.findViewById(R.id.save);
+                        MaterialButton setCalendarBTN = calendarDialog.findViewById(R.id.save);
                         setCalendarBTN.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
