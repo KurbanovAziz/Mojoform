@@ -299,5 +299,6 @@
 
     <!--    Pantalla 'Archivos'-->
     <string name="warning_files_access">El administrador de la organización\nconcede acceso a los archivos</string>
+    <string name="back">Atrás</string>
 
 </resources>

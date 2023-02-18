@@ -4,6 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="100dp"
     android:layout_marginBottom="10dp"
+    android:layout_marginTop="-20dp"
     android:fillViewport="true"
     android:scrollbars="none">
 
@@ -16,7 +17,7 @@
 
         <androidx.cardview.widget.CardView
             android:id="@+id/task_card"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="80dp"
             app:cardBackgroundColor="@color/blueGrey"
             app:cardCornerRadius="8dp">

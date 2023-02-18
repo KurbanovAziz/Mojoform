@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import okhttp3.Call;
 import okhttp3.Cookie;
 import okhttp3.CookieJar;
 import okhttp3.HttpUrl;
@@ -38,12 +39,13 @@ public class RequestService {
 
     public static Response createPostRequestWithCustomUrl(String url, String jsonStr) throws Exception {
         OkHttpClient client = createOkHttpClient();
-        RequestBody body = RequestBody.create(JSON, jsonStr);
+        RequestBody body = RequestBody.create(jsonStr, JSON);
         Request.Builder requestBuilder = new Request.Builder().url(url).post(body)
                 .addHeader("Content-Type", "application/json");
         Request request = requestBuilder.build();
         Log.d("mojo-log", "send file to server. request: " + request.toString());
-        return client.newCall(request).execute();
+        Call call = client.newCall(request);
+        return call.execute();
     }
 
     public static Response createPutRequestWithCustomUrl(String url, String jsonStr) throws Exception {
@@ -138,14 +140,12 @@ public class RequestService {
                             return oneCookie;
                         }
                     })
-                    .addInterceptor(new ChuckInterceptor(App.getContext()))
                     .build();
         else {
             return new OkHttpClient().newBuilder()
                     .connectTimeout(30, TimeUnit.SECONDS)
                     .writeTimeout(35, TimeUnit.SECONDS)
                     .readTimeout(30, TimeUnit.SECONDS)
-                    .addInterceptor(new ChuckInterceptor(App.getContext()))
                     .build();
         }
     }

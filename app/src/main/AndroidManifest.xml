@@ -8,6 +8,8 @@
         </intent>
     </queries>
 
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission
         android:name="android.permission.WRITE_EXTERNAL_STORAGE"
         tools:remove="android:maxSdkVersion" />
@@ -174,6 +176,9 @@
             android:screenOrientation="portrait"
             android:exported="true"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar.FullScreen" />
+        <service
+            android:name="org.dev_alex.mojo_qa.mojo.services.RequestService"
+            android:exported="true" />
         <activity android:name=".custom_views.camera.CustomCamera2Activity"
             android:exported="true"
             />

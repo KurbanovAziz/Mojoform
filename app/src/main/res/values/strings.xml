@@ -150,7 +150,7 @@
     <string name="date_desc">По дате (сначала новые)</string>
     <string name="name_asc">По имени</string>
     <string name="name_desc">По имени (с конца)</string>
-    <string name="executor">Исполнитель</string>
+    <string name="executor">Выполнил</string>
     <string name="finish_time">Время завершения</string>
     <string name="unknown">неизвестно</string>
     <string name="not_done_in_time">Не выполнена в срок</string>
@@ -187,6 +187,7 @@
     <string name="set_task_execution_time">Укажите время начала выполнения задачи</string>
     <string name="task_execution_period">Переодичность выполнения задачи</string>
     <string name="hours">Часы</string>
+    <string name="back">Назад</string>
     <string name="minutes">Минуты</string>
     <string name="days_short">Д</string>
     <string name="weeks_short">Н</string>

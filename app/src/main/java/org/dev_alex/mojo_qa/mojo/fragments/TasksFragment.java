@@ -317,7 +317,7 @@ public class TasksFragment extends Fragment {
             public void onCheckedChanged(RadioGroup group, @IdRes int checkedId) {
                 switch (checkedId) {
                     case R.id.ended:
-                        hideCalendarView();
+                        showCalendarView();
                         updateTaskAdapter(new TaskAdapter(TasksFragment.this, finishedTasks, true), CurrentAdapterType.FINISHED);
                         break;
 
@@ -329,10 +329,9 @@ public class TasksFragment extends Fragment {
                         break;
 
                     case R.id.permanent:
-                        showCalendarView();
                         updateTaskAdapter(new TaskAdapter(TasksFragment.this, permanentTasks, TaskAdapter.TaskType.PERMANENT), CurrentAdapterType.PERMANENT);
+                        hideCalendarView();
                         updateDate(true);
-
                         break;
                 }
             }
@@ -717,7 +716,7 @@ public class TasksFragment extends Fragment {
                         currentAdapterType = CurrentAdapterType.BUSY;
                     switch (currentAdapterType) {
                         case BUSY:
-                            hideCalendarView();
+                            showCalendarView();
                             ((RadioButton) rootView.findViewById(R.id.busy)).setChecked(true);
                             updateTaskAdapter(new TaskAdapter(TasksFragment.this, busyTasks, TaskAdapter.TaskType.BUSY), CurrentAdapterType.BUSY);
                             break;
@@ -728,7 +727,7 @@ public class TasksFragment extends Fragment {
 
                             break;
                         case PERMANENT:
-                            showCalendarView();
+                            hideCalendarView();
                             ((RadioButton) rootView.findViewById(R.id.permanent)).setChecked(true);
                             updateTaskAdapter(new TaskAdapter(TasksFragment.this, permanentTasks, TaskAdapter.TaskType.PERMANENT), CurrentAdapterType.PERMANENT);
 

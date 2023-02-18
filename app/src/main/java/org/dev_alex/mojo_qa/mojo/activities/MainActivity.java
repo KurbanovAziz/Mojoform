@@ -87,6 +87,10 @@ public class MainActivity extends AppCompatActivity {
 
         super.onCreate(null);
         setContentView(R.layout.activity_main);
+        getWindow().setFlags(
+                WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED,
+                WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED
+        );
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             getWindow().getDecorView().getWindowInsetsController().setSystemBarsAppearance(APPEARANCE_LIGHT_STATUS_BARS, APPEARANCE_LIGHT_STATUS_BARS);
         }
@@ -317,9 +321,11 @@ public class MainActivity extends AppCompatActivity {
 
         } else
             ((TextView) headerView.findViewById(R.id.user_name)).setText(String.format(Locale.getDefault(),
-                    "%s %s", TextUtils.isEmpty(currentUser.lastName) ? "" : currentUser.lastName,
+                    "%s\n%s", TextUtils.isEmpty(currentUser.lastName) ? "" : currentUser.lastName,
                     TextUtils.isEmpty(currentUser.firstName) ? "" : currentUser.firstName));
         ((TextView) headerView.findViewById(R.id.position)).setText(currentUser.description);
+        if (LoginHistoryService.getCurrentUser().has_avatar)
+            new DownloadUserAvatar(findViewById(R.id.profile_image1)).execute();
 
 
         SwitchCompat swPush = headerView.findViewById(R.id.checkBox);
@@ -434,9 +440,9 @@ public class MainActivity extends AppCompatActivity {
         });
 
         if (currentUser.has_avatar)
-            new DownloadUserAvatar((ImageView) headerView.findViewById(R.id.profile_image)).execute();
+            new DownloadUserAvatar((ImageView) headerView.findViewById(R.id.profile_image1)).execute();
         else {
-            headerView.findViewById(R.id.profile_image).setVisibility(View.GONE);
+            headerView.findViewById(R.id.profile_image1).setVisibility(View.GONE);
 
             String userInitials;
             if (TextUtils.isEmpty(currentUser.firstName) && TextUtils.isEmpty(currentUser.lastName))

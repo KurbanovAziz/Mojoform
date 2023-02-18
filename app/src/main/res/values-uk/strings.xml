@@ -298,5 +298,6 @@
 
     <!--    Екран 'Файли'-->
     <string name="warning_files_access">Доступ до файлів надає\nадміністратор організації</string>
+    <string name="back">Назад</string>
 
 </resources>

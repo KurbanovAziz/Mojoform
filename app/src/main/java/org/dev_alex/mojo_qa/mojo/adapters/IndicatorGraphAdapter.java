@@ -21,15 +21,12 @@ public class IndicatorGraphAdapter extends RecyclerView.Adapter<IndicatorGraphAd
 
     static class ResultViewHolder extends RecyclerView.ViewHolder {
         TextView panelName;
-        TextView panelStats;
         ImageView panelIcon;
 
         ResultViewHolder(View itemView) {
             super(itemView);
             panelIcon = (ImageView) itemView.findViewById(R.id.panel_icon_imag);
             panelName = (TextView) itemView.findViewById(R.id.panel_nam);
-            panelStats = (TextView) itemView.findViewById(R.id.panel_stat);
-
         }
     }
 
@@ -69,15 +66,7 @@ public class IndicatorGraphAdapter extends RecyclerView.Adapter<IndicatorGraphAd
                 onPanelClickListener.onClick(panel);
             }
         });
-
-        if(viewHolder.panelStats != null){
-            viewHolder.panelStats.setText(
-                    new StringBuilder().append(panel.val).append(" | ").append(panel.prc).append("%").toString());
-            viewHolder.panelName.setText(panel.name);}
-
-
-
-    }
+            }
 
 
     @Override

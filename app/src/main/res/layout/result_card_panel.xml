@@ -1,151 +1,162 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/card"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:background="@drawable/notification_card_background"
-    android:orientation="vertical">
-<LinearLayout
-    android:id="@+id/main_block"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:layout_marginBottom="-18dp"
-    android:layout_marginTop="5dp"
-    android:orientation="horizontal"
-    android:paddingBottom="20dp"
-    android:paddingLeft="15dp"
-    android:paddingRight="7dp"
-    android:paddingTop="2dp">
+    android:layout_height="wrap_content">
 
-    <ImageView
-        android:id="@+id/panel_icon_imag"
-        android:layout_width="25dp"
-        android:layout_height="25dp"
-        android:layout_gravity="center_vertical"
-        android:adjustViewBounds="true"
-        android:src="@drawable/result" />
+    <androidx.cardview.widget.CardView
 
-
-    <TextView
-        android:id="@+id/panel_nam"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_vertical"
-        android:layout_marginLeft="15dp"
-        android:layout_weight="3"
-        android:ellipsize="end"
-        android:maxLines="3"
-        android:text="Прочее"
-        android:textColor="#4c3d5f"
-        android:textSize="17sp" />
-
-    <TextView
-        android:id="@+id/panel_stat"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_weight="2"
-        android:maxLines="2"
-        android:gravity="center"
-        android:layout_gravity="center_vertical"
-        android:layout_marginLeft="15dp"
-        android:layout_marginRight="15dp"
-        android:text=""
-        android:textColor="#4c3d5f"
-        android:textSize="17sp" />
-
-</LinearLayout>
-    <net.cachapa.expandablelayout.ExpandableLayout
-        android:id="@+id/vExpandable"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:el_expanded="true">
+        android:layout_marginLeft="3dp"
+        android:layout_marginRight="3dp"
+        android:layout_marginBottom="7dp"
+        app:cardCornerRadius="5dp">
+
+
+        <View
+            android:id="@+id/vNotificationUnread"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_margin="1dp"
+            android:background="@drawable/notification_unread_border"
+            android:visibility="gone" />
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-android:orientation="vertical">
-
-            <TextView
-                android:id="@+id/result_date"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="50dp"
-                android:paddingRight="15dp"
-                android:textColor="#4c3d5f"
-                android:textSize="12sp"
-                tools:text="16 марта 2017 | 17:00" />
-            <TextView
-                android:id="@+id/information"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="50dp"
-                android:layout_marginTop="20dp"
-                android:paddingRight="15dp"
-                android:textColor="#4c3d5f"
-                android:textSize="16sp"
-                tools:text="Результат:
-баллы 78.7
-проценты: 76,07%
-
-Исполнитель:
-Менеджер смены
-
-Время завершения:
-17 декабря 2019 | 14:21" />
-
-
+            android:layout_marginLeft="15dp"
+            android:layout_marginTop="13dp"
+            android:layout_marginRight="15dp"
+            android:layout_marginBottom="23dp"
+            android:orientation="vertical">
 
             <LinearLayout
-                android:id="@+id/vButtonsBlock"
+                android:id="@+id/main_block"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="5dp"
-                android:layout_marginTop="18dp"
+                android:layout_height="match_parent"
                 android:orientation="horizontal">
 
-                <Button
-                    android:id="@+id/btDownloadPdf"
+                <LinearLayout
                     android:layout_width="0dp"
-                    android:layout_height="40dp"
-                    android:layout_gravity="center_horizontal"
-                    android:layout_marginRight="5dp"
+                    android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:background="@drawable/main_button_mojo"
-                    android:gravity="center"
-                    android:paddingHorizontal="20dp"
-                    android:text="@string/open_pdf"
-                    android:textColor="@android:color/white" />
+                    android:orientation="horizontal">
 
-                <Button
-                    android:id="@+id/btDownloadDoc"
-                    android:layout_width="0dp"
-                    android:layout_height="40dp"
-                    android:layout_gravity="center_horizontal"
-                    android:layout_marginLeft="5dp"
-                    android:layout_weight="1"
-                    android:background="@drawable/main_button_mojo"
-                    android:gravity="center"
-                    android:paddingHorizontal="20dp"
-                    android:text="@string/open_docs"
-                    android:textColor="@android:color/white" />
+                    <ImageView
+                        android:id="@+id/panel_icon_imag"
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        android:layout_gravity="top"
+                        android:layout_marginLeft="8dp"
+                        android:layout_marginTop="6dp"
+                        android:adjustViewBounds="true"
+                        android:src="@drawable/bell" />
 
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="15dp"
+                        android:layout_weight="30"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/panel_nam"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:ellipsize="end"
+                            android:gravity="center_vertical"
+                            android:maxLines="1"
+                            android:textColor="@color/textGrey"
+                            android:textSize="15sp"
+                            tools:text="Моя задача на все веремна всегда и везде" />
+
+                        <TextView
+                            android:id="@+id/result_date"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:ellipsize="end"
+                            android:gravity="center_vertical"
+                            android:maxLines="1"
+                            android:textColor="@color/textGrey"
+                            android:textSize="14sp"
+                            tools:text="16 марта 2017 | 17:00" />
+
+                    </LinearLayout>
+
+                    <ImageView
+                        android:id="@+id/btClose"
+                        android:layout_width="0dp"
+                        android:layout_height="20dp"
+                        android:layout_gravity="right"
+                        android:layout_weight="1"
+                        android:src="@drawable/krestik" />
+                </LinearLayout>
+
+                <ImageView
+                    android:id="@+id/more_btn"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginTop="-5dp"
+                    android:adjustViewBounds="true"
+                    android:src="@drawable/more_icon"
+                    android:visibility="gone" />
             </LinearLayout>
 
-
-            <ImageView
-                android:id="@+id/btClose"
+            <net.cachapa.expandablelayout.ExpandableLayout
+                android:id="@+id/vExpandable"
                 android:layout_width="match_parent"
-                android:layout_height="40dp"
-                android:layout_marginTop="8dp"
-                android:paddingTop="14dp"
-                android:paddingBottom="12dp"
-                android:scaleType="centerInside"
-                android:src="@drawable/arrow_expand_close" />
+                android:layout_height="wrap_content"
+                app:el_expanded="true">
 
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="28dp"
+                    android:orientation="vertical">
 
+                    <TextView
+                        android:id="@+id/information"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="43dp"
+                        android:paddingRight="15dp"
+                        android:textColor="@color/textGrey"
+                        android:textSize="16sp"
+                        tools:text="16 марта 2017 | 17:00" />
+
+                    <LinearLayout
+                        android:id="@+id/vButtonsBlock"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="40dp"
+                        android:layout_marginTop="18dp"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:gravity="center"
+                            android:text="Отчет: "
+                            android:textColor="@color/textGrey"
+                            android:textSize="16dp" />
+
+                        <ImageView
+                            android:id="@+id/btDownloadPdf"
+                            android:layout_width="wrap_content"
+                            android:layout_height="40dp"
+                            android:src="@drawable/pdf_btn" />
+
+                        <ImageView
+                            android:id="@+id/btDownloadDoc"
+                            android:layout_width="40dp"
+                            android:layout_height="40dp"
+                            android:src="@drawable/doc_btn" />
+                    </LinearLayout>
+                </LinearLayout>
+            </net.cachapa.expandablelayout.ExpandableLayout>
         </LinearLayout>
-
-    </net.cachapa.expandablelayout.ExpandableLayout>
-</LinearLayout>
+    </androidx.cardview.widget.CardView>
+</FrameLayout>

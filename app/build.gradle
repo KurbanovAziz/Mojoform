@@ -4,7 +4,7 @@ apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
 
 android {
-    compileSdkVersion 32
+    compileSdkVersion 33
     aaptOptions {ignoreAssetsPattern "! x86"}
 
 
@@ -12,7 +12,7 @@ android {
         applicationId "org.dev_alex.mojo_qa.mojo"
         minSdkVersion 24
         //noinspection OldTargetApi
-        targetSdkVersion 32
+        targetSdkVersion 33
         multiDexEnabled true
 
 
@@ -67,7 +67,7 @@ android {
             applicationId 'com.mojoform.Mojoform'
             resValue "string", "app_name", "Mojoform"
             manifestPlaceholders = [
-                    appIcon: "@drawable/app_logo"
+                    appIcon: "@mipmap/applogo3"
             ]
         }
 
@@ -86,8 +86,8 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility = '1.8'
+        targetCompatibility = '1.8'
     }
 }
 repositories {
@@ -140,6 +140,7 @@ dependencies {
     implementation 'com.google.firebase:firebase-core:11.8.0'
 
     implementation 'net.yslibrary.keyboardvisibilityevent:keyboardvisibilityevent:2.3.0'
+    implementation 'com.squareup.retrofit2:retrofit:2.9.0'
 
     implementation 'org.jsoup:jsoup:1.11.3'
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.6.0"
@@ -150,7 +151,7 @@ dependencies {
     implementation 'io.reactivex.rxjava3:rxandroid:3.0.0'
     implementation 'io.reactivex.rxjava3:rxjava:3.0.6'
 
-    implementation 'com.google.code.gson:gson:2.8.6'
+    implementation 'com.google.code.gson:gson:2.10'
 
     debugImplementation 'com.readystatesoftware.chuck:library:1.1.0'
     releaseImplementation 'com.readystatesoftware.chuck:library-no-op:1.1.0'
@@ -171,8 +172,11 @@ dependencies {
     implementation "androidx.camera:camera-lifecycle:1.0.0"
     implementation "androidx.camera:camera-view:1.0.0-alpha28"
     implementation "androidx.camera:camera-extensions:1.0.0-alpha28"
-    implementation 'androidx.work:work-runtime:2.7.1'
-    implementation 'androidx.work:work-runtime-ktx:2.7.1'
+    implementation 'androidx.work:work-runtime:2.8.0'
+    implementation 'androidx.work:work-runtime-ktx:2.8.0'
+    implementation(platform("com.squareup.okhttp3:okhttp-bom:4.10.0"))
+    implementation("com.squareup.okhttp3:okhttp")
+    implementation("com.squareup.okhttp3:logging-interceptor")
 
 
 }

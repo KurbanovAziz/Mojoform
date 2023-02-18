@@ -96,39 +96,39 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
     }
 
     private void sendNotification(String title, String body, Map<String, String> data) {
-        Intent intent = new Intent(this, AuthActivity.class);
-
-        for (Map.Entry<String, String> entry : data.entrySet()) {
-            Log.d(TAG, entry.getKey() + " " + entry.getValue());
-            intent.putExtra(entry.getKey(), entry.getValue());
-        }
-
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, new Random().nextInt(222222), intent, PendingIntent.FLAG_ONE_SHOT);
-
-        Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-
-        createNotificationChannel();
-        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this, CHANNEL_ID)
-                .setSmallIcon(R.drawable.watermark_logo)
-                .setContentTitle(getString(R.string.app_name))
-                .setContentText(title)
-                .setContentText(body)
-                .setAutoCancel(true)
-                .setSound(defaultSoundUri)
-                .setContentIntent(pendingIntent);
-
-        int notificationId = 4213;
-
-        if (data.containsKey(NOTIFY_ID)) {
-            notificationId = Integer.parseInt(data.get(NOTIFY_ID));
-        } else if (data.containsKey(TASK_ID)) {
-            notificationId = Integer.parseInt(data.get(TASK_ID));
-        }
-
-        NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        notificationManager.notify(notificationId, notificationBuilder.build());
+//        Intent intent = new Intent(this, AuthActivity.class);
+//
+//        for (Map.Entry<String, String> entry : data.entrySet()) {
+//            Log.d(TAG, entry.getKey() + " " + entry.getValue());
+//            intent.putExtra(entry.getKey(), entry.getValue());
+//        }
+//
+//        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+//        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+//        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+//        //PendingIntent pendingIntent = PendingIntent.getActivity(this, new Random().nextInt(222222), intent, PendingIntent.FLAG_ONE_SHOT);
+//
+//        Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+//
+//        createNotificationChannel();
+//        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this, CHANNEL_ID)
+//                .setSmallIcon(R.drawable.watermark_logo)
+//                .setContentTitle(getString(R.string.app_name))
+//                .setContentText(title)
+//                .setContentText(body)
+//                .setAutoCancel(true)
+//                .setSound(defaultSoundUri)
+//                .setContentIntent(pendingIntent);
+//
+//        int notificationId = 4213;
+//
+//        if (data.containsKey(NOTIFY_ID)) {
+//            notificationId = Integer.parseInt(data.get(NOTIFY_ID));
+//        } else if (data.containsKey(TASK_ID)) {
+//            notificationId = Integer.parseInt(data.get(TASK_ID));
+//        }
+//
+//        NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+//        notificationManager.notify(notificationId, notificationBuilder.build());
     }
 }

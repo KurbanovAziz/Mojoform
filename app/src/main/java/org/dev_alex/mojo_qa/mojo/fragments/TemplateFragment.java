@@ -54,6 +54,7 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.webkit.CookieManager;
 import android.webkit.WebChromeClient;
 import android.webkit.WebResourceRequest;
@@ -87,6 +88,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.GravityEnum;
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.bumptech.glide.Glide;
 import com.darsh.multipleimageselect.activities.AlbumSelectActivity;
 import com.darsh.multipleimageselect.helpers.Constants;
 import com.darsh.multipleimageselect.models.Image;
@@ -328,9 +330,9 @@ public class TemplateFragment extends Fragment {
 
         if (rootView == null) {
             isoDateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
-
             requiredElementTags = new ArrayList<>();
             requiredCategoriesTags = new ArrayList<>();
+
 
             rootView = inflater.inflate(R.layout.fragment_template, container, false);
             setupCloseKeyboardUI(getActivity(), rootView);
@@ -4703,6 +4705,90 @@ public class TemplateFragment extends Fragment {
             Log.e("MojoApp", "Error when formed json for task status " + e);
         }
         return null;
+    }
+    private class DownloadUserAvatar extends AsyncTask<Void, Void, Void> {
+        private ImageView avatarImageView;
+        private Bitmap avatar;
+
+        DownloadUserAvatar(ImageView avatarImageView) {
+            this.avatarImageView = avatarImageView;
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            try {
+                Response thumbResponse = RequestService.createGetRequest("/api/profile/avatar.png");
+                byte[] imageBytes = thumbResponse.body().bytes();
+                avatar = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length);
+            } catch (Exception exc) {
+                exc.printStackTrace();
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            try {
+                if (avatar != null) {
+                    avatarImageView.setImageBitmap(avatar);
+                    LoginHistoryService.addAvatar(LoginHistoryService.getCurrentUser().username, avatar);
+                }
+            } catch (Exception exc) {
+                exc.printStackTrace();
+            }
+        }
+    }
+
+    private class UpdateAvatarTask extends AsyncTask<Void, Void, Integer> {
+        private final File avatar;
+        private final String username;
+
+        private User user;
+
+        public UpdateAvatarTask(File avatar, String username) {
+            this.avatar = avatar;
+            this.username = username;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            Glide.with(getContext())
+                    .load(avatar)
+                    .into(((ImageView) rootView.findViewById(R.id.profile_image1)));
+
+            loopDialog.show();
+        }
+
+        @Override
+        protected Integer doInBackground(Void... params) {
+            try {
+                Response response = RequestService.createSendFilePutRequest("/api/profile/avatar.png", MediaType.parse("image/jpg"), avatar);
+                return response.code();
+            } catch (Exception exc) {
+                exc.printStackTrace();
+                return null;
+            }
+        }
+
+        @Override
+        protected void onPostExecute(Integer responseCode) {
+            super.onPostExecute(responseCode);
+            try {
+                if (loopDialog != null && loopDialog.isShowing())
+                    loopDialog.dismiss();
+
+
+                Activity activity = getActivity();
+                if (activity != null) {
+                    ((MainActivity) activity).initDrawer();
+                }
+
+            } catch (Exception exc) {
+                exc.printStackTrace();
+            }
+        }
     }
 
 }

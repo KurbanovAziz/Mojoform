@@ -299,5 +299,6 @@
 
     <!--    Fragment 'Files'-->
     <string name="warning_files_access">File access is granted by the\nadministrator of the organization</string>
+    <string name="back">Back</string>
 
 </resources>

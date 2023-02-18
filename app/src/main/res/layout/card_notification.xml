@@ -124,7 +124,7 @@
                         android:layout_marginLeft="43dp"
                         android:paddingRight="15dp"
                         android:textColor="@color/textGrey"
-                        android:textSize="14sp"
+                        android:textSize="16sp"
                         tools:text="16 марта 2017 | 17:00" />
 
                     <LinearLayout

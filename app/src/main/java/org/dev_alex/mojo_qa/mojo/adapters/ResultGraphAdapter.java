@@ -49,8 +49,8 @@ public class ResultGraphAdapter extends RecyclerView.Adapter<ResultGraphAdapter.
         TextView notificationDescription;
         TextView informationTV;
         ImageView moreBtn;
-        Button btDownloadPdf;
-        Button btDownloadDoc;
+        ImageView btDownloadPdf;
+        ImageView btDownloadDoc;
         View vButtonsBlock;
         ExpandableLayout expandableLayout;
         View btClose;
@@ -61,7 +61,6 @@ public class ResultGraphAdapter extends RecyclerView.Adapter<ResultGraphAdapter.
             super(itemView);
             panelIcon = (ImageView) itemView.findViewById(R.id.panel_icon_imag);
             panelName = (TextView) itemView.findViewById(R.id.panel_nam);
-            panelStats = (TextView) itemView.findViewById(R.id.panel_stat);
             notificationDate = (TextView) itemView.findViewById(R.id.result_date);
             notificationTitle = itemView.findViewById(R.id.notification_title);
             notificationDescription = itemView.findViewById(R.id.tvNotificationDesc);
@@ -112,7 +111,7 @@ public class ResultGraphAdapter extends RecyclerView.Adapter<ResultGraphAdapter.
             viewHolder.mainNotificationView.setOnClickListener(v -> {
                 viewHolder.expandableLayout.toggle(true);
                 float value = (float) indicator.prc;
-                int defaultColor = Color.parseColor("#4E3F60");
+                int defaultColor = Color.parseColor("#5E5E5E");
                 if(GraphFragment.ranges != null && GraphFragment.ranges.size() != 0){
                     for (Ranges range : GraphFragment.ranges) {
                         if (value >= range.from && value <= range.to){

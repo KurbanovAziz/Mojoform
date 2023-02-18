@@ -34,8 +34,6 @@
             android:layout_marginTop="4dp"
             android:layout_marginRight="10dp"
             android:gravity="right"
-            android:scaleX="1.1"
-            android:scaleY="0.8"
             android:thumb="@drawable/custom_thumb"
             app:track="@drawable/custom_track" />
     </FrameLayout>

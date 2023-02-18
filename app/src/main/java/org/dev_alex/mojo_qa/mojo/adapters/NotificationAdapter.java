@@ -106,16 +106,15 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
 
         String executorPart;
         if (notification.task.executor == null) {
-            executorPart = context.getString(R.string.executor) + ":<br/><b>" + context.getString(R.string.unknown) + "</b><br/><br/>";
+            executorPart = "<b>" + context.getString(R.string.executor) + ":</b><br/>" + context.getString(R.string.unknown);
         } else {
-            executorPart = context.getString(R.string.executor) + "<br/><b>" + notification.task.executor.fullname + "</b> (" + notification.task.executor.username + ")<br/><br/>";
+            executorPart = "<b>" +context.getString(R.string.executor) + "</b>:<br/>" + notification.task.executor.fullname + "(" + notification.task.executor.username + ")";
         }
 
         if (notification.type.equals("range")) {
-            String notificationDescription = context.getString(R.string.result) + "<br/>" +
-                    context.getString(R.string.points) + ": <b>" + notification.task.value.val + "</b><br/>" + context.getString(R.string.percent) + ": <b>" + notification.task.value.prc + "%</b><br/><br/>" +
-                    executorPart +
-                    context.getString(R.string.finish_time) + ":<br/><b>" + finishTime + "</b>";
+            String notificationDescription = "<b>" + context.getString(R.string.finish_time) + "</b>:<br/>" + finishTime + "<br/><br/>" +
+                    executorPart + "<b><br/><br/>" + context.getString(R.string.result) + ":</b><br/>" +
+                    context.getString(R.string.points) + ":<br/>" + notification.task.value.val + "</b><br/>" + context.getString(R.string.percent) + ":<br/>" + notification.task.value.prc;
 
             viewHolder.notificationDescription.setText(Html.fromHtml(notificationDescription));
             viewHolder.vButtonsBlock.setVisibility(View.VISIBLE);
