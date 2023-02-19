@@ -176,9 +176,6 @@
             android:screenOrientation="portrait"
             android:exported="true"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar.FullScreen" />
-        <service
-            android:name="org.dev_alex.mojo_qa.mojo.services.RequestService"
-            android:exported="true" />
         <activity android:name=".custom_views.camera.CustomCamera2Activity"
             android:exported="true"
             />
