@@ -88,9 +88,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.GravityEnum;
 import com.afollestad.materialdialogs.MaterialDialog;
+
 import com.bumptech.glide.Glide;
-import com.darsh.multipleimageselect.helpers.Constants;
-import com.darsh.multipleimageselect.models.Image;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.gcacace.signaturepad.views.SignaturePad;
@@ -433,12 +432,12 @@ public class TemplateFragment extends Fragment {
         Log.e("aaa", "Aaa");
         isResulted = true;
 
-        if (requestCode == Constants.REQUEST_CODE && resultCode == RESULT_OK && data != null) {
-            ArrayList<Image> images = data.getParcelableArrayListExtra(Constants.INTENT_EXTRA_IMAGES);
-            for (Image image : images) {
-                processImageFile(new File(image.path), false, null, true);
-            }
-        }
+//        if (requestCode == Constants.REQUEST_CODE && resultCode == RESULT_OK && data != null) {
+//            ArrayList<Image> images = data.getParcelableArrayListExtra(Constants.INTENT_EXTRA_IMAGES);
+//            for (Image image : images) {
+//                processImageFile(new File(image.path), false, null, true);
+//            }
+//        }
 
         if (requestCode == PHOTO_REQUEST_CODE && resultCode == RESULT_OK && data != null) {
             String photoPath = data.getStringExtra("photo_path");

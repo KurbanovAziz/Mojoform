@@ -302,6 +302,7 @@ class SelectTaskRulesFragment : Fragment() {
                                 put("monthDays", JSONArray(selectedPeriod.days))
                             })
                         }
+                        else -> {}
                     }
                     put("is_start", true)
                 }
@@ -325,6 +326,7 @@ class SelectTaskRulesFragment : Fragment() {
             OPEN_POLL -> {
                 configJson.put("openlinks", true)
             }
+            else -> {}
         }
         jsonObject.put("config", configJson)
 
