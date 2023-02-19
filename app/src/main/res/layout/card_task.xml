@@ -5,9 +5,6 @@
     android:id="@+id/task_item_container"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginBottom="10dp"
-    android:layout_marginEnd="12dp"
-    android:layout_marginStart="-2dp"
     android:gravity="center"
     android:orientation="horizontal"
     xmlns:android="http://schemas.android.com/apk/res/android"
@@ -16,6 +13,9 @@
         <androidx.cardview.widget.CardView
             android:id="@+id/task_card"
             android:layout_width="match_parent"
+            android:layout_marginBottom="10dp"
+            android:layout_marginEnd="12dp"
+            android:layout_marginStart="-2dp"
             android:layout_height="80dp"
             app:cardBackgroundColor="@color/blueGrey"
             app:cardCornerRadius="8dp">
