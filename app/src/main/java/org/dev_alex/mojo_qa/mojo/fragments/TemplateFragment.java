@@ -89,7 +89,6 @@ import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.GravityEnum;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.bumptech.glide.Glide;
-import com.darsh.multipleimageselect.activities.AlbumSelectActivity;
 import com.darsh.multipleimageselect.helpers.Constants;
 import com.darsh.multipleimageselect.models.Image;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -682,9 +681,9 @@ public class TemplateFragment extends Fragment {
                 .negativeText(R.string.gallery)
                 .onPositive((dialog, which) -> CustomCamera2Activity.startForResult(TemplateFragment.this, PHOTO_REQUEST_CODE))
                 .onNegative((dialog, which) -> {
-                    Intent intent = new Intent(getContext(), AlbumSelectActivity.class);
-                    intent.putExtra(Constants.INTENT_EXTRA_LIMIT, 10);
-                    startActivityForResult(intent, Constants.REQUEST_CODE);
+//                    Intent intent = new Intent(getContext(), AlbumSelectActivity.class);
+//                    intent.putExtra(Constants.INTENT_EXTRA_LIMIT, 10);
+//                    startActivityForResult(intent, Constants.REQUEST_CODE);
                 })
                 .build()
                 .show();
