@@ -1,19 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
-<org.dev_alex.mojo_qa.mojo.custom_views.scroll.LockableHorizontalScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="match_parent"
-    android:layout_height="100dp"
-    android:layout_marginBottom="10dp"
-    android:layout_marginTop="-20dp"
-    android:fillViewport="true"
-    android:scrollbars="none">
 
-    <LinearLayout
-        android:id="@+id/task_item_container"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:gravity="center"
-        android:orientation="horizontal">
+
+<LinearLayout
+    android:id="@+id/task_item_container"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="10dp"
+    android:layout_marginEnd="12dp"
+    android:layout_marginStart="-2dp"
+    android:gravity="center"
+    android:orientation="horizontal"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
         <androidx.cardview.widget.CardView
             android:id="@+id/task_card"
@@ -33,11 +31,10 @@
                     android:orientation="horizontal">
 
                     <LinearLayout
-                        android:layout_width="0dp"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="8dp"
                         android:layout_marginTop="15dp"
-                        android:layout_weight="1"
                         android:orientation="horizontal">
 
                         <FrameLayout
@@ -128,12 +125,10 @@
 
         </androidx.cardview.widget.CardView>
 
-        <androidx.legacy.widget.Space
-            android:layout_width="16dp"
-            android:layout_height="match_parent" />
-
         <LinearLayout
             android:id="@+id/task_delete"
+            android:visibility="gone"
+
             android:layout_width="100dp"
             android:layout_height="100dp"
             android:background="@drawable/ic_trash_bg"
@@ -164,4 +159,3 @@
 
     </LinearLayout>
 
-</org.dev_alex.mojo_qa.mojo.custom_views.scroll.LockableHorizontalScrollView>
