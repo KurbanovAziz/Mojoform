@@ -42,6 +42,7 @@ import com.prolificinteractive.materialcalendarview.DayViewFacade;
 import com.prolificinteractive.materialcalendarview.MaterialCalendarView;
 import com.prolificinteractive.materialcalendarview.OnDateSelectedListener;
 import com.prolificinteractive.materialcalendarview.OnMonthChangedListener;
+import com.prolificinteractive.materialcalendarview.OnRangeSelectedListener;
 
 import net.cachapa.expandablelayout.ExpandableLayout;
 
@@ -62,6 +63,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
@@ -81,7 +83,11 @@ public class TasksFragment extends Fragment {
     private ArrayList<Task> busyTasks;
     private ArrayList<Task> permanentTasks;
     private Calendar currentDate;
+    private CalendarDay selectedDate;
+    private CalendarDay selectedDateStart;
+    private CalendarDay selectedDateEnd;
     private boolean withDay = false;
+    private boolean withRange = false;
 
     private ArrayList<CalendarDay> daysWithOverdueTasks = new ArrayList<>();
     private ArrayList<CalendarDay> daysWithActualTasks = new ArrayList<>();
@@ -343,18 +349,34 @@ public class TasksFragment extends Fragment {
         calendarView.setTopbarVisible(false);
         calendarView.setCurrentDate(CalendarDay.from(currentDate), true);
 
+        calendarView.setSelectionMode(MaterialCalendarView.SELECTION_MODE_RANGE);
+
         calendarView.setOnDateChangedListener(new OnDateSelectedListener() {
             @Override
             public void onDateSelected(@NonNull MaterialCalendarView widget, @NonNull CalendarDay date, boolean selected) {
+                if (date == selectedDate) {
+                    selectedDate = null;
+                    widget.setDateSelected(date, true);
+                    expandableLayout.collapse();
+                    currentDate.setTime(date.getDate());
+                    withRange = false;
+                    withDay = true;
+                    new Handler().postDelayed(() -> updateDate(true), 500);
+                }
+                if (selected) selectedDate = date;
+            }
+        });
+
+        calendarView.setOnRangeSelectedListener(new OnRangeSelectedListener() {
+            @Override
+            public void onRangeSelected(@NonNull MaterialCalendarView widget, @NonNull List<CalendarDay> dates) {
                 expandableLayout.collapse();
-                currentDate.setTime(date.getDate());
-                withDay = true;
-                new Handler().postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        updateDate(true);
-                    }
-                }, 500);
+                selectedDateStart = dates.get(0);
+                selectedDateEnd = dates.get(dates.size() - 1);
+                currentDate.setTime(selectedDateStart.getDate());
+                withDay = false;
+                withRange = true;
+                new Handler().postDelayed(() -> updateDate(true), 500);
             }
         });
 
@@ -442,9 +464,21 @@ public class TasksFragment extends Fragment {
         currentDate.set(Calendar.SECOND, 0);
         currentDate.set(Calendar.MILLISECOND, 0);
 
-        if (withDay)
+        if (withDay) {
             date = new SimpleDateFormat("dd MMMM yyyy", Locale.getDefault()).format(currentDate.getTime());
-        else {
+        } else if (withRange) {
+            String monthNameStart;
+            String monthNameEnd;
+            if (Locale.getDefault().getISO3Language().equals("rus")) {
+                String monthList[] = {"Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"};
+                monthNameStart = monthList[selectedDateStart.getMonth()];
+                monthNameEnd = monthList[selectedDateEnd.getMonth()];
+            } else {
+                monthNameStart = new DateFormatSymbols(Locale.getDefault()).getMonths()[selectedDateStart.getMonth()];
+                monthNameEnd = new DateFormatSymbols(Locale.getDefault()).getMonths()[selectedDateEnd.getMonth()];
+            }
+            date = String.format("%s %s - %s %s %s", selectedDateStart.getDay(), monthNameStart, selectedDateEnd.getDay(), monthNameEnd, selectedDateEnd.getYear());
+        } else {
             ((MaterialCalendarView) rootView.findViewById(R.id.calendarView)).clearSelection();
             currentDate.set(Calendar.DAY_OF_MONTH, 1);
             String monthName;
@@ -581,6 +615,13 @@ public class TasksFragment extends Fragment {
                     dateFilters += "from=" + dayCalendar.getTime().getTime() / 1000;
                     dayCalendar.add(Calendar.DAY_OF_MONTH, 1);
                     dateFilters += "&to=" + dayCalendar.getTime().getTime() / 1000;
+                } else if (withRange) {
+                    Calendar rangeCalendar = Calendar.getInstance();
+                    rangeCalendar.setTime(selectedDateStart.getDate());
+                    dateFilters += "from=" + rangeCalendar.getTime().getTime() / 1000;
+                    rangeCalendar.setTime(selectedDateEnd.getDate());
+                    rangeCalendar.add(Calendar.DATE, 1);
+                    dateFilters += "&to=" + rangeCalendar.getTime().getTime() / 1000;
                 } else {
                     Calendar monthCalendar = Calendar.getInstance();
                     monthCalendar.setTime(currentDate.getTime());
