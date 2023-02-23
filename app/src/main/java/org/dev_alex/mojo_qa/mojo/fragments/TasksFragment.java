@@ -386,6 +386,7 @@ public class TasksFragment extends Fragment {
                 Log.d("mojo-log", String.valueOf(date.getMonth()));
                 if (CalendarDay.from(currentDate).getMonth() != date.getMonth()) {
                     withDay = false;
+                    withRange = false;
                     currentDate.setTime(date.getDate());
                     updateDate(true);
                 }
