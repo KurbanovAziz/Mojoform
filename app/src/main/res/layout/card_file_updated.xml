@@ -22,8 +22,9 @@
             android:orientation="horizontal">
 
             <RelativeLayout
-                android:layout_width="30dp"
-                android:layout_height="30dp"
+                android:layout_width="35dp"
+                android:layout_height="35dp"
+                android:gravity="center"
                 android:layout_gravity="center">
 
                 <ImageView
@@ -32,7 +33,7 @@
                     android:layout_height="25dp"
                     android:adjustViewBounds="true"
                     android:scaleType="centerCrop"
-                    android:src="@drawable/file_doc_icon" />
+                    android:src="@drawable/icon_template" />
 
                 <ImageView
                     android:id="@+id/selected_tick"
