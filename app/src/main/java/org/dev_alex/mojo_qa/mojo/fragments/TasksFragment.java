@@ -758,12 +758,12 @@ public class TasksFragment extends Fragment {
                         currentAdapterType = CurrentAdapterType.BUSY;
                     switch (currentAdapterType) {
                         case BUSY:
-                            showCalendarView();
+                            hideCalendarView();
                             ((RadioButton) rootView.findViewById(R.id.busy)).setChecked(true);
                             updateTaskAdapter(new TaskAdapter(TasksFragment.this, busyTasks, TaskAdapter.TaskType.BUSY), CurrentAdapterType.BUSY);
                             break;
                         case FINISHED:
-                            hideCalendarView();
+                            showCalendarView();
                             ((RadioButton) rootView.findViewById(R.id.ended)).setChecked(true);
                             updateTaskAdapter(new TaskAdapter(TasksFragment.this, finishedTasks, true), CurrentAdapterType.FINISHED);
 
