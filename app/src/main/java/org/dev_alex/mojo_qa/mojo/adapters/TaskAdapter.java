@@ -90,7 +90,9 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
                 Point point = new Point();
                 windowManager.getDefaultDisplay().getSize(point);
                 widthOffsetEnd *= 2;
-                view.setMinimumWidth(point.x - widthOffsetEnd);
+                int minWidth = point.x - widthOffsetEnd;
+                view.setMinimumWidth(minWidth);
+                if (view.getLayoutParams() != null) view.getLayoutParams().width = minWidth;
             }
         }
 

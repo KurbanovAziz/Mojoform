@@ -26,7 +26,9 @@ import androidx.annotation.IdRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
+import androidx.core.content.res.ResourcesCompat;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
@@ -128,6 +130,9 @@ public class TasksFragment extends Fragment {
 
             recyclerView = rootView.findViewById(R.id.recycler_view);
             recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+            DividerItemDecoration divider = new DividerItemDecoration(requireActivity(), DividerItemDecoration.VERTICAL);
+            divider.setDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.divider_vertical_transparent_10, null));
+            recyclerView.addItemDecoration(divider);
             ((RadioButton) rootView.findViewById(R.id.busy)).setChecked(true);
 
             initDialog();
