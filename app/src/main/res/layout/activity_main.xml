@@ -45,6 +45,7 @@
                     android:layout_height="20dp"
                     android:layout_gravity="bottom|center_horizontal"
                     android:adjustViewBounds="true"
+                    app:tint="@color/textGrey"
                     android:src="@drawable/back_arrow_icon" />
             </FrameLayout>
 
@@ -112,7 +113,7 @@
                     android:layout_gravity="bottom|center_horizontal"
                     android:adjustViewBounds="true"
                     android:src="@drawable/back_arrow_icon"
-                    app:tint="@color/grey" />
+                    app:tint="@color/textGrey" />
             </FrameLayout>
 
             <FrameLayout

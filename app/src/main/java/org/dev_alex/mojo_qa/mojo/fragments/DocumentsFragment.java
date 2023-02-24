@@ -225,7 +225,7 @@ public class DocumentsFragment extends Fragment implements FileAdapter.DocumentC
     }
 
     private void setupHeader() {
-        ((TextView) getActivity().findViewById(R.id.title)).setText(getString(R.string.files));
+        ((TextView) getActivity().findViewById(R.id.title)).setText(getString(R.string.documents));
         getActivity().findViewById(R.id.path_text).setVisibility(View.GONE);
         getActivity().findViewById(R.id.title).setVisibility(View.VISIBLE);
         getActivity().findViewById(R.id.back_btn).setVisibility(View.GONE);
@@ -284,7 +284,7 @@ public class DocumentsFragment extends Fragment implements FileAdapter.DocumentC
                 getActivity().findViewById(R.id.sandwich_btn).setVisibility(View.GONE);
                 getActivity().findViewById(R.id.back_btn).setVisibility(View.VISIBLE);
             } else {
-                ((TextView) getActivity().findViewById(R.id.title)).setText(R.string.files);
+                ((TextView) getActivity().findViewById(R.id.title)).setText(R.string.documents);
                 getActivity().findViewById(R.id.title).setVisibility(View.VISIBLE);
                 getActivity().findViewById(R.id.path_text).setVisibility(View.GONE);
                 getActivity().findViewById(R.id.sandwich_btn).setVisibility(View.VISIBLE);

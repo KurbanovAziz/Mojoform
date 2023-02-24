@@ -62,6 +62,7 @@ import org.dev_alex.mojo_qa.mojo.models.User;
 import org.dev_alex.mojo_qa.mojo.services.LoginHistoryService;
 import org.dev_alex.mojo_qa.mojo.services.RequestService;
 import org.dev_alex.mojo_qa.mojo.services.TokenService;
+import org.dev_alex.mojo_qa.mojo.utils.StatusBarUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -87,6 +88,7 @@ public class MainActivity extends AppCompatActivity {
 
         super.onCreate(null);
         setContentView(R.layout.activity_main);
+        StatusBarUtils.setColor(this, getResources().getColor(R.color.transparent_grey), 0);
         getWindow().setFlags(
                 WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED,
                 WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED
@@ -353,7 +355,7 @@ public class MainActivity extends AppCompatActivity {
             if (str.equals("tasks"))
                 mainDraggableItems.add(new CustomDrawerItem(15, mainDraggableItems.isEmpty() ? -48 : 0).withIdentifier(1).withName(R.string.tasks).withIcon(R.drawable.tasks_icon));
             if (str.equals("docs"))
-                mainDraggableItems.add(new CustomDrawerItem(15, mainDraggableItems.isEmpty() ? -48 : 0).withIdentifier(2).withName(R.string.files).withIcon(R.drawable.documents_icon));
+                mainDraggableItems.add(new CustomDrawerItem(15, mainDraggableItems.isEmpty() ? -48 : 0).withIdentifier(2).withName(R.string.documents).withIcon(R.drawable.documents_icon));
             if (str.equals("analytics"))
                 mainDraggableItems.add(new CustomDrawerItem(15, mainDraggableItems.isEmpty() ? -48 : 0).withIdentifier(5).withName(R.string.analystics).withIcon(R.drawable.graphs_icon));
         }

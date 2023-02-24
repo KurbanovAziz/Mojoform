@@ -49,6 +49,8 @@ public class App extends Application {
                 host = "https://demo.mojoform.com";
                 host = "https://system.mojoform.com";
                 host = "https://system.mojo2.ru";
+                host = "https://system.mojo2.ru";
+
 
 
                 break;
