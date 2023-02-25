@@ -27,11 +27,14 @@ import org.dev_alex.mojo_qa.mojo.custom_views.scroll.LockableHorizontalScrollVie
 import org.dev_alex.mojo_qa.mojo.fragments.TasksFragment;
 import org.dev_alex.mojo_qa.mojo.models.Task;
 import org.dev_alex.mojo_qa.mojo.services.LoginHistoryService;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Objects;
 
 
@@ -77,7 +80,6 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
             int offset = (int) getPxFromDp(itemView.getResources(), CARD_OFFSET_DP);
             setViewPadding(taskItemContainer, offset);
             setupViewWidth(itemView.getContext(), taskCard, offset);
-
         }
 
         private void setViewPadding(@NonNull View view, int padding) {
@@ -134,9 +136,18 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
         SharedPreferences mSettings;
         mSettings = App.getContext().getSharedPreferences("templates", Context.MODE_PRIVATE);
         String templateJson = mSettings.getString(task.id + LoginHistoryService.getCurrentUser().username, "");
-        viewHolder.delayed.setVisibility((task.suspended || templateJson.equals("")) ? View.GONE : View.VISIBLE);
-        viewHolder.taskDelete.setVisibility((task.suspended || templateJson.equals("")) ? View.GONE : View.VISIBLE);
-        viewHolder.moreBtn.setVisibility((task.suspended || templateJson.equals("")) ? View.GONE : View.VISIBLE);
+
+        boolean isTaskNotDelayed = task.suspended || templateJson.equals("");
+
+            try {
+                ((LockableHorizontalScrollView) viewHolder.itemView).scrollTo(0, 0);
+                ((LockableHorizontalScrollView) viewHolder.itemView).setScrollingEnabled(!isTaskNotDelayed);
+            } catch (ClassCastException e) {
+            }
+
+        viewHolder.delayed.setVisibility(isTaskNotDelayed ? View.GONE : View.VISIBLE);
+        viewHolder.taskDelete.setVisibility(isTaskNotDelayed ? View.GONE : View.VISIBLE);
+        viewHolder.moreBtn.setVisibility((isTaskNotDelayed ? View.GONE : View.VISIBLE));
         viewHolder.taskActiveCircle.setVisibility((task.suspended) ? View.INVISIBLE : View.VISIBLE);
         Log.e("f", isFinished + "");
 
@@ -184,11 +195,6 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
 
         viewHolder.taskTitle.setText(task.ref.name);
 
-        try {
-            ((LockableHorizontalScrollView) viewHolder.itemView).scrollTo(0, 0);
-        } catch (ClassCastException e) {
-        }
-
         if (task.suspended) {
             // viewHolder.moreBtn.setVisibility(View.VISIBLE)
             viewHolder.taskCard.setOnClickListener(new View.OnClickListener() {
@@ -214,13 +220,6 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
             });
         }
 
-        if (currentTaskType != TaskType.BUSY) {
-            try {
-                ((LockableHorizontalScrollView) viewHolder.itemView).setScrollingEnabled(false);
-            } catch (ClassCastException e) {
-            }
-        }
-
         viewHolder.taskDelete.setOnClickListener(v -> removeTask(task, i));
     }
 
@@ -232,7 +231,22 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
 
 
     private void removeTask(Task task, int position) {
-        tasks.remove(task);
+        SharedPreferences prefs = App.getContext().getSharedPreferences("templates", Context.MODE_PRIVATE);
+        Map<String, ?> keys = prefs.getAll();
+        for (Map.Entry<String, ?> entry : keys.entrySet()) {
+            if (entry.getKey().contains(LoginHistoryService.getCurrentUser().username)) {
+                String str = entry.getValue().toString();
+                try {
+                    JSONObject template = new JSONObject(str);
+                    if (template.getLong("longId") == task.id) {
+                    prefs.edit().remove(entry.getKey()).apply();
+                    }
+                } catch (JSONException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }
+            tasks.remove(task);
         notifyItemRemoved(position);
         notifyItemRangeChanged(position, getItemCount() - position);
     }
