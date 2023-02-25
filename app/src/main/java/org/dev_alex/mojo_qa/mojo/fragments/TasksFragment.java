@@ -336,7 +336,6 @@ public class TasksFragment extends Fragment {
                         hideCalendarView();
                         updateTaskAdapter(new TaskAdapter(TasksFragment.this, busyTasks, TaskAdapter.TaskType.BUSY), CurrentAdapterType.BUSY);
                         updateDate(true);
-
                         break;
 
                     case R.id.permanent:

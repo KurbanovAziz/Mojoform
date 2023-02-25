@@ -135,6 +135,7 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
         mSettings = App.getContext().getSharedPreferences("templates", Context.MODE_PRIVATE);
         String templateJson = mSettings.getString(task.id + LoginHistoryService.getCurrentUser().username, "");
         viewHolder.delayed.setVisibility((task.suspended || templateJson.equals("")) ? View.GONE : View.VISIBLE);
+        viewHolder.taskDelete.setVisibility((task.suspended || templateJson.equals("")) ? View.GONE : View.VISIBLE);
         viewHolder.moreBtn.setVisibility((task.suspended || templateJson.equals("")) ? View.GONE : View.VISIBLE);
         viewHolder.taskActiveCircle.setVisibility((task.suspended) ? View.INVISIBLE : View.VISIBLE);
         Log.e("f", isFinished + "");
