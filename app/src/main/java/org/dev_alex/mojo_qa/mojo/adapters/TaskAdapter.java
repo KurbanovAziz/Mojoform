@@ -239,14 +239,14 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
                 try {
                     JSONObject template = new JSONObject(str);
                     if (template.getLong("longId") == task.id) {
-                    prefs.edit().remove(entry.getKey()).apply();
+                        prefs.edit().remove(entry.getKey()).apply();
                     }
                 } catch (JSONException e) {
                     throw new RuntimeException(e);
                 }
             }
         }
-            tasks.remove(task);
+        tasks.remove(task);
         notifyItemRemoved(position);
         notifyItemRangeChanged(position, getItemCount() - position);
     }

@@ -54,7 +54,6 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
 import android.webkit.CookieManager;
 import android.webkit.WebChromeClient;
 import android.webkit.WebResourceRequest;
@@ -88,7 +87,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.GravityEnum;
 import com.afollestad.materialdialogs.MaterialDialog;
-
 import com.bumptech.glide.Glide;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -132,7 +130,6 @@ import org.dev_alex.mojo_qa.mojo.activities.OpenLinkActivity;
 import org.dev_alex.mojo_qa.mojo.activities.RecordAudio;
 import org.dev_alex.mojo_qa.mojo.activities.WebActivity;
 import org.dev_alex.mojo_qa.mojo.adapters.MediaFilesAdapter;
-import org.dev_alex.mojo_qa.mojo.custom_views.CustomImageView;
 import org.dev_alex.mojo_qa.mojo.custom_views.CustomWebview;
 import org.dev_alex.mojo_qa.mojo.custom_views.camera.CustomCamera2Activity;
 import org.dev_alex.mojo_qa.mojo.custom_views.indicator.IndicatorLayout;
@@ -1034,7 +1031,6 @@ public class TemplateFragment extends Fragment {
                     EditText editText = editTextMultiLineContainer.findViewById(R.id.value);
                     ImageView scanBTN = editTextMultiLineContainer.findViewById(R.id.btScanQr);
                     ImageView redStar = editTextMultiLineContainer.findViewById(R.id.red_star);
-                    final CustomImageView microBTN = editTextMultiLineContainer.findViewById(R.id.micro1);
                     final SpeechRecognizer mSpeechRecognizer = SpeechRecognizer.createSpeechRecognizer(getContext());
                     final Intent mSpeechRecognizerIntent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
                     mSpeechRecognizerIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,
@@ -1110,15 +1106,6 @@ public class TemplateFragment extends Fragment {
                     if (isTaskFinished)
                         editText.setEnabled(false);
                     else {
-                        microBTN.microBTN = microBTN;
-                        microBTN.mSpeechRecognizerIntent = mSpeechRecognizerIntent;
-                        microBTN.mSpeechRecognizer = mSpeechRecognizer;
-                        microBTN.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                if (!CheckPermissions()) RequestPermissions();
-                            }
-                        });
                         editText.addTextChangedListener(new TextWatcher() {
                             @Override
                             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
