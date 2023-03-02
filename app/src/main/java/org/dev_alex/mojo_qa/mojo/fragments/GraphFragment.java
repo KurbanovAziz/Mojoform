@@ -31,6 +31,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -407,6 +408,11 @@ public class GraphFragment extends Fragment implements ResultGraphAdapter.GraphC
                             ArrayList<Comment> comments = graphInfo.values.get((int) h.getX()).comments;
                             RecyclerView recyclerComment = commentsDialog.findViewById(R.id.comments_dialog_updated_rv);
                             if (comments != null && !comments.isEmpty()) {
+                                if (comments.size() > 1) {
+                                    DividerItemDecoration divider = new DividerItemDecoration(requireActivity(), DividerItemDecoration.VERTICAL);
+                                    divider.setDrawable(ContextCompat.getDrawable(requireActivity(), R.drawable.divider_vertical_1));
+                                    recyclerComment.addItemDecoration(divider);
+                                }
                                 recyclerComment.setLayoutManager(new LinearLayoutManager(getContext()));
                                 recyclerComment.setAdapter(new CommentAdapter(getActivity(), comments));
                             } else {

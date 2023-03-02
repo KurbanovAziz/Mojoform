@@ -54,8 +54,9 @@ public class CommentAdapter  extends RecyclerView.Adapter<CommentAdapter.ViewHol
         holder.commentTV.setText(comment.comment);
         holder.userNameTV.setText(comment.fullname);
         holder.timeTV.setText(time);
+        if (position > 0) {
 
-
+        }
     }
 
     @Override
@@ -75,7 +76,6 @@ public class CommentAdapter  extends RecyclerView.Adapter<CommentAdapter.ViewHol
             commentTV = view.findViewById(R.id.comment_item_updated_message_tv);
             timeTV = view.findViewById(R.id.comment_item_updated_time_tv);
             userNameTV = view.findViewById(R.id.comment_item_updated_author_tv);
-
         }
     }
 }
