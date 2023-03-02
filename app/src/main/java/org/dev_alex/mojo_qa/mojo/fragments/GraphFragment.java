@@ -59,6 +59,7 @@ import org.dev_alex.mojo_qa.mojo.models.Indicator;
 import org.dev_alex.mojo_qa.mojo.models.Panel;
 import org.dev_alex.mojo_qa.mojo.models.Ranges;
 import org.dev_alex.mojo_qa.mojo.models.Value;
+import org.dev_alex.mojo_qa.mojo.models.response.Comment;
 import org.dev_alex.mojo_qa.mojo.services.RequestService;
 import org.dev_alex.mojo_qa.mojo.services.Utils;
 import org.json.JSONArray;
@@ -403,9 +404,15 @@ public class GraphFragment extends Fragment implements ResultGraphAdapter.GraphC
                                     graphDialog.cancel();
                                 }
                             });
+                            ArrayList<Comment> comments = graphInfo.values.get((int) h.getX()).comments;
                             RecyclerView recyclerComment = commentsDialog.findViewById(R.id.comments_dialog_updated_rv);
-                            recyclerComment.setLayoutManager(new LinearLayoutManager(getContext()));
-                            recyclerComment.setAdapter(new CommentAdapter(getActivity(), graphInfo.values.get((int) h.getX()).comments));
+                            if (comments != null && !comments.isEmpty()) {
+                                recyclerComment.setLayoutManager(new LinearLayoutManager(getContext()));
+                                recyclerComment.setAdapter(new CommentAdapter(getActivity(), comments));
+                            } else {
+                                recyclerComment.setVisibility(View.GONE);
+                            }
+
                             EditText commentEt = (EditText) commentsDialog.findViewById(R.id.comments_dialog_updated_comment_et);
                             TextView labelTV = commentsDialog.findViewById(R.id.comments_dialog_updated_title_tv);
                             TextView timeTV = commentsDialog.findViewById(R.id.comments_dialog_updated_date_time_tv);

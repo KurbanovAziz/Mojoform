@@ -34,7 +34,7 @@ public class CommentAdapter  extends RecyclerView.Adapter<CommentAdapter.ViewHol
     public CommentAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
 
         View view = inflater.inflate(R.layout.comment_item_updated, parent, false);
-        return new ViewHolder(view, context);
+        return new ViewHolder(view);
     }
 
     @Override
@@ -65,15 +65,16 @@ public class CommentAdapter  extends RecyclerView.Adapter<CommentAdapter.ViewHol
 
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
+
         final TextView commentTV;
         final TextView timeTV;
         final TextView userNameTV;
 
-        ViewHolder(View view, final Context context1){
+        ViewHolder(View view){
             super(view);
-            commentTV = (TextView) view.findViewById(R.id.comment_item_updated_message_tv);
-            timeTV = (TextView) view.findViewById(R.id.comment_item_updated_time_tv);
-            userNameTV = (TextView) view.findViewById(R.id.comment_item_updated_author_tv);
+            commentTV = view.findViewById(R.id.comment_item_updated_message_tv);
+            timeTV = view.findViewById(R.id.comment_item_updated_time_tv);
+            userNameTV = view.findViewById(R.id.comment_item_updated_author_tv);
 
         }
     }
