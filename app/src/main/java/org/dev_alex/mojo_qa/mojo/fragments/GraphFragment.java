@@ -17,7 +17,6 @@ import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -363,10 +362,13 @@ public class GraphFragment extends Fragment implements ResultGraphAdapter.GraphC
                         new GetRaw().execute();
                     }
                     final Dialog graphDialog = new Dialog(getContext());
-                    graphDialog.getWindow().requestFeature(Window.FEATURE_NO_TITLE);
                     graphDialog.setContentView(LayoutInflater.from(getContext()).inflate(R.layout.graph_dialog, null, false));
                     graphDialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
                     graphDialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+
+                    ImageView closeIv = graphDialog.findViewById(R.id.graph_dialog_close_iv);
+                    closeIv.setOnClickListener(v -> graphDialog.cancel());
+
                     SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy", Locale.getDefault());
                     String graphFrom = dateFormat.format(graphInfo.values.get((int) h.getX()).from);
                     String graphTo = dateFormat.format(graphInfo.values.get((int) h.getX()).to);
@@ -398,13 +400,11 @@ public class GraphFragment extends Fragment implements ResultGraphAdapter.GraphC
                             commentsDialog.getWindow().getDecorView().setPadding(20, 20, 20, 20);
 
                             ImageView closeIv = commentsDialog.findViewById(R.id.comments_dialog_updated_close_iv);
-                            closeIv.setOnClickListener(new View.OnClickListener() {
-                                @Override
-                                public void onClick(View v) {
-                                    commentsDialog.cancel();
-                                    graphDialog.cancel();
-                                }
+                            closeIv.setOnClickListener(v1 -> {
+                                commentsDialog.cancel();
+                                graphDialog.cancel();
                             });
+
                             ArrayList<Comment> comments = graphInfo.values.get((int) h.getX()).comments;
                             RecyclerView recyclerComment = commentsDialog.findViewById(R.id.comments_dialog_updated_rv);
                             TextView titleComments = commentsDialog.findViewById(R.id.comments_dialog_updated_title_comments_tv);
