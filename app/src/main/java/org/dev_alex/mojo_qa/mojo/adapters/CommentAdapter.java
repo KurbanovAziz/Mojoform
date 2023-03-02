@@ -44,7 +44,7 @@ public class CommentAdapter  extends RecyclerView.Adapter<CommentAdapter.ViewHol
 
         String dateTimePattern = String.format(
                 Locale.getDefault(),
-                "dd MMMM yyyy %1$s %2$s hh:mm a",
+                "dd MMMM yyyy %1$s %2$s HH:mm",
                 context.getString(R.string.dialog_comments_time_year_addition),
                 context.getString(R.string.dialog_comments_time_addition));
 

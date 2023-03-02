@@ -414,7 +414,7 @@ public class GraphFragment extends Fragment implements ResultGraphAdapter.GraphC
 
                             String dateTimePattern = String.format(
                                     Locale.getDefault(),
-                                    "dd MMMM yyyy %1$s %2$s hh:mm a",
+                                    "dd MMMM yyyy %1$s %2$s HH:mm",
                                     getString(R.string.dialog_comments_time_year_addition),
                                     getString(R.string.dialog_comments_time_addition));
 
