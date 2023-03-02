@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#C8C2EA">
+    android:background="@color/lightBlue">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -14,8 +15,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginLeft="15dp"
-            android:layout_marginRight="15dp"
-            android:layout_marginTop="10dp">
+            android:layout_marginTop="10dp"
+            android:layout_marginRight="15dp">
 
             <TextView
                 android:id="@+id/select_layout_caption"
@@ -24,8 +25,8 @@
                 android:layout_centerVertical="true"
                 android:layout_marginRight="5dp"
                 android:layout_toLeftOf="@+id/select_layout_close"
-                android:textColor="@color/accent"
-                android:textSize="18sp"/>
+                android:textColor="@color/textGrey"
+                android:textSize="18sp" />
 
             <ImageView
                 android:id="@+id/select_layout_close"
@@ -41,20 +42,21 @@
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="20dp"
             android:layout_marginLeft="7dp"
+            android:layout_marginTop="10dp"
             android:layout_marginRight="7dp"
-            android:layout_marginTop="10dp">
+            android:layout_marginBottom="20dp">
 
             <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignBottom="@+id/list_container_with_btn"
                 android:layout_alignLeft="@+id/list_container_with_btn"
-                android:layout_alignRight="@+id/list_container_with_btn"
                 android:layout_alignTop="@+id/list_container_with_btn"
+                android:layout_alignRight="@+id/list_container_with_btn"
+                android:layout_alignBottom="@+id/list_container_with_btn"
                 android:scaleType="fitXY"
-                android:src="@drawable/select_popup_background" />
+                android:src="@drawable/select_popup_background"
+                app:tint="@color/lightBlue" />
 
             <LinearLayout
                 android:id="@+id/list_container_with_btn"
@@ -62,28 +64,30 @@
                 android:layout_height="wrap_content"
                 android:minHeight="300dp"
                 android:orientation="vertical"
-                android:paddingBottom="15dp"
                 android:paddingLeft="10dp"
-                android:paddingRight="10dp">
+                android:paddingRight="10dp"
+                android:paddingBottom="15dp">
 
                 <LinearLayout
                     android:id="@+id/list_select_btn_container"
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
                     android:layout_weight="1"
+                    android:gravity="center"
                     android:orientation="vertical" />
 
-                <TextView
+                <com.google.android.material.button.MaterialButton
                     android:id="@+id/select_layout_accept"
                     android:layout_width="140dp"
                     android:layout_height="50dp"
                     android:layout_gravity="center_horizontal"
                     android:layout_marginTop="15dp"
-                    android:background="@drawable/green_btn_with_shadow"
+                    android:backgroundTint="@color/colorAccent"
                     android:gravity="center"
-                    android:paddingBottom="12.5dp"
                     android:text="@string/select"
-                    android:textColor="@android:color/white" />
+                    android:textColor="@android:color/white"
+                    android:textSize="16sp"
+                    app:cornerRadius="30dp" />
             </LinearLayout>
         </RelativeLayout>
     </LinearLayout>

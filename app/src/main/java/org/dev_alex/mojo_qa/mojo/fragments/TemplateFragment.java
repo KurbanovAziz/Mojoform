@@ -24,7 +24,6 @@ import android.graphics.Paint;
 import android.graphics.PorterDuff;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
-import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.LayerDrawable;
 import android.location.Location;
 import android.media.ExifInterface;
@@ -110,6 +109,8 @@ import com.github.mikephil.charting.utils.ViewPortHandler;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.card.MaterialCardView;
+import com.google.android.material.textview.MaterialTextView;
 import com.google.gson.Gson;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
@@ -2241,20 +2242,20 @@ public class TemplateFragment extends Fragment {
         boolean isList = !(value.has("typeView") && value.getString("typeView").equals("list"));
 
         final ScrollView listSelectBtnLayout = (ScrollView) getActivity().getLayoutInflater()
-                .inflate(R.layout.select_btn_popup_layout, (ViewGroup) rootView.findViewById(R.id.select_btn_popup), false);
-        final LinearLayout listSelectBtnContainer = (LinearLayout) listSelectBtnLayout.findViewById(R.id.list_select_btn_container);
+                .inflate(R.layout.select_btn_popup_layout, rootView.findViewById(R.id.select_btn_popup), false);
+        final LinearLayout listSelectBtnContainer = listSelectBtnLayout.findViewById(R.id.list_select_btn_container);
 
         LinearLayout selectBtnLayout = (LinearLayout) getActivity().getLayoutInflater().inflate(R.layout.select_layout, container, false);
-        final LinearLayout selectBtnContainer = (LinearLayout) selectBtnLayout.getChildAt(1);
-        TextView showPopupSelectListBtn = (TextView) selectBtnLayout.getChildAt(2);
-        final LinearLayout optionalContainer = (LinearLayout) selectBtnLayout.getChildAt(3);
+        final LinearLayout selectBtnContainer = selectBtnLayout.findViewById(R.id.selectBtnContainer);
+        MaterialButton showPopupSelectListBtn = selectBtnLayout.findViewById(R.id.showPopupSelectListBtn);
+        final LinearLayout optionalContainer = selectBtnLayout.findViewById(R.id.optionalContainer);
 
-        ((ViewGroup) selectBtnLayout.getChildAt(0)).getChildAt(1).setVisibility(View.VISIBLE);
+        selectBtnLayout.findViewById(R.id.selectRedStarIv).setVisibility(View.VISIBLE);
 
         if (value.has("caption"))
-            ((TextView) ((ViewGroup) selectBtnLayout.getChildAt(0)).getChildAt(0)).setText(value.getString("caption"));
+            ((TextView) selectBtnLayout.findViewById(R.id.selectHeaderTv)).setText(value.getString("caption"));
         else
-            ((TextView) ((ViewGroup) selectBtnLayout.getChildAt(0)).getChildAt(0)).setText("Нет текста");
+            ((TextView) selectBtnLayout.findViewById(R.id.selectHeaderTv)).setText("Нет текста");
 
         if (value.has("options")) {
             int maxAnswersCt = 1;
@@ -2263,26 +2264,26 @@ public class TemplateFragment extends Fragment {
             if (value.has("answers_count") && value.getInt("answers_count") < 0)
                 maxAnswersCt = 100500;
 
-            final ArrayList<Pair<CheckBox, JSONObject>> buttons = new ArrayList<>();
+            final ArrayList<Pair<MaterialCardView, JSONObject>> buttons = new ArrayList<>();
             final int finalMaxAnswersCt = maxAnswersCt;
-            CompoundButton.OnCheckedChangeListener checkButtonListener = new CompoundButton.OnCheckedChangeListener() {
+            MaterialCardView.OnCheckedChangeListener checkButtonListener = new MaterialCardView.OnCheckedChangeListener() {
                 @Override
-                public void onCheckedChanged(CompoundButton selectedButton, boolean isChecked) {
+                public void onCheckedChanged(MaterialCardView card, boolean isChecked) {
                     try {
                         if (isChecked) {
-                            for (Pair<CheckBox, JSONObject> pair : buttons)
-                                if (pair.first.equals(selectedButton))
-                                    styleSelectBtn(selectedButton, true, pair.second);
+                            for (Pair<MaterialCardView, JSONObject> pair : buttons)
+                                if (pair.first.equals(card))
+                                    styleSelectBtn(card, true, pair.second);
 
                             JSONArray selectedBtnIds = new JSONArray();
-                            String btnId = (String) selectedButton.getTag();
+                            String btnId = (String) card.getTag();
                             selectedBtnIds.put(btnId);
                             int currentlySelected = 1;
 
-                            for (Pair<CheckBox, JSONObject> pair : buttons) {
-                                CompoundButton compoundButton = pair.first;
+                            for (Pair<MaterialCardView, JSONObject> pair : buttons) {
+                                MaterialCardView compoundButton = pair.first;
 
-                                if (!compoundButton.equals(selectedButton)) {
+                                if (!compoundButton.equals(card)) {
                                     if (compoundButton.isChecked()) {
                                         currentlySelected++;
                                         if (currentlySelected > finalMaxAnswersCt)
@@ -2295,10 +2296,10 @@ public class TemplateFragment extends Fragment {
 
                             value.put("values", selectedBtnIds);
                         } else {
-                            styleSelectBtn(selectedButton, false, null);
+                            styleSelectBtn(card, false, null);
 
                             if (value.has("values"))
-                                value.put("values", Utils.removeItemWithValue(value.getJSONArray("values"), (String) selectedButton.getTag()));
+                                value.put("values", Utils.removeItemWithValue(value.getJSONArray("values"), (String) card.getTag()));
                         }
 
                         optionalContainer.removeAllViewsInLayout();
@@ -2333,10 +2334,9 @@ public class TemplateFragment extends Fragment {
             JSONArray options = value.getJSONArray("options");
             for (int j = 0; j < options.length(); j++) {
                 JSONObject option = options.getJSONObject(j);
-                ViewGroup selectBtnFrame = (ViewGroup) getActivity().getLayoutInflater().inflate(R.layout.select_btn, selectBtnContainer, false);
+                MaterialCardView selectBtn = (MaterialCardView) getActivity().getLayoutInflater().inflate(R.layout.select_btn, selectBtnContainer, false);
+                TextView selectBtnText = (TextView) selectBtn.findViewById(R.id.tvButton);
 
-                final CheckBox selectBtn = (CheckBox) selectBtnFrame.getChildAt(0);
-                TextView selectBtnText = (TextView) selectBtnFrame.getChildAt(2);
                 if (option.has("caption"))
                     selectBtnText.setText(option.getString("caption"));
                 else
@@ -2344,23 +2344,25 @@ public class TemplateFragment extends Fragment {
 
                 if (j == 0) {
                     if (isList)
-                        ((LinearLayout.LayoutParams) selectBtnFrame.getLayoutParams()).topMargin =
+                        ((LinearLayout.LayoutParams) selectBtn.getLayoutParams()).topMargin =
                                 (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 25, getResources().getDisplayMetrics());
                     else
-                        ((LinearLayout.LayoutParams) selectBtnFrame.getLayoutParams()).topMargin = 0;
+                        ((LinearLayout.LayoutParams) selectBtn.getLayoutParams()).topMargin = 0;
                 }
 
                 if (isList)
-                    listSelectBtnContainer.addView(selectBtnFrame);
+                    listSelectBtnContainer.addView(selectBtn);
                 else
-                    selectBtnContainer.addView(selectBtnFrame);
+                    selectBtnContainer.addView(selectBtn);
 
                 buttons.add(new Pair<>(selectBtn, option));
                 selectBtn.setTag(option.getString("id"));
                 selectBtn.setChecked(value.has("values") && Utils.containsValue(value.getJSONArray("values"), option.getString("id")));
                 styleSelectBtn(selectBtn, selectBtn.isChecked(), option);
-                if (!isTaskFinished)
+                if (!isTaskFinished) {
+                    selectBtn.setOnClickListener(v -> selectBtn.setChecked(!selectBtn.isChecked()));
                     selectBtn.setOnCheckedChangeListener(checkButtonListener);
+                }
             }
 
             optionalContainer.removeAllViewsInLayout();
@@ -2452,9 +2454,8 @@ public class TemplateFragment extends Fragment {
                 for (int i = 0; i < options.length(); i++) {
                     JSONObject option = options.getJSONObject(i);
                     if (Utils.containsValue(value.getJSONArray("values"), option.getString("id"))) {
-                        ViewGroup selectBtnFrame = (ViewGroup) getActivity().getLayoutInflater().inflate(R.layout.select_btn, answersContainer, false);
-                        CheckBox selectBtn = (CheckBox) selectBtnFrame.getChildAt(0);
-                        TextView selectBtnText = (TextView) selectBtnFrame.getChildAt(2);
+                        MaterialCardView selectBtn = (MaterialCardView) getActivity().getLayoutInflater().inflate(R.layout.select_btn, answersContainer, false);
+                        TextView selectBtnText = (TextView) selectBtn.findViewById(R.id.tvButton);
 
                         if (option.has("caption"))
                             selectBtnText.setText(option.getString("caption"));
@@ -2462,12 +2463,12 @@ public class TemplateFragment extends Fragment {
                             selectBtnText.setText(R.string.no_text_);
 
                         if (isFirst) {
-                            ((LinearLayout.LayoutParams) selectBtnFrame.getLayoutParams()).topMargin = 0;
+                            ((LinearLayout.LayoutParams) selectBtn.getLayoutParams()).topMargin = 0;
                             isFirst = false;
                         }
 
                         styleSelectBtn(selectBtn, true, option);
-                        answersContainer.addView(selectBtnFrame);
+                        answersContainer.addView(selectBtn);
                     }
                 }
             }
@@ -2476,24 +2477,21 @@ public class TemplateFragment extends Fragment {
         }
     }
 
-    private void styleSelectBtn(CompoundButton checkButton, boolean isChecked, JSONObject buttonJson) {
+    private void styleSelectBtn(MaterialCardView checkButton, boolean isChecked, JSONObject buttonJson) {
         try {
-            GradientDrawable bgShape = (GradientDrawable) ContextCompat.getDrawable(getContext(), R.drawable.shape_white_oval).mutate();
 
             if (isChecked) {
-                ((TextView) ((ViewGroup) checkButton.getParent()).getChildAt(2)).setTextColor(Color.WHITE);
+                ((MaterialTextView) (checkButton.findViewById(R.id.tvButton))).setTextColor(Color.WHITE);
 
                 if (buttonJson.has("color"))
-                    bgShape.setColor(Color.parseColor(buttonJson.getString("color")));
+                    checkButton.setCardBackgroundColor(Color.parseColor(buttonJson.getString("color")));
                 else
-                    bgShape.setColor(Color.parseColor("#c99fe3"));
+                    checkButton.setCardBackgroundColor(Color.parseColor("#c99fe3"));
             } else {
-                bgShape.setColor(Color.WHITE);
-                ((TextView) ((ViewGroup) checkButton.getParent()).getChildAt(2)).setTextColor(Color.parseColor("#4c3e60"));
+                checkButton.setCardBackgroundColor(Color.WHITE);
+                ((MaterialTextView) (checkButton.findViewById(R.id.tvButton))).setTextColor(ContextCompat.getColor(requireActivity(), R.color.textGrey));
             }
 
-
-            ((ViewGroup) checkButton.getParent()).getChildAt(1).setBackground(bgShape);
         } catch (Exception exc) {
             exc.printStackTrace();
         }

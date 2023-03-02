@@ -1,46 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:layout_marginTop="-9dp">
+    android:layout_height="40dp"
+    android:layout_marginLeft="15dp"
+    android:layout_marginTop="5dp"
+    android:layout_marginRight="15dp"
+    android:layout_marginBottom="5dp"
+    android:checkable="true"
+    android:clickable="true"
+    android:focusable="true"
+    app:cardCornerRadius="36dp">
 
-    <CheckBox
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignLeft="@id/tvButton"
-        android:layout_alignTop="@+id/tvButton"
-        android:layout_alignRight="@+id/tvButton"
-        android:scaleY="0.7"
-        android:scaleX="0.9"
-
-        android:layout_alignBottom="@+id/tvButton"
-        android:background="@drawable/select_btn_only_shadow"
-        android:button="@null" />
-
-    <View
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignLeft="@id/tvButton"
-        android:layout_alignTop="@+id/tvButton"
-        android:layout_alignRight="@+id/tvButton"
-        android:layout_alignBottom="@+id/tvButton"
-        android:scaleY="0.7"
-        android:scaleX="0.9"
-        android:layout_marginLeft="15dp"
-        android:layout_marginRight="15dp"
-        android:background="@drawable/shape_white_oval"
-        android:visibility="visible" />
-
-    <TextView
+    <com.google.android.material.textview.MaterialTextView
         android:id="@+id/tvButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="14dp"
         android:ellipsize="end"
         android:gravity="center"
-        android:paddingHorizontal="16dp"
-        android:paddingTop="12dp"
-        android:paddingVertical="15dp"
-        android:textColor="#4c3e60"
+        android:padding="10dp"
+        android:textColor="@color/textGrey"
         android:textSize="16sp" />
-</RelativeLayout>
+
+</com.google.android.material.card.MaterialCardView>

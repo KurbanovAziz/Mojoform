@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
@@ -13,18 +14,19 @@
         android:layout_marginRight="5dp"
         android:orientation="horizontal">
 
-
         <TextView
+            android:id="@+id/selectHeaderTv"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
             android:layout_marginRight="5dp"
             android:layout_weight="1"
             android:text="Заголовок ввода"
-            android:textColor="#ff4c3d5f"
+            android:textColor="@color/textGrey"
             android:textSize="18sp" />
 
         <ImageView
+            android:id="@+id/selectRedStarIv"
             android:layout_width="15dp"
             android:layout_height="15dp"
             android:layout_gravity="center_vertical"
@@ -33,22 +35,26 @@
     </LinearLayout>
 
     <LinearLayout
+        android:id="@+id/selectBtnContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
         android:orientation="vertical" />
 
-    <TextView
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/showPopupSelectListBtn"
         android:layout_width="140dp"
         android:layout_height="50dp"
         android:layout_gravity="center_horizontal"
-        android:background="@drawable/green_btn_with_shadow"
+        android:backgroundTint="@color/colorAccent"
         android:gravity="center"
-        android:paddingBottom="13dp"
         android:text="@string/select"
-        android:textColor="@android:color/white" />
+        android:textColor="@android:color/white"
+        android:textSize="16sp"
+        app:cornerRadius="30dp" />
 
     <LinearLayout
+        android:id="@+id/optionalContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical" />
