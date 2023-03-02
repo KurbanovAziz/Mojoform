@@ -407,6 +407,7 @@ public class GraphFragment extends Fragment implements ResultGraphAdapter.GraphC
                             });
                             ArrayList<Comment> comments = graphInfo.values.get((int) h.getX()).comments;
                             RecyclerView recyclerComment = commentsDialog.findViewById(R.id.comments_dialog_updated_rv);
+                            TextView titleComments = commentsDialog.findViewById(R.id.comments_dialog_updated_title_comments_tv);
                             if (comments != null && !comments.isEmpty()) {
                                 if (comments.size() > 1) {
                                     DividerItemDecoration divider = new DividerItemDecoration(requireActivity(), DividerItemDecoration.VERTICAL);
@@ -416,6 +417,7 @@ public class GraphFragment extends Fragment implements ResultGraphAdapter.GraphC
                                 recyclerComment.setLayoutManager(new LinearLayoutManager(getContext()));
                                 recyclerComment.setAdapter(new CommentAdapter(getActivity(), comments));
                             } else {
+                                titleComments.setVisibility(View.GONE);
                                 recyclerComment.setVisibility(View.GONE);
                             }
 
