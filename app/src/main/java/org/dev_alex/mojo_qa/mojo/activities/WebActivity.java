@@ -19,11 +19,13 @@ public class WebActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_web);
         Intent intent = getIntent();
-        String link = intent.getStringExtra("link");
+        String link = intent.getStringExtra("link") + "/";
         webView = findViewById(R.id.webView);
         webView.getSettings().setJavaScriptEnabled(true);
-        webView.loadUrl(link);
-        webView.setWebViewClient(new MyWebViewClient());
+        webView.post(() -> {
+            webView.loadUrl(link);
+            webView.setWebViewClient(new MyWebViewClient());    });
+
 
     }
     @Override
@@ -34,8 +36,7 @@ public class WebActivity extends AppCompatActivity {
             super.onBackPressed();
         }
     }
-    private class MyWebViewClient extends WebViewClient {
-        @TargetApi(Build.VERSION_CODES.N)
+    private static class MyWebViewClient extends WebViewClient {
         @Override
         public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
             view.loadUrl(request.getUrl().toString());
