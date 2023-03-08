@@ -7,6 +7,7 @@
     <FrameLayout
         android:id="@+id/text1"
         android:layout_width="match_parent"
+        android:background="@color/lightBlue"
         android:layout_height="0dp"
         app:layout_constraintBottom_toTopOf="@id/buttons_block"
         app:layout_constraintTop_toTopOf="parent">

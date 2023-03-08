@@ -9,14 +9,16 @@
         android:id="@+id/task_item_container"
         android:layout_width="wrap_content"
         android:layout_height="80dp"
+        android:layout_marginStart="-14dp"
+
         android:gravity="center"
         android:orientation="horizontal">
 
         <androidx.cardview.widget.CardView
             android:id="@+id/task_card"
             android:layout_width="wrap_content"
+            android:layout_margin="3dp"
             android:layout_height="match_parent"
-            android:layout_marginStart="-2dp"
             android:layout_marginEnd="16dp"
             app:cardBackgroundColor="@color/blueGrey"
             app:cardCornerRadius="8dp">
@@ -133,6 +135,7 @@
             android:background="@drawable/ic_trash_bg"
             android:clickable="true"
             android:focusable="true"
+            android:layout_marginStart="20dp"
             android:gravity="center"
             android:orientation="vertical"
             android:padding="5dp"

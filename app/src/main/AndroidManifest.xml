@@ -64,7 +64,9 @@
             <intent-filter>
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-
+                <data
+                    android:host="system.mojo2.ru"
+                    android:scheme="https" />
                 <data
                     android:host="mojo-qa.dev-alex.org"
                     android:scheme="https" />
@@ -99,7 +101,10 @@
 
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-
+                <data
+                    android:host="tasks.mojo2.ru"
+                    android:pathPrefix="/tasks"
+                    android:scheme="https" />
                 <data
                     android:host="tasks.mojoform.com"
                     android:pathPrefix="/tasks"
@@ -113,6 +118,10 @@
 
                 <data
                     android:host="tasks.mojoform.com"
+                    android:pathPrefix="/reports"
+                    android:scheme="https" />
+                <data
+                    android:host="tasks.mojo2.ru"
                     android:pathPrefix="/reports"
                     android:scheme="https" />
             </intent-filter>

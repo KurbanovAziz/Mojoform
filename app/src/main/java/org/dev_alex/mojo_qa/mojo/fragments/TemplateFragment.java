@@ -1373,7 +1373,7 @@ public class TemplateFragment extends Fragment {
                             @Override
                             public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
                                 String link = request.getUrl().toString();
-                                if ((link.contains("mojo-qa.dev-alex.org") || link.contains("mojoform.com")) && !link.contains("help.mojoform.com")) {
+                                if ((link.contains("mojo-qa.dev-alex.org") || link.contains("mojoform.com") || link.contains("mojo2.ru")) && !link.contains("help.mojoform.com")) {
                                     isNextTemlpateURL = true;
                                     ((MainActivity) Objects.requireNonNull(getContext())).openFromLinkInApp(request.getUrl().toString());
                                 } else {
@@ -2093,7 +2093,7 @@ public class TemplateFragment extends Fragment {
 
 
         } else {
-            ((LinearLayout) mediaLayout.getChildAt(0)).getChildAt(0).setOnClickListener(new View.OnClickListener() {
+            mediaLayout.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     expandableLayout.toggle();
@@ -4541,7 +4541,7 @@ public class TemplateFragment extends Fragment {
             captionTv.setText(value.getString("caption"));
         }
 
-        captionTv.setOnClickListener(v -> {
+        mediaLayout.setOnClickListener(v -> {
             startAttachFileDialogForResult(mediaFilesAdapter::add);
         });
 

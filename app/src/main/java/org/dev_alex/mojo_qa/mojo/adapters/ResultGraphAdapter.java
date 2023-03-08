@@ -105,8 +105,6 @@ public class ResultGraphAdapter extends RecyclerView.Adapter<ResultGraphAdapter.
         final Indicator indicator = indicators.get(i);
         final Indicator notification = indicators.get(i);
 
-
-
         if (getItemViewType(i) == 0) {
             viewHolder.mainNotificationView.setOnClickListener(v -> {
                 viewHolder.expandableLayout.toggle(true);
@@ -132,13 +130,8 @@ public class ResultGraphAdapter extends RecyclerView.Adapter<ResultGraphAdapter.
                     catch (Exception e ){
                         e.printStackTrace();
                     }
-                    if(defaultColor != Color.parseColor("#4E3F60") ){
-                        viewHolder.panelIcon.setImageResource(R.drawable.bell_image);
-                    }
-                    else {
-                        viewHolder.panelIcon.setImageResource(R.drawable.bell_task);
-                    }
-                    viewHolder.panelIcon.setColorFilter(defaultColor);
+                    //viewHolder.panelIcon.setColorFilter(defaultColor);
+                    //тут была реализация окрашивания иконки в резульататах, вероятно придется потом вернуть
                 }
 
 
@@ -146,7 +139,7 @@ public class ResultGraphAdapter extends RecyclerView.Adapter<ResultGraphAdapter.
             viewHolder.expandableLayout.collapse(false);
             viewHolder.btDownloadPdf.setOnClickListener(v -> onPanelClickListener.onDownloadPdfClick(notification));
             viewHolder.btDownloadDoc.setOnClickListener(v -> onPanelClickListener.onDownloadDocClick(notification));
-            viewHolder.btClose.setOnClickListener(v -> viewHolder.expandableLayout.collapse(true)); viewHolder.panelIcon.setImageResource(R.drawable.result); viewHolder.panelIcon.setColorFilter(Color.parseColor("#4E3F60"));
+            viewHolder.btClose.setOnClickListener(v -> viewHolder.expandableLayout.collapse(true));
             viewHolder.panelName.setText(name);
             viewHolder.notificationDate.setText(sdf.format(new Date(indicator.timestamp)));
 

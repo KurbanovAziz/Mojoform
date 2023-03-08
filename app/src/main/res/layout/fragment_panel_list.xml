@@ -31,7 +31,7 @@
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
             android:layout_gravity="right"
-            android:layout_marginTop="4dp"
+            android:layout_marginTop="16dp"
             android:layout_marginRight="10dp"
             android:gravity="right"
             android:thumb="@drawable/custom_thumb"
