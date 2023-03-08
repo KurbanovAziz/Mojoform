@@ -2,6 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     package="org.dev_alex.mojo_qa.mojo">
+
     <queries>
         <intent>
             <action android:name="android.speech.RecognitionService" />
@@ -9,13 +10,11 @@
     </queries>
 
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <uses-permission
-        android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
-    <uses-permission
-        android:name="android.permission.RECORD_AUDIO"/>
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.GET_TASKS" />
@@ -40,20 +39,22 @@
         android:usesCleartextTraffic="true"
         tools:replace="android:allowBackup,android:icon"
         tools:targetApi="q">
-        <activity android:name=".activities.RecordAudio"
+        <activity
+            android:name=".activities.ImageFullScreenActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activities.RecordAudio"
+            android:exported="true" />
+        <activity
+            android:name=".activities.WebActivity"
             android:exported="true"
-            />
-        <activity android:name=".activities.WebActivity"
-            android:theme="@style/Theme.AppCompat.NoActionBar"
-            android:exported="true"
-            />
-
+            android:theme="@style/Theme.AppCompat.NoActionBar" />
         <activity
             android:name=".activities.AuthActivity"
             android:configChanges="orientation|keyboardHidden|keyboard"
+            android:exported="true"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.ActionBar.Transparent"
-            android:exported="true">
+            android:theme="@style/AppTheme.ActionBar.Transparent">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <action android:name="android.intent.action.MAIN" />
@@ -119,23 +120,22 @@
         <activity
             android:name=".activities.MainActivity"
             android:configChanges="orientation|keyboardHidden|keyboard|screenSize"
-            android:largeHeap="true"
             android:exported="true"
+            android:largeHeap="true"
             android:launchMode="singleTop"
             android:theme="@style/AppTheme.ActionBar.Transparent"
             android:windowSoftInputMode="adjustPan" />
         <activity
             android:name=".activities.OpenLinkActivity"
             android:configChanges="orientation|keyboardHidden|keyboard"
-            android:screenOrientation="portrait"
             android:exported="true"
+            android:screenOrientation="portrait"
             android:theme="@style/AppTheme.ActionBar.Transparent"
             android:windowSoftInputMode="adjustPan" />
         <activity
             android:name=".activities.PlayerActivity"
-            android:exported="true"
-
-            android:configChanges="keyboard|keyboardHidden|orientation|screenSize|screenLayout|smallestScreenSize|uiMode">
+            android:configChanges="keyboard|keyboardHidden|orientation|screenSize|screenLayout|smallestScreenSize|uiMode"
+            android:exported="true">
             <intent-filter android:autoVerify="true">
                 <action android:name="android.intent.action.VIEW" />
 
@@ -151,9 +151,8 @@
         <activity
             android:name=".activities.PickExecutorsActivity"
             android:configChanges="orientation|keyboardHidden|keyboard"
-            android:screenOrientation="portrait"
             android:exported="true"
-
+            android:screenOrientation="portrait"
             android:theme="@style/AppTheme.ActionBar.Transparent"
             android:windowSoftInputMode="adjustPan" />
 
@@ -170,34 +169,33 @@
         <activity
             android:name=".activities.ImageViewActivity"
             android:configChanges="orientation|keyboardHidden|keyboard"
+            android:exported="true"
             android:screenOrientation="portrait"
-            android:exported="true"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar.FullScreen" />
-        <activity android:name=".custom_views.camera.CustomCamera2Activity"
-            android:exported="true"
-            />
-        <activity android:name=".activities.OnboardingActivity"
-            android:exported="true"
-            />
+        <activity
+            android:name=".custom_views.camera.CustomCamera2Activity"
+            android:exported="true" />
+        <activity
+            android:name=".activities.OnboardingActivity"
+            android:exported="true" />
         <activity
             android:name="com.journeyapps.barcodescanner.CaptureActivity"
+            android:exported="true"
             android:screenOrientation="portrait"
             android:stateNotNeeded="true"
-            android:exported="true"
-
             tools:replace="android:screenOrientation" />
         <activity android:name=".custom_views.camerax.CameraActivity" />
 
-        <service android:name=".gcm.MyFirebaseMessagingService"
-            android:exported="true"
-            >
+        <service
+            android:name=".gcm.MyFirebaseMessagingService"
+            android:exported="true">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
         </service>
-        <service android:name=".gcm.MyFirebaseInstanceIDService"
-            android:exported="true"
-            >
+        <service
+            android:name=".gcm.MyFirebaseInstanceIDService"
+            android:exported="true">
             <intent-filter>
                 <action android:name="com.google.firebase.INSTANCE_ID_EVENT" />
             </intent-filter>

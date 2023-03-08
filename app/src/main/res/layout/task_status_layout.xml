@@ -4,6 +4,8 @@
     android:layout_height="wrap_content"
     android:animateLayoutChanges="true"
     android:background="@android:color/transparent"
+    android:clickable="true"
+    android:focusable="true"
     android:gravity="center"
     android:maxHeight="170dp"
     android:orientation="vertical">

@@ -58,6 +58,7 @@
                 android:text="17 декабря 2019 года в 12:00 PM" />
 
             <TextView
+                android:id="@+id/comments_dialog_updated_title_comments_tv"
                 style="@style/AppTheme.Dialog.Comments.TextView"
                 android:text="@string/comments" />
 

@@ -1,6 +1,9 @@
 package org.dev_alex.mojo_qa.mojo.adapters;
 
 import android.content.ContentResolver;
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
 import android.media.MediaMetadataRetriever;
 import android.net.Uri;
 import android.view.LayoutInflater;
@@ -14,7 +17,9 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.material.imageview.ShapeableImageView;
 
 import org.dev_alex.mojo_qa.mojo.R;
+import org.dev_alex.mojo_qa.mojo.activities.ImageFullScreenActivity;
 
+import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -72,6 +77,7 @@ public class MediaFilesAdapter extends RecyclerView.Adapter<MediaFilesAdapter.Me
 
             iconIv = itemView.findViewById(R.id.media_list_item_iv_icon);
             deleteIv = itemView.findViewById(R.id.media_list_item_iv_delete);
+
         }
 
         protected void bind(Uri uri, MediaFilesAdapter adapter) {
@@ -90,6 +96,7 @@ public class MediaFilesAdapter extends RecyclerView.Adapter<MediaFilesAdapter.Me
                         iconIv.setScaleType(ImageView.ScaleType.CENTER_CROP);
                         iconIv.setStrokeWidth(0);
                         iconIv.setImageURI(uri);
+                        iconIv.setOnClickListener(v -> viewImageFullScreen((ImageView) v));
                         break;
                     case TYPE_DOCUMENT:
                         iconIv.setImageResource(R.drawable.ic_list_item_media_file);
@@ -100,6 +107,25 @@ public class MediaFilesAdapter extends RecyclerView.Adapter<MediaFilesAdapter.Me
                 }
             }
             deleteIv.setOnClickListener(v -> removeItem(uri, adapter));
+        }
+
+        private void viewImageFullScreen(ImageView imageView) {
+            startImageViewActivity(getByteArrayFromImageView(imageView));
+        }
+
+        private void startImageViewActivity(byte[] extras) {
+            Intent intent = new Intent(itemView.getContext(), ImageFullScreenActivity.class);
+            intent.putExtra(ImageFullScreenActivity.INTENT_KEY_EXTRAS, extras);
+            itemView.getContext().startActivity(intent);
+        }
+
+        private byte[] getByteArrayFromImageView(ImageView imageView) {
+            BitmapDrawable drawable = ((BitmapDrawable) imageView.getDrawable());
+            Bitmap bitmap = drawable.getBitmap();
+            ByteArrayOutputStream bos = new ByteArrayOutputStream();
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100, bos);
+            byte[] arr = bos.toByteArray();
+            return arr;
         }
 
         private void removeItem(Uri uri, MediaFilesAdapter adapter) {

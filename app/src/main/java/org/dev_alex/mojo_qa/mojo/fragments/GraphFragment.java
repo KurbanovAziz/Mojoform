@@ -17,7 +17,6 @@ import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -31,6 +30,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -59,6 +59,7 @@ import org.dev_alex.mojo_qa.mojo.models.Indicator;
 import org.dev_alex.mojo_qa.mojo.models.Panel;
 import org.dev_alex.mojo_qa.mojo.models.Ranges;
 import org.dev_alex.mojo_qa.mojo.models.Value;
+import org.dev_alex.mojo_qa.mojo.models.response.Comment;
 import org.dev_alex.mojo_qa.mojo.services.RequestService;
 import org.dev_alex.mojo_qa.mojo.services.Utils;
 import org.json.JSONArray;
@@ -361,10 +362,13 @@ public class GraphFragment extends Fragment implements ResultGraphAdapter.GraphC
                         new GetRaw().execute();
                     }
                     final Dialog graphDialog = new Dialog(getContext());
-                    graphDialog.getWindow().requestFeature(Window.FEATURE_NO_TITLE);
                     graphDialog.setContentView(LayoutInflater.from(getContext()).inflate(R.layout.graph_dialog, null, false));
                     graphDialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
                     graphDialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+
+                    ImageView closeIv = graphDialog.findViewById(R.id.graph_dialog_close_iv);
+                    closeIv.setOnClickListener(v -> graphDialog.cancel());
+
                     SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy", Locale.getDefault());
                     String graphFrom = dateFormat.format(graphInfo.values.get((int) h.getX()).from);
                     String graphTo = dateFormat.format(graphInfo.values.get((int) h.getX()).to);
@@ -396,16 +400,27 @@ public class GraphFragment extends Fragment implements ResultGraphAdapter.GraphC
                             commentsDialog.getWindow().getDecorView().setPadding(20, 20, 20, 20);
 
                             ImageView closeIv = commentsDialog.findViewById(R.id.comments_dialog_updated_close_iv);
-                            closeIv.setOnClickListener(new View.OnClickListener() {
-                                @Override
-                                public void onClick(View v) {
-                                    commentsDialog.cancel();
-                                    graphDialog.cancel();
-                                }
+                            closeIv.setOnClickListener(v1 -> {
+                                commentsDialog.cancel();
+                                graphDialog.cancel();
                             });
+
+                            ArrayList<Comment> comments = graphInfo.values.get((int) h.getX()).comments;
                             RecyclerView recyclerComment = commentsDialog.findViewById(R.id.comments_dialog_updated_rv);
-                            recyclerComment.setLayoutManager(new LinearLayoutManager(getContext()));
-                            recyclerComment.setAdapter(new CommentAdapter(getActivity(), graphInfo.values.get((int) h.getX()).comments));
+                            TextView titleComments = commentsDialog.findViewById(R.id.comments_dialog_updated_title_comments_tv);
+                            if (comments != null && !comments.isEmpty()) {
+                                if (comments.size() > 1) {
+                                    DividerItemDecoration divider = new DividerItemDecoration(requireActivity(), DividerItemDecoration.VERTICAL);
+                                    divider.setDrawable(ContextCompat.getDrawable(requireActivity(), R.drawable.divider_vertical_1));
+                                    recyclerComment.addItemDecoration(divider);
+                                }
+                                recyclerComment.setLayoutManager(new LinearLayoutManager(getContext()));
+                                recyclerComment.setAdapter(new CommentAdapter(getActivity(), comments));
+                            } else {
+                                titleComments.setVisibility(View.GONE);
+                                recyclerComment.setVisibility(View.GONE);
+                            }
+
                             EditText commentEt = (EditText) commentsDialog.findViewById(R.id.comments_dialog_updated_comment_et);
                             TextView labelTV = commentsDialog.findViewById(R.id.comments_dialog_updated_title_tv);
                             TextView timeTV = commentsDialog.findViewById(R.id.comments_dialog_updated_date_time_tv);
@@ -414,7 +429,7 @@ public class GraphFragment extends Fragment implements ResultGraphAdapter.GraphC
 
                             String dateTimePattern = String.format(
                                     Locale.getDefault(),
-                                    "dd MMMM yyyy %1$s %2$s hh:mm a",
+                                    "dd MMMM yyyy %1$s %2$s HH:mm",
                                     getString(R.string.dialog_comments_time_year_addition),
                                     getString(R.string.dialog_comments_time_addition));
 

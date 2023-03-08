@@ -16,7 +16,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Locale;
 
-public class CommentAdapter  extends RecyclerView.Adapter<CommentAdapter.ViewHolder>{
+public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.ViewHolder> {
 
     private final LayoutInflater inflater;
     private ArrayList<Comment> comments = new ArrayList<>();
@@ -25,16 +25,19 @@ public class CommentAdapter  extends RecyclerView.Adapter<CommentAdapter.ViewHol
 
     public CommentAdapter(Context context, ArrayList<Comment> comments) {
         this.context = context;
-        if(comments != null){
-        this.comments = comments;}
-        else {Toast.makeText(context, "Пока комментариев нет", Toast.LENGTH_SHORT).show();}
+        if (comments != null) {
+            this.comments = comments;
+        } else {
+            Toast.makeText(context, "Пока комментариев нет", Toast.LENGTH_SHORT).show();
+        }
         this.inflater = LayoutInflater.from(context);
     }
+
     @Override
     public CommentAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
 
         View view = inflater.inflate(R.layout.comment_item_updated, parent, false);
-        return new ViewHolder(view, context);
+        return new ViewHolder(view);
     }
 
     @Override
@@ -44,7 +47,7 @@ public class CommentAdapter  extends RecyclerView.Adapter<CommentAdapter.ViewHol
 
         String dateTimePattern = String.format(
                 Locale.getDefault(),
-                "dd MMMM yyyy %1$s %2$s hh:mm a",
+                "dd MMMM yyyy %1$s %2$s HH:mm",
                 context.getString(R.string.dialog_comments_time_year_addition),
                 context.getString(R.string.dialog_comments_time_addition));
 
@@ -54,8 +57,9 @@ public class CommentAdapter  extends RecyclerView.Adapter<CommentAdapter.ViewHol
         holder.commentTV.setText(comment.comment);
         holder.userNameTV.setText(comment.fullname);
         holder.timeTV.setText(time);
-
-
+        if (position % 2 != 0) {
+            holder.addMargin();
+        }
     }
 
     @Override
@@ -65,16 +69,25 @@ public class CommentAdapter  extends RecyclerView.Adapter<CommentAdapter.ViewHol
 
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
+
         final TextView commentTV;
         final TextView timeTV;
         final TextView userNameTV;
 
-        ViewHolder(View view, final Context context1){
+        ViewHolder(View view) {
             super(view);
-            commentTV = (TextView) view.findViewById(R.id.comment_item_updated_message_tv);
-            timeTV = (TextView) view.findViewById(R.id.comment_item_updated_time_tv);
-            userNameTV = (TextView) view.findViewById(R.id.comment_item_updated_author_tv);
+            commentTV = view.findViewById(R.id.comment_item_updated_message_tv);
+            timeTV = view.findViewById(R.id.comment_item_updated_time_tv);
+            userNameTV = view.findViewById(R.id.comment_item_updated_author_tv);
+        }
 
+        protected void addMargin() {
+            ViewGroup.LayoutParams layoutParams = itemView.getLayoutParams();
+            if (layoutParams != null) {
+                if (layoutParams instanceof ViewGroup.MarginLayoutParams) {
+                    ((ViewGroup.MarginLayoutParams) layoutParams).setMargins(50, 0, 0, 0);
+                }
+            }
         }
     }
 }
