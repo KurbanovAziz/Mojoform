@@ -1,17 +1,18 @@
 package org.dev_alex.mojo_qa.mojo.activities;
 
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Bundle;
 import android.widget.ImageView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.bumptech.glide.Glide;
+
 import org.dev_alex.mojo_qa.mojo.R;
 
 public class ImageFullScreenActivity extends AppCompatActivity {
 
-    public static final String INTENT_KEY_EXTRAS = "image_view";
+    public static final String INTENT_KEY_EXTRAS = "image_uri";
 
     private ImageView closeIv = null;
     private ImageView contentIv = null;
@@ -29,10 +30,9 @@ public class ImageFullScreenActivity extends AppCompatActivity {
 
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
-            byte[] arr = extras.getByteArray(INTENT_KEY_EXTRAS);
-            if (arr != null) {
-                Bitmap bitmap = BitmapFactory.decodeByteArray(arr, 0, arr.length);
-                if (bitmap != null) contentIv.setImageBitmap(bitmap);
+            Uri uri = extras.getParcelable(INTENT_KEY_EXTRAS);
+            if (uri != null) {
+                Glide.with(this).load(uri).into(contentIv);
             }
         }
     }

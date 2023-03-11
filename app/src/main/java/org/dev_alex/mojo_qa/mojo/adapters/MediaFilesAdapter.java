@@ -14,6 +14,7 @@ import android.widget.ImageView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.google.android.material.imageview.ShapeableImageView;
 
 import org.dev_alex.mojo_qa.mojo.R;
@@ -93,10 +94,9 @@ public class MediaFilesAdapter extends RecyclerView.Adapter<MediaFilesAdapter.Me
                 }
                 switch (type) {
                     case TYPE_IMAGE:
-                        iconIv.setScaleType(ImageView.ScaleType.CENTER_CROP);
                         iconIv.setStrokeWidth(0);
-                        iconIv.setImageURI(uri);
-                        iconIv.setOnClickListener(v -> viewImageFullScreen((ImageView) v));
+                        Glide.with(itemView.getContext()).load(uri).centerCrop().into(iconIv);
+                        iconIv.setOnClickListener(v -> viewImageFullScreen(uri));
                         break;
                     case TYPE_DOCUMENT:
                         iconIv.setImageResource(R.drawable.ic_list_item_media_file);
@@ -109,13 +109,13 @@ public class MediaFilesAdapter extends RecyclerView.Adapter<MediaFilesAdapter.Me
             deleteIv.setOnClickListener(v -> removeItem(uri, adapter));
         }
 
-        private void viewImageFullScreen(ImageView imageView) {
-            startImageViewActivity(getByteArrayFromImageView(imageView));
+        private void viewImageFullScreen(Uri uri) {
+            startImageViewActivity(uri);
         }
 
-        private void startImageViewActivity(byte[] extras) {
+        private void startImageViewActivity(Uri uri) {
             Intent intent = new Intent(itemView.getContext(), ImageFullScreenActivity.class);
-            intent.putExtra(ImageFullScreenActivity.INTENT_KEY_EXTRAS, extras);
+            intent.putExtra(ImageFullScreenActivity.INTENT_KEY_EXTRAS, uri);
             itemView.getContext().startActivity(intent);
         }
 

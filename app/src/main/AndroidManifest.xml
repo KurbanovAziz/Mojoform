@@ -64,6 +64,7 @@
             <intent-filter>
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
+
                 <data
                     android:host="system.mojo2.ru"
                     android:scheme="https" />
@@ -101,6 +102,7 @@
 
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
+
                 <data
                     android:host="tasks.mojo2.ru"
                     android:pathPrefix="/tasks"
