@@ -1145,6 +1145,7 @@ public class TemplateFragment extends Fragment {
                 case "money":
                     final LinearLayout moneyContainer = (LinearLayout) getActivity().getLayoutInflater().inflate(R.layout.text_plan, container, false);
                     ((ViewGroup) moneyContainer.getChildAt(0)).getChildAt(1).setVisibility((value.has("is_required") && !value.getBoolean("is_required")) ? View.GONE : View.VISIBLE);
+                    final TextView tvPlan = moneyContainer.findViewById(R.id.planTv);
                     final EditText etPlan = moneyContainer.findViewById(R.id.planET);
                     final View tvPlanLabel = moneyContainer.findViewById(R.id.headTV);
                     final EditText etFact = moneyContainer.findViewById(R.id.factET);
@@ -1219,14 +1220,30 @@ public class TemplateFragment extends Fragment {
                             }
                         });
 
-                        if (value.has("plan")) {
-                            etPlan.setText(value.getString("plan"));
-                            etPlan.setEnabled(false);
 
-                            if (value.has("hidePlan") && value.getBoolean("hidePlan")) {
-                                etPlan.setVisibility(View.INVISIBLE);
-                                tvPlanLabel.setVisibility(View.INVISIBLE);
+                        if (value.has("plan")) {
+                            try {
+                                etPlan.setText(value.getString("plan"));
+                                etPlan.setEnabled(false);
+                            } catch (JSONException e) {
+                                Log.e("MojoApp", "Error while parsing JSON field 'plan' " + e);
                             }
+
+                            if (value.has("hidePlan")) {
+                                try {
+                                    if (value.getBoolean("hidePlan")) {
+                                        if (etPlan != null) etPlan.setVisibility(View.GONE);
+                                        if (tvPlan != null) tvPlan.setVisibility(View.GONE);
+                                    }
+                                } catch (JSONException e) {
+                                    Log.e("MojoApp", "Error while parsing JSON field 'hidePlan' " + e);
+                                }
+                            }
+
+//                            if (value.has("hidePlan") && value.getBoolean("hidePlan")) {
+//                                etPlan.setVisibility(View.INVISIBLE);
+//                                tvPlanLabel.setVisibility(View.INVISIBLE);
+//                            }
                         }
 
                         //btQrCode.setOnClickListener(view -> scanQrCode(captionLabel, value));
