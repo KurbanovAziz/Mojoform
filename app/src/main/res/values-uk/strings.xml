@@ -288,6 +288,7 @@
 
     <!--    Попередження-->
     <string name="err_task_status_not_set">Вкажіть статус завдання</string>
+    <string name="err_slider_out_of_range">Значення повзунка поза діапазоном</string>
 
     <!--    Вікно 'Коментарі'-->
     <string name="dialog_comments_time_year_addition">року</string>

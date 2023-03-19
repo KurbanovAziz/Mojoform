@@ -292,6 +292,7 @@
 
     <!--    Предупреждения-->
     <string name="err_task_status_not_set">Укажите статус задачи</string>
+    <string name="err_slider_out_of_range">Значение слайдера выходит за пределы диапазона</string>
 
     <!--    Окно 'Комменарии'-->
     <string name="dialog_comments_time_year_addition">года</string>

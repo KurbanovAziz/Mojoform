@@ -289,6 +289,7 @@
 
     <!--    Warnings-->
     <string name="err_task_status_not_set">Specify the task status</string>
+    <string name="err_slider_out_of_range">Slider value out of range</string>
 
     <!--    Comments dialog-->
     <string name="dialog_comments_time_year_addition">year</string>

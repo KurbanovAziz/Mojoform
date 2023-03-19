@@ -2629,6 +2629,13 @@ public class TemplateFragment extends Fragment {
         if (container != null)
             container.setBackgroundColor(Color.TRANSPARENT);
     }
+    private void highlightSliderValue(int color) {
+        View v = getView();
+        if (v != null) {
+            EditText changeValue = v.findViewById(R.id.resultET);
+            changeValue.setTextColor(color);
+        }
+    }
 
     private ViewGroup createImgFrame(Bitmap photo) {
         LinearLayout imageContainer = (LinearLayout) ((HorizontalScrollView) currentMediaBlock.first.getChildAt(1)).getChildAt(0);
@@ -4240,6 +4247,18 @@ public class TemplateFragment extends Fragment {
                     if (!value.has("value")) {
                         totalResult = false;
                         setBlockMarkedAsRequired(value.getString("id"));
+                    } else {
+                        try {
+                            double currValue = value.getDouble("value");
+                            double maxValue = value.getDouble("max_value");
+                            if (currValue > maxValue) {
+                                highlightSliderValue(Color.RED);
+                                setBlockMarkedAsRequired(value.getString("id"));
+                                showToast(getString(R.string.err_slider_out_of_range));
+                            }
+                        } catch (JSONException e) {
+                            Log.e("MojoApp", "Error when parse slider json values" + e);
+                        }
                     }
                     break;
 
@@ -4689,6 +4708,12 @@ public class TemplateFragment extends Fragment {
         }
         return null;
     }
+
+
+    private void showToast(String message) {
+        Toast.makeText(requireActivity(), message, Toast.LENGTH_SHORT).show();
+    }
+
     private class DownloadUserAvatar extends AsyncTask<Void, Void, Void> {
         private ImageView avatarImageView;
         private Bitmap avatar;
