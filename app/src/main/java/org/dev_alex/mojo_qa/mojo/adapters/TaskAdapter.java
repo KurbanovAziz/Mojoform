@@ -137,7 +137,7 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
         mSettings = App.getContext().getSharedPreferences("templates", Context.MODE_PRIVATE);
         String templateJson = mSettings.getString(task.id + LoginHistoryService.getCurrentUser().username, "");
 
-        boolean isTaskNotDelayed = task.suspended || templateJson.equals("");
+        boolean isTaskNotDelayed = !task.suspended || templateJson.equals("");
 
             try {
                 ((LockableHorizontalScrollView) viewHolder.itemView).scrollTo(0, 0);

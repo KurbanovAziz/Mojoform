@@ -666,6 +666,13 @@ public class TasksFragment extends Fragment {
                                     task.suspended = true;
 
                                     task.taskUUID = entry.getKey().replace(LoginHistoryService.getCurrentUser().username, "");
+
+                                    /*В TaskAdapter из shared pref читается по ключу, определяемому с помощью id, а не taskUUID,
+                                    * поэтому значение taskUUID записываем и в это поле*/
+                                    try {
+                                        task.id = Long.parseLong(task.taskUUID);
+                                    } catch (NumberFormatException e) { }
+
                                     try {
                                         task.ref.id = template.getLong("longId");
                                         task.ref.type = template.getString("typeTask");
@@ -699,11 +706,13 @@ public class TasksFragment extends Fragment {
                             if (i == 1) {
                                 busyTasks = new ObjectMapper().readValue(tasksJson.toString(), new TypeReference<ArrayList<Task>>() {
                                 });
-                                for (Task busyTask : busyTasks) {
+
+                                /* Закомментировал, т.к. иначе из списка удаляются отложенные задачи закешированные (из shared pref)*/
+                                /*for (Task busyTask : busyTasks) {
                                     lastTasks.removeIf(permanentT -> permanentT.ref.id == busyTask.id);
                                     lastTasks.removeIf(permanentT -> permanentT.ref.id == busyTask.ref.id);
                                     lastTasks.removeIf(permanentT -> permanentT.id == busyTask.ref.id);
-                                }
+                                }*/
 
                                 busyTasks.addAll(lastTasks);
 
