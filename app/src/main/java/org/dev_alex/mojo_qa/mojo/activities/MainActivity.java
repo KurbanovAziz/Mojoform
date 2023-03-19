@@ -74,6 +74,7 @@ import java.util.Locale;
 import java.util.Map;
 
 import me.leolin.shortcutbadger.ShortcutBadger;
+import okhttp3.OkHttpClient;
 import okhttp3.Response;
 import okio.BufferedSink;
 import okio.Okio;
@@ -93,6 +94,7 @@ public class MainActivity extends AppCompatActivity {
                 WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED,
                 WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED
         );
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             getWindow().getDecorView().getWindowInsetsController().setSystemBarsAppearance(APPEARANCE_LIGHT_STATUS_BARS, APPEARANCE_LIGHT_STATUS_BARS);
         }

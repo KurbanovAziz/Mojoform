@@ -34,6 +34,9 @@ public class App extends Application {
                 host = "https://system.mojoform.com";
                 host = "https://system.mojoform.com";
                 host = "https://system.mojo2.ru";
+                host = "https://mojo-qa.dev-alex.org";
+                host = "https://system.mojo2.ru";
+
 
                 break;
 
@@ -41,6 +44,9 @@ public class App extends Application {
                 host = "https://mojo-qa.dev-alex.org";
                 host = "https://system.mojoform.com";
                 host = "https://system.mojo2.ru";
+                host = "https://mojo-qa.dev-alex.org";
+                host = "https://system.mojo2.ru";
+
 
 
                 break;
@@ -49,6 +55,7 @@ public class App extends Application {
                 host = "https://demo.mojoform.com";
                 host = "https://system.mojoform.com";
                 host = "https://system.mojo2.ru";
+                host = "https://mojo-qa.dev-alex.org";
                 host = "https://system.mojo2.ru";
 
 
@@ -58,6 +65,9 @@ public class App extends Application {
             default:
                 host = "https://system.mojoform.com";
                 host = "https://system.mojo2.ru";
+                host = "https://mojo-qa.dev-alex.org";
+                host = "https://system.mojo2.ru";
+
 
                 break;
         }

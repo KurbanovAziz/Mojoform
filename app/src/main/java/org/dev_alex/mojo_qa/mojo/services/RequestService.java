@@ -2,7 +2,8 @@ package org.dev_alex.mojo_qa.mojo.services;
 
 import android.util.Log;
 
-import com.readystatesoftware.chuck.ChuckInterceptor;
+
+import com.chuckerteam.chucker.api.ChuckerInterceptor;
 
 import org.dev_alex.mojo_qa.mojo.App;
 
@@ -124,8 +125,8 @@ public class RequestService {
 
     private static OkHttpClient createOkHttpClient() {
         if (TokenService.isTokenExists())
-            return new OkHttpClient().newBuilder()
-                    .connectTimeout(30, TimeUnit.SECONDS)
+            return new OkHttpClient.Builder()
+                    .addInterceptor(new ChuckerInterceptor(App.getContext()))                            .connectTimeout(30, TimeUnit.SECONDS)
                     .writeTimeout(35, TimeUnit.SECONDS)
                     .readTimeout(30, TimeUnit.SECONDS)
                     .cookieJar(new CookieJar() {
@@ -142,11 +143,13 @@ public class RequestService {
                     })
                     .build();
         else {
-            return new OkHttpClient().newBuilder()
+            return new OkHttpClient.Builder()
+                    .addInterceptor(new ChuckerInterceptor(App.getContext()))
                     .connectTimeout(30, TimeUnit.SECONDS)
                     .writeTimeout(35, TimeUnit.SECONDS)
                     .readTimeout(30, TimeUnit.SECONDS)
                     .build();
+
         }
     }
 

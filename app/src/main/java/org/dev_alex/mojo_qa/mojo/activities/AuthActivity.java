@@ -28,6 +28,8 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import androidx.appcompat.app.AppCompatActivity;
+
+import okhttp3.OkHttpClient;
 import okhttp3.Response;
 
 public class AuthActivity extends AppCompatActivity {
@@ -41,7 +43,7 @@ public class AuthActivity extends AppCompatActivity {
             getWindow().getDecorView().getWindowInsetsController().setSystemBarsAppearance(APPEARANCE_LIGHT_STATUS_BARS, APPEARANCE_LIGHT_STATUS_BARS);
         }
         initDialog();
-        
+
         if (!OnboardingActivity.isOnboardingFinished())
             startActivity(new Intent(this, OnboardingActivity.class));
 
