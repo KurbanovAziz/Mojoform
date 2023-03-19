@@ -2629,13 +2629,6 @@ public class TemplateFragment extends Fragment {
         if (container != null)
             container.setBackgroundColor(Color.TRANSPARENT);
     }
-    private void highlightSliderValue(int color) {
-        View v = getView();
-        if (v != null) {
-            EditText changeValue = v.findViewById(R.id.resultET);
-            changeValue.setTextColor(color);
-        }
-    }
 
     private ViewGroup createImgFrame(Bitmap photo) {
         LinearLayout imageContainer = (LinearLayout) ((HorizontalScrollView) currentMediaBlock.first.getChildAt(1)).getChildAt(0);
@@ -2905,6 +2898,37 @@ public class TemplateFragment extends Fragment {
                 createVideoPreview(resPath, false);
             } catch (Exception e) {
                 e.printStackTrace();
+            }
+        }
+    }
+
+    private void initMediaBlock(LinearLayout mediaLayout, JSONObject value) {
+        if (currentMediaBlock == null) currentMediaBlock = new Pair<>(mediaLayout, value);
+    }
+
+    private List<Uri> getMediaUris(JSONObject value) throws JSONException {
+        List<Uri> uris = new ArrayList<>();
+        if (value.has(MEDIA_PATH_JSON_ARRAY)) {
+            JSONArray arr = value.getJSONArray(MEDIA_PATH_JSON_ARRAY);
+            for (int i = 0; i < arr.length(); i++) {
+                JSONObject json = (JSONObject) arr.get(i);
+                String uri = (String) json.get("path");
+                uris.add(Uri.parse(uri));
+            }
+        }
+        return uris;
+    }
+
+    private void removeMediaUri(JSONObject value, Uri uri) throws JSONException {
+        if (uri == null) return;
+        if (value.has(MEDIA_PATH_JSON_ARRAY)) {
+            JSONArray arr = value.getJSONArray(MEDIA_PATH_JSON_ARRAY);
+            for (int i = 0; i < arr.length(); i++) {
+                JSONObject json = (JSONObject) arr.get(i);
+                String uriPath = (String) json.get("path");
+                if (uriPath != null && uriPath.contentEquals(uri.toString())) {
+                    arr.remove(i);
+                }
             }
         }
     }
@@ -4247,18 +4271,6 @@ public class TemplateFragment extends Fragment {
                     if (!value.has("value")) {
                         totalResult = false;
                         setBlockMarkedAsRequired(value.getString("id"));
-                    } else {
-                        try {
-                            double currValue = value.getDouble("value");
-                            double maxValue = value.getDouble("max_value");
-                            if (currValue > maxValue) {
-                                highlightSliderValue(Color.RED);
-                                setBlockMarkedAsRequired(value.getString("id"));
-                                showToast(getString(R.string.err_slider_out_of_range));
-                            }
-                        } catch (JSONException e) {
-                            Log.e("MojoApp", "Error when parse slider json values" + e);
-                        }
                     }
                     break;
 
@@ -4550,6 +4562,7 @@ public class TemplateFragment extends Fragment {
 
         boolean required = false;
 
+
         if (value.has("is_required")) {
             required = value.getBoolean("is_required");
         }
@@ -4560,9 +4573,30 @@ public class TemplateFragment extends Fragment {
             captionTv.setText(value.getString("caption"));
         }
 
-        mediaLayout.setOnClickListener(v -> {
-            startAttachFileDialogForResult(mediaFilesAdapter::add);
+        mediaFilesAdapter.addOnElementRemoveListener(uri -> {
+            try {
+                removeMediaUri(value, uri);
+            } catch (JSONException e) {
+                Log.e("MojoApp", "Error while remove media uri" + e);
+            }
         });
+
+        try {
+            mediaFilesAdapter.addAll(getMediaUris(value));
+        } catch (JSONException e) {
+            Log.e("MojoApp", "Error while get media uris" + e);
+        }
+
+        mediaLayout.setOnClickListener(v -> startAttachFileDialogForResult(data -> {
+            try {
+                initMediaBlock(mediaLayout, value);
+                addMediaPath(data.toString(), requireActivity().getContentResolver().getType(data));
+            } catch (JSONException e) {
+                Log.e("MojoApp", "Media file path creation fail" + e);
+            } finally {
+                mediaFilesAdapter.add(data);
+            }
+        }));
 
         container.addView(boxInContainerWithId(mediaLayout, value.getString("id")));
     }
@@ -4707,11 +4741,6 @@ public class TemplateFragment extends Fragment {
             Log.e("MojoApp", "Error when formed json for task status " + e);
         }
         return null;
-    }
-
-
-    private void showToast(String message) {
-        Toast.makeText(requireActivity(), message, Toast.LENGTH_SHORT).show();
     }
 
     private class DownloadUserAvatar extends AsyncTask<Void, Void, Void> {

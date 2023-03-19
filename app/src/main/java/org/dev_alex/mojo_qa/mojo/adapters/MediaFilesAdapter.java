@@ -28,6 +28,12 @@ public class MediaFilesAdapter extends RecyclerView.Adapter<MediaFilesAdapter.Me
 
     private List<Uri> mediaUriList = new ArrayList<>();
 
+    public interface OnItemRemoveEventListener {
+        void onItemRemoved(Uri uri);
+    }
+
+    private OnItemRemoveEventListener onItemRemoveEventListener = null;
+
     @NonNull
     @Override
     public MediaFileViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -53,12 +59,29 @@ public class MediaFilesAdapter extends RecyclerView.Adapter<MediaFilesAdapter.Me
         }
     }
 
+    public void addAll(List<Uri> uris) {
+        if (uris != null) {
+            mediaUriList.clear();
+            mediaUriList.addAll(uris);
+            notifyDataSetChanged();
+        }
+    }
+
     protected void remove(Uri uri) {
         if (uri != null) {
             int position = mediaUriList.indexOf(uri);
             mediaUriList.remove(uri);
             notifyItemRemoved(position);
         }
+    }
+
+    protected void notifyMediaRemoved(Uri uri) {
+        if (onItemRemoveEventListener != null)
+            onItemRemoveEventListener.onItemRemoved(uri);
+    }
+
+    public void addOnElementRemoveListener(OnItemRemoveEventListener listener) {
+        onItemRemoveEventListener = listener;
     }
 
     public class MediaFileViewHolder extends RecyclerView.ViewHolder {
@@ -129,7 +152,10 @@ public class MediaFilesAdapter extends RecyclerView.Adapter<MediaFilesAdapter.Me
         }
 
         private void removeItem(Uri uri, MediaFilesAdapter adapter) {
-            if (adapter != null) adapter.remove(uri);
+            if (adapter != null) {
+                adapter.remove(uri);
+                adapter.notifyMediaRemoved(uri);
+            }
         }
     }
 }
